@@ -5,8 +5,6 @@ using CrossValidation.Rules;
 using CrossValidation.ValidationContexts;
 
 namespace CrossValidation;
-// Foo
-// Test2
 // TODO: Convert to a class to run the tests
 // Temporary solution until https://github.com/castleproject/Core/issues/632 is fixed
 public abstract class ModelValidator<TModel>
