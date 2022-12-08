@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrossValidation", "CrossValidation\CrossValidation.csproj", "{61859220-6B96-479E-B797-FC8036473558}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrossValidationTests", "CrossValidationTests\CrossValidationTests.csproj", "{5278047D-4B12-496B-9777-3207EBC5E4B4}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{61859220-6B96-479E-B797-FC8036473558}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{61859220-6B96-479E-B797-FC8036473558}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{61859220-6B96-479E-B797-FC8036473558}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{61859220-6B96-479E-B797-FC8036473558}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5278047D-4B12-496B-9777-3207EBC5E4B4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5278047D-4B12-496B-9777-3207EBC5E4B4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5278047D-4B12-496B-9777-3207EBC5E4B4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5278047D-4B12-496B-9777-3207EBC5E4B4}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
