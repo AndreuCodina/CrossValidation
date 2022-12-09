@@ -12,13 +12,17 @@ public static class Util
         var fieldFullPath = PathExpressionVisitor.Create(fieldSelector.Body).FieldFullPath;
         TField fieldValue;
         bool isFieldSelectedDifferentThanModel;
-        
+
         if (fieldSelector.Body is MemberExpression memberExpression)
         {
             isFieldSelectedDifferentThanModel = true;
             var propertyInfo = (PropertyInfo)memberExpression.Member;
             var currentModel = GetModelRelatedToField(fieldFullPath, model);
             fieldValue = (TField)propertyInfo.GetValue(currentModel)!;
+        }
+        else if (fieldSelector.Body is MethodCallExpression)
+        {
+            throw new InvalidOperationException("Cannot use a call in a field selector");
         }
         else
         {

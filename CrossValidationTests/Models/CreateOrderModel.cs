@@ -9,7 +9,7 @@ public class CreateOrderModel
     public required DateTime? DeliveryTime { get; set; }
     public required CreateOrderModelDeliveryAddress DeliveryAddress { get; set; }
     public required IEnumerable<CreateOrderModelProduct> Products { get; set; }
-    public required IEnumerable<int> ColorIds { get; set; }
+    public required List<int> ColorIds { get; set; }
 }
 
 public class CreateOrderModelDeliveryAddress

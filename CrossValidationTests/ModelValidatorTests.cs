@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Bogus;
 using CrossValidation;
 using CrossValidationTests.Models;
 using Moq;
 using Shouldly;
 using Xunit;
-using ValidationException = CrossValidation.ValidationException;
 
 namespace CrossValidationTests;
 
@@ -237,7 +235,7 @@ public class ModelValidatorTests
             return values.Select(x => x.ToString());
         }
 
-        var colorIds = new[] { 1, 2, 3 };
+        var colorIds = new List<int> { 1, 2, 3 };
         var expectedTransformation = TransformValues(colorIds);
         var model = new CreateOrderModelBuilder()
             .WithColorIds(colorIds)
@@ -351,8 +349,8 @@ public class ModelValidatorTests
         var validatorMock = CreateOrderModelValidatorMock(validator =>
         {
             validator.RuleFor(x => x.DeliveryAddress.Number)
-                .WithCode(new Faker().Lorem.Word())
-                .WithMessage(new Faker().Lorem.Word())
+                .WithCode(new Bogus.Faker().Lorem.Word())
+                .WithMessage(new Bogus.Faker().Lorem.Word())
                 .NotNull()
                 .WithMessage(expectedMessage)
                 .GreaterThan(model.DeliveryAddress.Number + 1);

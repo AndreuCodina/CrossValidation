@@ -7,7 +7,7 @@ public class CreateOrderModelBuilder
 {
     private string? _coupon = null;
     private CreateOrderModelDeliveryAddress _deliveryAddress = new DeliveryAddressBuilder().Build();
-    private IEnumerable<int>? _colorIds = null;
+    private List<int>? _colorIds = null;
 
     public CreateOrderModel Build()
     {
@@ -52,7 +52,7 @@ public class CreateOrderModelBuilder
         return this;
     }
     
-    public CreateOrderModelBuilder WithColorIds(IEnumerable<int>? colorIds)
+    public CreateOrderModelBuilder WithColorIds(List<int>? colorIds)
     {
         _colorIds = colorIds;
         return this;
