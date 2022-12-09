@@ -1,6 +1,6 @@
 ﻿using System.Linq.Expressions;
 
-namespace CrossValidation;
+namespace CrossValidation.Utils;
 
 public class PathExpressionVisitor : ExpressionVisitor
 {

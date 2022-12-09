@@ -1,9 +1,6 @@
-﻿using CrossValidation;
-using CrossValidationTests.Models;
-using Shouldly;
-using Xunit;
+﻿using CrossValidationTests.Models;
 
-namespace CrossValidationTests;
+namespace CrossValidationTests.Rules;
 
 public class InlineRuleTests
 {

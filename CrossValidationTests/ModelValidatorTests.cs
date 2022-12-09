@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using CrossValidation;
+using CrossValidation.Rules;
 using CrossValidationTests.Models;
 using Moq;
 using Shouldly;

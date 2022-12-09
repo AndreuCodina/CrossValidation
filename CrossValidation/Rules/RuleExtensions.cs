@@ -1,9 +1,8 @@
 ﻿using System.Numerics;
-using CrossValidation.Rules;
 using CrossValidation.ValidationContexts;
 using CrossValidation.Validators;
 
-namespace CrossValidation;
+namespace CrossValidation.Rules;
 
 public static class RuleExtensions
 {

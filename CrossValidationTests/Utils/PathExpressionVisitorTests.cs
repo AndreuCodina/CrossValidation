@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
-using CrossValidation;
+using CrossValidation.Utils;
 using CrossValidationTests.Models;
 using Shouldly;
 using Xunit;
 
-namespace CrossValidationTests;
+namespace CrossValidationTests.Utils;
 
 public class PathExpressionVisitorTests
 {
