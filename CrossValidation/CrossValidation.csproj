@@ -7,8 +7,4 @@
         <LangVersion>11</LangVersion>
     </PropertyGroup>
 
-    <ItemGroup>
-      <Folder Include="CommonErrors" />
-    </ItemGroup>
-
 </Project>

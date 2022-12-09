@@ -7,4 +7,5 @@ public abstract record CommonValidationError(string Code) : ValidationError(Code
     public record NotNull() : CommonValidationError("NotNull");
     public record Null() : CommonValidationError("Null");
     public record GreaterThan<T>(T ComparisonValue) : CommonValidationError("GreaterThan");
+    public record Enum() : CommonValidationError("Enum");
 }
