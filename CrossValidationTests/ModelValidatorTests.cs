@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Bogus;
 using CrossValidation;
@@ -225,9 +226,72 @@ public class ModelValidatorTests
 
         var action = () => orderValidatorMock.Object.Validate(model);
 
-        var exception = action.ShouldThrow<InvalidOperationException>();
+        action.ShouldThrow<InvalidOperationException>();
+    }
+    
+    [Fact]
+    public void Transform_fails_when_the_field_does_not_pass_the_validator()
+    {
+        IEnumerable<string> TransformValues(IEnumerable<int> values)
+        {
+            return values.Select(x => x.ToString());
+        }
+
+        var colorIds = new[] { 1, 2, 3 };
+        var expectedTransformation = TransformValues(colorIds);
+        var model = new CreateOrderModelBuilder()
+            .WithColorIds(colorIds)
+            .Build();
+        var validatorMock = CreateOrderModelValidatorMock(validator =>
+        {
+            validator.ValidationMode = ValidationMode.AccumulateErrors;
+            
+            validator.RuleFor(x => x.ColorIds)
+                .Transform(x => x.ColorIds, x => TransformValues(x))
+                .Null();
+        });
+    
+        var action = () => validatorMock.Object.Validate(model);
+    
+        var exception = action.ShouldThrow<ValidationException>();
+        exception.Errors.First().FieldValue.ShouldBe(expectedTransformation);
+    }
+    
+    [Fact]
+    public void Field_value_is_null_when_model_and_field_selected_match()
+    {
+        object? expectedFieldValue = null;
+        var model = new CreateOrderModelBuilder().Build();
+        var validatorMock = CreateOrderModelValidatorMock(validator =>
+        {
+            validator.RuleFor(x => x)
+                .NotNull();
+        });
+
+        var action = () => validatorMock.Object.Validate(model);
+
+        var exception = action.ShouldThrow<ValidationException>();
+        exception.Errors.First().FieldValue.ShouldBe(expectedFieldValue);
+    }
+    
+    [Fact]
+    public void Field_value_has_value_when_model_and_field_selected_do_not_match()
+    {
+        var model = new CreateOrderModelBuilder().Build();
+        var expectedFieldValue = model.DeliveryAddress.Number;
+        var validatorMock = CreateOrderModelValidatorMock(validator =>
+        {
+            validator.RuleFor(x => x.DeliveryAddress.Number)
+                .GreaterThan(model.DeliveryAddress.Number + 1);
+        });
+
+        var action = () => validatorMock.Object.Validate(model);
+
+        var exception = action.ShouldThrow<ValidationException>();
+        exception.Errors.First().FieldValue.ShouldBe(expectedFieldValue);
     }
 
+    // TODO
     // [Fact]
     // public void Take_parent_path_when_the_selected_field_is_under_an_array()
     // {

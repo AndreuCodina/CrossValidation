@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.Linq.Expressions;
-using CrossValidation.Results;
+﻿using System.Linq.Expressions;
 using CrossValidation.Rules;
 using CrossValidation.ValidationContexts;
 
@@ -30,10 +28,7 @@ public abstract class ModelValidator<TModel>
 
     public ModelRule<TModel, TField> RuleFor<TField>(Expression<Func<TModel, TField>> fieldSelector)
     {
-        var context = Context!;
-        // context.FieldName = "";
-        // context.FieldValue = null;
-        return new ModelRule<TModel, TField>(Model, fieldSelector, context);
+        return ModelRule<TModel, TField>.Create(Model, Context!, fieldSelector);
     }
 
     public abstract void CreateRules();
@@ -57,28 +52,4 @@ public abstract class ModelValidator<TModel>
             throw new ValidationException(Context.Errors!);
         }
     }
-
-    // public List<ValidationError> ValidateAndReturnErrors(TModel model, ModelValidationContext childContext)
-    // {
-    //     Model = (TModel)model;
-    //     Context = childContext;
-    //     Context.ExecutionMode = ExecutionMode.ReturnErrors;
-    //     var errors = new List<ValidationError>();
-    //     CreateRules();
-    //     
-    //     // foo:
-    //     //     Console.WriteLine();
-    //
-    //     if (Context.Errors is not null)
-    //     {
-    //         errors.AddRange(Context.Errors);
-    //     }
-    //
-    //     return errors;
-    // }
-
-    // public void SetContext(ModelValidationContext childContext)
-    // {
-    //     Context = childContext;
-    // }
 }

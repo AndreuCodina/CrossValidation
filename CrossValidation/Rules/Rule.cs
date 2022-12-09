@@ -4,6 +4,9 @@ using CrossValidation.ValidationContexts;
 
 namespace CrossValidation.Rules;
 
+/// <summary>
+/// Rule to validate a field
+/// </summary>
 public abstract class Rule<TSelf, TField, TValidationContext>
     where TValidationContext : ValidationContext
 {
