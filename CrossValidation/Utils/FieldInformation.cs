@@ -1,24 +1,13 @@
 namespace CrossValidation.Utils;
 
-public class FieldInformation<TField>
-{
-    public static FieldInformation<TField> Create(
-        string fieldFullPath,
-        TField fieldValue,
-        bool isMember)
-    {
-        return new FieldInformation<TField>
-        {
-            FieldFullPath = fieldFullPath,
-            FieldValue = fieldValue,
-            IsFieldSelectedDifferentThanModel = isMember
-        };
-    }
-
-    public string FieldFullPath { get; init; }
-    public TField FieldValue { get; init; }
-
-    /// <example>True: x => x.SomeField</example>
-    /// <example>False: x => x</example>
-    public bool IsFieldSelectedDifferentThanModel { get; init; }
-}
+/// <summary>
+/// 
+/// </summary>
+/// <param name="FieldFullPath"></param>
+/// <param name="FieldValue"></param>
+/// <param name="IsFieldSelectedDifferentThanModel">Example: True: x => x.SomeField; False: x => x</param>
+/// <typeparam name="TField"></typeparam>
+public record FieldInformation<TField>(
+    string FieldFullPath,
+    TField FieldValue,
+    bool IsFieldSelectedDifferentThanModel);

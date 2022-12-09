@@ -11,25 +11,25 @@ public static class Util
     {
         var fieldFullPath = PathExpressionVisitor.Create(fieldSelector.Body).FieldFullPath;
         TField fieldValue;
-        bool isMember;
+        bool isFieldSelectedDifferentThanModel;
         
         if (fieldSelector.Body is MemberExpression memberExpression)
         {
-            isMember = true;
+            isFieldSelectedDifferentThanModel = true;
             var propertyInfo = (PropertyInfo)memberExpression.Member;
             var currentModel = GetModelRelatedToField(fieldFullPath, model);
             fieldValue = (TField)propertyInfo.GetValue(currentModel)!;
         }
         else
         {
-            isMember = false;
+            isFieldSelectedDifferentThanModel = false;
             fieldValue = (TField)(object)model!;
         }
         
-        return FieldInformation<TField>.Create(
-            fieldFullPath: fieldFullPath,
-            fieldValue: fieldValue,
-            isMember: isMember);
+        return new FieldInformation<TField>(
+            FieldFullPath: fieldFullPath,
+            FieldValue: fieldValue,
+            IsFieldSelectedDifferentThanModel: isFieldSelectedDifferentThanModel);
     }
 
     private static object GetModelRelatedToField<TModel>(string fieldFullPath, TModel model)
@@ -41,20 +41,20 @@ public static class Util
 
         if (!hasSomeNode)
         {
-            return model;
+            return model!;
         }
 
-        object currentNodeModel = model;
+        object currentNodeModel = model!;
         var propertiesInCurrentNodeModel = model!.GetType().GetProperties();
 
         foreach (var node in nodeNames)
         {
             var propertyInfo = propertiesInCurrentNodeModel.First(x => x.Name == node);
-            var childNodeModel = ConvertToChildField(propertyInfo, currentNodeModel);
+            var childNodeModel = ConvertToChildField(propertyInfo, currentNodeModel!);
             currentNodeModel = childNodeModel;
         }
 
-        return currentNodeModel;
+        return currentNodeModel!;
     }
     
     private static object ConvertToChildField(PropertyInfo propertyInfo, object parent)

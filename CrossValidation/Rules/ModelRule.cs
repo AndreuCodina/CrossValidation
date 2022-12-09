@@ -21,12 +21,12 @@ public class ModelRule<TModel, TField>
         TModel model,
         string fieldFullPath,
         TField fieldValue,
-        bool isMember)
+        bool isFieldSelectedDifferentThanModel)
     {
         Context = context;
         Model = model;
         FieldFullPath = fieldFullPath;
-        var fieldValueToAssign = isMember ? fieldValue : default;
+        var fieldValueToAssign = isFieldSelectedDifferentThanModel ? fieldValue : default;
         FieldValue = fieldValueToAssign;
         Context.FieldValue = fieldValueToAssign;
         var parentPath = context.ParentPath is not null ? context.ParentPath + "." : "";
@@ -44,7 +44,12 @@ public class ModelRule<TModel, TField>
             model,
             fieldInformation.FieldFullPath,
             fieldInformation.FieldValue,
-            fieldInformation.IsFieldSelectedDifferentThanModel);
+            fieldInformation.IsFieldSelectedDifferentThanModel)
+        {
+            Context = context,
+            Model = model,
+            FieldFullPath = fieldInformation.FieldFullPath,
+        };
     }
     
     public ModelRule<TModel, TTransformed> Transform<TTransformed>(
@@ -61,12 +66,12 @@ public class ModelRule<TModel, TField>
             fieldInformation.IsFieldSelectedDifferentThanModel);
     }
 
-    public override ModelRule<TModel, TField> GetSelf()
+    protected override ModelRule<TModel, TField> GetSelf()
     {
         return this;
     }
 
-    public override void HandleError(ValidationError error)
+    protected override void HandleError(ValidationError error)
     {
         Context.AddError(error);
         

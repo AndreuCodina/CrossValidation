@@ -2,7 +2,7 @@
 
 namespace CrossValidation.FieldValidators;
 
-public record NullValidator<TField>(TField FieldValue) : FieldValidator
+public record NullValidator<TField>(TField? FieldValue) : FieldValidator
 {
     protected override bool IsValid()
     {

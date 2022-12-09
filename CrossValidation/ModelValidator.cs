@@ -44,10 +44,7 @@ public abstract class ModelValidator<TModel>
 
         CreateRules();
 
-        // If it's not a child model and the validation mode is
-        if (!Context.IsChildContext
-            && Context.Errors is not null
-            && Context.Errors.Any()) // TODO: Remove second condition?
+        if (!Context.IsChildContext && Context.Errors is not null)
         {
             throw new ValidationException(Context.Errors!);
         }

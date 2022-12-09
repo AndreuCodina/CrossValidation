@@ -32,6 +32,6 @@ public static class RuleExtensions
         where TValidationContext : ValidationContext
         where TField : IComparable<TField>
     {
-        return rule.SetValidator(new GreaterThanValidator<TField>(rule.FieldValue, valueToCompare));
+        return rule.SetValidator(new GreaterThanValidator<TField>(rule.FieldValue!, valueToCompare));
     }
 }

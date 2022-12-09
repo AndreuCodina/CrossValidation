@@ -32,7 +32,7 @@ public class PathExpressionVisitor : ExpressionVisitor
         return base.VisitParameter(node);
     }
 
-    public void ExtractPath(Expression expression)
+    private void ExtractPath(Expression expression)
     {
         var expressionToVisit = expression is LambdaExpression lambdaExpression
             ? lambdaExpression.Body
