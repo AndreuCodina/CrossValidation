@@ -1,5 +1,6 @@
 ﻿using System.Linq.Expressions;
 using CrossValidation.Rules;
+using CrossValidation.Utils;
 using CrossValidation.ValidationContexts;
 
 namespace CrossValidation;
@@ -29,6 +30,30 @@ public abstract class ModelValidator<TModel>
     public ModelRule<TModel, TField> RuleFor<TField>(Expression<Func<TModel, TField>> fieldSelector)
     {
         return ModelRule<TModel, TField>.Create(Model, Context!, fieldSelector);
+    }
+
+    public void RuleForEach<TInnerType>(
+        Expression<Func<TModel, IEnumerable<TInnerType>>> collectionSelector,
+        Action<ModelRule<TModel, TInnerType>> action)
+    {
+        var collectionSelected = collectionSelector.Compile()(Model);
+        var fieldInformation = Util.GetFieldInformation(collectionSelector, Model);
+        var index = 0;
+
+        foreach (var innerField in collectionSelected)
+        {
+            Expression<Func<TModel, TInnerType>> innerFieldSelector = model => innerField;
+            var rule = new ModelRule<TModel, TInnerType>(
+                Context,
+                Model,
+                fieldInformation.FieldFullPath,
+                innerField,
+                fieldInformation.IsFieldSelectedDifferentThanModel,
+                innerFieldSelector,
+                index);
+            action(rule);
+            index++;
+        }
     }
 
     public abstract void CreateRules();

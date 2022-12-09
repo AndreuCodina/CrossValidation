@@ -16,13 +16,14 @@ public class ModelRule<TModel, TField>
     public string FieldFullPath { get; set; }
     public Expression<Func<TModel, TField>> FieldSelector { get; set; }
 
-    private ModelRule(
+    public ModelRule(
         ModelValidationContext context,
         TModel model,
         string fieldFullPath,
         TField fieldValue,
         bool isFieldSelectedDifferentThanModel,
-        Expression<Func<TModel, TField>> fieldSelector)
+        Expression<Func<TModel, TField>> fieldSelector,
+        int? index = null)
     {
         Context = context;
         Model = model;
@@ -30,8 +31,13 @@ public class ModelRule<TModel, TField>
         var fieldValueToAssign = isFieldSelectedDifferentThanModel ? fieldValue : default;
         FieldValue = fieldValueToAssign;
         Context.FieldValue = fieldValueToAssign;
-        var parentPath = context.ParentPath is not null ? context.ParentPath + "." : "";
-        Context.FieldName = parentPath + fieldFullPath;
+        var indexRepresentation = index is not null
+            ? $"[{index}]"
+            : "";
+        var parentPath = context.ParentPath is not null
+            ? context.ParentPath + "."
+            : "";
+        Context.FieldName = parentPath + fieldFullPath + indexRepresentation;
         FieldSelector = fieldSelector;
     }
     
@@ -47,12 +53,7 @@ public class ModelRule<TModel, TField>
             fieldInformation.FieldFullPath,
             fieldInformation.FieldValue,
             fieldInformation.IsFieldSelectedDifferentThanModel,
-            fieldSelector)
-        {
-            Context = context,
-            Model = model,
-            FieldFullPath = fieldInformation.FieldFullPath,
-        };
+            fieldSelector);
     }
     
     public ModelRule<TModel, TFieldTransformed> Transform<TFieldTransformed>(

@@ -7,8 +7,7 @@ public class InlineRule<TField>
     : Rule<
         InlineRule<TField>,
         TField,
-        InlineValidationContext
-    >
+        InlineValidationContext>
 {
     public InlineRule(TField value)
     {
