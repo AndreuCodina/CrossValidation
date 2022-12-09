@@ -246,7 +246,7 @@ public class ModelValidatorTests
             validator.ValidationMode = ValidationMode.AccumulateErrors;
             
             validator.RuleFor(x => x.ColorIds)
-                .Transform(x => x.ColorIds, x => TransformValues(x))
+                .Transform(x => TransformValues(x))
                 .Null();
         });
     
@@ -289,21 +289,6 @@ public class ModelValidatorTests
         var exception = action.ShouldThrow<ValidationException>();
         exception.Errors.First().FieldValue.ShouldBe(expectedFieldValue);
     }
-
-    // TODO
-    // [Fact]
-    // public void Take_parent_path_when_the_selected_field_is_under_an_array()
-    // {
-    //     var model = new CreateOrderModelBuilder().Build();
-    //     var validatorMock = CreateValidatorMock(validator =>
-    //     {
-    //         validator.RuleFor(x => x.DeliveryAddress.Number)
-    //             .GreaterThan(0);
-    //     });
-    //
-    //     var exception = Record.Exception(() => validatorMock.Object.Validate(model));
-    //     exception.ShouldBeNull();
-    // }
 
     [Fact]
     public void Validator_keeps_message_customization()

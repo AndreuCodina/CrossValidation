@@ -13,15 +13,16 @@ public class ModelRule<TModel, TField>
     >
 {
     public TModel Model { get; set; }
-
     public string FieldFullPath { get; set; }
+    public Expression<Func<TModel, TField>> FieldSelector { get; set; }
 
     private ModelRule(
         ModelValidationContext context,
         TModel model,
         string fieldFullPath,
         TField fieldValue,
-        bool isFieldSelectedDifferentThanModel)
+        bool isFieldSelectedDifferentThanModel,
+        Expression<Func<TModel, TField>> fieldSelector)
     {
         Context = context;
         Model = model;
@@ -31,6 +32,7 @@ public class ModelRule<TModel, TField>
         Context.FieldValue = fieldValueToAssign;
         var parentPath = context.ParentPath is not null ? context.ParentPath + "." : "";
         Context.FieldName = parentPath + fieldFullPath;
+        FieldSelector = fieldSelector;
     }
     
     public static ModelRule<TModel, TField> Create(
@@ -44,7 +46,8 @@ public class ModelRule<TModel, TField>
             model,
             fieldInformation.FieldFullPath,
             fieldInformation.FieldValue,
-            fieldInformation.IsFieldSelectedDifferentThanModel)
+            fieldInformation.IsFieldSelectedDifferentThanModel,
+            fieldSelector)
         {
             Context = context,
             Model = model,
@@ -52,18 +55,23 @@ public class ModelRule<TModel, TField>
         };
     }
     
-    public ModelRule<TModel, TTransformed> Transform<TTransformed>(
-        Expression<Func<TModel, TField>> oldFieldSelector,
-        Func<TField, TTransformed> transformer)
+    public ModelRule<TModel, TFieldTransformed> Transform<TFieldTransformed>(
+        Func<TField, TFieldTransformed> transformer)
     {
+        var oldFieldSelector = FieldSelector;
         var fieldInformation = Util.GetFieldInformation(oldFieldSelector, Model);
+        
+        Expression<Func<TModel, TFieldTransformed>> transformedFieldSelector = model =>
+            transformer(fieldInformation.FieldValue);
+        
         var fieldValueTransformed = transformer(fieldInformation.FieldValue);
-        return new ModelRule<TModel, TTransformed>(
+        return new ModelRule<TModel, TFieldTransformed>(
             Context,
             Model,
             fieldInformation.FieldFullPath,
             fieldValueTransformed,
-            fieldInformation.IsFieldSelectedDifferentThanModel);
+            fieldInformation.IsFieldSelectedDifferentThanModel,
+            transformedFieldSelector);
     }
 
     protected override ModelRule<TModel, TField> GetSelf()
