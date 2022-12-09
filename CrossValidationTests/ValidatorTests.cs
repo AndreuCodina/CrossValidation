@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Linq;
 using CrossValidation;
-using CrossValidation.FieldValidators;
+using CrossValidation.Validators;
 using CrossValidationTests.Models;
 using Shouldly;
 using Xunit;
 
 namespace CrossValidationTests;
 
-public class FieldValidatorTests
+public class ValidatorTests
 {
     [Fact]
     public void NotNull()

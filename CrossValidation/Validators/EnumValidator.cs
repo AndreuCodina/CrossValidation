@@ -1,10 +1,10 @@
 ﻿using CrossValidation.Results;
 
-namespace CrossValidation.FieldValidators;
+namespace CrossValidation.Validators;
 
 public record EnumValidator<TField>(
     TField FieldValue,
-    Type enumType) : FieldValidator
+    Type enumType) : Validator
 {
     public override bool IsValid()
     {

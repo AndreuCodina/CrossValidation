@@ -1,11 +1,11 @@
 ﻿using System.Numerics;
 using CrossValidation.Results;
 
-namespace CrossValidation.FieldValidators;
+namespace CrossValidation.Validators;
 
 public record GreaterThanValidator<TField>(
     TField FieldValue,
-    TField ComparisonValue) : FieldValidator
+    TField ComparisonValue) : Validator
     where TField : IComparisonOperators<TField, TField, bool>
 {
     public override bool IsValid()

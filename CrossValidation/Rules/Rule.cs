@@ -1,6 +1,6 @@
-﻿using CrossValidation.FieldValidators;
-using CrossValidation.Results;
+﻿using CrossValidation.Results;
 using CrossValidation.ValidationContexts;
+using CrossValidation.Validators;
 
 namespace CrossValidation.Rules;
 
@@ -15,7 +15,7 @@ public abstract class Rule<TSelf, TField, TValidationContext>
 
     protected abstract TSelf GetSelf();
 
-    public TSelf SetValidator(FieldValidator validator)
+    public TSelf SetValidator(Validator validator)
     {
         // if (Context.ValidationMode == ValidationMode.StopOnFirstError && Context.HasCurrentModelValidatorAnyError){}
         // Execute validator and take its properties and customize the error to add with ValidationContext.AddError(...)

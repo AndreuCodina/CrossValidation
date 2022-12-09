@@ -1,8 +1,8 @@
 ﻿using CrossValidation.Results;
 
-namespace CrossValidation.FieldValidators;
+namespace CrossValidation.Validators;
 
-public record NullValidator<TField>(TField? FieldValue) : FieldValidator
+public record NullValidator<TField>(TField? FieldValue) : Validator
 {
     public override bool IsValid()
     {

@@ -1,8 +1,8 @@
 ﻿using CrossValidation.Results;
 
-namespace CrossValidation.FieldValidators;
+namespace CrossValidation.Validators;
 
-public abstract record FieldValidator
+public abstract record Validator
 {
     public ValidationError? Error { get; set; }
     public abstract bool IsValid();
