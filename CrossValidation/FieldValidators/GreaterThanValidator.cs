@@ -1,18 +1,19 @@
-﻿using CrossValidation.Results;
+﻿using System.Numerics;
+using CrossValidation.Results;
 
 namespace CrossValidation.FieldValidators;
 
 public record GreaterThanValidator<TField>(
     TField FieldValue,
     TField ComparisonValue) : FieldValidator
-    where TField : IComparable<TField>
+    where TField : IComparisonOperators<TField, TField, bool>
 {
-    protected override bool IsValid()
+    public override bool IsValid()
     {
-        return FieldValue.CompareTo(ComparisonValue) > 0;
+        return FieldValue > ComparisonValue;
     }
 
-    protected override ValidationError CreateError()
+    public override ValidationError CreateError()
     {
         return new CommonValidationError.GreaterThan<TField>(ComparisonValue);
     }

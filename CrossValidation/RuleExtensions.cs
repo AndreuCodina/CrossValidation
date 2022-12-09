@@ -1,4 +1,5 @@
-﻿using CrossValidation.FieldValidators;
+﻿using System.Numerics;
+using CrossValidation.FieldValidators;
 using CrossValidation.Rules;
 using CrossValidation.ValidationContexts;
 
@@ -6,13 +7,6 @@ namespace CrossValidation;
 
 public static class RuleExtensions
 {
-    // TODO:
-    // User-defined data:
-    // - Create extension method for IRule that accepts your class/interface that define the error for your system
-    // .SetValidator(ICustomError error), and that method assign fields to the Dictionary<object, object>
-    // and call the CrossValidation validator
-    // and customize the response from ValidationException to ProblemDetails
-
     public static TSelf NotNull<TSelf, TField, TValidationContext>(
         this Rule<TSelf, TField, TValidationContext> rule)
         where TValidationContext : ValidationContext
@@ -30,7 +24,7 @@ public static class RuleExtensions
     public static TSelf GreaterThan<TSelf, TField, TValidationContext>(
         this Rule<TSelf, TField, TValidationContext> rule, TField valueToCompare)
         where TValidationContext : ValidationContext
-        where TField : IComparable<TField>
+        where TField : IComparisonOperators<TField, TField, bool>
     {
         return rule.SetValidator(new GreaterThanValidator<TField>(rule.FieldValue!, valueToCompare));
     }
