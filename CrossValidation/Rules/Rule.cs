@@ -1,24 +1,27 @@
-﻿using CrossValidation.FieldValidators;
-using CrossValidation.Results;
+﻿using CrossValidation.Results;
 using CrossValidation.ValidationContexts;
+using CrossValidation.Validators;
 
 namespace CrossValidation.Rules;
 
+/// <summary>
+/// Rule to validate a field
+/// </summary>
 public abstract class Rule<TSelf, TField, TValidationContext>
     where TValidationContext : ValidationContext
 {
-    public TField FieldValue { get; set; }
-    public TValidationContext Context { get; set; }
+    public TField? FieldValue { get; set; }
+    protected TValidationContext Context { get; set; }
 
-    public abstract TSelf GetSelf();
+    protected abstract TSelf GetSelf();
 
-    public TSelf SetValidator(FieldValidator validator)
+    public TSelf SetValidator(Validator validator)
     {
         // if (Context.ValidationMode == ValidationMode.StopOnFirstError && Context.HasCurrentModelValidatorAnyError){}
         // Execute validator and take its properties and customize the error to add with ValidationContext.AddError(...)
         // var foo = this;
 
-        if (validator.HasError())
+        if (Context.ExecuteNextValidator && validator.HasError())
         {
             // TODO:
             // If the model validator has some error && Context.ValidationMode == ValidationMode.StopOnFirstError,
@@ -39,7 +42,7 @@ public abstract class Rule<TSelf, TField, TValidationContext>
         return GetSelf();
     }
 
-    public abstract void HandleError(ValidationError error);
+    protected abstract void HandleError(ValidationError error);
 
     public TSelf WithMessage(string message)
     {

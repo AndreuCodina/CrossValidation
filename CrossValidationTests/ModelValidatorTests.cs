@@ -1,12 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
-using Bogus;
 using CrossValidation;
+using CrossValidation.Rules;
 using CrossValidationTests.Models;
 using Moq;
 using Shouldly;
 using Xunit;
-using ValidationException = CrossValidation.ValidationException;
 
 namespace CrossValidationTests;
 
@@ -225,22 +225,70 @@ public class ModelValidatorTests
 
         var action = () => orderValidatorMock.Object.Validate(model);
 
-        var exception = action.ShouldThrow<InvalidOperationException>();
+        action.ShouldThrow<InvalidOperationException>();
     }
+    
+    [Fact]
+    public void Transform_fails_when_the_field_does_not_pass_the_validator()
+    {
+        IEnumerable<string> TransformValues(IEnumerable<int> values)
+        {
+            return values.Select(x => x.ToString());
+        }
 
-    // [Fact]
-    // public void Take_parent_path_when_the_selected_field_is_under_an_array()
-    // {
-    //     var model = new CreateOrderModelBuilder().Build();
-    //     var validatorMock = CreateValidatorMock(validator =>
-    //     {
-    //         validator.RuleFor(x => x.DeliveryAddress.Number)
-    //             .GreaterThan(0);
-    //     });
-    //
-    //     var exception = Record.Exception(() => validatorMock.Object.Validate(model));
-    //     exception.ShouldBeNull();
-    // }
+        var colorIds = new List<int> { 1, 2, 3 };
+        var expectedTransformation = TransformValues(colorIds);
+        var model = new CreateOrderModelBuilder()
+            .WithColorIds(colorIds)
+            .Build();
+        var validatorMock = CreateOrderModelValidatorMock(validator =>
+        {
+            validator.ValidationMode = ValidationMode.AccumulateErrors;
+            
+            validator.RuleFor(x => x.ColorIds)
+                .Transform(x => TransformValues(x))
+                .Null();
+        });
+    
+        var action = () => validatorMock.Object.Validate(model);
+    
+        var exception = action.ShouldThrow<ValidationException>();
+        exception.Errors.First().FieldValue.ShouldBe(expectedTransformation);
+    }
+    
+    [Fact]
+    public void Field_value_is_null_when_model_and_field_selected_match()
+    {
+        object? expectedFieldValue = null;
+        var model = new CreateOrderModelBuilder().Build();
+        var validatorMock = CreateOrderModelValidatorMock(validator =>
+        {
+            validator.RuleFor(x => x)
+                .NotNull();
+        });
+
+        var action = () => validatorMock.Object.Validate(model);
+
+        var exception = action.ShouldThrow<ValidationException>();
+        exception.Errors.First().FieldValue.ShouldBe(expectedFieldValue);
+    }
+    
+    [Fact]
+    public void Field_value_has_value_when_model_and_field_selected_do_not_match()
+    {
+        var model = new CreateOrderModelBuilder().Build();
+        var expectedFieldValue = model.DeliveryAddress.Number;
+        var validatorMock = CreateOrderModelValidatorMock(validator =>
+        {
+            validator.RuleFor(x => x.DeliveryAddress.Number)
+                .GreaterThan(model.DeliveryAddress.Number + 1);
+        });
+
+        var action = () => validatorMock.Object.Validate(model);
+
+        var exception = action.ShouldThrow<ValidationException>();
+        exception.Errors.First().FieldValue.ShouldBe(expectedFieldValue);
+    }
 
     [Fact]
     public void Validator_keeps_message_customization()
@@ -287,8 +335,8 @@ public class ModelValidatorTests
         var validatorMock = CreateOrderModelValidatorMock(validator =>
         {
             validator.RuleFor(x => x.DeliveryAddress.Number)
-                .WithCode(new Faker().Lorem.Word())
-                .WithMessage(new Faker().Lorem.Word())
+                .WithCode(new Bogus.Faker().Lorem.Word())
+                .WithMessage(new Bogus.Faker().Lorem.Word())
                 .NotNull()
                 .WithMessage(expectedMessage)
                 .GreaterThan(model.DeliveryAddress.Number + 1);
@@ -344,6 +392,89 @@ public class ModelValidatorTests
 
         var exception = action.ShouldThrow<ValidationException>();
         exception.Errors.First().Code.ShouldBe(expectedCode);
+    }
+    
+    [Fact]
+    public void Execute_validators_for_all_item_collection()
+    {
+        var model = new CreateOrderModelBuilder()
+            .WithColorIds(new List<int> { 100, 90, 80 })
+            .Build();
+        var orderValidatorMock = CreateOrderModelValidatorMock(validator =>
+        {
+            validator.RuleForEach(x => x.ColorIds, x => x
+                .GreaterThan(1)
+                .GreaterThan(10));
+        });
+        
+        var action = () => orderValidatorMock.Object.Validate(model);
+
+        action.ShouldNotThrow();
+    }
+    
+    [Fact]
+    public void Execute_validators_for_all_item_collection_fails()
+    {
+        var model = new CreateOrderModelBuilder()
+            .WithColorIds(new List<int> { 100, 1, 90, 2 })
+            .Build();
+        var orderValidatorMock = CreateOrderModelValidatorMock(validator =>
+        {
+            validator.ValidationMode = ValidationMode.AccumulateErrors;
+            validator.RuleForEach(x => x.ColorIds, x => x
+                .GreaterThan(0)
+                .GreaterThan(10));
+        });
+        
+        var action = () => orderValidatorMock.Object.Validate(model);
+
+        var exception = action.ShouldThrow<ValidationException>();
+        var errors = exception.Errors.ToArray();
+        errors.Length.ShouldBe(2);
+        errors[0].FieldName.ShouldBe($"{nameof(model.ColorIds)}[1]");
+        errors[1].FieldName.ShouldBe($"{nameof(model.ColorIds)}[3]");
+    }
+    
+    [Fact]
+    public void Index_is_represented_in_field_name_when_iterate_collection()
+    {
+        var model = new CreateOrderModelBuilder()
+            .WithColorIds(new List<int> {100, 1, 2})
+            .Build();
+        var orderValidatorMock = CreateOrderModelValidatorMock(validator =>
+        {
+            validator.RuleForEach(x => x.ColorIds, x => x
+                .GreaterThan(10));
+        });
+
+        var action = () => orderValidatorMock.Object.Validate(model);
+
+        var exception = action.ShouldThrow<ValidationException>();
+        exception.Errors.Count().ShouldBe(1);
+        exception.Errors.First().FieldName.ShouldBe($"{nameof(model.ColorIds)}[1]");
+    }
+    
+    [Fact]
+    public void Validator_conditional_execution()
+    {
+        var expectedErrorMessage = "TrueCase";
+        var model = new CreateOrderModelBuilder()
+            .WithColorIds(new List<int> {100, 1, 2})
+            .Build();
+        var orderValidatorMock = CreateOrderModelValidatorMock(validator =>
+        {
+            validator.RuleFor(x => x.DeliveryAddress.Number)
+                .When(x => false)
+                .GreaterThan(model.DeliveryAddress.Number + 1)
+                .When(x => true)
+                .WithMessage(expectedErrorMessage)
+                .GreaterThan(model.DeliveryAddress.Number);
+        });
+
+        var action = () => orderValidatorMock.Object.Validate(model);
+
+        var exception = action.ShouldThrow<ValidationException>();
+        exception.Errors.First().Message.ShouldBe(expectedErrorMessage);
     }
 
     private Mock<CreateOrderModelValidator> CreateOrderModelValidatorMock(Action<CreateOrderModelValidator> validator)

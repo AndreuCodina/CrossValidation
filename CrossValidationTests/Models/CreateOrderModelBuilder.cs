@@ -7,6 +7,7 @@ public class CreateOrderModelBuilder
 {
     private string? _coupon = null;
     private CreateOrderModelDeliveryAddress _deliveryAddress = new DeliveryAddressBuilder().Build();
+    private List<int>? _colorIds = null;
 
     public CreateOrderModel Build()
     {
@@ -30,7 +31,8 @@ public class CreateOrderModelBuilder
                         1
                     }
                 }
-            }
+            },
+            ColorIds = _colorIds
         };
 
         return model;
@@ -47,6 +49,12 @@ public class CreateOrderModelBuilder
     public CreateOrderModelBuilder WithCoupon(string? coupon)
     {
         _coupon = coupon;
+        return this;
+    }
+    
+    public CreateOrderModelBuilder WithColorIds(List<int>? colorIds)
+    {
+        _colorIds = colorIds;
         return this;
     }
 

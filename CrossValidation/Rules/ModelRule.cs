@@ -1,6 +1,6 @@
 ﻿using System.Linq.Expressions;
-using System.Reflection;
 using CrossValidation.Results;
+using CrossValidation.Utils;
 using CrossValidation.ValidationContexts;
 
 namespace CrossValidation.Rules;
@@ -13,86 +13,78 @@ public class ModelRule<TModel, TField>
     >
 {
     public TModel Model { get; set; }
+    public string FieldFullPath { get; set; }
     public Expression<Func<TModel, TField>> FieldSelector { get; set; }
 
-    public string FieldFullPath { get; set; }
-    
     public ModelRule(
+        ModelValidationContext context,
         TModel model,
+        string fieldFullPath,
+        TField fieldValue,
+        bool isFieldSelectedDifferentThanModel,
         Expression<Func<TModel, TField>> fieldSelector,
-        ModelValidationContext context)
+        int? index = null)
     {
         Context = context;
         Model = model;
+        FieldFullPath = fieldFullPath;
+        var fieldValueToAssign = isFieldSelectedDifferentThanModel ? fieldValue : default;
+        FieldValue = fieldValueToAssign;
+        Context.FieldValue = fieldValueToAssign;
+        var indexRepresentation = index is not null
+            ? $"[{index}]"
+            : "";
+        var parentPath = context.ParentPath is not null
+            ? context.ParentPath + "."
+            : "";
+        Context.FieldName = parentPath + fieldFullPath + indexRepresentation;
         FieldSelector = fieldSelector;
-        FieldFullPath = PathExpressionVisitor.Create(fieldSelector.Body).FieldFullPath;
-
-        if (fieldSelector.Body is MemberExpression memberExpression)
-        {
-            var propertyInfo = (PropertyInfo)memberExpression.Member;
-            var currentModel = GetModelRelatedToField();
-            FieldValue = (TField)propertyInfo.GetValue(currentModel)!;
-        }
-        else
-        {
-            FieldValue = (TField)((object)model!);
-        }
-
-        var parentPath = Context.ParentPath is not null ? Context.ParentPath + "." : "";
-        context.FieldName = parentPath + FieldFullPath;
-        context.FieldValue = FieldValue;
     }
-
-    public object GetModelRelatedToField()
+    
+    public static ModelRule<TModel, TField> Create(
+        TModel model,
+        ModelValidationContext context,
+        Expression<Func<TModel, TField>> fieldSelector)
     {
-        var nodeNames = FieldFullPath.Split('.')
-            .SkipLast(1) // Remove the field selected
-            .ToList();
-        var hasSomeNode = !(nodeNames.Count == 1 && nodeNames[0] == "");
-
-        if (!hasSomeNode)
-        {
-            return Model!;
-        }
-
-        object currentNodeModel = Model!;
-        var propertiesInCurrentNodeModel = Model!.GetType().GetProperties();
-
-        foreach (var node in nodeNames)
-        {
-            var propertyInfo = propertiesInCurrentNodeModel.First(x => x.Name == node);
-            var childNodeModel = ConvertToChildField(propertyInfo, currentNodeModel);
-            currentNodeModel = childNodeModel;
-        }
-
-        return currentNodeModel;
+        var fieldInformation = Util.GetFieldInformation(fieldSelector, model);
+        return new ModelRule<TModel, TField>(
+            context,
+            model,
+            fieldInformation.FieldFullPath,
+            fieldInformation.FieldValue,
+            fieldInformation.IsFieldSelectedDifferentThanModel,
+            fieldSelector);
     }
-
-    public object ConvertToChildField(PropertyInfo propertyInfo, object parent)
+    
+    public ModelRule<TModel, TFieldTransformed> Transform<TFieldTransformed>(
+        Func<TField, TFieldTransformed> transformer)
     {
-        var source = propertyInfo.GetValue(parent, null)!;
-        var destination = Activator.CreateInstance(propertyInfo.PropertyType)!;
-
-        foreach (var prop in destination.GetType().GetProperties().ToList())
-        {
-            var value = source.GetType().GetProperty(prop.Name)!.GetValue(source, null);
-            prop.SetValue(destination, value, null);
-        }
-
-        return destination;
+        var oldFieldSelector = FieldSelector;
+        var fieldInformation = Util.GetFieldInformation(oldFieldSelector, Model);
+        
+        Expression<Func<TModel, TFieldTransformed>> transformedFieldSelector = model =>
+            transformer(fieldInformation.FieldValue);
+        
+        var fieldValueTransformed = transformer(fieldInformation.FieldValue);
+        return new ModelRule<TModel, TFieldTransformed>(
+            Context,
+            Model,
+            fieldInformation.FieldFullPath,
+            fieldValueTransformed,
+            fieldInformation.IsFieldSelectedDifferentThanModel,
+            transformedFieldSelector);
     }
 
-    public override ModelRule<TModel, TField> GetSelf()
+    protected override ModelRule<TModel, TField> GetSelf()
     {
         return this;
     }
 
-    public override void HandleError(ValidationError error)
+    protected override void HandleError(ValidationError error)
     {
         Context.AddError(error);
         
-        if (Context.ValidationMode == ValidationMode.StopOnFirstError
-            && Context.Errors != null)
+        if (Context is {ValidationMode: ValidationMode.StopOnFirstError, Errors: { }})
         {
             throw new ValidationException(Context.Errors!);
         }
@@ -109,6 +101,12 @@ public class ModelRule<TModel, TField>
         var newErrors = validator.Context.Errors;
         validator.Context = oldContext;
         validator.Context.Errors = newErrors;
+        return this;
+    }
+    
+    public ModelRule<TModel, TField> When(Func<TModel, bool> condition)
+    {
+        Context.ExecuteNextValidator = condition(Model);
         return this;
     }
 }

@@ -5,30 +5,31 @@ namespace CrossValidationTests.Models;
 
 public class CreateOrderModel
 {
-    public string? Coupon { get; set; }
-    public DateTime? DeliveryTime { get; set; }
-    public CreateOrderModelDeliveryAddress DeliveryAddress { get; set; }
-    public IEnumerable<CreateOrderModelProduct> Products { get; set; }
+    public required string? Coupon { get; set; }
+    public required DateTime? DeliveryTime { get; set; }
+    public required CreateOrderModelDeliveryAddress DeliveryAddress { get; set; }
+    public required IEnumerable<CreateOrderModelProduct> Products { get; set; }
+    public required List<int> ColorIds { get; set; }
 }
 
 public class CreateOrderModelDeliveryAddress
 {
-    public string Street { get; set; }
-    public int Number { get; set; }
-    public CreateOrderModelAddressInformation Information { get; set; }
+    public required string Street { get; set; }
+    public required int Number { get; set; }
+    public required CreateOrderModelAddressInformation Information { get; set; }
 }
     
 public class CreateOrderModelAddressInformation
 {
-    public bool IsGood { get; set; }
+    public required bool IsGood { get; set; }
 }
 
 public class CreateOrderModelProduct
 {
-    public int ProductId { get; set; }
-    public int Quantity { get; set; }
-    public IEnumerable<CreateOrderModelProductColor> Colors { get; set; }
-    public IEnumerable<int> SizeIds { get; set; }
+    public required int ProductId { get; set; }
+    public required int Quantity { get; set; }
+    public required IEnumerable<CreateOrderModelProductColor> Colors { get; set; }
+    public required IEnumerable<int> SizeIds { get; set; }
 }
     
 public enum CreateOrderModelProductColor

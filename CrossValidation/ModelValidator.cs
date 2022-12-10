@@ -1,11 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.Linq.Expressions;
-using CrossValidation.Results;
+﻿using System.Linq.Expressions;
 using CrossValidation.Rules;
+using CrossValidation.Utils;
 using CrossValidation.ValidationContexts;
 
 namespace CrossValidation;
-
 // TODO: Convert to a class to run the tests
 // Temporary solution until https://github.com/castleproject/Core/issues/632 is fixed
 public abstract class ModelValidator<TModel>
@@ -31,10 +29,31 @@ public abstract class ModelValidator<TModel>
 
     public ModelRule<TModel, TField> RuleFor<TField>(Expression<Func<TModel, TField>> fieldSelector)
     {
-        var context = Context!;
-        // context.FieldName = "";
-        // context.FieldValue = null;
-        return new ModelRule<TModel, TField>(Model, fieldSelector, context);
+        return ModelRule<TModel, TField>.Create(Model, Context!, fieldSelector);
+    }
+
+    public void RuleForEach<TInnerType>(
+        Expression<Func<TModel, IEnumerable<TInnerType>>> collectionSelector,
+        Action<ModelRule<TModel, TInnerType>> action)
+    {
+        var collectionSelected = collectionSelector.Compile()(Model);
+        var fieldInformation = Util.GetFieldInformation(collectionSelector, Model);
+        var index = 0;
+
+        foreach (var innerField in collectionSelected)
+        {
+            Expression<Func<TModel, TInnerType>> innerFieldSelector = model => innerField;
+            var rule = new ModelRule<TModel, TInnerType>(
+                Context,
+                Model,
+                fieldInformation.FieldFullPath,
+                innerField,
+                fieldInformation.IsFieldSelectedDifferentThanModel,
+                innerFieldSelector,
+                index);
+            action(rule);
+            index++;
+        }
     }
 
     public abstract void CreateRules();
@@ -50,36 +69,9 @@ public abstract class ModelValidator<TModel>
 
         CreateRules();
 
-        // If it's not a child model and the validation mode is
-        if (!Context.IsChildContext
-            && Context.Errors is not null
-            && Context.Errors.Any()) // TODO: Remove second condition?
+        if (!Context.IsChildContext && Context.Errors is not null)
         {
             throw new ValidationException(Context.Errors!);
         }
     }
-
-    // public List<ValidationError> ValidateAndReturnErrors(TModel model, ModelValidationContext childContext)
-    // {
-    //     Model = (TModel)model;
-    //     Context = childContext;
-    //     Context.ExecutionMode = ExecutionMode.ReturnErrors;
-    //     var errors = new List<ValidationError>();
-    //     CreateRules();
-    //     
-    //     // foo:
-    //     //     Console.WriteLine();
-    //
-    //     if (Context.Errors is not null)
-    //     {
-    //         errors.AddRange(Context.Errors);
-    //     }
-    //
-    //     return errors;
-    // }
-
-    // public void SetContext(ModelValidationContext childContext)
-    // {
-    //     Context = childContext;
-    // }
 }
