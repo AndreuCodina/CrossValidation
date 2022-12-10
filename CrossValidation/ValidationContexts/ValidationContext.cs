@@ -9,6 +9,7 @@ public abstract class ValidationContext
     public List<ValidationError>? Errors { get; set; }
     public string FieldName { get; set; } = "";
     public object? FieldValue { get; set; }
+    public bool ExecuteNextValidator { get; set; } = true;
 
     public ValidationContext()
     {
@@ -32,6 +33,7 @@ public abstract class ValidationContext
     {
         Code = null;
         Message = null;
+        ExecuteNextValidator = true;
     }
 
     public void SetCode(string code)

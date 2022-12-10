@@ -21,7 +21,7 @@ public abstract class Rule<TSelf, TField, TValidationContext>
         // Execute validator and take its properties and customize the error to add with ValidationContext.AddError(...)
         // var foo = this;
 
-        if (validator.HasError())
+        if (Context.ExecuteNextValidator && validator.HasError())
         {
             // TODO:
             // If the model validator has some error && Context.ValidationMode == ValidationMode.StopOnFirstError,

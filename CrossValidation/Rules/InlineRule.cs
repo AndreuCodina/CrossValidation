@@ -26,4 +26,16 @@ public class InlineRule<TField>
         Context.AddError(error);
         throw new ValidationException(Context.Errors!);
     }
+
+    public InlineRule<TField> When(bool condition)
+    {
+        Context.ExecuteNextValidator = condition;
+        return this;
+    }
+    
+    public InlineRule<TField> When(Func<TField, bool> condition)
+    {
+        Context.ExecuteNextValidator = condition(FieldValue);
+        return this;
+    }
 }

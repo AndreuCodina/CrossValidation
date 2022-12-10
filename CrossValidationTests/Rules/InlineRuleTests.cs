@@ -1,22 +1,34 @@
-﻿using CrossValidationTests.Models;
+﻿using System.Linq;
+using CrossValidation;
+using CrossValidation.Rules;
+using CrossValidationTests.Models;
+using Shouldly;
+using Xunit;
 
 namespace CrossValidationTests.Rules;
 
 public class InlineRuleTests
 {
-    private readonly FirstLevelModel _model;
+    private CreateOrderModel _model;
 
     public InlineRuleTests()
     {
-        _model = new FirstLevelModelBuilder().Build();
+        _model = new CreateOrderModelBuilder().Build();
     }
-    
-    // [Fact]
-    // public void Foo()
-    // {
-    //     var rule = new InlineRule<int>(_model.Property);
-    //     var fooo =rule.fieldn;
-    //     
-    //     fooo.ShouldBe(1);
-    // }
+
+    [Fact]
+    public void Validator_conditional_execution()
+    {
+        var expectedErrorMessage = "TrueCase";
+        _model = new CreateOrderModelBuilder().Build();
+        var action = () => new InlineRule<int>(_model.DeliveryAddress.Number)
+            .When(x => false)
+            .GreaterThan(_model.DeliveryAddress.Number + 1)
+            .When(true)
+            .WithMessage(expectedErrorMessage)
+            .GreaterThan(_model.DeliveryAddress.Number);
+
+        var exception = action.ShouldThrow<ValidationException>();
+        exception.Errors.First().Message.ShouldBe(expectedErrorMessage);
+    }
 }

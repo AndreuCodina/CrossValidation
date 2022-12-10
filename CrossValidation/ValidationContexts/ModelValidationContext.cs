@@ -5,7 +5,6 @@ public class ModelValidationContext : ValidationContext
     public string? ParentPath { get; set; }
     public ValidationMode ValidationMode { get; set; } = ValidationMode.StopOnFirstError;
     public bool IsChildContext { get; set; }
-    
 
     public ModelValidationContext CloneForChildModelValidator(string parentPath)
     {

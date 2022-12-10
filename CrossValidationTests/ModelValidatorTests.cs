@@ -453,6 +453,29 @@ public class ModelValidatorTests
         exception.Errors.Count().ShouldBe(1);
         exception.Errors.First().FieldName.ShouldBe($"{nameof(model.ColorIds)}[1]");
     }
+    
+    [Fact]
+    public void Validator_conditional_execution()
+    {
+        var expectedErrorMessage = "TrueCase";
+        var model = new CreateOrderModelBuilder()
+            .WithColorIds(new List<int> {100, 1, 2})
+            .Build();
+        var orderValidatorMock = CreateOrderModelValidatorMock(validator =>
+        {
+            validator.RuleFor(x => x.DeliveryAddress.Number)
+                .When(x => false)
+                .GreaterThan(model.DeliveryAddress.Number + 1)
+                .When(x => true)
+                .WithMessage(expectedErrorMessage)
+                .GreaterThan(model.DeliveryAddress.Number);
+        });
+
+        var action = () => orderValidatorMock.Object.Validate(model);
+
+        var exception = action.ShouldThrow<ValidationException>();
+        exception.Errors.First().Message.ShouldBe(expectedErrorMessage);
+    }
 
     private Mock<CreateOrderModelValidator> CreateOrderModelValidatorMock(Action<CreateOrderModelValidator> validator)
     {

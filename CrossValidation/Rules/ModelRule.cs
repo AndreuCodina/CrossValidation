@@ -103,4 +103,10 @@ public class ModelRule<TModel, TField>
         validator.Context.Errors = newErrors;
         return this;
     }
+    
+    public ModelRule<TModel, TField> When(Func<TModel, bool> condition)
+    {
+        Context.ExecuteNextValidator = condition(Model);
+        return this;
+    }
 }
