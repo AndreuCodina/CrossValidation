@@ -62,4 +62,13 @@ public static class RuleExtensions
         
         return rule.SetValidator(new EnumValidator<string>(rule.FieldValue!, enumType));
     }
+    
+    public static TSelf Length<TSelf, TValidationContext>(
+        this Rule<TSelf, string, TValidationContext> rule,
+        int minimum,
+        int maximum)
+        where TValidationContext : ValidationContext
+    {
+        return rule.SetValidator(new LengthValidator(rule.FieldValue!, minimum, maximum));
+    }
 }
