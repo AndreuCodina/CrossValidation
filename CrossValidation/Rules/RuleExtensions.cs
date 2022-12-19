@@ -69,6 +69,6 @@ public static class RuleExtensions
         int maximum)
         where TValidationContext : ValidationContext
     {
-        return rule.SetValidator(new LengthValidator(rule.FieldValue!, minimum, maximum));
+        return rule.SetValidator(new LengthRangeValidator(rule.FieldValue!, minimum, maximum));
     }
 }

@@ -13,11 +13,11 @@ public class PathExpressionVisitorTests
     [Fact]
     public void Field_name_and_full_path_are_equal_with_one_level()
     {
-        var expectedFieldName = nameof(FirstLevelModel.Property);
-        var expectedFieldFullPath = nameof(FirstLevelModel.Property);
+        var expectedFieldName = nameof(ParentModel.NestedEnum);
+        var expectedFieldFullPath = nameof(ParentModel.NestedEnum);
 
-        var expression = CreateExpressionFromDelegate<FirstLevelModel, int>(model =>
-            model.Property);
+        var expression = CreateExpressionFromDelegate<ParentModel, NestedEnum>(model =>
+            model.NestedEnum);
 
         var visitor = PathExpressionVisitor.Create(expression);
         
@@ -28,16 +28,16 @@ public class PathExpressionVisitorTests
     [Fact]
     public void Field_name_is_part_of_full_path_with_multilevel()
     {
-        var expectedFieldName = nameof(FirstLevelModel.SecondLevel.ThirdLevel.Property);
+        var expectedFieldName = nameof(ParentModel.NestedModel.NestedNestedModel.Bool);
         var expectedFieldFullPath = string.Join('.', new List<string>
         {
-            nameof(FirstLevelModel.SecondLevel),
-            nameof(FirstLevelModel.SecondLevel.ThirdLevel),
-            nameof(FirstLevelModel.SecondLevel.ThirdLevel.Property),
+            nameof(ParentModel.NestedModel),
+            nameof(ParentModel.NestedModel.NestedNestedModel),
+            nameof(ParentModel.NestedModel.NestedNestedModel.Bool),
         });
 
-        var expression = CreateExpressionFromDelegate<FirstLevelModel, int>(model =>
-            model.SecondLevel.ThirdLevel.Property);
+        var expression = CreateExpressionFromDelegate<ParentModel, bool>(model =>
+            model.NestedModel.NestedNestedModel.Bool);
 
         var visitor = PathExpressionVisitor.Create(expression);
         
@@ -52,7 +52,7 @@ public class PathExpressionVisitorTests
         var expectedFieldName = "";
         var expectedFieldFullPath = "";
 
-        var expression = CreateExpressionFromDelegate<FirstLevelModel, FirstLevelModel>(model => model);
+        var expression = CreateExpressionFromDelegate<ParentModel, ParentModel>(model => model);
 
         var visitor = PathExpressionVisitor.Create(expression);
         
@@ -60,8 +60,8 @@ public class PathExpressionVisitorTests
         visitor.FieldFullPath.ShouldBe(expectedFieldFullPath);
     }
 
-    private Expression<Func<TModel, TField>> CreateExpressionFromDelegate<TModel, TField>(
-        Expression<Func<TModel, TField>> expression)
+    private Expression<Func<TModel, TField?>> CreateExpressionFromDelegate<TModel, TField>(
+        Expression<Func<TModel, TField?>> expression)
     {
         return expression;
     }

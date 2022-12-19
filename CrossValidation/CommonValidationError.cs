@@ -21,7 +21,7 @@ public abstract record CommonValidationError(string Code) : ResXValidationError(
     
     public record Enum() : CommonValidationError("Enum");
     
-    public record Length(int Minimum, int Maximum) :
+    public record LengthRange(int Minimum, int Maximum) :
         CommonValidationError(nameof(ErrorResource.Length))
     {
         public override void AddPlaceHolderValues()

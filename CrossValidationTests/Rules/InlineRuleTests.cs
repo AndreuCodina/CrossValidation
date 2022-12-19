@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using CrossValidation;
 using CrossValidation.Rules;
+using CrossValidationTests.Builders;
 using CrossValidationTests.Models;
 using Shouldly;
 using Xunit;
@@ -9,25 +10,25 @@ namespace CrossValidationTests.Rules;
 
 public class InlineRuleTests
 {
-    private CreateOrderModel _model;
+    private readonly ParentModel _model;
 
     public InlineRuleTests()
     {
-        _model = new CreateOrderModelBuilder().Build();
+        _model = new ParentModelBuilder().Build();
     }
 
     [Fact]
     public void Validator_conditional_execution()
     {
-        var expectedErrorMessage = "TrueCase";
-        var action = () => new InlineRule<int>(_model.DeliveryAddress.Number)
+        var expectedMessage = "TrueCase";
+        var action = () => new InlineRule<int>(_model.NestedModel.Int)
             .When(x => false)
-            .GreaterThan(_model.DeliveryAddress.Number + 1)
+            .GreaterThan(_model.NestedModel.Int + 1)
             .When(true)
-            .WithMessage(expectedErrorMessage)
-            .GreaterThan(_model.DeliveryAddress.Number);
+            .WithMessage(expectedMessage)
+            .GreaterThan(_model.NestedModel.Int);
 
         var exception = action.ShouldThrow<ValidationException>();
-        exception.Errors.First().Message.ShouldBe(expectedErrorMessage);
+        exception.Errors.First().Message.ShouldBe(expectedMessage);
     }
 }

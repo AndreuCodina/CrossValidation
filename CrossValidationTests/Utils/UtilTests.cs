@@ -1,7 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using CrossValidation.Utils;
-using CrossValidationTests.Models;
+using CrossValidationTests.Builders;
 using Shouldly;
 using Xunit;
 
@@ -12,23 +13,25 @@ public class UtilTests
     [Fact]
     public void Field_selector_with_method_call_fails()
     {
-        var model = new CreateOrderModelBuilder().Build();
+        var model = new ParentModelBuilder()
+            .WithNullableIntList(new List<int> {1})
+            .Build();
         
         var action = () =>
-            Util.GetFieldInformation(x => x.ColorIds.First(), model);
+            Util.GetFieldInformation(x => x.NullableIntList!.First(), model);
         action.ShouldThrow<InvalidOperationException>();
         
         action = () =>
-            Util.GetFieldInformation(x => x.ColorIds[0], model);
+            Util.GetFieldInformation(x => x.NullableIntList![0], model);
         action.ShouldThrow<InvalidOperationException>();
     }
     
     [Fact]
     public void Field_selector_to_null_field_returns_null_value()
     {
-        var model = new CreateOrderModelBuilder().Build();
+        var model = new ParentModelBuilder().Build();
         
-        var result = Util.GetFieldInformation(x => x.intNullable, model);
+        var result = Util.GetFieldInformation(x => x.NullableInt, model);
         
         result.Value.ShouldBeNull();
     }
@@ -36,7 +39,7 @@ public class UtilTests
     [Fact]
     public void Field_selector_to_same_model_returns_model()
     {
-        var model = new CreateOrderModelBuilder().Build();
+        var model = new ParentModelBuilder().Build();
         
         var result = Util.GetFieldInformation(x => x, model);
         
@@ -46,9 +49,9 @@ public class UtilTests
     [Fact]
     public void Field_selector_to_child_model_returns_child_model()
     {
-        var model = new CreateOrderModelBuilder().Build();
+        var model = new ParentModelBuilder().Build();
         
-        var result = Util.GetFieldInformation(x => x.DeliveryAddress, model);
+        var result = Util.GetFieldInformation(x => x.NestedModel, model);
 
         result.Value.ShouldNotBeNull();
     }
