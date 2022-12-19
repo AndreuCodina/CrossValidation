@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using CrossValidation;
+using CrossValidation.Resources;
 using CrossValidation.Results;
 using CrossValidation.Rules;
 using CrossValidationTests.Builders;
@@ -26,9 +27,9 @@ public class ModelValidatorTests
                 .NotNull();
         });
 
-        var exception = Record.Exception(() => parentModelValidator.Validate(model));
+        var action = () => parentModelValidator.Validate(model);
 
-        exception.ShouldBeNull();
+        action.ShouldNotThrow();
     }
 
     [Fact]
@@ -43,8 +44,8 @@ public class ModelValidatorTests
 
         var action = () => parentModelValidator.Validate(model);
 
-        var exception = action.ShouldThrow<ValidationException>();
-        exception.Errors.First().Code.ShouldBe("NotNull");
+        var error = action.ShouldThrow<ValidationException>().Errors[0];
+        error.Code.ShouldBe(nameof(ErrorResource.NotNull));
     }
 
     [Fact]
@@ -56,9 +57,9 @@ public class ModelValidatorTests
             validator.RuleFor(x => x);
         });
 
-        var exception = Record.Exception(() => parentModelValidator.Validate(model));
+        var action = () => parentModelValidator.Validate(model);
 
-        exception.ShouldBeNull();
+        action.ShouldNotThrow();
     }
 
     [Fact]
@@ -70,14 +71,14 @@ public class ModelValidatorTests
         var parentModelValidator = CreateParentModelValidator(validator =>
         {
             validator.RuleFor(x => x.NestedModel.Int)
-                .GreaterThan(model.NestedModel.Int + 1);
+                .GreaterThan(model.NestedModel.Int);
         });
 
         var action = () => parentModelValidator.Validate(model);
 
-        var exception = action.ShouldThrow<ValidationException>();
-        exception.Errors.First().FieldName.ShouldBe(expectedFieldName);
-        exception.Errors.First().FieldValue.ShouldBe(expectedFieldValue);
+        var error = action.ShouldThrow<ValidationException>().Errors[0];
+        error.FieldName.ShouldBe(expectedFieldName);
+        error.FieldValue.ShouldBe(expectedFieldValue);
     }
 
     [Fact]
@@ -99,9 +100,9 @@ public class ModelValidatorTests
 
         var action = () => parentModelValidator.Validate(model);
 
-        var exception = action.ShouldThrow<ValidationException>();
-        exception.Errors.First().FieldName.ShouldBe(expectedFieldName);
-        exception.Errors.First().FieldValue.ShouldBe(expectedFieldValue);
+        var error = action.ShouldThrow<ValidationException>().Errors[0];
+        error.FieldName.ShouldBe(expectedFieldName);
+        error.FieldValue.ShouldBe(expectedFieldValue);
     }
 
     [Fact]
@@ -122,9 +123,9 @@ public class ModelValidatorTests
 
         var action = () => parentModelValidator.Validate(model);
 
-        var exception = action.ShouldThrow<ValidationException>();
-        exception.Errors.First().FieldName.ShouldBe(expectedFieldName);
-        exception.Errors.First().FieldValue.ShouldBe(expectedFieldValue);
+        var error = action.ShouldThrow<ValidationException>().Errors[0];
+        error.FieldName.ShouldBe(expectedFieldName);
+        error.FieldValue.ShouldBe(expectedFieldValue);
     }
     
     [Fact]
@@ -160,9 +161,9 @@ public class ModelValidatorTests
 
         var action = () => parentModelValidator.Validate(model);
 
-        var exception = action.ShouldThrow<ValidationException>();
-        exception.Errors.Count().ShouldBe(1);
-        exception.Errors.First().Code.ShouldBe(expectedCode);
+        var errors = action.ShouldThrow<ValidationException>().Errors;
+        errors.Count.ShouldBe(1);
+        errors[0].Code.ShouldBe(expectedCode);
     }
     
 
@@ -178,9 +179,9 @@ public class ModelValidatorTests
         {
             validator.RuleFor(x => x.Int)
                 .WithCode(expectedCodes[1])
-                .GreaterThan(model.NestedModel.Int + 1)
+                .GreaterThan(model.NestedModel.Int)
                 .WithCode(expectedCodes[2])
-                .GreaterThan(model.NestedModel.Int + 1);
+                .GreaterThan(model.NestedModel.Int);
             validator.RuleFor(x => x.NestedNestedModel)
                 .WithCode("UnexpectedErrorCode")
                 .NotNull()
@@ -199,15 +200,15 @@ public class ModelValidatorTests
                 .Null();
             validator.RuleFor(x => x.NestedModel.Int)
                 .WithCode(expectedCodes[5])
-                .GreaterThan(model.NestedModel.Int + 1)
+                .GreaterThan(model.NestedModel.Int)
                 .WithCode(expectedCodes[6])
-                .GreaterThan(model.NestedModel.Int + 1);
+                .GreaterThan(model.NestedModel.Int);
         });
 
         var action = () => parentModelValidator.Validate(model);
 
-        var exception = action.ShouldThrow<ValidationException>();
-        exception.Errors.Select(x => x.Code).ShouldBe(expectedCodes);
+        var errors = action.ShouldThrow<ValidationException>().Errors;
+        errors.Select(x => x.Code).ShouldBe(expectedCodes);
     }
 
     [Fact]
@@ -221,7 +222,7 @@ public class ModelValidatorTests
                 .GreaterThan(10);
             validator.RuleFor(x => x.Int)
                 .WithCode("UnexpectedErrorCode")
-                .GreaterThan(model.NestedModel.Int + 1);
+                .GreaterThan(model.NestedModel.Int);
         });
         var parentModelValidator = CreateParentModelValidator(validator =>
         {
@@ -258,8 +259,8 @@ public class ModelValidatorTests
     
         var action = () => parentModelValidator.Validate(model);
     
-        var exception = action.ShouldThrow<ValidationException>();
-        exception.Errors.First().FieldValue.ShouldBe(expectedTransformation);
+        var error = action.ShouldThrow<ValidationException>().Errors[0];
+        error.FieldValue.ShouldBe(expectedTransformation);
     }
     
     [Fact]
@@ -275,8 +276,8 @@ public class ModelValidatorTests
 
         var action = () => parentModelValidator.Validate(model);
 
-        var exception = action.ShouldThrow<ValidationException>();
-        exception.Errors.First().FieldValue.ShouldBe(expectedFieldValue);
+        var error = action.ShouldThrow<ValidationException>().Errors[0];
+        error.FieldValue.ShouldBe(expectedFieldValue);
     }
     
     [Fact]
@@ -287,13 +288,13 @@ public class ModelValidatorTests
         var parentModelValidator = CreateParentModelValidator(validator =>
         {
             validator.RuleFor(x => x.NestedModel.Int)
-                .GreaterThan(model.NestedModel.Int + 1);
+                .GreaterThan(model.NestedModel.Int);
         });
 
         var action = () => parentModelValidator.Validate(model);
 
-        var exception = action.ShouldThrow<ValidationException>();
-        exception.Errors.First().FieldValue.ShouldBe(expectedFieldValue);
+        var error = action.ShouldThrow<ValidationException>().Errors[0];
+        error.FieldValue.ShouldBe(expectedFieldValue);
     }
 
     [Fact]
@@ -310,8 +311,8 @@ public class ModelValidatorTests
 
         var action = () => parentModelValidator.Validate(model);
 
-        var exception = action.ShouldThrow<ValidationException>();
-        exception.Errors.First().Message.ShouldBe(expectedMessage);
+        var error = action.ShouldThrow<ValidationException>().Errors[0];
+        error.Message.ShouldBe(expectedMessage);
     }
 
     [Fact]
@@ -328,26 +329,25 @@ public class ModelValidatorTests
 
         var action = () => parentModelValidator.Validate(model);
 
-        var exception = action.ShouldThrow<ValidationException>();
-        exception.Errors.First().Code.ShouldBe(expectedCode);
+        var error = action.ShouldThrow<ValidationException>().Errors[0];
+        error.Code.ShouldBe(expectedCode);
     }
     
     [Fact]
     public void Validator_keeps_error_customization()
     {
-        var expectedError = new CustomErrorWithCode("COD123");
         var model = new ParentModelBuilder().Build();
         var parentModelValidator = CreateParentModelValidator(validator =>
         {
             validator.RuleFor(x => x.NullableString)
-                .WithError(expectedError)
+                .WithError(new CustomErrorWithCode("COD123"))
                 .NotNull();
         });
         
         var action = () => parentModelValidator.Validate(model);
-        
-        var exception = action.ShouldThrow<ValidationException>();
-        exception.Errors.First().ShouldBeOfType<CustomErrorWithCode>();
+
+        var error = action.ShouldThrow<ValidationException>().Errors[0];
+        error.ShouldBeOfType<CustomErrorWithCode>();
     }
     
     [Fact]
@@ -363,8 +363,8 @@ public class ModelValidatorTests
         
         var action = () => parentModelValidator.Validate(model);
         
-        var exception = action.ShouldThrow<ValidationException>();
-        var error = exception.Errors.First().ShouldBeOfType<CommonValidationError.GreaterThan<int>>();
+        var errors = action.ShouldThrow<ValidationException>().Errors;
+        var error = errors[0].ShouldBeOfType<CommonValidationError.GreaterThan<int>>();
         error.ComparisonValue.ShouldBe(comparisonValue);
         error.Code.ShouldBe("GreaterThan");
     }
@@ -385,8 +385,8 @@ public class ModelValidatorTests
         
         var action = () => parentModelValidator.Validate(model);
         
-        var exception = action.ShouldThrow<ValidationException>();
-        var error = exception.Errors.First().ShouldBeOfType<CustomErrorWithCode>();
+        var error = action.ShouldThrow<ValidationException>().Errors[0];
+        error.ShouldBeOfType<CustomErrorWithCode>();
         error.Code.ShouldBe(expectedError.Code);
         error.Message.ShouldBe(expectedMessage);
     }
@@ -407,8 +407,8 @@ public class ModelValidatorTests
         
         var action = () => parentModelValidator.Validate(model);
         
-        var exception = action.ShouldThrow<ValidationException>();
-        var error = exception.Errors.First().ShouldBeOfType<CustomErrorWithCode>();
+        var error = action.ShouldThrow<ValidationException>().Errors[0];
+        error.ShouldBeOfType<CustomErrorWithCode>();
         error.Code.ShouldBe(expectedError.Code);
         error.Message.ShouldBe(expectedMessage);
     }
@@ -431,10 +431,10 @@ public class ModelValidatorTests
 
         var action = () => parentModelValidator.Validate(model);
 
-        var exception = action.ShouldThrow<ValidationException>();
-        exception.Errors.First().Message.ShouldBe(expectedMessage);
-        exception.Errors.First().Code.ShouldBe(expectedCode);
-        exception.Errors.First().ShouldBeOfType<CommonValidationError.GreaterThan<int>>();
+        var error = action.ShouldThrow<ValidationException>().Errors[0];
+        error.Message.ShouldBe(expectedMessage);
+        error.Code.ShouldBe(expectedCode);
+        error.ShouldBeOfType<CommonValidationError.GreaterThan<int>>();
     }
 
     [Fact]
@@ -456,8 +456,8 @@ public class ModelValidatorTests
 
         var action = () => parentModelValidator.Validate(model);
 
-        var exception = action.ShouldThrow<ValidationException>();
-        exception.Errors.First().Code.ShouldBe(expectedCode);
+        var error = action.ShouldThrow<ValidationException>().Errors[0];
+        error.Code.ShouldBe(expectedCode);
     }
 
     [Fact]
@@ -478,8 +478,8 @@ public class ModelValidatorTests
 
         var action = () => parentModelValidator.Validate(model);
 
-        var exception = action.ShouldThrow<ValidationException>();
-        exception.Errors.First().Code.ShouldBe(expectedCode);
+        var error = action.ShouldThrow<ValidationException>().Errors[0];
+        error.Code.ShouldBe(expectedCode);
     }
     
     [Fact]
@@ -516,9 +516,8 @@ public class ModelValidatorTests
         
         var action = () => parentModelValidator.Validate(model);
 
-        var exception = action.ShouldThrow<ValidationException>();
-        var errors = exception.Errors.ToArray();
-        errors.Length.ShouldBe(2);
+        var errors = action.ShouldThrow<ValidationException>().Errors;
+        errors.Count.ShouldBe(2);
         errors[0].FieldName.ShouldBe($"{nameof(model.NullableIntList)}[1]");
         errors[1].FieldName.ShouldBe($"{nameof(model.NullableIntList)}[3]");
     }
@@ -537,9 +536,9 @@ public class ModelValidatorTests
 
         var action = () => parentModelValidator.Validate(model);
 
-        var exception = action.ShouldThrow<ValidationException>();
-        exception.Errors.Count().ShouldBe(1);
-        exception.Errors.First().FieldName.ShouldBe($"{nameof(model.NullableIntList)}[1]");
+        var errors = action.ShouldThrow<ValidationException>().Errors;
+        errors.Count.ShouldBe(1);
+        errors[0].FieldName.ShouldBe($"{nameof(model.NullableIntList)}[1]");
     }
     
     [Fact]
@@ -561,8 +560,8 @@ public class ModelValidatorTests
 
         var action = () => parentModelValidator.Validate(model);
 
-        var exception = action.ShouldThrow<ValidationException>();
-        exception.Errors.First().Message.ShouldBe(expectedErrorMessage);
+        var error = action.ShouldThrow<ValidationException>().Errors[0];
+        error.Message.ShouldBe(expectedErrorMessage);
     }
     
     [Fact]
@@ -580,8 +579,8 @@ public class ModelValidatorTests
 
         var action = () => parentModelValidator.Validate(model);
 
-        var exception = action.ShouldThrow<ValidationException>();
-        exception.Errors.First().Message.ShouldBe(expectedMessage);
+        var error = action.ShouldThrow<ValidationException>().Errors[0];
+        error.Message.ShouldBe(expectedMessage);
     }
     
     [Fact]
@@ -599,8 +598,8 @@ public class ModelValidatorTests
 
         var action = () => parentModelValidator.Validate(model);
 
-        var exception = action.ShouldThrow<ValidationException>();
-        exception.Errors.First().Message.ShouldBe(expectedMessage);
+        var error = action.ShouldThrow<ValidationException>().Errors[0];
+        error.Message.ShouldBe(expectedMessage);
     }
 
     [Fact]
@@ -619,8 +618,8 @@ public class ModelValidatorTests
 
         var action = () => parentModelValidator.Validate(model);
 
-        var exception = action.ShouldThrow<ValidationException>();
-        exception.Errors.First().Message.ShouldBe(expectedMessage);
+        var error = action.ShouldThrow<ValidationException>().Errors[0];
+        error.Message.ShouldBe(expectedMessage);
     }
 
     private ParentModelValidator CreateParentModelValidator(Action<ParentModelValidator> validator)

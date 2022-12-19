@@ -8,7 +8,7 @@ public record EnumValidator<TField>(
 {
     public override bool IsValid()
     {
-        return Enum.IsDefined(enumType, FieldValue);
+        return Enum.IsDefined(enumType, FieldValue!);
     }
 
     public override ValidationError CreateError()

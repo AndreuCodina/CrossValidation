@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using CrossValidation;
+﻿using CrossValidation;
 using CrossValidation.Rules;
 using CrossValidationTests.Builders;
 using CrossValidationTests.Models;
@@ -28,7 +27,7 @@ public class InlineRuleTests
             .WithMessage(expectedMessage)
             .GreaterThan(_model.NestedModel.Int);
 
-        var exception = action.ShouldThrow<ValidationException>();
-        exception.Errors.First().Message.ShouldBe(expectedMessage);
+        var error = action.ShouldThrow<ValidationException>().Errors[0];
+        error.Message.ShouldBe(expectedMessage);
     }
 }

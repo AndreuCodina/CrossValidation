@@ -20,7 +20,7 @@ public abstract class ValidationContext
     {
         Errors ??= new List<ValidationError>();
         SetError(error);
-        Error.AddPlaceHolderValues();
+        Error!.AddPlaceHolderValues();
         Errors.Add(Error);
     }
 

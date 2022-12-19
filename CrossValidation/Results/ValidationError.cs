@@ -58,7 +58,7 @@ public record ValidationError
             if (!PlaceholderValues!.TryGetValue(key, out var value))
                 return evaluator.Value;
 
-            return value.ToString();
+            return value.ToString()!;
         });
     }
 }

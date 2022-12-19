@@ -14,7 +14,7 @@ public abstract record CommonValidationError(string Code) : ResXValidationError(
     {
         public override void AddPlaceHolderValues()
         {
-            AddPlaceholderValue(ComparisonValue);
+            AddPlaceholderValue(ComparisonValue!);
             base.AddPlaceHolderValues();
         }
     }

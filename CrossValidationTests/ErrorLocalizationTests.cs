@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using CrossValidation;
+﻿using CrossValidation;
 using CrossValidation.Resources;
 using CrossValidation.Rules;
 using Shouldly;
@@ -15,8 +14,8 @@ public class ErrorLocalizationTests
         var action = () => new InlineRule<string?>(null)
             .NotNull();
 
-        var exception = action.ShouldThrow<ValidationException>();
-        exception.Errors.First().Code.ShouldBe(nameof(ErrorResource.NotNull));
-        exception.Errors.First().Message.ShouldBe(ErrorResource.NotNull);
+        var error = action.ShouldThrow<ValidationException>().Errors[0];
+        error.Code.ShouldBe(nameof(ErrorResource.NotNull));
+        error.Message.ShouldBe(ErrorResource.NotNull);
     }
 }
