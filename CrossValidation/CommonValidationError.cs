@@ -5,7 +5,7 @@ namespace CrossValidation;
 
 public abstract record CommonValidationError(string Code) : ResXValidationError(Code)
 {
-    public record NotNull() : CommonValidationError("NotNull");
+    public record NotNull() : CommonValidationError(nameof(ErrorResource.NotNull));
     
     public record Null() : CommonValidationError("Null");
 
