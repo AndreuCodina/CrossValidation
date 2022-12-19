@@ -4,20 +4,17 @@ namespace CrossValidation.Validators;
 
 public abstract record Validator
 {
-    public ValidationError? Error { get; set; }
+    private ValidationError? _error;
     public abstract bool IsValid();
     public abstract ValidationError CreateError();
-    
-    public bool HasError()
-    {
-        var isValid = IsValid();
-        
-        if (!isValid)
-        {
-            Error = CreateError();
-            return true;
-        }
 
-        return false;
+    public ValidationError? GetError()
+    {
+        return !IsValid() ? CreateError() : null;
+    }
+    
+    public void SetError(ValidationError error)
+    {
+        _error = error;
     }
 }

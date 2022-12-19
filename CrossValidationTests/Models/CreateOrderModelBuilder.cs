@@ -8,6 +8,7 @@ public class CreateOrderModelBuilder
     private string? _coupon = null;
     private CreateOrderModelDeliveryAddress _deliveryAddress = new DeliveryAddressBuilder().Build();
     private List<int>? _colorIds = null;
+    private int? _intNullable = null;
 
     public CreateOrderModel Build()
     {
@@ -32,7 +33,8 @@ public class CreateOrderModelBuilder
                     }
                 }
             },
-            ColorIds = _colorIds
+            ColorIds = _colorIds,
+            intNullable = _intNullable
         };
 
         return model;
@@ -55,6 +57,12 @@ public class CreateOrderModelBuilder
     public CreateOrderModelBuilder WithColorIds(List<int>? colorIds)
     {
         _colorIds = colorIds;
+        return this;
+    }
+    
+    public CreateOrderModelBuilder WithIntNullable(int? intNullable)
+    {
+        _intNullable = intNullable;
         return this;
     }
 

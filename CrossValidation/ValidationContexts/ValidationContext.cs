@@ -9,30 +9,26 @@ public abstract class ValidationContext
     public List<ValidationError>? Errors { get; set; }
     public string FieldName { get; set; } = "";
     public object? FieldValue { get; set; }
+    public ValidationError? Error { get; set; }
     public bool ExecuteNextValidator { get; set; } = true;
 
     public ValidationContext()
     {
-        // Errors = new List<ValidationError>();
     }
 
     public void AddError(ValidationError error)
     {
         Errors ??= new List<ValidationError>();
-        var errorToAdd = new ValidationError(
-            FieldName: error.FieldName,
-            FieldValue: error.FieldValue,
-            Code: Code ?? error.Code,
-            Message: Message ?? error.Message,
-            Detail: error.Detail,
-            Parameters: error.Parameters);
-        Errors.Add(errorToAdd); // If the validationPath exists, add another error -> ToDictionary -> Dictionary<FieldName, List<IError/ErrorCode>>
+        SetError(error);
+        Error.AddPlaceHolderValues();
+        Errors.Add(Error);
     }
 
     public void Clean()
     {
         Code = null;
         Message = null;
+        Error = null;
         ExecuteNextValidator = true;
     }
 
@@ -44,5 +40,35 @@ public abstract class ValidationContext
     public void SetMessage(string message)
     {
         Message ??= message;
+    }
+    
+    public void SetError(ValidationError error)
+    {
+        Error = CustomizationsToError(error);
+    }
+
+    private ValidationError CustomizationsToError(ValidationError error)
+    {
+        ValidationError errorToCustomize;
+        
+        if (Error is not null)
+        {
+            errorToCustomize = Error;
+            CombineErrors(errorToCustomize, error);
+        }
+        else
+        {
+            errorToCustomize = error;
+        }
+        
+        errorToCustomize.Code = Code ?? error.Code;
+        errorToCustomize.Message = Message ?? error.Message;
+        return errorToCustomize;
+    }
+    
+    private void CombineErrors(ValidationError originalError, ValidationError errorToCombine)
+    {
+        originalError.Code ??= errorToCombine.Code;
+        originalError.Message ??= errorToCombine.Message;
     }
 }

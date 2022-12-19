@@ -11,10 +11,11 @@ namespace CrossValidationTests.Validators;
 public class EnumValidatorTests
 {
     [Fact]
-    public void Enum()
+    public void Validate_enumeration()
     {
         var enumValue = CreateOrderModelProductColor.Red;
-        var enumAction = () => Validate.That(enumValue).IsInEnum();
+        var enumAction = () => Validate.That(enumValue)
+            .IsInEnum();
         enumAction.ShouldNotThrow();
          
         var intValue = (int)CreateOrderModelProductColor.Red;
@@ -29,13 +30,14 @@ public class EnumValidatorTests
     }
      
     [Fact]
-    public void Enum_fails()
+    public void Validate_enumeration_fails()
     {
         var lastColorId = (int)System.Enum.GetValues<CreateOrderModelProductColor>().Last();
         var nonExistentColorId = lastColorId + 1;
          
         var enumValue = (CreateOrderModelProductColor)nonExistentColorId;
-        var enumAction = () => Validate.That(enumValue).IsInEnum();
+        var enumAction = () => Validate.That(enumValue)
+            .IsInEnum();
         enumAction.ShouldThrow<ValidationException>();
          
         var intValue = nonExistentColorId;
@@ -50,7 +52,7 @@ public class EnumValidatorTests
     }
 
     [Fact]
-    public void Enum_fails_when_type_is_not_enum()
+    public void Validate_enumeration_fails_when_type_is_not_enumeration()
     {
         var value = (int)CreateOrderModelProductColor.Red;
         var enumAction = () => Validate.That(value)

@@ -2,10 +2,11 @@
 
 namespace CrossValidation.Validators;
 
+// TODO: Rename to LengthRangeValidator
 public record LengthValidator(
     string FieldValue,
     int Minimum,
-    int Maximum) : Validator
+    int Maximum) : Validator, ILengthValidator
 {
     public override bool IsValid()
     {

@@ -7,7 +7,7 @@ namespace CrossValidationTests.Validators;
 public class LengthValidatorTests
 {
     [Fact]
-    public void Length()
+    public void Validate_length()
     {
         var value = "123";
         var validator = new LengthValidator(value, 3, 3);
@@ -18,7 +18,7 @@ public class LengthValidatorTests
     }
     
     [Fact]
-    public void Length_fails()
+    public void Validate_length_fails()
     {
         var value = "123";
         var validator = new LengthValidator(value, 4, 3);

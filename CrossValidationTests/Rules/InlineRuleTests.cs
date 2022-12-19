@@ -20,7 +20,6 @@ public class InlineRuleTests
     public void Validator_conditional_execution()
     {
         var expectedErrorMessage = "TrueCase";
-        _model = new CreateOrderModelBuilder().Build();
         var action = () => new InlineRule<int>(_model.DeliveryAddress.Number)
             .When(x => false)
             .GreaterThan(_model.DeliveryAddress.Number + 1)

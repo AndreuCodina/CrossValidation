@@ -42,11 +42,11 @@ public abstract class ModelValidator<TModel>
 
         foreach (var innerField in collectionSelected)
         {
-            Expression<Func<TModel, TInnerType>> innerFieldSelector = model => innerField;
+            Expression<Func<TModel, TInnerType?>> innerFieldSelector = model => innerField;
             var rule = new ModelRule<TModel, TInnerType>(
                 Context,
                 Model,
-                fieldInformation.FieldFullPath,
+                fieldInformation.SelectionFullPath,
                 innerField,
                 fieldInformation.IsFieldSelectedDifferentThanModel,
                 innerFieldSelector,

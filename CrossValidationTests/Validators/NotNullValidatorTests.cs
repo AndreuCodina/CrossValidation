@@ -7,7 +7,7 @@ namespace CrossValidationTests.Validators;
 public class NotNullValidatorTests
 {
     [Fact]
-    public void NotNull()
+    public void Validate_not_null()
     {
         var value = new Bogus.Faker().Lorem.Word();
         var validator = new NotNullValidator<string>(value);
@@ -18,7 +18,7 @@ public class NotNullValidatorTests
     }
     
     [Fact]
-    public void NotNull_fails()
+    public void Validate_not_null_fails()
     {
         string? value = null;
         var validator = new NotNullValidator<string?>(value);

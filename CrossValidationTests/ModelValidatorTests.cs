@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using CrossValidation;
+using CrossValidation.Results;
 using CrossValidation.Rules;
 using CrossValidationTests.Models;
 using Moq;
@@ -325,6 +326,87 @@ public class ModelValidatorTests
         var exception = action.ShouldThrow<ValidationException>();
         exception.Errors.First().Code.ShouldBe(expectedCode);
     }
+    
+    [Fact]
+    public void Validator_keeps_error_customization()
+    {
+        var expectedError = new CustomErrorWithCode("COD123");
+        var model = new CreateOrderModelBuilder().Build();
+        var orderValidatorMock = CreateOrderModelValidatorMock(validator =>
+        {
+            validator.RuleFor(x => x.Coupon)
+                .WithError(expectedError)
+                .NotNull();
+        });
+        
+        var action = () => orderValidatorMock.Object.Validate(model);
+        
+        var exception = action.ShouldThrow<ValidationException>();
+        exception.Errors.First().ShouldBeOfType<CustomErrorWithCode>();
+    }
+    
+    [Fact]
+    public void Get_custom_error()
+    {
+        var model = new CreateOrderModelBuilder().Build();
+        var comparisonValue = model.DeliveryAddress.Number + 1;
+        var orderValidatorMock = CreateOrderModelValidatorMock(validator =>
+        {
+            validator.RuleFor(x => x.DeliveryAddress.Number)
+                .GreaterThan(comparisonValue);
+        });
+        
+        var action = () => orderValidatorMock.Object.Validate(model);
+        
+        var exception = action.ShouldThrow<ValidationException>();
+        var error = exception.Errors.First().ShouldBeOfType<CommonValidationError.GreaterThan<int>>();
+        error.ComparisonValue.ShouldBe(comparisonValue);
+        error.Code.ShouldBe("GreaterThan");
+    }
+    
+    [Fact]
+    public void CombineCustomizationWithCustomError()
+    {
+        var expectedMessage = "Expected message";
+        var expectedError = new CustomErrorWithCode("COD123");
+        var model = new CreateOrderModelBuilder().Build();
+        var orderValidatorMock = CreateOrderModelValidatorMock(validator =>
+        {
+            validator.RuleFor(x => x.Coupon)
+                .WithMessage(expectedMessage)
+                .WithError(expectedError)
+                .NotNull();
+        });
+        
+        var action = () => orderValidatorMock.Object.Validate(model);
+        
+        var exception = action.ShouldThrow<ValidationException>();
+        var error = exception.Errors.First().ShouldBeOfType<CustomErrorWithCode>();
+        error.Code.ShouldBe(expectedError.Code);
+        error.Message.ShouldBe(expectedMessage);
+    }
+    
+    [Fact]
+    public void CombineCustomErrorCodeWithCustomization()
+    {
+        var expectedMessage = "Expected message";
+        var expectedError = new CustomErrorWithCode("COD123");
+        var model = new CreateOrderModelBuilder().Build();
+        var orderValidatorMock = CreateOrderModelValidatorMock(validator =>
+        {
+            validator.RuleFor(x => x.Coupon)
+                .WithError(expectedError)
+                .WithMessage(expectedMessage)
+                .NotNull();
+        });
+        
+        var action = () => orderValidatorMock.Object.Validate(model);
+        
+        var exception = action.ShouldThrow<ValidationException>();
+        var error = exception.Errors.First().ShouldBeOfType<CustomErrorWithCode>();
+        error.Code.ShouldBe(expectedError.Code);
+        error.Message.ShouldBe(expectedMessage);
+    }
 
     [Fact]
     public void Successful_validator_cleans_customizations()
@@ -347,6 +429,7 @@ public class ModelValidatorTests
         var exception = action.ShouldThrow<ValidationException>();
         exception.Errors.First().Message.ShouldBe(expectedMessage);
         exception.Errors.First().Code.ShouldBe(expectedCode);
+        exception.Errors.First().ShouldBeOfType<CommonValidationError.GreaterThan<int>>();
     }
 
     [Fact]
@@ -466,7 +549,7 @@ public class ModelValidatorTests
             validator.RuleFor(x => x.DeliveryAddress.Number)
                 .When(x => false)
                 .GreaterThan(model.DeliveryAddress.Number + 1)
-                .When(x => true)
+                .When(x => x.DeliveryAddress.Number == model.DeliveryAddress.Number)
                 .WithMessage(expectedErrorMessage)
                 .GreaterThan(model.DeliveryAddress.Number);
         });
@@ -475,6 +558,64 @@ public class ModelValidatorTests
 
         var exception = action.ShouldThrow<ValidationException>();
         exception.Errors.First().Message.ShouldBe(expectedErrorMessage);
+    }
+    
+    [Fact]
+    public void Replace_default_placeholders()
+    {
+        var model = new CreateOrderModelBuilder().Build();
+        var template = "{FieldDisplayName} is {FieldValue}";
+        var expectedMessage = $"Coupon is ";
+        var orderValidatorMock = CreateOrderModelValidatorMock(validator =>
+        {
+            validator.RuleFor(x => x.Coupon)
+                .WithMessage(template)
+                .NotNull();
+        });
+
+        var action = () => orderValidatorMock.Object.Validate(model);
+
+        var exception = action.ShouldThrow<ValidationException>();
+        exception.Errors.First().Message.ShouldBe(expectedMessage);
+    }
+    
+    [Fact]
+    public void Do_not_replace_placeholders_not_added()
+    {
+        var model = new CreateOrderModelBuilder().Build();
+        var template = "{PlaceholderNotReplaced} is {FieldValue}";
+        var expectedMessage = $"{{PlaceholderNotReplaced}} is {model.DeliveryAddress.Number}";
+        var orderValidatorMock = CreateOrderModelValidatorMock(validator =>
+        {
+            validator.RuleFor(x => x.DeliveryAddress.Number)
+                .WithMessage(template)
+                .GreaterThan(model.DeliveryAddress.Number);
+        });
+
+        var action = () => orderValidatorMock.Object.Validate(model);
+
+        var exception = action.ShouldThrow<ValidationException>();
+        exception.Errors.First().Message.ShouldBe(expectedMessage);
+    }
+
+    [Fact]
+    public void Replace_custom_error_placeholders()
+    {
+        var model = new CreateOrderModelBuilder().Build();
+        var comparisonValue = model.DeliveryAddress.Number;
+        var template = "{ComparisonValue} is not greater than {FieldValue}";
+        var expectedMessage = $"{model.DeliveryAddress.Number} is not greater than {comparisonValue}";
+        var orderValidatorMock = CreateOrderModelValidatorMock(validator =>
+        {
+            validator.RuleFor(x => x.DeliveryAddress.Number)
+                .WithMessage(template)
+                .GreaterThan(comparisonValue);
+        });
+
+        var action = () => orderValidatorMock.Object.Validate(model);
+
+        var exception = action.ShouldThrow<ValidationException>();
+        exception.Errors.First().Message.ShouldBe(expectedMessage);
     }
 
     private Mock<CreateOrderModelValidator> CreateOrderModelValidatorMock(Action<CreateOrderModelValidator> validator)
@@ -513,4 +654,6 @@ public class ModelValidatorTests
         {
         }
     }
+
+    public record CustomErrorWithCode(string Code) : ValidationError(Code: Code);
 }

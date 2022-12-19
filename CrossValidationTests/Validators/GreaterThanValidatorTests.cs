@@ -7,7 +7,7 @@ namespace CrossValidationTests.Validators;
 public class GreaterThanValidatorTests
 {
     [Fact]
-    public void GreaterThan()
+    public void Validate_greater_than()
     {
         var intValue = 2;
         var comparisonIntValue = 1;
@@ -29,7 +29,7 @@ public class GreaterThanValidatorTests
     }
      
     [Fact]
-    public void GreaterThanFails()
+    public void Validate_greater_than_fails()
     {
         var intValue = 1;
         var comparisonIntValue = 2;

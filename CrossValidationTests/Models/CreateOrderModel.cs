@@ -10,6 +10,7 @@ public class CreateOrderModel
     public required CreateOrderModelDeliveryAddress DeliveryAddress { get; set; }
     public required IEnumerable<CreateOrderModelProduct> Products { get; set; }
     public required List<int> ColorIds { get; set; }
+    public required int? intNullable { get; set; }
 }
 
 public class CreateOrderModelDeliveryAddress

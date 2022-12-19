@@ -9,7 +9,7 @@ public class InlineRule<TField>
         TField,
         InlineValidationContext>
 {
-    public InlineRule(TField value)
+    public InlineRule(TField? value)
     {
         // TODO
         FieldValue = value;
@@ -33,7 +33,7 @@ public class InlineRule<TField>
         return this;
     }
     
-    public InlineRule<TField> When(Func<TField, bool> condition)
+    public InlineRule<TField> When(Func<TField?, bool> condition)
     {
         Context.ExecuteNextValidator = condition(FieldValue);
         return this;

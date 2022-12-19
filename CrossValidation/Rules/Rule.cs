@@ -1,4 +1,5 @@
-﻿using CrossValidation.Results;
+﻿using CrossValidation.Resources;
+using CrossValidation.Results;
 using CrossValidation.ValidationContexts;
 using CrossValidation.Validators;
 
@@ -17,25 +18,24 @@ public abstract class Rule<TSelf, TField, TValidationContext>
 
     public TSelf SetValidator(Validator validator)
     {
-        // if (Context.ValidationMode == ValidationMode.StopOnFirstError && Context.HasCurrentModelValidatorAnyError){}
-        // Execute validator and take its properties and customize the error to add with ValidationContext.AddError(...)
-        // var foo = this;
-
-        if (Context.ExecuteNextValidator && validator.HasError())
+        if (Context.ExecuteNextValidator)
         {
-            // TODO:
-            // If the model validator has some error && Context.ValidationMode == ValidationMode.StopOnFirstError,
-            // add modelValidator.Errors to Context.Errors and return
-            
-            
-            // HandleError / CreateErrorMessage / etc.
-            // throw new ValidationException(new List<ValidationError>());
-            validator.Error = validator.Error! with
+            var error = validator.GetError();
+
+            if (error is not null)
             {
-                FieldName = Context.FieldName,
-                FieldValue = FieldValue
-            };
-            HandleError(validator.Error!);
+                var errorFilled = error with
+                {
+                    FieldName = Context.FieldName,
+                    FieldValue = Context.FieldValue,
+                    Message = Context.Message is null && error.Message is null && error.Code is not null
+                        ? ErrorResource.ResourceManager.GetString(error.Code!)
+                        : Context.Message,
+                    FieldDisplayName = error.FieldDisplayName ?? Context.FieldName
+                };
+                validator.SetError(errorFilled);
+                HandleError(errorFilled);
+            }
         }
 
         Context.Clean();
@@ -53,6 +53,12 @@ public abstract class Rule<TSelf, TField, TValidationContext>
     public TSelf WithCode(string code)
     {
         Context.SetCode(code);
+        return GetSelf();
+    }
+    
+    public TSelf WithError(ValidationError error)
+    {
+        Context.SetError(error);
         return GetSelf();
     }
 }

@@ -10,7 +10,7 @@ namespace CrossValidationTests.Utils;
 public class UtilTests
 {
     [Fact]
-    public void Method_call_in_field_selector_fails()
+    public void Field_selector_with_method_call_fails()
     {
         var model = new CreateOrderModelBuilder().Build();
         
@@ -21,5 +21,35 @@ public class UtilTests
         action = () =>
             Util.GetFieldInformation(x => x.ColorIds[0], model);
         action.ShouldThrow<InvalidOperationException>();
+    }
+    
+    [Fact]
+    public void Field_selector_to_null_field_returns_null_value()
+    {
+        var model = new CreateOrderModelBuilder().Build();
+        
+        var result = Util.GetFieldInformation(x => x.intNullable, model);
+        
+        result.Value.ShouldBeNull();
+    }
+    
+    [Fact]
+    public void Field_selector_to_same_model_returns_model()
+    {
+        var model = new CreateOrderModelBuilder().Build();
+        
+        var result = Util.GetFieldInformation(x => x, model);
+        
+        result.Value.ShouldBe(model);
+    }
+    
+    [Fact]
+    public void Field_selector_to_child_model_returns_child_model()
+    {
+        var model = new CreateOrderModelBuilder().Build();
+        
+        var result = Util.GetFieldInformation(x => x.DeliveryAddress, model);
+
+        result.Value.ShouldNotBeNull();
     }
 }
