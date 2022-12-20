@@ -53,7 +53,7 @@ public record CrossValidationError
 
     private void AddCustomErrorPlaceholderValues()
     {
-        var arePlaceholderValuesAdded = GetType().GetMethod("AddPlaceHolderValues").DeclaringType == GetType();
+        var arePlaceholderValuesAdded = GetType().GetMethod(nameof(AddPlaceHolderValues))!.DeclaringType == GetType();
 
         if (!arePlaceholderValuesAdded && CrossValidationConfiguration.GeneratePlaceholderValuesWhenTheyAreNotAdded)
         {
