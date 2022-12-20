@@ -35,6 +35,8 @@ public class InlineRuleTests
     [Fact]
     public void Placeholder_values_are_added_automatically_when_they_are_not_added_and_it_is_enabled_in_configuration()
     {
+        CrossValidationConfiguration.GeneratePlaceholderValuesWhenTheyAreNotAdded = true;
+        
         var action = () => new InlineRule<int>(_model.NestedModel.Int)
             .WithError(new CustomErrorWithPlaceholderValue(_model.NestedModel.Int))
             .GreaterThan(_model.NestedModel.Int);

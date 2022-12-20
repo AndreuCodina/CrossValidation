@@ -2,5 +2,5 @@
 
 public static class CrossValidationConfiguration
 {
-    public static bool GeneratePlaceholderValuesWhenTheyAreNotAdded = true;
+    public static bool GeneratePlaceholderValuesWhenTheyAreNotAdded = false;
 }
