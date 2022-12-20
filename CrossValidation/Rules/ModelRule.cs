@@ -77,7 +77,7 @@ public class ModelRule<TModel, TField>
         return this;
     }
 
-    protected override void HandleError(ValidationError error)
+    protected override void HandleError(CrossValidationError error)
     {
         Context.AddError(error);
         

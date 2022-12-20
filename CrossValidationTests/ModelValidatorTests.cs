@@ -364,7 +364,7 @@ public class ModelValidatorTests
         var action = () => parentModelValidator.Validate(model);
         
         var errors = action.ShouldThrow<ValidationException>().Errors;
-        var error = errors[0].ShouldBeOfType<CommonValidationError.GreaterThan<int>>();
+        var error = errors[0].ShouldBeOfType<CommonCrossValidationError.GreaterThan<int>>();
         error.ComparisonValue.ShouldBe(comparisonValue);
         error.Code.ShouldBe("GreaterThan");
     }
@@ -434,7 +434,7 @@ public class ModelValidatorTests
         var error = action.ShouldThrow<ValidationException>().Errors[0];
         error.Message.ShouldBe(expectedMessage);
         error.Code.ShouldBe(expectedCode);
-        error.ShouldBeOfType<CommonValidationError.GreaterThan<int>>();
+        error.ShouldBeOfType<CommonCrossValidationError.GreaterThan<int>>();
     }
 
     [Fact]
@@ -659,5 +659,5 @@ public class ModelValidatorTests
         }
     }
 
-    public record CustomErrorWithCode(string Code) : ValidationError(Code: Code);
+    public record CustomErrorWithCode(string Code) : CrossValidationError(Code: Code);
 }

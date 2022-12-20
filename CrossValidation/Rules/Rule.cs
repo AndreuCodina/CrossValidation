@@ -42,7 +42,7 @@ public abstract class Rule<TSelf, TField, TValidationContext>
         return GetSelf();
     }
 
-    protected abstract void HandleError(ValidationError error);
+    protected abstract void HandleError(CrossValidationError error);
 
     public TSelf WithMessage(string message)
     {
@@ -56,7 +56,7 @@ public abstract class Rule<TSelf, TField, TValidationContext>
         return GetSelf();
     }
     
-    public TSelf WithError(ValidationError error)
+    public TSelf WithError(CrossValidationError error)
     {
         Context.SetError(error);
         return GetSelf();

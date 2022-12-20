@@ -3,7 +3,7 @@ using System.Text.RegularExpressions;
 
 namespace CrossValidation.Results;
 
-public record ValidationError
+public record CrossValidationError
 {
     private static readonly Regex _placeholderRegex = new Regex("{([^{}:]+)}", RegexOptions.Compiled);
     private static readonly string _defaultPlaceholderValue = "";
@@ -16,7 +16,7 @@ public record ValidationError
     public string? Details { get; set; }
     public Dictionary<string, object>? PlaceholderValues { get; set; }
 
-    public ValidationError(
+    public CrossValidationError(
         string? FieldName = null,
         string? FieldDisplayName = null,
         object? FieldValue = null,
@@ -93,4 +93,4 @@ public record ValidationError
 }
 
 public record ResXValidationError(string Code)
-    : ValidationError(Code: Code);
+    : CrossValidationError(Code: Code);

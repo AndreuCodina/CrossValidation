@@ -3,14 +3,14 @@ using CrossValidation.Results;
 
 namespace CrossValidation;
 
-public abstract record CommonValidationError(string Code) : ResXValidationError(Code)
+public abstract record CommonCrossValidationError(string Code) : ResXValidationError(Code)
 {
-    public record NotNull() : CommonValidationError(nameof(ErrorResource.NotNull));
+    public record NotNull() : CommonCrossValidationError(nameof(ErrorResource.NotNull));
     
-    public record Null() : CommonValidationError(nameof(ErrorResource.Null));
+    public record Null() : CommonCrossValidationError(nameof(ErrorResource.Null));
 
     public record GreaterThan<T>(T ComparisonValue) :
-        CommonValidationError(nameof(ErrorResource.GreaterThan))
+        CommonCrossValidationError(nameof(ErrorResource.GreaterThan))
     {
         public override void AddPlaceHolderValues()
         {
@@ -19,10 +19,10 @@ public abstract record CommonValidationError(string Code) : ResXValidationError(
         }
     }
     
-    public record Enum() : CommonValidationError(nameof(ErrorResource.Enum));
+    public record Enum() : CommonCrossValidationError(nameof(ErrorResource.Enum));
     
     public record LengthRange(int Minimum, int Maximum) :
-        CommonValidationError(nameof(ErrorResource.Length))
+        CommonCrossValidationError(nameof(ErrorResource.Length))
     {
         public override void AddPlaceHolderValues()
         {

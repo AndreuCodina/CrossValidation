@@ -10,8 +10,8 @@ public record LengthRangeValidator(string FieldValue, int Minimum, int Maximum) 
                && FieldValue.Length <= Maximum;
     }
 
-    public override ValidationError CreateError()
+    public override CrossValidationError CreateError()
     {
-        return new CommonValidationError.LengthRange(Minimum, Maximum);
+        return new CommonCrossValidationError.LengthRange(Minimum, Maximum);
     }
 }

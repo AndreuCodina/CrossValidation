@@ -46,5 +46,5 @@ public class InlineRuleTests
                 && (int)x.Value == _model.NestedModel.Int);
     }
 
-    public record CustomErrorWithPlaceholderValue(int Value) : ValidationError;
+    public record CustomErrorWithPlaceholderValue(int Value) : CrossValidationError;
 }

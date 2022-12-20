@@ -6,19 +6,19 @@ public abstract class ValidationContext
 {
     public string? Code { get; set; }
     public string? Message { get; set; }
-    public List<ValidationError>? Errors { get; set; }
+    public List<CrossValidationError>? Errors { get; set; }
     public string FieldName { get; set; } = "";
     public object? FieldValue { get; set; }
-    public ValidationError? Error { get; set; }
+    public CrossValidationError? Error { get; set; }
     public bool ExecuteNextValidator { get; set; } = true;
 
     public ValidationContext()
     {
     }
 
-    public void AddError(ValidationError error)
+    public void AddError(CrossValidationError error)
     {
-        Errors ??= new List<ValidationError>();
+        Errors ??= new List<CrossValidationError>();
         SetError(error);
         Error!.AddPlaceHolderValues();
         Errors.Add(Error);
@@ -42,14 +42,14 @@ public abstract class ValidationContext
         Message ??= message;
     }
     
-    public void SetError(ValidationError error)
+    public void SetError(CrossValidationError error)
     {
         Error = CustomizationsToError(error);
     }
 
-    private ValidationError CustomizationsToError(ValidationError error)
+    private CrossValidationError CustomizationsToError(CrossValidationError error)
     {
-        ValidationError errorToCustomize;
+        CrossValidationError errorToCustomize;
         
         if (Error is not null)
         {
@@ -66,7 +66,7 @@ public abstract class ValidationContext
         return errorToCustomize;
     }
     
-    private void CombineErrors(ValidationError originalError, ValidationError errorToCombine)
+    private void CombineErrors(CrossValidationError originalError, CrossValidationError errorToCombine)
     {
         originalError.Code ??= errorToCombine.Code;
         originalError.Message ??= errorToCombine.Message;

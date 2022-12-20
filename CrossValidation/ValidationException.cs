@@ -4,9 +4,9 @@ namespace CrossValidation;
 
 public class ValidationException : Exception
 {
-    public List<ValidationError> Errors { get; }
+    public List<CrossValidationError> Errors { get; }
 
-    public ValidationException(List<ValidationError> errors)
+    public ValidationException(List<CrossValidationError> errors)
     {
         Errors = errors;
     }
