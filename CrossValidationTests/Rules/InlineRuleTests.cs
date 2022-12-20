@@ -46,6 +46,8 @@ public class InlineRuleTests
             .ShouldContain(x =>
                 x.Key == nameof(CustomErrorWithPlaceholderValue.Value)
                 && (int)x.Value == _model.NestedModel.Int);
+        
+        CrossValidationConfiguration.GeneratePlaceholderValuesWhenTheyAreNotAdded = false;
     }
     
     [Fact]
