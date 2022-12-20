@@ -27,4 +27,10 @@
     <data name="NotNull" xml:space="preserve">
         <value>Debe tener un valor</value>
     </data>
+    <data name="Enum" xml:space="preserve">
+        <value>Debe ser un valor válido</value>
+    </data>
+    <data name="Null" xml:space="preserve">
+        <value>No debe tener un valor</value>
+    </data>
 </root>

@@ -6,6 +6,7 @@ namespace CrossValidation.Results;
 public record ValidationError
 {
     private static readonly Regex _placeholderRegex = new Regex("{([^{}:]+)}", RegexOptions.Compiled);
+    private static readonly string _defaultPlaceholderValue = "";
     
     public string? FieldName { get; set; }
     public string? FieldDisplayName { get; set; }
@@ -39,9 +40,37 @@ public record ValidationError
     
     public virtual void AddPlaceHolderValues()
     {
-        AddPlaceholderValue(FieldDisplayName ?? "", nameof(FieldDisplayName));
-        AddPlaceholderValue(FieldValue ?? "", nameof(FieldValue));
+        AddCommonPlaceholderValues();
+        AddCustomErrorPlaceholderValues();
         ReplacePlaceholderValues();
+    }
+
+    private void AddCommonPlaceholderValues()
+    {
+        AddPlaceholderValue(FieldDisplayName ?? _defaultPlaceholderValue, nameof(FieldDisplayName));
+        AddPlaceholderValue(FieldValue ?? _defaultPlaceholderValue, nameof(FieldValue));
+    }
+
+    private void AddCustomErrorPlaceholderValues()
+    {
+        var arePlaceholderValuesAdded = GetType().GetMethod("AddPlaceHolderValues").DeclaringType == GetType();
+
+        if (!arePlaceholderValuesAdded && CrossValidationConfiguration.GeneratePlaceholderValuesWhenTheyAreNotAdded)
+        {
+            var properties = GetType().GetProperties();
+            var customPlaceholders = GetType().GetConstructors()
+                .Single()
+                .GetParameters();
+
+            foreach (var customPlaceholder in customPlaceholders)
+            {
+                var name = customPlaceholder.Name;
+                var value = properties.Where(x => x.Name == name)
+                    .Select(x => x.GetValue(this)!)
+                    .FirstOrDefault();
+                AddPlaceholderValue(value ?? _defaultPlaceholderValue, name);
+            }
+        }
     }
 
     private void ReplacePlaceholderValues()

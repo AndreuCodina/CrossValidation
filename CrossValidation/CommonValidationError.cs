@@ -7,7 +7,7 @@ public abstract record CommonValidationError(string Code) : ResXValidationError(
 {
     public record NotNull() : CommonValidationError(nameof(ErrorResource.NotNull));
     
-    public record Null() : CommonValidationError("Null");
+    public record Null() : CommonValidationError(nameof(ErrorResource.Null));
 
     public record GreaterThan<T>(T ComparisonValue) :
         CommonValidationError(nameof(ErrorResource.GreaterThan))
@@ -19,7 +19,7 @@ public abstract record CommonValidationError(string Code) : ResXValidationError(
         }
     }
     
-    public record Enum() : CommonValidationError("Enum");
+    public record Enum() : CommonValidationError(nameof(ErrorResource.Enum));
     
     public record LengthRange(int Minimum, int Maximum) :
         CommonValidationError(nameof(ErrorResource.Length))

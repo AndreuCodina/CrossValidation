@@ -60,6 +60,15 @@ namespace CrossValidation.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Debe ser un valor válido.
+        /// </summary>
+        internal static string Enum {
+            get {
+                return ResourceManager.GetString("Enum", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Debe ser mayor que {FieldValue}.
         /// </summary>
         internal static string GreaterThan {
@@ -83,6 +92,15 @@ namespace CrossValidation.Resources {
         internal static string NotNull {
             get {
                 return ResourceManager.GetString("NotNull", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No debe tener un valor.
+        /// </summary>
+        internal static string Null {
+            get {
+                return ResourceManager.GetString("Null", resourceCulture);
             }
         }
     }
