@@ -22,7 +22,7 @@ public abstract record CommonCrossValidationError(string Code) : ResXValidationE
     public record Enum() : CommonCrossValidationError(nameof(ErrorResource.Enum));
     
     public record LengthRange(int Minimum, int Maximum) :
-        CommonCrossValidationError(nameof(ErrorResource.Length))
+        CommonCrossValidationError(nameof(ErrorResource.LengthRange))
     {
         public override void AddPlaceHolderValues()
         {
@@ -31,4 +31,6 @@ public abstract record CommonCrossValidationError(string Code) : ResXValidationE
             base.AddPlaceHolderValues();
         }
     }
+    
+    public record Predicate() : CommonCrossValidationError(nameof(ErrorResource.Predicate));
 }

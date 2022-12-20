@@ -45,6 +45,16 @@ public class InlineRuleTests
                 x.Key == nameof(CustomErrorWithPlaceholderValue.Value)
                 && (int)x.Value == _model.NestedModel.Int);
     }
+    
+    [Fact]
+    public void Validate_predicate()
+    {
+        var action = () => new InlineRule<NestedModel>(_model.NestedModel)
+            .Must(x => x.Int > x.Int);
+
+        var error = action.ShouldThrow<ValidationException>().Errors[0];
+        error.ShouldBeOfType<CommonCrossValidationError.Predicate>();
+    }
 
     public record CustomErrorWithPlaceholderValue(int Value) : CrossValidationError;
 }

@@ -621,6 +621,22 @@ public class ModelValidatorTests
         var error = action.ShouldThrow<ValidationException>().Errors[0];
         error.Message.ShouldBe(expectedMessage);
     }
+    
+    [Fact]
+    public void Validate_predicate()
+    {
+        var model = new ParentModelBuilder().Build();
+        var parentModelValidator = CreateParentModelValidator(validator =>
+        {
+            validator.RuleFor(x => x.NestedModel)
+                .Must(x => x.NestedModel.Int > model.NestedModel.Int);
+        });
+        
+        var action = () => parentModelValidator.Validate(model);
+
+        var error = action.ShouldThrow<ValidationException>().Errors[0];
+        error.ShouldBeOfType<CommonCrossValidationError.Predicate>();
+    }
 
     private ParentModelValidator CreateParentModelValidator(Action<ParentModelValidator> validator)
     {

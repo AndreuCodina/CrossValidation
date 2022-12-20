@@ -80,9 +80,9 @@ namespace CrossValidation.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Debe tener entre {Minimum} y {Maximum} caracter(es).
         /// </summary>
-        internal static string Length {
+        internal static string LengthRange {
             get {
-                return ResourceManager.GetString("Length", resourceCulture);
+                return ResourceManager.GetString("LengthRange", resourceCulture);
             }
         }
         
@@ -101,6 +101,15 @@ namespace CrossValidation.Resources {
         internal static string Null {
             get {
                 return ResourceManager.GetString("Null", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to La entrada no es válida.
+        /// </summary>
+        internal static string Predicate {
+            get {
+                return ResourceManager.GetString("Predicate", resourceCulture);
             }
         }
     }

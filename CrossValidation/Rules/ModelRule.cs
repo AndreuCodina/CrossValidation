@@ -2,6 +2,7 @@
 using CrossValidation.Results;
 using CrossValidation.Utils;
 using CrossValidation.ValidationContexts;
+using CrossValidation.Validators;
 
 namespace CrossValidation.Rules;
 
@@ -104,6 +105,12 @@ public class ModelRule<TModel, TField>
     public ModelRule<TModel, TField> When(Func<TModel, bool> condition)
     {
         Context.ExecuteNextValidator = condition(Model);
+        return this;
+    }
+    
+    public ModelRule<TModel, TField> Must(Func<TModel, bool> condition)
+    {
+        SetValidator(new PredicateValidator(condition(Model)));
         return this;
     }
 }

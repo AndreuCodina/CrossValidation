@@ -1,5 +1,6 @@
 ﻿using CrossValidation.Results;
 using CrossValidation.ValidationContexts;
+using CrossValidation.Validators;
 
 namespace CrossValidation.Rules;
 
@@ -36,6 +37,12 @@ public class InlineRule<TField>
     public InlineRule<TField> When(Func<TField?, bool> condition)
     {
         Context.ExecuteNextValidator = condition(FieldValue);
+        return this;
+    }
+    
+    public InlineRule<TField> Must(Func<TField?, bool> condition)
+    {
+        SetValidator(new PredicateValidator(condition(FieldValue)));
         return this;
     }
 }
