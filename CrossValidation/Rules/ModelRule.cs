@@ -38,6 +38,7 @@ public class ModelRule<TModel, TField>
             ? context.ParentPath + "."
             : "";
         Context.FieldName = parentPath + fieldFullPath + indexRepresentation;
+        Context.FieldDisplayName = null;
         FieldSelector = fieldSelector;
     }
     

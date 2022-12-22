@@ -58,18 +58,38 @@ public abstract class Rule<TSelf, TField, TValidationContext>
         return GetSelf();
     }
     
+    public TSelf WithFieldDisplayName(string fieldDisplayName)
+    {
+        Context.SetFieldDisplayName(fieldDisplayName);
+        return GetSelf();
+    }
+
     private void FillErrorWithCustomizations(CrossValidationError error)
     {
         error.FieldName = Context.FieldName;
         error.FieldValue = Context.FieldValue;
-        error.Message = GetErrorMessage(error);
-        error.FieldDisplayName ??= error.FieldName;
+        error.Message = GetMessageToFill(error);
+        error.FieldDisplayName = GetFieldDisplayNameToFill(error);
     }
-    
-    private string? GetErrorMessage(CrossValidationError error)
+
+    private string? GetMessageToFill(CrossValidationError error)
     {
         return Context.Message is null && error.Message is null && error.Code is not null
             ? ErrorResource.ResourceManager.GetString(error.Code)
             : Context.Message;
+    }
+    
+    private string GetFieldDisplayNameToFill(CrossValidationError error)
+    {
+        if (Context.FieldDisplayName is not null)
+        {
+            return Context.FieldDisplayName;
+        }
+        else if (error.FieldDisplayName is not null)
+        {
+            return error.FieldDisplayName;
+        }
+
+        return error.FieldName;
     }
 }

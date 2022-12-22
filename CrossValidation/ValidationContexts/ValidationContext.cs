@@ -8,6 +8,7 @@ public abstract class ValidationContext
     public string? Message { get; set; }
     public List<CrossValidationError>? Errors { get; set; }
     public string FieldName { get; set; } = "";
+    public string? FieldDisplayName { get; set; }
     public object? FieldValue { get; set; }
     public CrossValidationError? Error { get; set; }
     public bool ExecuteNextValidator { get; set; } = true;
@@ -45,6 +46,11 @@ public abstract class ValidationContext
     public void SetError(CrossValidationError error)
     {
         Error = CustomizationsToError(error);
+    }
+
+    public void SetFieldDisplayName(string fieldDisplayName)
+    {
+        FieldDisplayName = fieldDisplayName;
     }
 
     private CrossValidationError CustomizationsToError(CrossValidationError error)

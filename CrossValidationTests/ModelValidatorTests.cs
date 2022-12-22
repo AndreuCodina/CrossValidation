@@ -348,6 +348,23 @@ public class ModelValidatorTests
     }
     
     [Fact]
+    public void Validator_keeps_field_display_name_customization()
+    {
+        var expectedDisplayName = "My display name";
+        var parentModelValidator = CreateParentModelValidator(validator =>
+        {
+            validator.RuleFor(x => x.NullableString)
+                .WithFieldDisplayName(expectedDisplayName)
+                .NotNull();
+        });
+
+        var action = () => parentModelValidator.Validate(_model);
+
+        var error = action.ShouldThrow<CrossValidationException>().Errors[0];
+        error.FieldDisplayName.ShouldBe(expectedDisplayName);
+    }
+    
+    [Fact]
     public void Get_custom_error()
     {
         var comparisonValue = _model.NestedModel.Int + 1;
@@ -408,7 +425,7 @@ public class ModelValidatorTests
     }
 
     [Fact]
-    public void Successful_validator_cleans_customizations()
+    public void Successful_validator_cleans_customization()
     {
         var expectedMessage = "Error message";
         var expectedCode = "GreaterThan";
@@ -428,6 +445,26 @@ public class ModelValidatorTests
         error.Message.ShouldBe(expectedMessage);
         error.Code.ShouldBe(expectedCode);
         error.ShouldBeOfType<CommonCrossValidationError.GreaterThan<int>>();
+    }
+    
+    [Fact]
+    public void New_rule_overrides_field_name_customization()
+    {
+        var parentModelValidator = CreateParentModelValidator(validator =>
+        {
+            validator.RuleFor(x => x.NestedModel.Int)
+                .WithFieldDisplayName("Field display name")
+                .NotNull();
+
+            validator.RuleFor(x => x.NullableString)
+                .NotNull();
+        });
+
+        var action = () => parentModelValidator.Validate(_model);
+
+        var error = action.ShouldThrow<CrossValidationException>().Errors[0];
+        error.FieldName.ShouldBe("NullableString");
+        error.FieldDisplayName.ShouldBe("NullableString");
     }
 
     [Fact]

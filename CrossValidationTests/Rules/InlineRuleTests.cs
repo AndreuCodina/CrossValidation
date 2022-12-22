@@ -62,20 +62,6 @@ public class InlineRuleTests
         error.ShouldBeOfType<CommonCrossValidationError.Predicate>();
     }
     
-    // [Fact]
-    // public void Instance_keeps_customizations()
-    // {
-    //     var expectedMessage = "Expected message";
-    //     var getAge = () => new InlineRule<int>(_model.NestedModel.Int)
-    //         .WithMessage(expectedMessage)
-    //         .Instance(UserAge.Create);
-    //
-    //     var ex = getAge.ShouldThrow<CrossValidationException>();
-    //     var error = getAge.ShouldThrow<CrossValidationException>().Errors[0];
-    //     error.ShouldBeOfType<CommonCrossValidationError.GreaterThan<int>>();
-    //     error.Message.ShouldBe(expectedMessage);
-    // }
-    
     [Fact]
     public void Keep_customizations_before_create_instance()
     {
@@ -116,6 +102,7 @@ public class InlineRuleTests
         error.ShouldBeOfType<CommonCrossValidationError.GreaterThan<int>>();
         error.Code.ShouldBe(nameof(ErrorResource.GreaterThan));
         error.Message.ShouldBe("Expected message");
+        error.FieldDisplayName.ShouldBe("Expected field display name");
     }
 
     public record CustomErrorWithPlaceholderValue(int Value) : CrossValidationError;
@@ -142,6 +129,7 @@ public class InlineRuleTests
         {
             Validate.That(value)
                 .WithMessage("Expected message")
+                .WithFieldDisplayName("Expected field display name")
                 .GreaterThan(int.MaxValue);
             return new UserAgeWithCustomization
             {
