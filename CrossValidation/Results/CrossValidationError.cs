@@ -5,8 +5,8 @@ namespace CrossValidation.Results;
 
 public record CrossValidationError
 {
+    private const string DefaultPlaceholderValue = "";
     private static readonly Regex _placeholderRegex = new Regex("{([^{}:]+)}", RegexOptions.Compiled);
-    private static readonly string _defaultPlaceholderValue = "";
     
     public string? FieldName { get; set; }
     public string? FieldDisplayName { get; set; }
@@ -35,10 +35,16 @@ public record CrossValidationError
     protected void AddPlaceholderValue(object value, [CallerArgumentExpression(nameof(value))] string? name = null)
     {
         PlaceholderValues ??= new();
+
+        if (PlaceholderValues.ContainsKey(name!))
+        {
+            throw new InvalidOperationException("Cannot add a placeholder with the same name twice");
+        }
+        
         PlaceholderValues.Add(name!, value);
     }
     
-    public virtual void AddPlaceHolderValues()
+    public virtual void AddPlaceholderValues()
     {
         AddCommonPlaceholderValues();
         AddCustomErrorPlaceholderValues();
@@ -47,13 +53,13 @@ public record CrossValidationError
 
     private void AddCommonPlaceholderValues()
     {
-        AddPlaceholderValue(FieldDisplayName ?? _defaultPlaceholderValue, nameof(FieldDisplayName));
-        AddPlaceholderValue(FieldValue ?? _defaultPlaceholderValue, nameof(FieldValue));
+        AddPlaceholderValue(FieldDisplayName ?? DefaultPlaceholderValue, nameof(FieldDisplayName));
+        AddPlaceholderValue(FieldValue ?? DefaultPlaceholderValue, nameof(FieldValue));
     }
 
     private void AddCustomErrorPlaceholderValues()
     {
-        var arePlaceholderValuesAdded = GetType().GetMethod(nameof(AddPlaceHolderValues))!.DeclaringType == GetType();
+        var arePlaceholderValuesAdded = GetType().GetMethod(nameof(AddPlaceholderValues))!.DeclaringType == GetType();
 
         if (!arePlaceholderValuesAdded && CrossValidationConfiguration.GeneratePlaceholderValuesWhenTheyAreNotAdded)
         {
@@ -68,7 +74,7 @@ public record CrossValidationError
                 var value = properties.Where(x => x.Name == name)
                     .Select(x => x.GetValue(this)!)
                     .FirstOrDefault();
-                AddPlaceholderValue(value ?? _defaultPlaceholderValue, name);
+                AddPlaceholderValue(value ?? DefaultPlaceholderValue, name);
             }
         }
     }

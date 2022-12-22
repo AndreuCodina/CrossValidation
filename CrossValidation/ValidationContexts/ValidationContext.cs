@@ -20,7 +20,7 @@ public abstract class ValidationContext
     {
         Errors ??= new List<CrossValidationError>();
         SetError(error);
-        Error!.AddPlaceHolderValues();
+        Error!.AddPlaceholderValues();
         Errors.Add(Error);
     }
 
@@ -70,5 +70,7 @@ public abstract class ValidationContext
     {
         originalError.Code ??= errorToCombine.Code;
         originalError.Message ??= errorToCombine.Message;
+        originalError.FieldName ??= errorToCombine.FieldName;
+        originalError.FieldDisplayName ??= errorToCombine.FieldDisplayName;
     }
 }

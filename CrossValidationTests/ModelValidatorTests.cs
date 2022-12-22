@@ -50,7 +50,7 @@ public class ModelValidatorTests
 
         var action = () => parentModelValidator.Validate(_model);
 
-        var error = action.ShouldThrow<ValidationException>().Errors[0];
+        var error = action.ShouldThrow<CrossValidationException>().Errors[0];
         error.Code.ShouldBe(nameof(ErrorResource.NotNull));
     }
 
@@ -80,7 +80,7 @@ public class ModelValidatorTests
 
         var action = () => parentModelValidator.Validate(_model);
 
-        var error = action.ShouldThrow<ValidationException>().Errors[0];
+        var error = action.ShouldThrow<CrossValidationException>().Errors[0];
         error.FieldName.ShouldBe(expectedFieldName);
         error.FieldValue.ShouldBe(expectedFieldValue);
     }
@@ -103,7 +103,7 @@ public class ModelValidatorTests
 
         var action = () => parentModelValidator.Validate(_model);
 
-        var error = action.ShouldThrow<ValidationException>().Errors[0];
+        var error = action.ShouldThrow<CrossValidationException>().Errors[0];
         error.FieldName.ShouldBe(expectedFieldName);
         error.FieldValue.ShouldBe(expectedFieldValue);
     }
@@ -126,7 +126,7 @@ public class ModelValidatorTests
 
         var action = () => parentModelValidator.Validate(_model);
 
-        var error = action.ShouldThrow<ValidationException>().Errors[0];
+        var error = action.ShouldThrow<CrossValidationException>().Errors[0];
         error.FieldName.ShouldBe(expectedFieldName);
         error.FieldValue.ShouldBe(expectedFieldValue);
     }
@@ -163,7 +163,7 @@ public class ModelValidatorTests
 
         var action = () => parentModelValidator.Validate(_model);
 
-        var errors = action.ShouldThrow<ValidationException>().Errors;
+        var errors = action.ShouldThrow<CrossValidationException>().Errors;
         errors.Count.ShouldBe(1);
         errors[0].Code.ShouldBe(expectedCode);
     }
@@ -209,7 +209,7 @@ public class ModelValidatorTests
 
         var action = () => parentModelValidator.Validate(_model);
 
-        var errors = action.ShouldThrow<ValidationException>().Errors;
+        var errors = action.ShouldThrow<CrossValidationException>().Errors;
         errors.Select(x => x.Code).ShouldBe(expectedCodes);
     }
 
@@ -260,7 +260,7 @@ public class ModelValidatorTests
     
         var action = () => parentModelValidator.Validate(_model);
     
-        var error = action.ShouldThrow<ValidationException>().Errors[0];
+        var error = action.ShouldThrow<CrossValidationException>().Errors[0];
         error.FieldValue.ShouldBe(expectedTransformation);
     }
     
@@ -276,7 +276,7 @@ public class ModelValidatorTests
 
         var action = () => parentModelValidator.Validate(_model);
 
-        var error = action.ShouldThrow<ValidationException>().Errors[0];
+        var error = action.ShouldThrow<CrossValidationException>().Errors[0];
         error.FieldValue.ShouldBe(expectedFieldValue);
     }
     
@@ -292,7 +292,7 @@ public class ModelValidatorTests
 
         var action = () => parentModelValidator.Validate(_model);
 
-        var error = action.ShouldThrow<ValidationException>().Errors[0];
+        var error = action.ShouldThrow<CrossValidationException>().Errors[0];
         error.FieldValue.ShouldBe(expectedFieldValue);
     }
 
@@ -310,7 +310,7 @@ public class ModelValidatorTests
 
         var action = () => parentModelValidator.Validate(_model);
 
-        var error = action.ShouldThrow<ValidationException>().Errors[0];
+        var error = action.ShouldThrow<CrossValidationException>().Errors[0];
         error.Message.ShouldBe(expectedMessage);
     }
 
@@ -327,7 +327,7 @@ public class ModelValidatorTests
 
         var action = () => parentModelValidator.Validate(_model);
 
-        var error = action.ShouldThrow<ValidationException>().Errors[0];
+        var error = action.ShouldThrow<CrossValidationException>().Errors[0];
         error.Code.ShouldBe(expectedCode);
     }
     
@@ -343,7 +343,7 @@ public class ModelValidatorTests
         
         var action = () => parentModelValidator.Validate(_model);
 
-        var error = action.ShouldThrow<ValidationException>().Errors[0];
+        var error = action.ShouldThrow<CrossValidationException>().Errors[0];
         error.ShouldBeOfType<CustomErrorWithCode>();
     }
     
@@ -359,7 +359,7 @@ public class ModelValidatorTests
         
         var action = () => parentModelValidator.Validate(_model);
         
-        var errors = action.ShouldThrow<ValidationException>().Errors;
+        var errors = action.ShouldThrow<CrossValidationException>().Errors;
         var error = errors[0].ShouldBeOfType<CommonCrossValidationError.GreaterThan<int>>();
         error.ComparisonValue.ShouldBe(comparisonValue);
         error.Code.ShouldBe("GreaterThan");
@@ -373,14 +373,14 @@ public class ModelValidatorTests
         var parentModelValidator = CreateParentModelValidator(validator =>
         {
             validator.RuleFor(x => x.NullableString)
-                .WithMessage(expectedMessage)
                 .WithError(expectedError)
+                .WithMessage(expectedMessage)
                 .NotNull();
         });
         
         var action = () => parentModelValidator.Validate(_model);
         
-        var error = action.ShouldThrow<ValidationException>().Errors[0];
+        var error = action.ShouldThrow<CrossValidationException>().Errors[0];
         error.ShouldBeOfType<CustomErrorWithCode>();
         error.Code.ShouldBe(expectedError.Code);
         error.Message.ShouldBe(expectedMessage);
@@ -394,14 +394,14 @@ public class ModelValidatorTests
         var parentModelValidator = CreateParentModelValidator(validator =>
         {
             validator.RuleFor(x => x.NullableString)
-                .WithError(expectedError)
                 .WithMessage(expectedMessage)
+                .WithError(expectedError)
                 .NotNull();
         });
         
         var action = () => parentModelValidator.Validate(_model);
         
-        var error = action.ShouldThrow<ValidationException>().Errors[0];
+        var error = action.ShouldThrow<CrossValidationException>().Errors[0];
         error.ShouldBeOfType<CustomErrorWithCode>();
         error.Code.ShouldBe(expectedError.Code);
         error.Message.ShouldBe(expectedMessage);
@@ -424,7 +424,7 @@ public class ModelValidatorTests
 
         var action = () => parentModelValidator.Validate(_model);
 
-        var error = action.ShouldThrow<ValidationException>().Errors[0];
+        var error = action.ShouldThrow<CrossValidationException>().Errors[0];
         error.Message.ShouldBe(expectedMessage);
         error.Code.ShouldBe(expectedCode);
         error.ShouldBeOfType<CommonCrossValidationError.GreaterThan<int>>();
@@ -448,7 +448,7 @@ public class ModelValidatorTests
 
         var action = () => parentModelValidator.Validate(_model);
 
-        var error = action.ShouldThrow<ValidationException>().Errors[0];
+        var error = action.ShouldThrow<CrossValidationException>().Errors[0];
         error.Code.ShouldBe(expectedCode);
     }
 
@@ -469,7 +469,7 @@ public class ModelValidatorTests
 
         var action = () => parentModelValidator.Validate(_model);
 
-        var error = action.ShouldThrow<ValidationException>().Errors[0];
+        var error = action.ShouldThrow<CrossValidationException>().Errors[0];
         error.Code.ShouldBe(expectedCode);
     }
     
@@ -507,7 +507,7 @@ public class ModelValidatorTests
         
         var action = () => parentModelValidator.Validate(_model);
 
-        var errors = action.ShouldThrow<ValidationException>().Errors;
+        var errors = action.ShouldThrow<CrossValidationException>().Errors;
         errors.Count.ShouldBe(2);
         errors[0].FieldName.ShouldBe($"{nameof(_model.NullableIntList)}[1]");
         errors[1].FieldName.ShouldBe($"{nameof(_model.NullableIntList)}[3]");
@@ -527,7 +527,7 @@ public class ModelValidatorTests
 
         var action = () => parentModelValidator.Validate(_model);
 
-        var errors = action.ShouldThrow<ValidationException>().Errors;
+        var errors = action.ShouldThrow<CrossValidationException>().Errors;
         errors.Count.ShouldBe(1);
         errors[0].FieldName.ShouldBe($"{nameof(_model.NullableIntList)}[1]");
     }
@@ -551,7 +551,7 @@ public class ModelValidatorTests
 
         var action = () => parentModelValidator.Validate(_model);
 
-        var error = action.ShouldThrow<ValidationException>().Errors[0];
+        var error = action.ShouldThrow<CrossValidationException>().Errors[0];
         error.Message.ShouldBe(expectedErrorMessage);
     }
     
@@ -569,7 +569,7 @@ public class ModelValidatorTests
 
         var action = () => parentModelValidator.Validate(_model);
 
-        var error = action.ShouldThrow<ValidationException>().Errors[0];
+        var error = action.ShouldThrow<CrossValidationException>().Errors[0];
         error.Message.ShouldBe(expectedMessage);
     }
     
@@ -587,7 +587,7 @@ public class ModelValidatorTests
 
         var action = () => parentModelValidator.Validate(_model);
 
-        var error = action.ShouldThrow<ValidationException>().Errors[0];
+        var error = action.ShouldThrow<CrossValidationException>().Errors[0];
         error.Message.ShouldBe(expectedMessage);
     }
 
@@ -606,7 +606,7 @@ public class ModelValidatorTests
 
         var action = () => parentModelValidator.Validate(_model);
 
-        var error = action.ShouldThrow<ValidationException>().Errors[0];
+        var error = action.ShouldThrow<CrossValidationException>().Errors[0];
         error.Message.ShouldBe(expectedMessage);
     }
     
@@ -621,7 +621,7 @@ public class ModelValidatorTests
         
         var action = () => parentModelValidator.Validate(_model);
 
-        var error = action.ShouldThrow<ValidationException>().Errors[0];
+        var error = action.ShouldThrow<CrossValidationException>().Errors[0];
         error.ShouldBeOfType<CommonCrossValidationError.Predicate>();
     }
 

@@ -38,17 +38,17 @@ public class EnumValidatorTests
         var enumValue = (NestedEnum)nonExistentColorId;
         var enumAction = () => Validate.That(enumValue)
             .IsInEnum();
-        enumAction.ShouldThrow<ValidationException>();
+        enumAction.ShouldThrow<CrossValidationException>();
          
         var intValue = nonExistentColorId;
         var intAction = () => Validate.That(intValue)
             .IsInEnum(typeof(NestedEnum));
-        intAction.ShouldThrow<ValidationException>();
+        intAction.ShouldThrow<CrossValidationException>();
          
         var stringValue = new Bogus.Faker().Lorem.Sentence();
         var stringAction = () => Validate.That(stringValue)
             .IsInEnum(typeof(NestedEnum));
-        stringAction.ShouldThrow<ValidationException>();
+        stringAction.ShouldThrow<CrossValidationException>();
     }
 
     [Fact]

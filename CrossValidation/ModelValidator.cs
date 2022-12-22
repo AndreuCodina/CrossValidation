@@ -71,7 +71,7 @@ public abstract class ModelValidator<TModel>
 
         if (!Context.IsChildContext && Context.Errors is not null)
         {
-            throw new ValidationException(Context.Errors!);
+            throw new CrossValidationException(Context.Errors!);
         }
     }
 }

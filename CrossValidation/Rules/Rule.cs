@@ -24,22 +24,18 @@ public abstract class Rule<TSelf, TField, TValidationContext>
 
             if (error is not null)
             {
-                var errorFilled = error with
-                {
-                    FieldName = Context.FieldName,
-                    FieldValue = Context.FieldValue,
-                    Message = Context.Message is null && error.Message is null && error.Code is not null
-                        ? ErrorResource.ResourceManager.GetString(error.Code!)
-                        : Context.Message,
-                    FieldDisplayName = error.FieldDisplayName ?? Context.FieldName
-                };
-                validator.SetError(errorFilled);
-                HandleError(errorFilled);
+                FinishWithError(error);
             }
         }
 
         Context.Clean();
         return GetSelf();
+    }
+
+    public void FinishWithError(CrossValidationError error)
+    {
+        FillErrorWithCustomizations(error);
+        HandleError(error);
     }
 
     protected abstract void HandleError(CrossValidationError error);
@@ -60,5 +56,20 @@ public abstract class Rule<TSelf, TField, TValidationContext>
     {
         Context.SetError(error);
         return GetSelf();
+    }
+    
+    private void FillErrorWithCustomizations(CrossValidationError error)
+    {
+        error.FieldName = Context.FieldName;
+        error.FieldValue = Context.FieldValue;
+        error.Message = GetErrorMessage(error);
+        error.FieldDisplayName ??= error.FieldName;
+    }
+    
+    private string? GetErrorMessage(CrossValidationError error)
+    {
+        return Context.Message is null && error.Message is null && error.Code is not null
+            ? ErrorResource.ResourceManager.GetString(error.Code)
+            : Context.Message;
     }
 }

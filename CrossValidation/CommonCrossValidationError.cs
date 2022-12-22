@@ -12,10 +12,10 @@ public abstract record CommonCrossValidationError(string Code) : ResXValidationE
     public record GreaterThan<T>(T ComparisonValue) :
         CommonCrossValidationError(nameof(ErrorResource.GreaterThan))
     {
-        public override void AddPlaceHolderValues()
+        public override void AddPlaceholderValues()
         {
             AddPlaceholderValue(ComparisonValue!);
-            base.AddPlaceHolderValues();
+            base.AddPlaceholderValues();
         }
     }
     
@@ -24,11 +24,11 @@ public abstract record CommonCrossValidationError(string Code) : ResXValidationE
     public record LengthRange(int Minimum, int Maximum) :
         CommonCrossValidationError(nameof(ErrorResource.LengthRange))
     {
-        public override void AddPlaceHolderValues()
+        public override void AddPlaceholderValues()
         {
             AddPlaceholderValue(Minimum);
             AddPlaceholderValue(Maximum);
-            base.AddPlaceHolderValues();
+            base.AddPlaceholderValues();
         }
     }
     

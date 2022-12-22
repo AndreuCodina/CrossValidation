@@ -84,7 +84,7 @@ public class ModelRule<TModel, TField>
         
         if (Context is {ValidationMode: ValidationMode.StopOnFirstError, Errors: { }})
         {
-            throw new ValidationException(Context.Errors!);
+            throw new CrossValidationException(Context.Errors!);
         }
     }
 
