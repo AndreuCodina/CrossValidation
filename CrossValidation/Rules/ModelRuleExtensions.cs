@@ -21,7 +21,7 @@ public static class ModelRuleExtensions
     
     public static CollectionModelRule<TModel, IEnumerable<TInnerType>> ForEach<TModel, TInnerType>(
         this CollectionModelRule<TModel, IEnumerable<TInnerType>> rule,
-        Action<CollectionModelRule<TModel, TInnerType>> action)
+        Action<ModelRule<TModel, TInnerType>> action)
     {
         var fieldCollection = rule.FieldValue!;
         var fieldFullPath = rule.Context.FieldName;
@@ -29,7 +29,7 @@ public static class ModelRuleExtensions
         
         foreach (var innerField in fieldCollection)
         {
-            var newRule = new CollectionModelRule<TModel, TInnerType>(
+            var newRule = new ModelRule<TModel, TInnerType>(
                 rule.Context,
                 rule.Model,
                 fieldFullPath: fieldFullPath,

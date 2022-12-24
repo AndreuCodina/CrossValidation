@@ -6,6 +6,7 @@ using CrossValidation.ValidationContexts;
 namespace CrossValidation.Rules;
 
 public class CollectionModelRule<TModel, TField> : ModelRule<TModel, TField>
+    where TField : IEnumerable
 {
     internal CollectionModelRule(
         ModelValidationContext context,
@@ -18,13 +19,10 @@ public class CollectionModelRule<TModel, TField> : ModelRule<TModel, TField>
     {
     }
     
-#pragma warning disable CS0693
-    internal static CollectionModelRule<TModel, TField> Create<TField>(
-#pragma warning restore CS0693
+    internal new static CollectionModelRule<TModel, TField> Create(
         TModel model,
         ModelValidationContext context,
         Expression<Func<TModel, TField?>> fieldSelector)
-        where TField : IEnumerable
     {
         var fieldInformation = Util.GetFieldInformation(fieldSelector, model);
         return new CollectionModelRule<TModel, TField>(
