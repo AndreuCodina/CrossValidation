@@ -16,6 +16,6 @@ public static class InlineRuleExtensions
         where TField : struct
     {
         return rule.SetValidator(new NotNullValidator<TField?>(rule.FieldValue))
-            .Transform(x => x.Value);
+            .Transform(x => x!.Value);
     }
 }

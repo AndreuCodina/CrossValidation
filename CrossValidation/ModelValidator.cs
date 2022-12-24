@@ -9,7 +9,7 @@ public abstract class ModelValidator<TModel>
 {
     private ValidationMode _validationMode = ValidationMode.StopOnFirstError;
     public ModelValidationContext? Context { get; set; } = null;
-    public TModel Model { get; set; }
+    public TModel? Model { get; set; }
 
     public ValidationMode ValidationMode
     {
@@ -26,15 +26,15 @@ public abstract class ModelValidator<TModel>
         }
     }
 
-    public ModelRule<TModel, TField> RuleFor<TField>(Expression<Func<TModel, TField>> fieldSelector)
+    public ModelRule<TModel, TField?> RuleFor<TField>(Expression<Func<TModel, TField?>> fieldSelector)
     {
-        return ModelRule<TModel, TField>.Create(Model, Context!, fieldSelector);
+        return ModelRule<TModel, TField?>.Create(Model!, Context!, fieldSelector);
     }
     
     public CollectionModelRule<TModel, IEnumerable<TField>> RuleForCollection<TField>(
         Expression<Func<TModel, IEnumerable<TField>?>> fieldSelector)
     {
-        return CollectionModelRule<TModel, IEnumerable<TField>>.Create(Model, Context!, fieldSelector);
+        return CollectionModelRule<TModel, IEnumerable<TField>>.Create(Model!, Context!, fieldSelector);
     }
 
     public abstract void CreateRules();

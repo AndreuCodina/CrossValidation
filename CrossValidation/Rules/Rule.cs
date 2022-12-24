@@ -12,7 +12,7 @@ public abstract class Rule<TSelf, TField, TValidationContext>
     where TValidationContext : ValidationContext
 {
     public TField? FieldValue { get; set; }
-    public TValidationContext Context { get; set; }
+    public TValidationContext Context { get; set; } = null!;
 
     protected abstract TSelf GetSelf();
 
@@ -85,11 +85,11 @@ public abstract class Rule<TSelf, TField, TValidationContext>
         {
             return Context.FieldDisplayName;
         }
-        else if (error.FieldDisplayName is not null)
+        else if (error.FieldDisplayName is not null and not "")
         {
             return error.FieldDisplayName;
         }
 
-        return error.FieldName;
+        return error.FieldName!;
     }
 }

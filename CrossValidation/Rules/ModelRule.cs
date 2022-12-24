@@ -57,7 +57,7 @@ public class ModelRule<TModel, TField>
         ModelValidationContext context,
         Expression<Func<TModel, TField?>> fieldSelector)
     {
-        var fieldInformation = Util.GetFieldInformation(fieldSelector, model);
+        var fieldInformation = Util.GetFieldInformation(fieldSelector!, model);
         return new ModelRule<TModel, TField>(
             context,
             model,

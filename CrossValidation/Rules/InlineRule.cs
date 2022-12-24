@@ -21,13 +21,17 @@ public class InlineRule<TField>
         Context = new InlineValidationContext
         {
             FieldValue = value,
-            FieldName = fieldName // TODO: fieldFullPath + indexRepresentation;
         };
+
+        if (fieldName is not null)
+        {
+            Context.FieldName = fieldName; // TODO: fieldFullPath + indexRepresentation;
+        }
     }
     
     public static InlineRule<TField> CreateFromSelector<TModel>(
         TModel model,
-        Expression<Func<TModel, TField>> fieldSelector)
+        Expression<Func<TModel, TField?>> fieldSelector)
     {
         var fieldInformation = Util.GetFieldInformation(fieldSelector, model);
         return new InlineRule<TField>(fieldInformation.Value, fieldInformation.SelectionFullPath);

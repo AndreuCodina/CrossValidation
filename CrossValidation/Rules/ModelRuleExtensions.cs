@@ -16,14 +16,14 @@ public static class ModelRuleExtensions
         where TField : struct
     {
         return rule.SetValidator(new NotNullValidator<TField?>(rule.FieldValue))
-            .Transform(x => x.Value);
+            .Transform(x => x!.Value);
     }
     
     public static CollectionModelRule<TModel, IEnumerable<TInnerType>> ForEach<TModel, TInnerType>(
         this CollectionModelRule<TModel, IEnumerable<TInnerType>> rule,
         Action<CollectionModelRule<TModel, TInnerType>> action)
     {
-        var fieldCollection = rule.FieldValue;
+        var fieldCollection = rule.FieldValue!;
         var fieldFullPath = rule.Context.FieldName;
         var index = 0;
         

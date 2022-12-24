@@ -130,10 +130,9 @@ public class InlineRuleTests
             .Build();
         
         var action = () => Validate.That(_model.String)
-            .NotNull()
             .Must(_ => true);
         action.ShouldNotThrow();
-        
+
         action = () => Validate.That(_model.NullableString)
             .NotNull()
             .Must(_ => true);
