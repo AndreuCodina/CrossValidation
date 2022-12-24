@@ -265,19 +265,41 @@ public class ModelValidatorTests
     }
     
     [Fact]
-    public void Field_value_is_null_when_model_and_field_selected_match()
+    public void Cannot_transform_same_model()
+    {
+        ParentModel ChangeValues(ParentModel model)
+        {
+            model.NullableString = "Nullable string";
+            return model;
+        }
+        
+        var parentModelValidator = CreateParentModelValidator(validator =>
+        {
+            validator.RuleFor(x => x)
+                .Transform(x => ChangeValues(x!))
+                .Null();
+        });
+    
+        var action = () => parentModelValidator.Validate(_model);
+    
+        var error = action.ShouldThrow<CrossValidationException>().Errors[0];
+        error.FieldName.ShouldBe("");
+    }
+    
+    [Fact]
+    public void Field_value_has_value_when_model_and_field_selected_match()
     {
         object? expectedFieldValue = null;
         var parentModelValidator = CreateParentModelValidator(validator =>
         {
             validator.RuleFor(x => x)
-                .NotNull();
+                .Null();
         });
 
         var action = () => parentModelValidator.Validate(_model);
 
         var error = action.ShouldThrow<CrossValidationException>().Errors[0];
-        error.FieldValue.ShouldBe(expectedFieldValue);
+        error.FieldValue.ShouldNotBeNull();
     }
     
     [Fact]
@@ -509,7 +531,7 @@ public class ModelValidatorTests
         var error = action.ShouldThrow<CrossValidationException>().Errors[0];
         error.Code.ShouldBe(expectedCode);
     }
-    
+
     [Fact]
     public void Execute_validators_for_all_item_collection()
     {
@@ -518,9 +540,10 @@ public class ModelValidatorTests
             .Build();
         var parentModelValidator = CreateParentModelValidator(validator =>
         {
-            validator.RuleForEach(x => x.NullableIntList!, x => x
-                .GreaterThan(1)
-                .GreaterThan(10));
+            validator.RuleForCollection(x => x.NullableIntList)
+                .ForEach(x => x
+                    .GreaterThan(1)
+                    .GreaterThan(10));
         });
         
         var action = () => parentModelValidator.Validate(_model);
@@ -537,17 +560,38 @@ public class ModelValidatorTests
         var parentModelValidator = CreateParentModelValidator(validator =>
         {
             validator.ValidationMode = ValidationMode.AccumulateErrors;
-            validator.RuleForEach(x => x.NullableIntList!, x => x
-                .GreaterThan(0)
-                .GreaterThan(10));
+            validator.RuleForCollection(x => x.NullableIntList)
+                .ForEach(x => x
+                    .GreaterThan(0)
+                    .GreaterThan(10));
         });
         
         var action = () => parentModelValidator.Validate(_model);
 
         var errors = action.ShouldThrow<CrossValidationException>().Errors;
         errors.Count.ShouldBe(2);
-        errors[0].FieldName.ShouldBe($"{nameof(_model.NullableIntList)}[1]");
-        errors[1].FieldName.ShouldBe($"{nameof(_model.NullableIntList)}[3]");
+        errors[0].FieldName.ShouldBe("NullableIntList[1]");
+        errors[1].FieldName.ShouldBe("NullableIntList[3]");
+    }
+    
+    [Fact]
+    public void Keep_field_name_when_the_field_is_transformed_in_a_collection()
+    {
+        _model = new ParentModelBuilder()
+            .WithNullableIntList(new List<int> { 1 })
+            .Build();
+        var parentModelValidator = CreateParentModelValidator(validator =>
+        {
+            validator.RuleForCollection(x => x.NullableIntList)
+                .ForEach(x => x
+                    .Transform(Convert.ToDouble)
+                    .GreaterThan(10d));
+        });
+        
+        var action = () => parentModelValidator.Validate(_model);
+
+        var error = action.ShouldThrow<CrossValidationException>().Errors[0];
+        error.FieldName.ShouldBe("NullableIntList[0]");
     }
     
     [Fact]
@@ -558,15 +602,16 @@ public class ModelValidatorTests
             .Build();
         var parentModelValidator = CreateParentModelValidator(validator =>
         {
-            validator.RuleForEach(x => x.NullableIntList!, x => x
-                .GreaterThan(10));
+            validator.RuleForCollection(x => x.NullableIntList)
+                .ForEach(x => x
+                    .GreaterThan(10));
         });
 
         var action = () => parentModelValidator.Validate(_model);
 
         var errors = action.ShouldThrow<CrossValidationException>().Errors;
         errors.Count.ShouldBe(1);
-        errors[0].FieldName.ShouldBe($"{nameof(_model.NullableIntList)}[1]");
+        errors[0].FieldName.ShouldBe("NullableIntList[1]");
     }
     
     [Fact]

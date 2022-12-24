@@ -14,32 +14,42 @@ public class ModelRule<TModel, TField>
 {
     public TModel Model { get; set; }
     public string FieldFullPath { get; set; }
-    public Expression<Func<TModel, TField?>> FieldSelector { get; set; }
 
     public ModelRule(
         ModelValidationContext context,
         TModel model,
         string fieldFullPath,
         TField? fieldValue,
-        bool isFieldSelectedDifferentThanModel,
-        Expression<Func<TModel, TField?>> fieldSelector,
-        int? index = null)
+        int? index = null,
+        string? parentPath = null)
     {
         Context = context;
         Model = model;
         FieldFullPath = fieldFullPath;
-        var fieldValueToAssign = isFieldSelectedDifferentThanModel ? fieldValue : default;
-        FieldValue = fieldValueToAssign;
-        Context.FieldValue = fieldValueToAssign;
+        FieldValue = fieldValue;
+        Context.FieldValue = fieldValue;
         var indexRepresentation = index is not null
             ? $"[{index}]"
             : "";
-        var parentPath = context.ParentPath is not null
-            ? context.ParentPath + "."
-            : "";
-        Context.FieldName = parentPath + fieldFullPath + indexRepresentation;
+
+        var parentPathValue = "";
+        
+        if (parentPath is not null)
+        {
+            parentPathValue = parentPath;
+        }
+        else if (context.ParentPath is not null)
+        {
+            parentPathValue = context.ParentPath;
+        }
+        
+        if (parentPathValue is not "")
+        {
+            parentPathValue += ".";
+        }
+
+        Context.FieldName = parentPathValue + fieldFullPath + indexRepresentation;
         Context.FieldDisplayName = null;
-        FieldSelector = fieldSelector;
     }
     
     public static ModelRule<TModel, TField> Create(
@@ -52,26 +62,18 @@ public class ModelRule<TModel, TField>
             context,
             model,
             fieldInformation.SelectionFullPath,
-            fieldInformation.Value,
-            fieldInformation.IsFieldSelectedDifferentThanModel,
-            fieldSelector);
+            fieldInformation.Value);
     }
-    
+
     public ModelRule<TModel, TFieldTransformed?> Transform<TFieldTransformed>(
         Func<TField?, TFieldTransformed?> transformer)
     {
-        var oldFieldSelector = FieldSelector;
-        var fieldInformation = Util.GetFieldInformation(oldFieldSelector, Model);
-        Expression<Func<TModel, TFieldTransformed?>> transformedFieldSelector = model =>
-            transformer(fieldInformation.Value);
-        var fieldValueTransformed = transformer(fieldInformation.Value);
+        var fieldValueTransformed = transformer(FieldValue);
         return new ModelRule<TModel, TFieldTransformed?>(
             Context,
             Model,
-            fieldInformation.SelectionFullPath,
-            fieldValueTransformed,
-            fieldInformation.IsFieldSelectedDifferentThanModel,
-            transformedFieldSelector);
+            Context.FieldName,
+            fieldValueTransformed);
     }
 
     protected override ModelRule<TModel, TField> GetSelf()
