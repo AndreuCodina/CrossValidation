@@ -19,6 +19,7 @@ public class ParentModelBuilder
             NullableString = _nullableString,
             NullableDateTime = DateTime.UtcNow,
             NestedModel = _nestedModel,
+            NullableNestedModel = null,
             NullableIntList = _nullableIntList,
             NullableInt = _nullableInt,
             NestedEnum = NestedEnum.Red

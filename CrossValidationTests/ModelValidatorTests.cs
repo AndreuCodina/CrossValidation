@@ -6,19 +6,21 @@ using CrossValidation.Resources;
 using CrossValidation.Results;
 using CrossValidation.Rules;
 using CrossValidationTests.Builders;
+using CrossValidationTests.Fixtures;
 using CrossValidationTests.Models;
-using Moq;
 using Shouldly;
 using Xunit;
 
 namespace CrossValidationTests;
 
-public class ModelValidatorTests
+public class ModelValidatorTests : IClassFixture<ModelValidatorFixture>
 {
+    private readonly ModelValidatorFixture _modelValidatorFixture;
     private ParentModel _model;
 
-    public ModelValidatorTests()
+    public ModelValidatorTests(ModelValidatorFixture modelValidatorFixture)
     {
+        _modelValidatorFixture = modelValidatorFixture;
         _model = new ParentModelBuilder().Build();
     }
     
@@ -28,7 +30,7 @@ public class ModelValidatorTests
         _model = new ParentModelBuilder()
             .WithNullableString("Coupon1")
             .Build();
-        var parentModelValidator = CreateParentModelValidator(validator =>
+        var parentModelValidator = _modelValidatorFixture.CreateParentModelValidator(validator =>
         {
             validator.RuleFor(x => x.NullableString)
                 .NotNull();
@@ -42,7 +44,7 @@ public class ModelValidatorTests
     [Fact]
     public void One_rule_fails_when_the_field_does_not_pass_the_validator()
     {
-        var parentModelValidator = CreateParentModelValidator(validator =>
+        var parentModelValidator = _modelValidatorFixture.CreateParentModelValidator(validator =>
         {
             validator.RuleFor(x => x.NullableString)
                 .NotNull();
@@ -57,7 +59,7 @@ public class ModelValidatorTests
     [Fact]
     public void One_rule_with_same_model_as_field()
     {
-        var parentModelValidator = CreateParentModelValidator(validator =>
+        var parentModelValidator = _modelValidatorFixture.CreateParentModelValidator(validator =>
         {
             validator.RuleFor(x => x);
         });
@@ -72,7 +74,7 @@ public class ModelValidatorTests
     {
         var expectedFieldName = "NestedModel.Int";
         var expectedFieldValue = _model.NestedModel.Int;
-        var parentModelValidator = CreateParentModelValidator(validator =>
+        var parentModelValidator = _modelValidatorFixture.CreateParentModelValidator(validator =>
         {
             validator.RuleFor(x => x.NestedModel.Int)
                 .GreaterThan(_model.NestedModel.Int);
@@ -90,12 +92,12 @@ public class ModelValidatorTests
     {
         var expectedFieldName = "NestedModel.Int";
         var expectedFieldValue = _model.NestedModel.Int;
-        var nestedModelValidator = CreateNestedModelValidator(validator =>
+        var nestedModelValidator = _modelValidatorFixture.CreateNestedModelValidator(validator =>
         {
             validator.RuleFor(x => x.Int)
                 .GreaterThan(10);
         });
-        var parentModelValidator = CreateParentModelValidator(validator =>
+        var parentModelValidator = _modelValidatorFixture.CreateParentModelValidator(validator =>
         {
             validator.RuleFor(x => x.NestedModel)
                 .SetModelValidator(nestedModelValidator);
@@ -114,10 +116,10 @@ public class ModelValidatorTests
         var expectedFieldName = "NullableString";
         string? expectedFieldValue = null;
 
-        var parentModelValidator = CreateParentModelValidator(validator =>
+        var parentModelValidator = _modelValidatorFixture.CreateParentModelValidator(validator =>
         {
             validator.RuleFor(x => x.NestedModel)
-                .NotNull();
+                .Must(_ => true);
             validator.RuleFor(x => x.NullableString)
                 .NotNull();
         });
@@ -133,22 +135,23 @@ public class ModelValidatorTests
     public void Stop_on_first_error()
     {
         var expectedCode = "ExpectedCode";
-        var nestedModelValidator = CreateNestedModelValidator(validator =>
+        var nestedModelValidator = _modelValidatorFixture.CreateNestedModelValidator(validator =>
         {
             validator.RuleFor(x => x.Int)
                 .WithCode("UnexpectedCode2")
                 .GreaterThan(_model.NestedModel.Int - 1)
                 .WithCode("UnexpectedCode3")
                 .GreaterThan(_model.NestedModel.Int - 1);
+
             validator.RuleFor(x => x.NestedNestedModel)
                 .WithCode("UnexpectedCode4")
-                .NotNull()
+                .Must(_ => true)
                 .WithCode(expectedCode)
-                .Null()
+                .Must(_ => false)
                 .WithCode("UnexpectedCode5")
-                .Null();
+                .Must(_ => false);
         });
-        var parentModelValidator = CreateParentModelValidator(validator =>
+        var parentModelValidator = _modelValidatorFixture.CreateParentModelValidator(validator =>
         {
             validator.RuleFor(x => x.NullableString)
                 .WithCode("UnexpectedCode1")
@@ -156,7 +159,7 @@ public class ModelValidatorTests
             validator.RuleFor(x => x.NestedModel)
                 .SetModelValidator(nestedModelValidator)
                 .WithCode("UnexpectedCode6")
-                .NotNull();
+                .Must(_ => true);
         });
 
         var action = () => parentModelValidator.Validate(_model);
@@ -175,7 +178,7 @@ public class ModelValidatorTests
             "ErrorCode1", "ErrorCode2", "ErrorCode3", "ErrorCode4", "ErrorCode5", "ErrorCode6", "ErrorCode7"
         };
 
-        var nestedModelValidator = CreateNestedModelValidator(validator =>
+        var nestedModelValidator = _modelValidatorFixture.CreateNestedModelValidator(validator =>
         {
             validator.RuleFor(x => x.Int)
                 .WithCode(expectedCodes[1])
@@ -184,11 +187,11 @@ public class ModelValidatorTests
                 .GreaterThan(_model.NestedModel.Int);
             validator.RuleFor(x => x.NestedNestedModel)
                 .WithCode("UnexpectedErrorCode")
-                .NotNull()
+                .Must(_ => true)
                 .WithCode(expectedCodes[3])
-                .Null();
+                .Must(_ => false);
         });
-        var parentModelValidator = CreateParentModelValidator(validator =>
+        var parentModelValidator = _modelValidatorFixture.CreateParentModelValidator(validator =>
         {
             validator.ValidationMode = ValidationMode.AccumulateFirstErrorEachRule;
             validator.RuleFor(x => x.NullableString)
@@ -197,7 +200,7 @@ public class ModelValidatorTests
             validator.RuleFor(x => x.NestedModel)
                 .SetModelValidator(nestedModelValidator)
                 .WithCode(expectedCodes[4])
-                .Null();
+                .Must(_ => false);
             validator.RuleFor(x => x.NestedModel.Int)
                 .WithCode(expectedCodes[5])
                 .GreaterThan(_model.NestedModel.Int)
@@ -214,7 +217,7 @@ public class ModelValidatorTests
     [Fact]
     public void Validation_mode_cannot_be_changed_in_children_validators()
     {
-        var nestedModelValidator = CreateNestedModelValidator(validator =>
+        var nestedModelValidator = _modelValidatorFixture.CreateNestedModelValidator(validator =>
         {
             validator.ValidationMode = ValidationMode.AccumulateFirstErrorEachRule;
             validator.RuleFor(x => x.Int)
@@ -223,7 +226,7 @@ public class ModelValidatorTests
                 .WithCode("UnexpectedErrorCode")
                 .GreaterThan(_model.NestedModel.Int);
         });
-        var parentModelValidator = CreateParentModelValidator(validator =>
+        var parentModelValidator = _modelValidatorFixture.CreateParentModelValidator(validator =>
         {
             validator.RuleFor(x => x.NestedModel)
                 .SetModelValidator(nestedModelValidator);
@@ -247,7 +250,7 @@ public class ModelValidatorTests
         _model = new ParentModelBuilder()
             .WithNullableIntList(nullableIntList)
             .Build();
-        var parentModelValidator = CreateParentModelValidator(validator =>
+        var parentModelValidator = _modelValidatorFixture.CreateParentModelValidator(validator =>
         {
             validator.ValidationMode = ValidationMode.AccumulateFirstErrorEachRule;
             
@@ -271,7 +274,7 @@ public class ModelValidatorTests
             return model;
         }
         
-        var parentModelValidator = CreateParentModelValidator(validator =>
+        var parentModelValidator = _modelValidatorFixture.CreateParentModelValidator(validator =>
         {
             validator.RuleFor(x => x)
                 .Transform(x => ChangeValues(x!))
@@ -287,10 +290,10 @@ public class ModelValidatorTests
     [Fact]
     public void Field_value_has_value_when_model_and_field_selected_match()
     {
-        var parentModelValidator = CreateParentModelValidator(validator =>
+        var parentModelValidator = _modelValidatorFixture.CreateParentModelValidator(validator =>
         {
             validator.RuleFor(x => x)
-                .Null();
+                .Must(_ => false);
         });
 
         var action = () => parentModelValidator.Validate(_model);
@@ -303,7 +306,7 @@ public class ModelValidatorTests
     public void Field_value_has_value_when_model_and_field_selected_do_not_match()
     {
         var expectedFieldValue = _model.NestedModel.Int;
-        var parentModelValidator = CreateParentModelValidator(validator =>
+        var parentModelValidator = _modelValidatorFixture.CreateParentModelValidator(validator =>
         {
             validator.RuleFor(x => x.NestedModel.Int)
                 .GreaterThan(_model.NestedModel.Int);
@@ -320,7 +323,7 @@ public class ModelValidatorTests
     {
         var expectedMessage = "Error message";
 
-        var parentModelValidator = CreateParentModelValidator(validator =>
+        var parentModelValidator = _modelValidatorFixture.CreateParentModelValidator(validator =>
         {
             validator.RuleFor(x => x.NullableString)
                 .WithMessage(expectedMessage)
@@ -337,7 +340,7 @@ public class ModelValidatorTests
     public void Validator_keeps_code_customization()
     {
         var expectedCode = "MyCode";
-        var parentModelValidator = CreateParentModelValidator(validator =>
+        var parentModelValidator = _modelValidatorFixture.CreateParentModelValidator(validator =>
         {
             validator.RuleFor(x => x.NullableString)
                 .WithCode(expectedCode)
@@ -353,7 +356,7 @@ public class ModelValidatorTests
     [Fact]
     public void Validator_keeps_error_customization()
     {
-        var parentModelValidator = CreateParentModelValidator(validator =>
+        var parentModelValidator = _modelValidatorFixture.CreateParentModelValidator(validator =>
         {
             validator.RuleFor(x => x.NullableString)
                 .WithError(new CustomErrorWithCode("COD123"))
@@ -370,7 +373,7 @@ public class ModelValidatorTests
     public void Validator_keeps_field_display_name_customization()
     {
         var expectedDisplayName = "My display name";
-        var parentModelValidator = CreateParentModelValidator(validator =>
+        var parentModelValidator = _modelValidatorFixture.CreateParentModelValidator(validator =>
         {
             validator.RuleFor(x => x.NullableString)
                 .WithFieldDisplayName(expectedDisplayName)
@@ -387,7 +390,7 @@ public class ModelValidatorTests
     public void Get_custom_error()
     {
         var comparisonValue = _model.NestedModel.Int + 1;
-        var parentModelValidator = CreateParentModelValidator(validator =>
+        var parentModelValidator = _modelValidatorFixture.CreateParentModelValidator(validator =>
         {
             validator.RuleFor(x => x.NestedModel.Int)
                 .GreaterThan(comparisonValue);
@@ -406,7 +409,7 @@ public class ModelValidatorTests
     {
         var expectedMessage = "Expected message";
         var expectedError = new CustomErrorWithCode("COD123");
-        var parentModelValidator = CreateParentModelValidator(validator =>
+        var parentModelValidator = _modelValidatorFixture.CreateParentModelValidator(validator =>
         {
             validator.RuleFor(x => x.NullableString)
                 .WithError(expectedError)
@@ -427,7 +430,7 @@ public class ModelValidatorTests
     {
         var expectedMessage = "Expected message";
         var expectedError = new CustomErrorWithCode("COD123");
-        var parentModelValidator = CreateParentModelValidator(validator =>
+        var parentModelValidator = _modelValidatorFixture.CreateParentModelValidator(validator =>
         {
             validator.RuleFor(x => x.NullableString)
                 .WithMessage(expectedMessage)
@@ -451,7 +454,7 @@ public class ModelValidatorTests
             .Build();
         var expectedMessage = "Error message";
         var expectedCode = "GreaterThan";
-        var parentModelValidator = CreateParentModelValidator(validator =>
+        var parentModelValidator = _modelValidatorFixture.CreateParentModelValidator(validator =>
         {
             validator.RuleFor(x => x.NullableInt)
                 .WithCode(new Bogus.Faker().Lorem.Word())
@@ -475,7 +478,7 @@ public class ModelValidatorTests
         _model = new ParentModelBuilder()
             .WithNullableInt(1)
             .Build();
-        var parentModelValidator = CreateParentModelValidator(validator =>
+        var parentModelValidator = _modelValidatorFixture.CreateParentModelValidator(validator =>
         {
             validator.RuleFor(x => x.NullableInt)
                 .WithFieldDisplayName("Field display name")
@@ -496,12 +499,12 @@ public class ModelValidatorTests
     public void Set_model_validator()
     {
         var expectedCode = "GreaterThan";
-        var nestedModelValidator = CreateNestedModelValidator(validator =>
+        var nestedModelValidator = _modelValidatorFixture.CreateNestedModelValidator(validator =>
         {
             validator.RuleFor(x => x.Int)
                 .GreaterThan(10);
         });
-        var parentModelValidator = CreateParentModelValidator(validator =>
+        var parentModelValidator = _modelValidatorFixture.CreateParentModelValidator(validator =>
         {
             validator.RuleFor(x => x.NestedModel)
                 .WithMessage("Message to be cleaned")
@@ -518,12 +521,12 @@ public class ModelValidatorTests
     public void Discard_customizations_for_model_validator()
     {
         var expectedCode = "GreaterThan";
-        var nestedModelValidator = CreateNestedModelValidator(validator =>
+        var nestedModelValidator = _modelValidatorFixture.CreateNestedModelValidator(validator =>
         {
             validator.RuleFor(x => x.Int)
                 .GreaterThan(10);
         });
-        var parentModelValidator = CreateParentModelValidator(validator =>
+        var parentModelValidator = _modelValidatorFixture.CreateParentModelValidator(validator =>
         {
             validator.RuleFor(x => x.NestedModel)
                 .SetModelValidator(nestedModelValidator);
@@ -541,7 +544,7 @@ public class ModelValidatorTests
         _model = new ParentModelBuilder()
             .WithNullableIntList(new List<int> { 100, 90, 80 })
             .Build();
-        var parentModelValidator = CreateParentModelValidator(validator =>
+        var parentModelValidator = _modelValidatorFixture.CreateParentModelValidator(validator =>
         {
             validator.RuleForCollection(x => x.NullableIntList)
                 .ForEach(x => x
@@ -560,7 +563,7 @@ public class ModelValidatorTests
         _model = new ParentModelBuilder()
             .WithNullableIntList(new List<int> { 100, 1, 90, 2 })
             .Build();
-        var parentModelValidator = CreateParentModelValidator(validator =>
+        var parentModelValidator = _modelValidatorFixture.CreateParentModelValidator(validator =>
         {
             validator.ValidationMode = ValidationMode.AccumulateFirstErrorEachRule;
             validator.RuleForCollection(x => x.NullableIntList)
@@ -583,7 +586,7 @@ public class ModelValidatorTests
         _model = new ParentModelBuilder()
             .WithNullableIntList(new List<int> { 1 })
             .Build();
-        var parentModelValidator = CreateParentModelValidator(validator =>
+        var parentModelValidator = _modelValidatorFixture.CreateParentModelValidator(validator =>
         {
             validator.RuleForCollection(x => x.NullableIntList)
                 .ForEach(x => x
@@ -603,7 +606,7 @@ public class ModelValidatorTests
         _model = new ParentModelBuilder()
             .WithNullableIntList(new List<int> {100, 1, 2})
             .Build();
-        var parentModelValidator = CreateParentModelValidator(validator =>
+        var parentModelValidator = _modelValidatorFixture.CreateParentModelValidator(validator =>
         {
             validator.RuleForCollection(x => x.NullableIntList)
                 .ForEach(x => x
@@ -624,7 +627,7 @@ public class ModelValidatorTests
         _model = new ParentModelBuilder()
             .WithNullableIntList(new List<int> {100, 1, 2})
             .Build();
-        var parentModelValidator = CreateParentModelValidator(validator =>
+        var parentModelValidator = _modelValidatorFixture.CreateParentModelValidator(validator =>
         {
             validator.RuleFor(x => x.NestedModel.Int)
                 .When(_ => false)
@@ -645,7 +648,7 @@ public class ModelValidatorTests
     {
         var template = "{FieldDisplayName} is {FieldValue}";
         var expectedMessage = $"NullableString is ";
-        var parentModelValidator = CreateParentModelValidator(validator =>
+        var parentModelValidator = _modelValidatorFixture.CreateParentModelValidator(validator =>
         {
             validator.RuleFor(x => x.NullableString)
                 .WithMessage(template)
@@ -663,7 +666,7 @@ public class ModelValidatorTests
     {
         var template = "{PlaceholderNotReplaced} is {FieldValue}";
         var expectedMessage = $"{{PlaceholderNotReplaced}} is {_model.NestedModel.Int}";
-        var parentModelValidator = CreateParentModelValidator(validator =>
+        var parentModelValidator = _modelValidatorFixture.CreateParentModelValidator(validator =>
         {
             validator.RuleFor(x => x.NestedModel.Int)
                 .WithMessage(template)
@@ -682,7 +685,7 @@ public class ModelValidatorTests
         var comparisonValue = _model.NestedModel.Int;
         var template = "{ComparisonValue} is not greater than {FieldValue}";
         var expectedMessage = $"{_model.NestedModel.Int} is not greater than {comparisonValue}";
-        var parentModelValidator = CreateParentModelValidator(validator =>
+        var parentModelValidator = _modelValidatorFixture.CreateParentModelValidator(validator =>
         {
             validator.RuleFor(x => x.NestedModel.Int)
                 .WithMessage(template)
@@ -698,7 +701,7 @@ public class ModelValidatorTests
     [Fact]
     public void Validate_predicate()
     {
-        var parentModelValidator = CreateParentModelValidator(validator =>
+        var parentModelValidator = _modelValidatorFixture.CreateParentModelValidator(validator =>
         {
             validator.RuleFor(x => x.NestedModel)
                 .Must(x => x.NestedModel.Int > _model.NestedModel.Int);
@@ -710,42 +713,7 @@ public class ModelValidatorTests
         error.ShouldBeOfType<CommonCrossValidationError.Predicate>();
     }
 
-    private ParentModelValidator CreateParentModelValidator(Action<ParentModelValidator> validator)
-    {
-        var validatorMock = new Mock<ParentModelValidator>()
-        {
-            CallBase = true
-        };
-        validatorMock.Setup(x => x.CreateRules())
-            .Callback(() => { validator(validatorMock.Object); });
-        return validatorMock.Object;
-    }
-
-    private NestedModelValidator CreateNestedModelValidator(
-        Action<NestedModelValidator> validator)
-    {
-        var validatorMock = new Mock<NestedModelValidator>()
-        {
-            CallBase = true
-        };
-        validatorMock.Setup(x => x.CreateRules())
-            .Callback(() => { validator(validatorMock.Object); });
-        return validatorMock.Object;
-    }
-
-    public class ParentModelValidator : ModelValidator<ParentModel>
-    {
-        public override void CreateRules()
-        {
-        }
-    }
-
-    public class NestedModelValidator : ModelValidator<NestedModel>
-    {
-        public override void CreateRules()
-        {
-        }
-    }
+    
 
     public record CustomErrorWithCode(string Code) : CrossValidationError(Code: Code);
 }

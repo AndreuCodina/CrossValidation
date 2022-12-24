@@ -105,40 +105,6 @@ public class InlineRuleTests
         error.FieldDisplayName.ShouldBe("Expected field display name");
     }
 
-    [Fact]
-    public void NotNull_works_with_nullable_value_types()
-    {
-        _model = new ParentModelBuilder()
-            .WithNullableInt(1)
-            .Build();
-        
-        var action = () => Validate.That(_model.NestedModel.Int)
-            .GreaterThan(_model.NestedModel.Int - 1);
-        action.ShouldNotThrow();
-        
-        action = () => Validate.That(_model.NullableInt)
-            .NotNull()
-            .GreaterThan(_model.NullableInt!.Value - 1);
-        action.ShouldNotThrow();
-    }
-    
-    [Fact]
-    public void NotNull_works_with_nullable_reference_types()
-    {
-        _model = new ParentModelBuilder()
-            .WithNullableString("The string")
-            .Build();
-        
-        var action = () => Validate.That(_model.String)
-            .Must(_ => true);
-        action.ShouldNotThrow();
-
-        action = () => Validate.That(_model.NullableString)
-            .NotNull()
-            .Must(_ => true);
-        action.ShouldNotThrow();
-    }
-
     public record CustomErrorWithPlaceholderValue(int Value) : CrossValidationError;
 
     public record UserAgeWithoutCustomization

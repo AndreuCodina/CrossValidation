@@ -6,13 +6,6 @@ namespace CrossValidation.Rules;
 
 public static class RuleExtensions
 {
-    public static TSelf Null<TSelf, TField, TValidationContext>(
-        this Rule<TSelf, TField,TValidationContext> rule)
-        where TValidationContext : ValidationContext
-    {
-        return rule.SetValidator(new NullValidator<TField>(rule.FieldValue));
-    }
-
     public static TSelf GreaterThan<TSelf, TField, TValidationContext>(
         this Rule<TSelf, TField, TValidationContext> rule,
         TField valueToCompare)

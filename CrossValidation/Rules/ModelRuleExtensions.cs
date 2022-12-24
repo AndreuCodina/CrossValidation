@@ -19,6 +19,20 @@ public static class ModelRuleExtensions
             .Transform(x => x!.Value);
     }
     
+    public static ModelRule<TModel, TField?> Null<TModel, TField>(
+        this ModelRule<TModel, TField?> rule)
+        where TField : class
+    {
+        return rule.SetValidator(new NullValidator<TField?>(rule.FieldValue));
+    }
+    
+    public static ModelRule<TModel, TField?> Null<TModel, TField>(
+        this ModelRule<TModel, TField?> rule)
+        where TField : struct
+    {
+        return rule.SetValidator(new NullValidator<TField?>(rule.FieldValue));
+    }
+    
     public static CollectionModelRule<TModel, IEnumerable<TInnerType>> ForEach<TModel, TInnerType>(
         this CollectionModelRule<TModel, IEnumerable<TInnerType>> rule,
         Action<ModelRule<TModel, TInnerType>> action)
