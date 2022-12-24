@@ -6,13 +6,6 @@ namespace CrossValidation.Rules;
 
 public static class RuleExtensions
 {
-    public static TSelf NotNull<TSelf, TField, TValidationContext>(
-        this Rule<TSelf, TField, TValidationContext> rule)
-        where TValidationContext : ValidationContext
-    {
-        return rule.SetValidator(new NotNullValidator<TField>(rule.FieldValue));
-    }
-    
     public static TSelf Null<TSelf, TField, TValidationContext>(
         this Rule<TSelf, TField,TValidationContext> rule)
         where TValidationContext : ValidationContext

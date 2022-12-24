@@ -5,6 +5,7 @@ namespace CrossValidationTests.Models;
 
 public class ParentModel
 {
+    public required string String { get; set; }
     public required string? NullableString { get; set; }
     public required DateTime? NullableDateTime { get; set; }
     public required NestedModel NestedModel { get; set; }

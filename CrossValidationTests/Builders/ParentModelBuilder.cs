@@ -15,6 +15,7 @@ public class ParentModelBuilder
     {
         var model = new ParentModel
         {
+            String = "The string",
             NullableString = _nullableString,
             NullableDateTime = DateTime.UtcNow,
             NestedModel = _nestedModel,
@@ -46,7 +47,7 @@ public class ParentModelBuilder
         return this;
     }
     
-    public ParentModelBuilder WithIntNullable(int? nullableInt)
+    public ParentModelBuilder WithNullableInt(int? nullableInt)
     {
         _nullableInt = nullableInt;
         return this;

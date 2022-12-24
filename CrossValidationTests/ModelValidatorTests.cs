@@ -118,8 +118,6 @@ public class ModelValidatorTests
         {
             validator.RuleFor(x => x.NestedModel)
                 .NotNull();
-            validator.RuleFor(x => x.NestedModel.Int)
-                .NotNull();
             validator.RuleFor(x => x.NullableString)
                 .NotNull();
         });
@@ -192,7 +190,7 @@ public class ModelValidatorTests
         });
         var parentModelValidator = CreateParentModelValidator(validator =>
         {
-            validator.ValidationMode = ValidationMode.AccumulateErrors;
+            validator.ValidationMode = ValidationMode.AccumulateFirstErrorEachRule;
             validator.RuleFor(x => x.NullableString)
                 .WithCode(expectedCodes[0])
                 .NotNull();
@@ -218,7 +216,7 @@ public class ModelValidatorTests
     {
         var nestedModelValidator = CreateNestedModelValidator(validator =>
         {
-            validator.ValidationMode = ValidationMode.AccumulateErrors;
+            validator.ValidationMode = ValidationMode.AccumulateFirstErrorEachRule;
             validator.RuleFor(x => x.Int)
                 .GreaterThan(10);
             validator.RuleFor(x => x.Int)
@@ -251,7 +249,7 @@ public class ModelValidatorTests
             .Build();
         var parentModelValidator = CreateParentModelValidator(validator =>
         {
-            validator.ValidationMode = ValidationMode.AccumulateErrors;
+            validator.ValidationMode = ValidationMode.AccumulateFirstErrorEachRule;
             
             validator.RuleFor(x => x.NullableIntList)
                 .Transform(x => TransformValues(x!))
@@ -289,7 +287,6 @@ public class ModelValidatorTests
     [Fact]
     public void Field_value_has_value_when_model_and_field_selected_match()
     {
-        object? expectedFieldValue = null;
         var parentModelValidator = CreateParentModelValidator(validator =>
         {
             validator.RuleFor(x => x)
@@ -449,11 +446,14 @@ public class ModelValidatorTests
     [Fact]
     public void Successful_validator_cleans_customization()
     {
+        _model = new ParentModelBuilder()
+            .WithNullableInt(1)
+            .Build();
         var expectedMessage = "Error message";
         var expectedCode = "GreaterThan";
         var parentModelValidator = CreateParentModelValidator(validator =>
         {
-            validator.RuleFor(x => x.NestedModel.Int)
+            validator.RuleFor(x => x.NullableInt)
                 .WithCode(new Bogus.Faker().Lorem.Word())
                 .WithMessage(new Bogus.Faker().Lorem.Word())
                 .NotNull()
@@ -470,11 +470,14 @@ public class ModelValidatorTests
     }
     
     [Fact]
-    public void New_rule_overrides_field_name_customization()
+    public void New_rule_overrides_field_display_name_customization()
     {
+        _model = new ParentModelBuilder()
+            .WithNullableInt(1)
+            .Build();
         var parentModelValidator = CreateParentModelValidator(validator =>
         {
-            validator.RuleFor(x => x.NestedModel.Int)
+            validator.RuleFor(x => x.NullableInt)
                 .WithFieldDisplayName("Field display name")
                 .NotNull();
 
@@ -559,7 +562,7 @@ public class ModelValidatorTests
             .Build();
         var parentModelValidator = CreateParentModelValidator(validator =>
         {
-            validator.ValidationMode = ValidationMode.AccumulateErrors;
+            validator.ValidationMode = ValidationMode.AccumulateFirstErrorEachRule;
             validator.RuleForCollection(x => x.NullableIntList)
                 .ForEach(x => x
                     .GreaterThan(0)
@@ -624,7 +627,7 @@ public class ModelValidatorTests
         var parentModelValidator = CreateParentModelValidator(validator =>
         {
             validator.RuleFor(x => x.NestedModel.Int)
-                .When(x => false)
+                .When(_ => false)
                 .GreaterThan(_model.NestedModel.Int + 1)
                 .When(x => x.NestedModel.Int == _model.NestedModel.Int)
                 .WithMessage(expectedErrorMessage)

@@ -56,9 +56,9 @@ public class InlineRule<TField>
         return this;
     }
     
-    public InlineRule<TField> Must(Func<TField?, bool> condition)
+    public InlineRule<TField> Must(Func<TField, bool> condition)
     {
-        SetValidator(new PredicateValidator(condition(FieldValue)));
+        SetValidator(new PredicateValidator(condition(FieldValue!)));
         return this;
     }
 
@@ -74,6 +74,13 @@ public class InlineRule<TField>
             FinishWithError(error);
             throw new InvalidOperationException("Dead code");
         }
+    }
+    
+    public InlineRule<TFieldTransformed?> Transform<TFieldTransformed>(
+        Func<TField?, TFieldTransformed?> transformer)
+    {
+        var fieldValueTransformed = transformer(FieldValue);
+        return new InlineRule<TFieldTransformed?>(fieldValueTransformed, Context.FieldName);
     }
 
     private CrossValidationError FromExceptionToContext(CrossValidationException exception)
