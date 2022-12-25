@@ -22,7 +22,7 @@ public class InlineRuleTests
     public void Validator_conditional_execution()
     {
         var expectedMessage = "TrueCase";
-        var action = () => new InlineRule<int>(_model.NestedModel.Int)
+        var action = () => InlineRule<int>.CreateFromField(_model.NestedModel.Int)
             .When(_ => false)
             .GreaterThan(_model.NestedModel.Int + 1)
             .When(true)
@@ -39,7 +39,7 @@ public class InlineRuleTests
         var defaultConfiguration = CrossValidationConfiguration.GeneratePlaceholderValuesWhenTheyAreNotAdded;
         CrossValidationConfiguration.GeneratePlaceholderValuesWhenTheyAreNotAdded = true;
         
-        var action = () => new InlineRule<int>(_model.NestedModel.Int)
+        var action = () => InlineRule<int>.CreateFromField(_model.NestedModel.Int)
             .WithError(new CustomErrorWithPlaceholderValue(_model.NestedModel.Int))
             .GreaterThan(_model.NestedModel.Int);
 
@@ -55,7 +55,7 @@ public class InlineRuleTests
     [Fact]
     public void Validate_predicate()
     {
-        var action = () => new InlineRule<NestedModel>(_model.NestedModel)
+        var action = () => InlineRule<NestedModel>.CreateFromField(_model.NestedModel)
             .Must(x => x.Int > x.Int);
 
         var error = action.ShouldThrow<CrossValidationException>().Errors[0];

@@ -15,18 +15,27 @@ public class ModelRule<TModel, TField>
     public TModel Model { get; set; }
     public string FieldFullPath { get; set; }
 
+    private ModelRule(
+        TField? fieldValue,
+        ModelValidationContext context,
+        TModel model,
+        string fieldFullPath) :
+        base(fieldValue, context)
+    {
+        Model = model;
+        FieldFullPath = fieldFullPath;
+    }
+    
+    // CreateFromField
     public ModelRule(
         ModelValidationContext context,
         TModel model,
         string fieldFullPath,
         TField? fieldValue,
         int? index = null,
-        string? parentPath = null)
+        string? parentPath = null) :
+        this(fieldValue, context, model, fieldFullPath)
     {
-        Context = context;
-        Model = model;
-        FieldFullPath = fieldFullPath;
-        FieldValue = fieldValue;
         Context.FieldValue = fieldValue;
         var indexRepresentation = index is not null
             ? $"[{index}]"
@@ -51,8 +60,8 @@ public class ModelRule<TModel, TField>
         Context.FieldName = parentPathValue + fieldFullPath + indexRepresentation;
         Context.FieldDisplayName = null;
     }
-    
-    public static ModelRule<TModel, TField> Create(
+
+    public static ModelRule<TModel, TField> CreateFromFieldSelector(
         TModel model,
         ModelValidationContext context,
         Expression<Func<TModel, TField?>> fieldSelector)

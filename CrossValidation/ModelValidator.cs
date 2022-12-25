@@ -28,13 +28,13 @@ public abstract class ModelValidator<TModel>
 
     public ModelRule<TModel, TField> RuleFor<TField>(Expression<Func<TModel, TField>> fieldSelector)
     {
-        return ModelRule<TModel, TField>.Create(Model!, Context!, fieldSelector!);
+        return ModelRule<TModel, TField>.CreateFromFieldSelector(Model!, Context!, fieldSelector!);
     }
     
     public CollectionModelRule<TModel, IEnumerable<TField>> RuleForCollection<TField>(
         Expression<Func<TModel, IEnumerable<TField>?>> fieldSelector)
     {
-        return CollectionModelRule<TModel, IEnumerable<TField>>.Create(Model!, Context!, fieldSelector);
+        return CollectionModelRule<TModel, IEnumerable<TField>>.CreateFromField(Model!, Context!, fieldSelector);
     }
 
     public abstract void CreateRules();

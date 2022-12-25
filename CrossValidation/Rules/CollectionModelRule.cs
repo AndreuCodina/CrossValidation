@@ -8,7 +8,7 @@ namespace CrossValidation.Rules;
 public class CollectionModelRule<TModel, TField> : ModelRule<TModel, TField>
     where TField : IEnumerable
 {
-    internal CollectionModelRule(
+    private CollectionModelRule(
         ModelValidationContext context,
         TModel model,
         string fieldFullPath,
@@ -19,7 +19,7 @@ public class CollectionModelRule<TModel, TField> : ModelRule<TModel, TField>
     {
     }
     
-    internal new static CollectionModelRule<TModel, TField> Create(
+    public static CollectionModelRule<TModel, TField> CreateFromField(
         TModel model,
         ModelValidationContext context,
         Expression<Func<TModel, TField?>> fieldSelector)

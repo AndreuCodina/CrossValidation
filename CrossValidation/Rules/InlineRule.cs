@@ -13,28 +13,36 @@ public class InlineRule<TField>
         TField,
         InlineValidationContext>
 {
-    public InlineRule(
-        TField? value,
+    private InlineRule(
+        TField? fieldValue,
+        InlineValidationContext context)
+        : base(fieldValue, context)
+    {
+    }
+    
+    public static InlineRule<TField> CreateFromField(
+        TField? fieldValue,
         string? fieldName = null)
     {
-        FieldValue = value;
-        Context = new InlineValidationContext
+        var context = new InlineValidationContext
         {
-            FieldValue = value,
+            FieldValue = fieldValue,
         };
 
         if (fieldName is not null)
         {
-            Context.FieldName = fieldName; // TODO: fieldFullPath + indexRepresentation;
+            context.FieldName = fieldName; // TODO: fieldFullPath + indexRepresentation;
         }
+        
+        return new InlineRule<TField>(fieldValue, context);
     }
-    
-    public static InlineRule<TField> CreateFromSelector<TModel>(
+
+    public static InlineRule<TField> CreateFromFieldSelector<TModel>(
         TModel model,
         Expression<Func<TModel, TField?>> fieldSelector)
     {
         var fieldInformation = Util.GetFieldInformation(fieldSelector, model);
-        return new InlineRule<TField>(fieldInformation.Value, fieldInformation.SelectionFullPath);
+        return CreateFromField(fieldInformation.Value, fieldInformation.SelectionFullPath);
     }
 
     protected override InlineRule<TField> GetSelf()
@@ -84,7 +92,7 @@ public class InlineRule<TField>
         Func<TField?, TFieldTransformed?> transformer)
     {
         var fieldValueTransformed = transformer(FieldValue);
-        return new InlineRule<TFieldTransformed?>(fieldValueTransformed, Context.FieldName);
+        return InlineRule<TFieldTransformed?>.CreateFromField(fieldValueTransformed, Context.FieldName);
     }
 
     private CrossValidationError FromExceptionToContext(CrossValidationException exception)

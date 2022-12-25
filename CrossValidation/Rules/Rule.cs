@@ -12,7 +12,13 @@ public abstract class Rule<TSelf, TField, TValidationContext>
     where TValidationContext : ValidationContext
 {
     public TField? FieldValue { get; set; }
-    public TValidationContext Context { get; set; } = null!;
+    public TValidationContext Context { get; set; }
+
+    protected Rule(TField? fieldValue, TValidationContext context)
+    {
+        FieldValue = fieldValue;
+        Context = context;
+    }
 
     protected abstract TSelf GetSelf();
 
