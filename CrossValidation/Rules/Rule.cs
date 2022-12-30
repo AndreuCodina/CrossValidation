@@ -7,14 +7,14 @@ using CrossValidation.Validators;
 
 namespace CrossValidation.Rules;
 
-public class Rule<TField>
+public class Rule<TField> : IRule<TField>
 {
     public bool IsValid { get; set; }
     public TField FieldValue { get; set; }
     public ValidationContext Context { get; set; }
     public string FieldFullPath { get; set; }
 
-    public Rule(
+    private Rule(
         TField fieldValue,
         string? fieldFullPath = null,
         ValidationContext? context = null,
@@ -51,7 +51,7 @@ public class Rule<TField>
         Context.FieldName = parentPathValue + fieldFullPath + indexRepresentation;
     }
 
-    public static Rule<TField> CreateFromFieldSelector<TModel>(
+    public static IRule<TField> CreateFromFieldSelector<TModel>(
         TModel model,
         Expression<Func<TModel, TField>> fieldSelector,
         ValidationContext? context = null)
@@ -60,7 +60,7 @@ public class Rule<TField>
         return new Rule<TField>(fieldInformation.Value, fieldInformation.SelectionFullPath, context);
     }
 
-    public static Rule<TField> CreateFromField(
+    public static IRule<TField> CreateFromField(
         TField fieldValue,
         string? fieldFullPath = null,
         ValidationContext? context = null,
@@ -70,7 +70,12 @@ public class Rule<TField>
         return new Rule<TField>(fieldValue, fieldFullPath, context, index, parentPath);
     }
     
-    public Rule<TField> SetValidator(Func<Validator> validator)
+    public TField GetFieldValue()
+    {
+        return FieldValue;
+    }
+    
+    public IRule<TField> SetValidator(Func<Validator> validator)
     {
         if (Context.ExecuteNextValidator && IsValid)
         {
@@ -104,43 +109,43 @@ public class Rule<TField>
         }
     }
 
-    public Rule<TField> WithMessage(string message)
+    public IRule<TField> WithMessage(string message)
     {
         Context.SetMessage(message);
         return this;
     }
 
-    public Rule<TField> WithCode(string code)
+    public IRule<TField> WithCode(string code)
     {
         Context.SetCode(code);
         return this;
     }
     
-    public Rule<TField> WithError(CrossValidationError error)
+    public IRule<TField> WithError(CrossValidationError error)
     {
         Context.SetError(error);
         return this;
     }
     
-    public Rule<TField> WithFieldDisplayName(string fieldDisplayName)
+    public IRule<TField> WithFieldDisplayName(string fieldDisplayName)
     {
         Context.SetFieldDisplayName(fieldDisplayName);
         return this;
     }
     
-    public Rule<TField> When(bool condition)
+    public IRule<TField> When(bool condition)
     {
         Context.ExecuteNextValidator = condition;
         return this;
     }
     
-    public Rule<TField> When(Func<TField, bool> condition)
+    public IRule<TField> When(Func<TField, bool> condition)
     {
         Context.ExecuteNextValidator = condition(FieldValue!);
         return this;
     }
     
-    public Rule<TField> Must(Func<TField, bool> condition)
+    public IRule<TField> Must(Func<TField, bool> condition)
     {
         SetValidator(() => new PredicateValidator(condition(FieldValue!)));
         return this;
@@ -160,14 +165,14 @@ public class Rule<TField>
         }
     }
     
-    public Rule<TFieldTransformed> Transform<TFieldTransformed>(
+    public IRule<TFieldTransformed> Transform<TFieldTransformed>(
         Func<TField, TFieldTransformed> transformer)
     {
         var fieldValueTransformed = transformer(FieldValue);
         return Rule<TFieldTransformed>.CreateFromField(fieldValueTransformed, Context.FieldName);
     }
     
-    public Rule<TField> SetModelValidator<TChildModel>(ModelValidator<TChildModel> validator)
+    public IRule<TField> SetModelValidator<TChildModel>(ModelValidator<TChildModel> validator)
     {
         Context.Clean(); // Ignore customizations for model validators
         var oldContext = Context;

@@ -25,15 +25,9 @@ public abstract record ModelValidator<TModel>
         }
     }
 
-    public Rule<TField> RuleFor<TField>(Expression<Func<TModel, TField>> fieldSelector)
+    public IRule<TField> RuleFor<TField>(Expression<Func<TModel, TField>> fieldSelector)
     {
         return Rule<TField>.CreateFromFieldSelector(Model!, fieldSelector, Context!);
-    }
-    
-    public CollectionRule<IEnumerable<TField>> RuleForCollection<TField>(
-        Expression<Func<TModel, IEnumerable<TField>>> fieldSelector)
-    {
-        return CollectionRule<IEnumerable<TField>>.CreateFromFieldSelector(Model!, Context!, fieldSelector);
     }
 
     public abstract void CreateRules(TModel model);
