@@ -7,7 +7,7 @@ namespace CrossValidation;
 public abstract record ModelValidator<TModel>
 {
     private ValidationMode _validationMode = ValidationMode.StopOnFirstError;
-    public ValidationContext? Context { get; set; } = null;
+    public ValidationContext? Context { get; set; }
     public TModel? Model { get; set; }
 
     public ValidationMode ValidationMode
@@ -27,11 +27,11 @@ public abstract record ModelValidator<TModel>
 
     public Rule<TField> RuleFor<TField>(Expression<Func<TModel, TField>> fieldSelector)
     {
-        return Rule<TField>.CreateFromFieldSelector(Model!, fieldSelector!, Context!);
+        return Rule<TField>.CreateFromFieldSelector(Model!, fieldSelector, Context!);
     }
     
     public CollectionRule<IEnumerable<TField>> RuleForCollection<TField>(
-        Expression<Func<TModel, IEnumerable<TField>?>> fieldSelector)
+        Expression<Func<TModel, IEnumerable<TField>>> fieldSelector)
     {
         return CollectionRule<IEnumerable<TField>>.CreateFromFieldSelector(Model!, Context!, fieldSelector);
     }

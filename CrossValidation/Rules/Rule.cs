@@ -10,12 +10,12 @@ namespace CrossValidation.Rules;
 public class Rule<TField>
 {
     public bool IsValid { get; set; }
-    public TField? FieldValue { get; set; }
+    public TField FieldValue { get; set; }
     public ValidationContext Context { get; set; }
     public string FieldFullPath { get; set; }
 
     public Rule(
-        TField? fieldValue,
+        TField fieldValue,
         string? fieldFullPath = null,
         ValidationContext? context = null,
         int? index = null,
@@ -53,7 +53,7 @@ public class Rule<TField>
 
     public static Rule<TField> CreateFromFieldSelector<TModel>(
         TModel model,
-        Expression<Func<TModel, TField?>> fieldSelector,
+        Expression<Func<TModel, TField>> fieldSelector,
         ValidationContext? context = null)
     {
         var fieldInformation = Util.GetFieldInformation(fieldSelector, model);
@@ -61,7 +61,7 @@ public class Rule<TField>
     }
 
     public static Rule<TField> CreateFromField(
-        TField? fieldValue,
+        TField fieldValue,
         string? fieldFullPath = null,
         ValidationContext? context = null,
         int? index = null,
@@ -134,9 +134,9 @@ public class Rule<TField>
         return this;
     }
     
-    public Rule<TField> When(Func<TField?, bool> condition)
+    public Rule<TField> When(Func<TField, bool> condition)
     {
-        Context.ExecuteNextValidator = condition(FieldValue);
+        Context.ExecuteNextValidator = condition(FieldValue!);
         return this;
     }
     
@@ -160,11 +160,11 @@ public class Rule<TField>
         }
     }
     
-    public Rule<TFieldTransformed?> Transform<TFieldTransformed>(
-        Func<TField?, TFieldTransformed?> transformer)
+    public Rule<TFieldTransformed> Transform<TFieldTransformed>(
+        Func<TField, TFieldTransformed> transformer)
     {
         var fieldValueTransformed = transformer(FieldValue);
-        return Rule<TFieldTransformed?>.CreateFromField(fieldValueTransformed, Context.FieldName);
+        return Rule<TFieldTransformed>.CreateFromField(fieldValueTransformed, Context.FieldName);
     }
     
     public Rule<TField> SetModelValidator<TChildModel>(ModelValidator<TChildModel> validator)

@@ -236,13 +236,13 @@ public class ModelValidatorTests : IClassFixture<ModelValidatorFixture>
 
         action.ShouldThrow<InvalidOperationException>();
     }
-    
+
     [Fact]
-    public void Transform_fails_when_the_field_does_not_pass_the_validator()
+    public void Transform_field()
     {
-        IEnumerable<string> TransformValues(IEnumerable<int> values)
+        IEnumerable<string>? TransformValues(IEnumerable<int>? values)
         {
-            return values.Select(x => x.ToString());
+            return values?.Select(x => x.ToString());
         }
 
         var nullableIntList = new List<int> { 1, 2, 3 };
@@ -253,7 +253,7 @@ public class ModelValidatorTests : IClassFixture<ModelValidatorFixture>
         var parentModelValidator = _modelValidatorFixture.CreateParentModelValidator(validator =>
         {
             validator.ValidationMode = ValidationMode.AccumulateFirstErrorEachRule;
-            
+
             validator.RuleFor(x => x.NullableIntList)
                 .Transform(x => TransformValues(x!))
                 .Null();
@@ -266,25 +266,27 @@ public class ModelValidatorTests : IClassFixture<ModelValidatorFixture>
     }
     
     [Fact]
-    public void Cannot_transform_same_model()
+    public void Transform_same_model()
     {
-        ParentModel ChangeValues(ParentModel model)
+        ParentModel ChangeValue(ParentModel model)
         {
             model.NullableString = "Nullable string";
             return model;
         }
         
+        var expectedTransformation = ChangeValue(_model);
         var parentModelValidator = _modelValidatorFixture.CreateParentModelValidator(validator =>
         {
             validator.RuleFor(x => x)
-                .Transform(x => ChangeValues(x!))
-                .Null();
+                .Transform(ChangeValue)
+                .Must(_ => false);
         });
     
         var action = () => parentModelValidator.Validate(_model);
     
         var error = action.ShouldThrow<CrossValidationException>().Errors[0];
         error.FieldName.ShouldBe("");
+        error.FieldValue.ShouldBe(expectedTransformation);
     }
     
     [Fact]

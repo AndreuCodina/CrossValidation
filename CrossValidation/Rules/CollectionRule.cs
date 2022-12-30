@@ -9,7 +9,7 @@ public class CollectionRule<TField> : Rule<TField>
     where TField : IEnumerable
 {
     private CollectionRule(
-        TField? fieldValue,
+        TField fieldValue,
         string? fieldFullPath = null,
         ValidationContext? context = null,
         int? index = null,
@@ -21,7 +21,7 @@ public class CollectionRule<TField> : Rule<TField>
     public static CollectionRule<TField> CreateFromFieldSelector<TModel>(
         TModel model,
         ValidationContext context,
-        Expression<Func<TModel, TField?>> fieldSelector)
+        Expression<Func<TModel, TField>> fieldSelector)
     {
         var fieldInformation = Util.GetFieldInformation(fieldSelector, model);
         return new CollectionRule<TField>(

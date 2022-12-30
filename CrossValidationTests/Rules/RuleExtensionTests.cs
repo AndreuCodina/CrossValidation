@@ -96,7 +96,7 @@ public class RuleExtensionTests : IClassFixture<ModelValidatorFixture>
             .Build();
         var parentModelValidator = _modelValidatorFixture.CreateParentModelValidator(validator =>
         {
-            validator.RuleForCollection(x => x.NullableIntList)
+            validator.RuleForCollection(x => x.NullableIntList!)
                 .ForEach(x => x
                     .GreaterThan(1)
                     .GreaterThan(10));
@@ -116,7 +116,7 @@ public class RuleExtensionTests : IClassFixture<ModelValidatorFixture>
         var parentModelValidator = _modelValidatorFixture.CreateParentModelValidator(validator =>
         {
             validator.ValidationMode = ValidationMode.AccumulateFirstErrorEachRule;
-            validator.RuleForCollection(x => x.NullableIntList)
+            validator.RuleForCollection(x => x.NullableIntList!)
                 .ForEach(x => x
                     .GreaterThan(0)
                     .GreaterThan(10));
@@ -138,7 +138,7 @@ public class RuleExtensionTests : IClassFixture<ModelValidatorFixture>
             .Build();
         var parentModelValidator = _modelValidatorFixture.CreateParentModelValidator(validator =>
         {
-            validator.RuleForCollection(x => x.NullableIntList)
+            validator.RuleForCollection(x => x.NullableIntList!)
                 .ForEach(x => x
                     .Transform(Convert.ToDouble)
                     .GreaterThan(10d));
@@ -158,7 +158,7 @@ public class RuleExtensionTests : IClassFixture<ModelValidatorFixture>
             .Build();
         var parentModelValidator = _modelValidatorFixture.CreateParentModelValidator(validator =>
         {
-            validator.RuleForCollection(x => x.NullableIntList)
+            validator.RuleForCollection(x => x.NullableIntList!)
                 .ForEach(x => x
                     .GreaterThan(10));
         });

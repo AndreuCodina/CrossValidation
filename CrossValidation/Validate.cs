@@ -12,7 +12,7 @@ public static class Validate
 
     public static Rule<TField> Field<TModel, TField>(
         TModel model,
-        Expression<Func<TModel, TField?>> fieldSelector)
+        Expression<Func<TModel, TField>> fieldSelector)
     {
         return Rule<TField>.CreateFromFieldSelector(model, fieldSelector);
     }

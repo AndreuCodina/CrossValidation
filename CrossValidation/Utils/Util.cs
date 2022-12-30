@@ -6,16 +6,14 @@ namespace CrossValidation.Utils;
 public static class Util
 {
     public static FieldInformation<TField> GetFieldInformation<TModel, TField>(
-        Expression<Func<TModel, TField?>> fieldSelector,
+        Expression<Func<TModel, TField>> fieldSelector,
         TModel model)
     {
         var fieldFullPath = PathExpressionVisitor.Create(fieldSelector.Body).FieldFullPath;
-        TField? fieldValue;
-        bool isFieldSelectedDifferentThanModel;
+        TField fieldValue;
 
         if (fieldSelector.Body is MemberExpression memberExpression)
         {
-            isFieldSelectedDifferentThanModel = true;
             var propertyInfo = (PropertyInfo)memberExpression.Member;
             var currentModel = GetModelRelatedToField(fieldFullPath, model);
             fieldValue = (TField)propertyInfo.GetValue(currentModel)!;
@@ -26,14 +24,12 @@ public static class Util
         }
         else
         {
-            isFieldSelectedDifferentThanModel = false;
             fieldValue = (TField)(object)model!;
         }
         
         return new FieldInformation<TField>(
             SelectionFullPath: fieldFullPath,
-            Value: fieldValue,
-            IsFieldSelectedDifferentThanModel: isFieldSelectedDifferentThanModel);
+            Value: fieldValue);
     }
 
     private static object GetModelRelatedToField<TModel>(string fieldFullPath, TModel model)
