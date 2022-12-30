@@ -3,7 +3,7 @@ using CrossValidationTests.Models;
 
 namespace CrossValidationTests.Fixtures.Validators;
 
-public class NestedModelValidator : ModelValidator<NestedModel>
+public record NestedModelValidator : ModelValidator<NestedModel>
 {
     public override void CreateRules(NestedModel model)
     {

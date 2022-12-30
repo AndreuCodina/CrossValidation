@@ -3,7 +3,7 @@ using CrossValidationTests.Models;
 
 namespace CrossValidationTests.Fixtures.Validators;
 
-public class ParentModelValidator : ModelValidator<ParentModel>
+public record ParentModelValidator : ModelValidator<ParentModel>
 {
     public override void CreateRules(ParentModel model)
     {
