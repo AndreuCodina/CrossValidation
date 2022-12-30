@@ -5,15 +5,15 @@ namespace CrossValidation;
 
 public static class Validate
 {
-    public static InlineRule<TField> That<TField>(TField fieldValue)
+    public static Rule<TField> That<TField>(TField fieldValue)
     {
-        return InlineRule<TField>.CreateFromField(fieldValue);
+        return Rule<TField>.CreateFromField(fieldValue);
     }
 
-    public static InlineRule<TField> Field<TModel, TField>(
+    public static Rule<TField> Field<TModel, TField>(
         TModel model,
         Expression<Func<TModel, TField?>> fieldSelector)
     {
-        return InlineRule<TField>.CreateFromFieldSelector(model, fieldSelector);
+        return Rule<TField>.CreateFromFieldSelector(model, fieldSelector);
     }
 }

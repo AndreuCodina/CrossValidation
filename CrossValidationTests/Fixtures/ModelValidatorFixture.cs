@@ -1,5 +1,6 @@
 ﻿using System;
 using CrossValidationTests.Fixtures.Validators;
+using CrossValidationTests.Models;
 using Moq;
 
 namespace CrossValidationTests.Fixtures;
@@ -12,7 +13,7 @@ public class ModelValidatorFixture
         {
             CallBase = true
         };
-        validatorMock.Setup(x => x.CreateRules())
+        validatorMock.Setup(x => x.CreateRules(It.IsAny<ParentModel>()))
             .Callback(() => validator(validatorMock.Object));
         return validatorMock.Object;
     }
@@ -24,7 +25,7 @@ public class ModelValidatorFixture
         {
             CallBase = true
         };
-        validatorMock.Setup(x => x.CreateRules())
+        validatorMock.Setup(x => x.CreateRules(It.IsAny<NestedModel>()))
             .Callback(() => validator(validatorMock.Object));
         return validatorMock.Object;
     }

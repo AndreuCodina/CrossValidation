@@ -2,7 +2,7 @@
 
 namespace CrossValidation.ValidationContexts;
 
-public abstract class ValidationContext
+public class ValidationContext
 {
     public string? Code { get; set; }
     public string? Message { get; set; }
@@ -12,6 +12,21 @@ public abstract class ValidationContext
     public object? FieldValue { get; set; }
     public CrossValidationError? Error { get; set; }
     public bool ExecuteNextValidator { get; set; } = true;
+    public string? ParentPath { get; set; }
+    public ValidationMode ValidationMode { get; set; } = ValidationMode.StopOnFirstError;
+    public bool IsChildContext { get; set; }
+
+    public ValidationContext CloneForChildModelValidator(string parentPath)
+    {
+        var newContext = new ValidationContext
+        {
+            IsChildContext = true,
+            ParentPath = parentPath,
+            Errors = Errors,
+            ValidationMode = ValidationMode
+        };
+        return newContext;
+    }
 
     public void AddError(CrossValidationError error)
     {

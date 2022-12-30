@@ -8,7 +8,7 @@ namespace CrossValidation;
 public abstract class ModelValidator<TModel>
 {
     private ValidationMode _validationMode = ValidationMode.StopOnFirstError;
-    public ModelValidationContext? Context { get; set; } = null;
+    public ValidationContext? Context { get; set; } = null;
     public TModel? Model { get; set; }
 
     public ValidationMode ValidationMode
@@ -26,18 +26,18 @@ public abstract class ModelValidator<TModel>
         }
     }
 
-    public ModelRule<TModel, TField> RuleFor<TField>(Expression<Func<TModel, TField>> fieldSelector)
+    public Rule<TField> RuleFor<TField>(Expression<Func<TModel, TField>> fieldSelector)
     {
-        return ModelRule<TModel, TField>.CreateFromFieldSelector(Model!, Context!, fieldSelector!);
+        return Rule<TField>.CreateFromFieldSelector(Model!, fieldSelector!, Context!);
     }
     
-    public CollectionModelRule<TModel, IEnumerable<TField>> RuleForCollection<TField>(
+    public CollectionRule<IEnumerable<TField>> RuleForCollection<TField>(
         Expression<Func<TModel, IEnumerable<TField>?>> fieldSelector)
     {
-        return CollectionModelRule<TModel, IEnumerable<TField>>.CreateFromField(Model!, Context!, fieldSelector);
+        return CollectionRule<IEnumerable<TField>>.CreateFromFieldSelector(Model!, Context!, fieldSelector);
     }
 
-    public abstract void CreateRules();
+    public abstract void CreateRules(TModel model);
 
     public void Validate(TModel model)
     {
@@ -45,10 +45,10 @@ public abstract class ModelValidator<TModel>
 
         if (Context is not {IsChildContext: true})
         {
-            Context = new ModelValidationContext();
+            Context = new ValidationContext();
         }
 
-        CreateRules();
+        CreateRules(model);
 
         if (!Context.IsChildContext && Context.Errors is not null)
         {

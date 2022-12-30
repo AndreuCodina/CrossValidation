@@ -553,7 +553,7 @@ public class ModelValidatorTests : IClassFixture<ModelValidatorFixture>
             validator.RuleFor(x => x.NestedModel.Int)
                 .When(_ => false)
                 .GreaterThan(_model.NestedModel.Int + 1)
-                .When(x => x.NestedModel.Int == _model.NestedModel.Int)
+                .When(x => x == _model.NestedModel.Int)
                 .WithMessage(expectedErrorMessage)
                 .GreaterThan(_model.NestedModel.Int);
         });
@@ -625,7 +625,7 @@ public class ModelValidatorTests : IClassFixture<ModelValidatorFixture>
         var parentModelValidator = _modelValidatorFixture.CreateParentModelValidator(validator =>
         {
             validator.RuleFor(x => x.NestedModel)
-                .Must(x => x.NestedModel.Int > _model.NestedModel.Int);
+                .Must(x => x.Int > _model.NestedModel.Int);
         });
         
         var action = () => parentModelValidator.Validate(_model);

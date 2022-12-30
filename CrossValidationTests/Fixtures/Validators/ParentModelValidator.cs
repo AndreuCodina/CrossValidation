@@ -5,7 +5,7 @@ namespace CrossValidationTests.Fixtures.Validators;
 
 public class ParentModelValidator : ModelValidator<ParentModel>
 {
-    public override void CreateRules()
+    public override void CreateRules(ParentModel model)
     {
     }
 }

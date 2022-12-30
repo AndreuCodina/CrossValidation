@@ -10,36 +10,44 @@ using Xunit;
 
 namespace CrossValidationTests.Rules;
 
-public class ModelRuleExtensionTests : IClassFixture<ModelValidatorFixture>
+public class RuleExtensionTests : IClassFixture<ModelValidatorFixture>
 {
     private readonly ModelValidatorFixture _modelValidatorFixture;
     private ParentModel _model;
 
-    public ModelRuleExtensionTests(ModelValidatorFixture modelValidatorFixture)
+    public RuleExtensionTests(ModelValidatorFixture modelValidatorFixture)
     {
         _modelValidatorFixture = modelValidatorFixture;
         _model = new ParentModelBuilder().Build();
     }
-
+    
     [Fact]
     public void NotNull_works_with_nullable_value_types()
     {
         _model = new ParentModelBuilder()
             .WithNullableInt(1)
             .Build();
-        
-        var parentModelValidator = _modelValidatorFixture.CreateParentModelValidator(validator =>
-        {
-            validator.RuleFor(x => x.NullableInt)
-                .NotNull()
-                .GreaterThan(_model.NullableInt!.Value - 1);
-        });
-        
-        var action = () => parentModelValidator.Validate(_model);
 
+        var action = () => Validate.That(_model.NullableInt)
+            .NotNull()
+            .GreaterThan(_model.NullableInt!.Value - 1);
         action.ShouldNotThrow();
     }
     
+    [Fact]
+    public void NotNull_works_with_nullable_reference_types()
+    {
+        _model = new ParentModelBuilder()
+            .WithNullableString("The string")
+            .Build();
+
+        var action = () => Validate.That(_model.NullableString)
+            .NotNull()
+            .Must(_ => true);
+        action.ShouldNotThrow();
+    }
+    
+        
     [Fact]
     public void NotNull_works_with_nullable_value_types_and_error_accumulation()
     {
@@ -59,63 +67,27 @@ public class ModelRuleExtensionTests : IClassFixture<ModelValidatorFixture>
         var errors = action.ShouldThrow<CrossValidationException>().Errors;
         errors.Count.ShouldBe(2);
     }
-    
-    [Fact]
-    public void NotNull_works_with_nullable_reference_types()
-    {
-        _model = new ParentModelBuilder()
-            .WithNullableString("The string")
-            .Build();
-        
-        var parentModelValidator = _modelValidatorFixture.CreateParentModelValidator(validator =>
-        {
-            validator.RuleFor(x => x.NullableString)
-                .NotNull()
-                .Must(_ => true);
-        });
-        var action = () => parentModelValidator.Validate(_model);
-        action.ShouldNotThrow();
-
-        parentModelValidator = _modelValidatorFixture.CreateParentModelValidator(validator =>
-        {
-            validator.RuleFor(x => x.NullableString)
-                .NotNull()
-                .Must(_ => true);
-        });
-        action = () => parentModelValidator.Validate(_model);
-        action.ShouldNotThrow();
-    }
 
     [Fact]
     public void Null_works_with_nullable_value_types()
     {
-        var parentModelValidator = _modelValidatorFixture.CreateParentModelValidator(validator =>
-        {
-            validator.RuleFor(x => x.NullableInt)
-                .Null()
-                .Must(_ => true);
-        });
+        var action = () => Validate.That(_model.NullableInt)
+            .Null()
+            .Must(_ => true);
         
-        var action = () => parentModelValidator.Validate(_model);
-
-        action.ShouldNotThrow();
-    }
-
-    [Fact]
-    public void Null_works_with_nullable_reference_types()
-    {
-        var parentModelValidator = _modelValidatorFixture.CreateParentModelValidator(validator =>
-        {
-            validator.RuleFor(x => x.NullableString)
-                .Null()
-                .Must(_ => true);
-        });
-        
-        var action = () => parentModelValidator.Validate(_model);
-
         action.ShouldNotThrow();
     }
     
+    [Fact]
+    public void Null_works_with_nullable_reference_types()
+    {
+        var action = () => Validate.That(_model.NullableString)
+            .Null()
+            .Must(_ => true);
+        
+        action.ShouldNotThrow();
+    }
+
     [Fact]
     public void Execute_validators_for_all_item_collection()
     {

@@ -11,7 +11,7 @@ public class ErrorLocalizationTests
     [Fact]
     public void Validator_error_is_localized()
     {
-        var action = () => InlineRule<string?>.CreateFromField(null)
+        var action = () => Rule<string?>.CreateFromField(null)
             .NotNull();
 
         var error = action.ShouldThrow<CrossValidationException>().Errors[0];

@@ -9,11 +9,11 @@ using Xunit;
 
 namespace CrossValidationTests.Rules;
 
-public class InlineRuleTests
+public class RuleTests
 {
     private ParentModel _model;
 
-    public InlineRuleTests()
+    public RuleTests()
     {
         _model = new ParentModelBuilder().Build();
     }
@@ -22,7 +22,7 @@ public class InlineRuleTests
     public void Validator_conditional_execution()
     {
         var expectedMessage = "TrueCase";
-        var action = () => InlineRule<int>.CreateFromField(_model.NestedModel.Int)
+        var action = () => Rule<int>.CreateFromField(_model.NestedModel.Int)
             .When(_ => false)
             .GreaterThan(_model.NestedModel.Int + 1)
             .When(true)
@@ -39,7 +39,7 @@ public class InlineRuleTests
         var defaultConfiguration = CrossValidationConfiguration.GeneratePlaceholderValuesWhenTheyAreNotAdded;
         CrossValidationConfiguration.GeneratePlaceholderValuesWhenTheyAreNotAdded = true;
         
-        var action = () => InlineRule<int>.CreateFromField(_model.NestedModel.Int)
+        var action = () => Rule<int>.CreateFromField(_model.NestedModel.Int)
             .WithError(new CustomErrorWithPlaceholderValue(_model.NestedModel.Int))
             .GreaterThan(_model.NestedModel.Int);
 
@@ -55,7 +55,7 @@ public class InlineRuleTests
     [Fact]
     public void Validate_predicate()
     {
-        var action = () => InlineRule<NestedModel>.CreateFromField(_model.NestedModel)
+        var action = () => Rule<NestedModel>.CreateFromField(_model.NestedModel)
             .Must(x => x.Int > x.Int);
 
         var error = action.ShouldThrow<CrossValidationException>().Errors[0];

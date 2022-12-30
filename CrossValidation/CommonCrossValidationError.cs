@@ -9,7 +9,7 @@ public abstract record CommonCrossValidationError(string Code) : ResXValidationE
     
     public record Null() : CommonCrossValidationError(nameof(ErrorResource.Null));
 
-    public record GreaterThan<T>(T ComparisonValue) :
+    public record GreaterThan<TField>(TField ComparisonValue) :
         CommonCrossValidationError(nameof(ErrorResource.GreaterThan))
     {
         public override void AddPlaceholderValues()
