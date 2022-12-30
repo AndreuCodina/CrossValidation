@@ -41,6 +41,26 @@ public class ModelRuleExtensionTests : IClassFixture<ModelValidatorFixture>
     }
     
     [Fact]
+    public void NotNull_works_with_nullable_value_types_and_error_accumulation()
+    {
+        var parentModelValidator = _modelValidatorFixture.CreateParentModelValidator(validator =>
+        {
+            validator.ValidationMode = ValidationMode.AccumulateFirstErrorEachRule;
+            
+            validator.RuleFor(x => x.NullableInt)
+                .NotNull()
+                .GreaterThan(-1);
+            validator.RuleFor(x => x.NullableInt)
+                .NotNull();
+        });
+        
+        var action = () => parentModelValidator.Validate(_model);
+
+        var errors = action.ShouldThrow<CrossValidationException>().Errors;
+        errors.Count.ShouldBe(2);
+    }
+    
+    [Fact]
     public void NotNull_works_with_nullable_reference_types()
     {
         _model = new ParentModelBuilder()
@@ -80,7 +100,7 @@ public class ModelRuleExtensionTests : IClassFixture<ModelValidatorFixture>
 
         action.ShouldNotThrow();
     }
-    
+
     [Fact]
     public void Null_works_with_nullable_reference_types()
     {

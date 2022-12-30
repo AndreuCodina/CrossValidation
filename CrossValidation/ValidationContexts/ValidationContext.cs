@@ -13,10 +13,6 @@ public abstract class ValidationContext
     public CrossValidationError? Error { get; set; }
     public bool ExecuteNextValidator { get; set; } = true;
 
-    public ValidationContext()
-    {
-    }
-
     public void AddError(CrossValidationError error)
     {
         Errors ??= new List<CrossValidationError>();

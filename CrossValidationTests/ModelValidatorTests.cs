@@ -175,7 +175,7 @@ public class ModelValidatorTests : IClassFixture<ModelValidatorFixture>
     {
         var expectedCodes = new[]
         {
-            "ErrorCode1", "ErrorCode2", "ErrorCode3", "ErrorCode4", "ErrorCode5", "ErrorCode6", "ErrorCode7"
+            "ErrorCode1", "ErrorCode2", "ErrorCode3", "ErrorCode4", "ErrorCode5"
         };
 
         var nestedModelValidator = _modelValidatorFixture.CreateNestedModelValidator(validator =>
@@ -183,12 +183,12 @@ public class ModelValidatorTests : IClassFixture<ModelValidatorFixture>
             validator.RuleFor(x => x.Int)
                 .WithCode(expectedCodes[1])
                 .GreaterThan(_model.NestedModel.Int)
-                .WithCode(expectedCodes[2])
+                .WithCode("UnexpectedErrorCode")
                 .GreaterThan(_model.NestedModel.Int);
             validator.RuleFor(x => x.NestedNestedModel)
                 .WithCode("UnexpectedErrorCode")
                 .Must(_ => true)
-                .WithCode(expectedCodes[3])
+                .WithCode(expectedCodes[2])
                 .Must(_ => false);
         });
         var parentModelValidator = _modelValidatorFixture.CreateParentModelValidator(validator =>
@@ -199,12 +199,12 @@ public class ModelValidatorTests : IClassFixture<ModelValidatorFixture>
                 .NotNull();
             validator.RuleFor(x => x.NestedModel)
                 .SetModelValidator(nestedModelValidator)
-                .WithCode(expectedCodes[4])
+                .WithCode(expectedCodes[3])
                 .Must(_ => false);
             validator.RuleFor(x => x.NestedModel.Int)
-                .WithCode(expectedCodes[5])
+                .WithCode(expectedCodes[4])
                 .GreaterThan(_model.NestedModel.Int)
-                .WithCode(expectedCodes[6])
+                .WithCode("UnexpectedErrorCode")
                 .GreaterThan(_model.NestedModel.Int);
         });
 
@@ -459,6 +459,9 @@ public class ModelValidatorTests : IClassFixture<ModelValidatorFixture>
             validator.RuleFor(x => x.NullableInt)
                 .WithCode(new Bogus.Faker().Lorem.Word())
                 .WithMessage(new Bogus.Faker().Lorem.Word())
+                // .NotNull()
+                // .WithMessage(expectedMessage)
+                // .GreaterThan(_model.NestedModel.Int + 1);
                 .NotNull()
                 .WithMessage(expectedMessage)
                 .GreaterThan(_model.NestedModel.Int + 1);

@@ -12,7 +12,7 @@ public static class RuleExtensions
         where TValidationContext : ValidationContext
         where TField : IComparisonOperators<TField, TField, bool>
     {
-        return rule.SetValidator(new GreaterThanValidator<TField>(rule.FieldValue!, valueToCompare));
+        return rule.SetValidator(() => new GreaterThanValidator<TField>(rule.FieldValue!, valueToCompare));
     }
 
     public static TSelf IsInEnum<TSelf, TField, TValidationContext>(
@@ -20,7 +20,7 @@ public static class RuleExtensions
         where TValidationContext : ValidationContext
         where TField : Enum
     {
-        return rule.SetValidator(new EnumValidator<TField>(rule.FieldValue!, typeof(TField)));
+        return rule.SetValidator(() => new EnumValidator<TField>(rule.FieldValue!, typeof(TField)));
     }
     
     public static TSelf IsInEnum<TSelf, TValidationContext>(
@@ -33,7 +33,7 @@ public static class RuleExtensions
             throw new InvalidOperationException($"Cannot use {nameof(IsInEnum)} if the type provided is not an enumeration");
         }
         
-        return rule.SetValidator(new EnumValidator<int>(rule.FieldValue!, enumType));
+        return rule.SetValidator(() => new EnumValidator<int>(rule.FieldValue!, enumType));
     }
     
     public static TSelf IsInEnum<TSelf, TValidationContext>(
@@ -46,7 +46,7 @@ public static class RuleExtensions
             throw new InvalidOperationException($"Cannot use {nameof(IsInEnum)} if the type provided is not an enumeration");
         }
         
-        return rule.SetValidator(new EnumValidator<string>(rule.FieldValue!, enumType));
+        return rule.SetValidator(() => new EnumValidator<string>(rule.FieldValue!, enumType));
     }
     
     public static TSelf Length<TSelf, TValidationContext>(
@@ -55,6 +55,6 @@ public static class RuleExtensions
         int maximum)
         where TValidationContext : ValidationContext
     {
-        return rule.SetValidator(new LengthRangeValidator(rule.FieldValue!, minimum, maximum));
+        return rule.SetValidator(() => new LengthRangeValidator(rule.FieldValue!, minimum, maximum));
     }
 }

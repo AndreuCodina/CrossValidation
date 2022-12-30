@@ -82,7 +82,10 @@ public class ModelRule<TModel, TField>
             Context,
             Model,
             Context.FieldName,
-            fieldValueTransformed);
+            fieldValueTransformed)
+        {
+            IsValid = IsValid
+        };
     }
 
     protected override ModelRule<TModel, TField> GetSelf()
@@ -122,7 +125,7 @@ public class ModelRule<TModel, TField>
     
     public ModelRule<TModel, TField> Must(Func<TModel, bool> condition)
     {
-        SetValidator(new PredicateValidator(condition(Model)));
+        SetValidator(() => new PredicateValidator(condition(Model)));
         return this;
     }
 }

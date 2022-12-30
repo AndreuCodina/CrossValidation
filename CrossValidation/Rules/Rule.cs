@@ -16,27 +16,31 @@ public abstract class Rule<TSelf, TField, TValidationContext>
 
     protected Rule(TField? fieldValue, TValidationContext context)
     {
+        IsValid = true;
         FieldValue = fieldValue;
         Context = context;
     }
 
     protected abstract TSelf GetSelf();
 
-    public TSelf SetValidator(Validator validator)
+    public TSelf SetValidator(Func<Validator> validator)
     {
-        if (Context.ExecuteNextValidator)
+        if (Context.ExecuteNextValidator && IsValid)
         {
-            var error = validator.GetError();
+            var error = validator().GetError();
 
             if (error is not null)
             {
                 FinishWithError(error);
+                IsValid = false;
             }
         }
 
         Context.Clean();
         return GetSelf();
     }
+
+    public bool IsValid { get; set; }
 
     public void FinishWithError(CrossValidationError error)
     {

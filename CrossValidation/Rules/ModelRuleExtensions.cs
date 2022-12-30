@@ -8,29 +8,29 @@ public static class ModelRuleExtensions
         this ModelRule<TModel, TField?> rule)
         where TField : class
     {
-        return rule.SetValidator(new NotNullValidator<TField?>(rule.FieldValue))!;
+        return rule.SetValidator(() => new NotNullValidator<TField?>(rule.FieldValue))!;
     }
     
     public static ModelRule<TModel, TField> NotNull<TModel, TField>(
         this ModelRule<TModel, TField?> rule)
         where TField : struct
     {
-        return rule.SetValidator(new NotNullValidator<TField?>(rule.FieldValue))
-            .Transform(x => x!.Value);
+        return rule.SetValidator(() => new NotNullValidator<TField?>(rule.FieldValue))
+            .Transform(x => x ?? default);
     }
     
     public static ModelRule<TModel, TField?> Null<TModel, TField>(
         this ModelRule<TModel, TField?> rule)
         where TField : class
     {
-        return rule.SetValidator(new NullValidator<TField?>(rule.FieldValue));
+        return rule.SetValidator(() => new NullValidator<TField?>(rule.FieldValue));
     }
     
     public static ModelRule<TModel, TField?> Null<TModel, TField>(
         this ModelRule<TModel, TField?> rule)
         where TField : struct
     {
-        return rule.SetValidator(new NullValidator<TField?>(rule.FieldValue));
+        return rule.SetValidator(() => new NullValidator<TField?>(rule.FieldValue));
     }
     
     public static CollectionModelRule<TModel, IEnumerable<TInnerType>> ForEach<TModel, TInnerType>(

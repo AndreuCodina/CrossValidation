@@ -11,8 +11,6 @@ public class ModelValidationContext : ValidationContext
         var newContext = new ModelValidationContext
         {
             IsChildContext = true,
-            Code = Code,
-            Message = Message,
             ParentPath = parentPath,
             Errors = Errors,
             ValidationMode = ValidationMode

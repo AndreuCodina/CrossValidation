@@ -70,7 +70,7 @@ public class InlineRule<TField>
     
     public InlineRule<TField> Must(Func<TField, bool> condition)
     {
-        SetValidator(new PredicateValidator(condition(FieldValue!)));
+        SetValidator(() => new PredicateValidator(condition(FieldValue!)));
         return this;
     }
 
