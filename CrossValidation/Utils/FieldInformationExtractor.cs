@@ -3,11 +3,20 @@ using System.Reflection;
 
 namespace CrossValidation.Utils;
 
-public static class Util
+public class FieldInformationExtractor<TField>
 {
-    public static FieldInformation<TField> GetFieldInformation<TModel, TField>(
-        Expression<Func<TModel, TField>> fieldSelector,
-        TModel model)
+    public string SelectionFullPath { get; }
+    public TField Value { get; }
+
+    private FieldInformationExtractor(string selectionFullPath, TField value)
+    {
+        SelectionFullPath = selectionFullPath;
+        Value = value;
+    }
+
+    public static FieldInformationExtractor<TField> Extract<TModel>(
+        TModel model,
+        Expression<Func<TModel, TField>> fieldSelector)
     {
         var fieldFullPath = PathExpressionVisitor.Create(fieldSelector.Body).FieldFullPath;
         TField fieldValue;
@@ -26,10 +35,8 @@ public static class Util
         {
             fieldValue = (TField)(object)model!;
         }
-        
-        return new FieldInformation<TField>(
-            SelectionFullPath: fieldFullPath,
-            Value: fieldValue);
+
+        return new FieldInformationExtractor<TField>(fieldFullPath, fieldValue);
     }
 
     private static object GetModelRelatedToField<TModel>(string fieldFullPath, TModel model)

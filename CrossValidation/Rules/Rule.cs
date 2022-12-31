@@ -67,7 +67,8 @@ public class Rule<TField> : IRule<TField>
         Expression<Func<TModel, TField>> fieldSelector,
         ValidationContext? context = null)
     {
-        var fieldInformation = Util.GetFieldInformation(fieldSelector, model);
+        var fieldInformation = FieldInformationExtractor<TField>
+            .Extract(model, fieldSelector);
         return new Rule<TField>(fieldInformation.Value, fieldInformation.SelectionFullPath, context);
     }
 
