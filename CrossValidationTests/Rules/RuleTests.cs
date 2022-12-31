@@ -105,6 +105,24 @@ public class RuleTests
         error.FieldDisplayName.ShouldBe("Expected field display name");
     }
 
+    [Fact]
+    public void Must()
+    {
+        var action = () => Validate.That(1)
+            .Must(x => x == 1);
+
+        action.ShouldNotThrow();
+    }
+    
+    [Fact]
+    public void Must_fails()
+    {
+        var action = () => Validate.That(1)
+            .Must(x => x != 1);
+
+        action.ShouldThrow<CrossValidationException>();
+    }
+
     public record CustomErrorWithPlaceholderValue(int Value) : CrossValidationError;
 
     public record UserAgeWithoutCustomization

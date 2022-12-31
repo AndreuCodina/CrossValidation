@@ -5,7 +5,7 @@ using Moq;
 
 namespace CrossValidationTests.Fixtures;
 
-public class ModelValidatorFixture
+public class Fixture
 {
     public ParentModelValidator CreateParentModelValidator(Action<ParentModelValidator> validator)
     {
@@ -28,5 +28,15 @@ public class ModelValidatorFixture
         validatorMock.Setup(x => x.CreateRules(It.IsAny<NestedModel>()))
             .Callback(() => validator(validatorMock.Object));
         return validatorMock.Object;
+    }
+
+    public bool BeValid<T>(T parameter)
+    {
+        return true;
+    }
+    
+    public bool NotBeValid<T>(T parameter)
+    {
+        return false;
     }
 }
