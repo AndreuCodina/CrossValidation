@@ -46,6 +46,36 @@ public static class RuleExtensions
             notNullRule(rule.Transform(x => x!.Value));
         }
     }
+    
+    public static IRule<TField?> WhenNotNull<TField>(
+        this IRule<TField?> rule,
+        Action<IRule<TField>> notNullRule)
+        where TField : struct
+    {
+        var validator = new NotNullValidator<TField?>(rule.GetFieldValue());
+
+        if (validator.IsValid())
+        {
+            notNullRule(rule.Transform(x => x!.Value));
+        }
+
+        return rule;
+    }
+    
+    public static IRule<TField?> WhenNotNull<TField>(
+        this IRule<TField?> rule,
+        Action<IRule<TField>> notNullRule)
+        where TField : class
+    {
+        var validator = new NotNullValidator<TField?>(rule.GetFieldValue());
+
+        if (validator.IsValid())
+        {
+            notNullRule(rule.Transform(x => x!));
+        }
+
+        return rule;
+    }
 
     public static IRule<TField?> Null<TField>(
         this IRule<TField?> rule)
