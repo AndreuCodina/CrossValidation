@@ -1,6 +1,6 @@
 ﻿using CrossValidation.Results;
 
-namespace CrossValidation;
+namespace CrossValidation.Exceptions;
 
 public class CrossValidationException : Exception
 {

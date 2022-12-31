@@ -1,4 +1,5 @@
 ﻿using System.Linq.Expressions;
+using CrossValidation.Exceptions;
 using CrossValidation.Resources;
 using CrossValidation.Results;
 using CrossValidation.Utils;

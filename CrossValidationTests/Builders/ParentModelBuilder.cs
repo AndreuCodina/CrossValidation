@@ -20,7 +20,10 @@ public class ParentModelBuilder
             NullableDateTime = DateTime.UtcNow,
             NestedModel = _nestedModel,
             NullableNestedModel = null,
+            IntList = new List<int> {1, 2, 3},
             NullableIntList = _nullableIntList,
+            StringList = new List<string> {"1", "2", "3"},
+            NullableStringList = null,
             NullableInt = _nullableInt,
             NestedEnum = NestedEnum.Red
         };

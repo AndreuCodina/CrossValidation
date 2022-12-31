@@ -1,4 +1,4 @@
-﻿using CrossValidation;
+﻿using CrossValidation.Exceptions;
 using CrossValidation.Resources;
 using CrossValidation.Rules;
 using Shouldly;

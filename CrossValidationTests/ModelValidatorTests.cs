@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using CrossValidation;
+using CrossValidation.Exceptions;
 using CrossValidation.Resources;
 using CrossValidation.Results;
 using CrossValidation.Rules;
@@ -665,7 +666,53 @@ public class ModelValidatorTests : IClassFixture<Fixture>
         error.ShouldBeOfType<CommonCrossValidationError.Predicate>();
     }
 
+    [Fact]
+    public void Non_nullable_field_with_null_fails()
+    {
+        var property = _model
+            .GetType()
+            .GetProperties()
+            .First(x => x.Name == nameof(ParentModel.String));
+        property.SetValue(_model, null);
+        
+        var parentModelValidator = _fixture.CreateParentModelValidator(_ => { });
+        
+        var action = () => parentModelValidator.Validate(_model);
+
+        action.ShouldThrow<ModelFormatException>();
+    }
     
+    [Fact]
+    public void Collection_containing_non_nullable_items_with_null_fails()
+    {
+        var property = _model
+            .GetType()
+            .GetProperties()
+            .First(x => x.Name == nameof(ParentModel.StringList));
+        property.SetValue(_model, new List<string?> {"", null});
+        
+        var parentModelValidator = _fixture.CreateParentModelValidator(_ => { });
+        
+        var action = () => parentModelValidator.Validate(_model);
+
+        action.ShouldThrow<ModelFormatException>();
+    }
+    
+    [Fact]
+    public void Non_nullable_nested_model_with_null_fails()
+    {
+        var property = _model
+            .GetType()
+            .GetProperties()
+            .First(x => x.Name == nameof(ParentModel.NestedModel));
+        property.SetValue(_model, null);
+        
+        var parentModelValidator = _fixture.CreateParentModelValidator(_ => { });
+        
+        var action = () => parentModelValidator.Validate(_model);
+
+        action.ShouldThrow<ModelFormatException>();
+    }
 
     public record CustomErrorWithCode(string Code) : CrossValidationError(Code: Code);
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using CrossValidation;
+using CrossValidation.Exceptions;
 using CrossValidation.Rules;
 using CrossValidationTests.Builders;
 using CrossValidationTests.Fixtures;

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using CrossValidation;
+using CrossValidation.Exceptions;
 using CrossValidation.Rules;
 using CrossValidationTests.Models;
 using Shouldly;

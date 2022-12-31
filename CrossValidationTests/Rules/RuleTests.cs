@@ -1,4 +1,5 @@
 ﻿using CrossValidation;
+using CrossValidation.Exceptions;
 using CrossValidation.Resources;
 using CrossValidation.Results;
 using CrossValidation.Rules;
