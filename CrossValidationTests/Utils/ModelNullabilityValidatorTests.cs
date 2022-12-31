@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using CrossValidation.Exceptions;
+using CrossValidation.Utils;
 using CrossValidationTests.Builders;
 using CrossValidationTests.Fixtures;
 using CrossValidationTests.Models;
-using Shouldly;
+using CrossValidationTests.TestExtensions;
 using Xunit;
 
 namespace CrossValidationTests.Utils;
@@ -31,7 +31,7 @@ public class ModelNullabilityValidatorTests : IClassFixture<Fixture>
         
         var action = () => parentModelValidator.Validate(_model);
 
-        action.ShouldThrow<ModelFormatException>();
+        action.ShouldThrowCrossError<ModelNullabilityValidator.Error.NonNullablePropertyIsNull>();
     }
     
     [Fact]
@@ -45,7 +45,7 @@ public class ModelNullabilityValidatorTests : IClassFixture<Fixture>
         
         var action = () => parentModelValidator.Validate(_model);
 
-        action.ShouldThrow<ModelFormatException>();
+        action.ShouldThrowCrossError<ModelNullabilityValidator.Error.NonNullableItemCollectionWithNullItem>();
     }
     
     [Fact]
@@ -59,7 +59,7 @@ public class ModelNullabilityValidatorTests : IClassFixture<Fixture>
         
         var action = () => parentModelValidator.Validate(_model);
 
-        action.ShouldThrow<ModelFormatException>();
+        action.ShouldThrowCrossError<ModelNullabilityValidator.Error.NonNullablePropertyIsNull>();
     }
 
     private void SetPropertyValue(object model, string propertyName, object? propertyValue)

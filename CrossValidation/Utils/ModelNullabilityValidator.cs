@@ -1,11 +1,18 @@
 ﻿using System.Collections;
 using System.Reflection;
 using CrossValidation.Exceptions;
+using CrossValidation.Results;
 
 namespace CrossValidation.Utils;
 
 public static class ModelNullabilityValidator
 {
+    public record Error : CrossError
+    {
+        public record NonNullablePropertyIsNull(string PropertyName) : Error;
+        public record NonNullableItemCollectionWithNullItem(string CollectionName) : Error;
+    }
+    
     /// <summary>
     /// Check model and nested models don't have nulls in non-nullable types
     /// </summary>
@@ -51,7 +58,7 @@ public static class ModelNullabilityValidator
 
         if (isNonNullableProperty)
         {
-            throw new ModelFormatException($"Non-nullable property '{property.Name}' is null");
+            throw new CrossErrorException(new Error.NonNullablePropertyIsNull(property.Name));
         }
     }
 
@@ -73,7 +80,7 @@ public static class ModelNullabilityValidator
                 if (item is null &&
                     nullabilityInfo.GenericTypeArguments[0].WriteState is not NullabilityState.Nullable)
                 {
-                    throw new ModelFormatException($"The collection '{property.Name}' cannot contain null values");
+                    throw new CrossErrorException(new Error.NonNullableItemCollectionWithNullItem(property.Name));
                 }
             }
         }
