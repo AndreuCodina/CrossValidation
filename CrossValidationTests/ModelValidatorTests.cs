@@ -238,6 +238,35 @@ public class ModelValidatorTests : IClassFixture<ModelValidatorFixture>
     }
 
     [Fact]
+    public void Transform_after_apply_NotNull_to_nullable_field()
+    {
+        int StringToInt(string value)
+        {
+            return int.Parse(value);
+        }
+
+        string? nullableString = "1";
+        var expectedTransformation = StringToInt(nullableString);
+        _model = new ParentModelBuilder()
+            .WithNullableString(nullableString)
+            .Build();
+        var parentModelValidator = _modelValidatorFixture.CreateParentModelValidator(validator =>
+        {
+            validator.ValidationMode = ValidationMode.AccumulateFirstErrorEachRule;
+    
+            validator.RuleFor(x => x.NullableString)
+                .NotNull(x => x
+                    .Transform(StringToInt)
+                    .GreaterThan(expectedTransformation));
+        });
+    
+        var action = () => parentModelValidator.Validate(_model);
+    
+        var error = action.ShouldThrow<CrossValidationException>().Errors[0];
+        error.FieldValue.ShouldBe(expectedTransformation);
+    }
+    
+    [Fact]
     public void Transform_field()
     {
         IEnumerable<string>? TransformValues(IEnumerable<int>? values)
@@ -464,9 +493,9 @@ public class ModelValidatorTests : IClassFixture<ModelValidatorFixture>
                 // .NotNull()
                 // .WithMessage(expectedMessage)
                 // .GreaterThan(_model.NestedModel.Int + 1);
-                .NotNull()
-                .WithMessage(expectedMessage)
-                .GreaterThan(_model.NestedModel.Int + 1);
+                .NotNull(x => x
+                    .WithMessage(expectedMessage)
+                    .GreaterThan(_model.NestedModel.Int + 1));
         });
 
         var action = () => parentModelValidator.Validate(_model);

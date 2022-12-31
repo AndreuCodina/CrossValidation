@@ -50,6 +50,16 @@ public class Rule<TField> : IRule<TField>
     
         Context.FieldName = parentPathValue + fieldFullPath + indexRepresentation;
     }
+    
+    public static IRule<TField> CreateFromField(
+        TField fieldValue,
+        string? fieldFullPath = null,
+        ValidationContext? context = null,
+        int? index = null,
+        string? parentPath = null)
+    {
+        return new Rule<TField>(fieldValue, fieldFullPath, context, index, parentPath);
+    }
 
     public static IRule<TField> CreateFromFieldSelector<TModel>(
         TModel model,
@@ -60,16 +70,6 @@ public class Rule<TField> : IRule<TField>
         return new Rule<TField>(fieldInformation.Value, fieldInformation.SelectionFullPath, context);
     }
 
-    public static IRule<TField> CreateFromField(
-        TField fieldValue,
-        string? fieldFullPath = null,
-        ValidationContext? context = null,
-        int? index = null,
-        string? parentPath = null)
-    {
-        return new Rule<TField>(fieldValue, fieldFullPath, context, index, parentPath);
-    }
-    
     public TField GetFieldValue()
     {
         return FieldValue;
@@ -169,7 +169,7 @@ public class Rule<TField> : IRule<TField>
         Func<TField, TFieldTransformed> transformer)
     {
         var fieldValueTransformed = transformer(FieldValue);
-        return Rule<TFieldTransformed>.CreateFromField(fieldValueTransformed, Context.FieldName);
+        return Rule<TFieldTransformed>.CreateFromField(fieldValueTransformed, Context.FieldName, Context);
     }
     
     public IRule<TField> SetModelValidator<TChildModel>(ModelValidator<TChildModel> validator)

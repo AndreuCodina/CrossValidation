@@ -5,21 +5,48 @@ namespace CrossValidation.Rules;
 
 public static class RuleExtensions
 {
-    public static IRule<TField> NotNull<TField>(
+    public static void NotNull<TField>(
         this IRule<TField?> rule)
         where TField : class
     {
-        return rule.SetValidator(() => new NotNullValidator<TField?>(rule.GetFieldValue()))!;
+        rule.SetValidator(() => new NotNullValidator<TField?>(rule.GetFieldValue()));
     }
     
-    public static IRule<TField> NotNull<TField>(
+    public static void NotNull<TField>(
+        this IRule<TField?> rule,
+        Action<IRule<TField>> notNullRule)
+        where TField : class
+    {
+        var validator = new NotNullValidator<TField?>(rule.GetFieldValue());
+        rule.SetValidator(() => validator);
+
+        if (validator.IsValid())
+        {
+            notNullRule(rule.Transform(x => x!));
+        }
+    }
+    
+    public static void NotNull<TField>(
         this IRule<TField?> rule)
         where TField : struct
     {
-        return rule.SetValidator(() => new NotNullValidator<TField?>(rule.GetFieldValue()))
-            .Transform(x => x ?? default);
+        rule.SetValidator(() => new NotNullValidator<TField?>(rule.GetFieldValue()));
     }
     
+    public static void NotNull<TField>(
+        this IRule<TField?> rule,
+        Action<IRule<TField>> notNullRule)
+        where TField : struct
+    {
+        var validator = new NotNullValidator<TField?>(rule.GetFieldValue());
+        rule.SetValidator(() => validator);
+
+        if (validator.IsValid())
+        {
+            notNullRule(rule.Transform(x => x!.Value));
+        }
+    }
+
     public static IRule<TField?> Null<TField>(
         this IRule<TField?> rule)
         where TField : class
@@ -39,7 +66,7 @@ public static class RuleExtensions
         TField valueToCompare)
         where TField : IComparisonOperators<TField, TField, bool>
     {
-        return rule.SetValidator(() => new GreaterThanValidator<TField>(rule.GetFieldValue()!, valueToCompare));
+        return rule.SetValidator(() => new GreaterThanValidator<TField>(rule.GetFieldValue(), valueToCompare));
     }
 
     public static IRule<TField> IsInEnum<TField>(
@@ -58,7 +85,7 @@ public static class RuleExtensions
             throw new InvalidOperationException($"Cannot use {nameof(IsInEnum)} if the type provided is not an enumeration");
         }
         
-        return rule.SetValidator(() => new EnumValidator<int>(rule.GetFieldValue()!, enumType));
+        return rule.SetValidator(() => new EnumValidator<int>(rule.GetFieldValue(), enumType));
     }
     
     public static IRule<string> IsInEnum(
@@ -70,7 +97,7 @@ public static class RuleExtensions
             throw new InvalidOperationException($"Cannot use {nameof(IsInEnum)} if the type provided is not an enumeration");
         }
         
-        return rule.SetValidator(() => new EnumValidator<string>(rule.GetFieldValue()!, enumType));
+        return rule.SetValidator(() => new EnumValidator<string>(rule.GetFieldValue(), enumType));
     }
     
     public static IRule<string> Length(
@@ -78,7 +105,7 @@ public static class RuleExtensions
         int minimum,
         int maximum)
     {
-        return rule.SetValidator(() => new LengthRangeValidator(rule.GetFieldValue()!, minimum, maximum));
+        return rule.SetValidator(() => new LengthRangeValidator(rule.GetFieldValue(), minimum, maximum));
     }
     
     public static IRule<IEnumerable<TInnerType>> ForEach<TInnerType>(

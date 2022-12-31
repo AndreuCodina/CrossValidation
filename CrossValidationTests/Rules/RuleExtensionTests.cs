@@ -29,8 +29,8 @@ public class RuleExtensionTests : IClassFixture<ModelValidatorFixture>
             .Build();
 
         var action = () => Validate.That(_model.NullableInt)
-            .NotNull()
-            .GreaterThan(_model.NullableInt!.Value - 1);
+            .NotNull(x => x
+                .GreaterThan(_model.NullableInt!.Value - 1));
         action.ShouldNotThrow();
     }
     
@@ -42,30 +42,42 @@ public class RuleExtensionTests : IClassFixture<ModelValidatorFixture>
             .Build();
 
         var action = () => Validate.That(_model.NullableString)
-            .NotNull()
-            .Must(_ => true);
+            .NotNull(x => x
+                .Must(_ => true));
         action.ShouldNotThrow();
     }
     
         
     [Fact]
-    public void NotNull_works_with_nullable_value_types_and_error_accumulation()
+    public void NotNull_works_with_nullable_types_and_error_accumulation()
     {
+        _model = new ParentModelBuilder()
+            .WithNullableString("Value")
+            .Build();
+        
         var parentModelValidator = _modelValidatorFixture.CreateParentModelValidator(validator =>
         {
             validator.ValidationMode = ValidationMode.AccumulateFirstErrorEachRule;
             
             validator.RuleFor(x => x.NullableInt)
-                .NotNull()
-                .GreaterThan(-1);
-            validator.RuleFor(x => x.NullableInt)
-                .NotNull();
+                .NotNull(x => x
+                    .GreaterThan(-1));
+            
+            validator.RuleFor(x => x.NullableString)
+                .NotNull(x => x
+                    .Length(int.MaxValue, int.MaxValue));
+
+                validator.RuleFor(x => x.NullableInt)
+                    .NotNull();
         });
         
         var action = () => parentModelValidator.Validate(_model);
 
         var errors = action.ShouldThrow<CrossValidationException>().Errors;
-        errors.Count.ShouldBe(2);
+        errors.Count.ShouldBe(3);
+        errors[0].ShouldBeOfType<CommonCrossValidationError.NotNull>();
+        errors[1].ShouldBeOfType<CommonCrossValidationError.LengthRange>();
+        errors[2].ShouldBeOfType<CommonCrossValidationError.NotNull>();
     }
 
     [Fact]
@@ -97,10 +109,10 @@ public class RuleExtensionTests : IClassFixture<ModelValidatorFixture>
         var parentModelValidator = _modelValidatorFixture.CreateParentModelValidator(validator =>
         {
             validator.RuleFor(x => x.NullableIntList)
-                .NotNull()
-                .ForEach(rule => rule
-                    .GreaterThan(1)
-                    .GreaterThan(10));
+                .NotNull(x => x
+                    .ForEach(x => x
+                        .GreaterThan(1)
+                        .GreaterThan(10)));
         });
         
         var action = () => parentModelValidator.Validate(_model);
@@ -118,10 +130,10 @@ public class RuleExtensionTests : IClassFixture<ModelValidatorFixture>
         {
             validator.ValidationMode = ValidationMode.AccumulateFirstErrorEachRule;
             validator.RuleFor(x => x.NullableIntList)
-                .NotNull()
-                .ForEach(rule => rule
-                    .GreaterThan(0)
-                    .GreaterThan(10));
+                .NotNull(x => x
+                    .ForEach(x => x
+                        .GreaterThan(0)
+                        .GreaterThan(10)));
         });
         
         var action = () => parentModelValidator.Validate(_model);
@@ -141,10 +153,10 @@ public class RuleExtensionTests : IClassFixture<ModelValidatorFixture>
         var parentModelValidator = _modelValidatorFixture.CreateParentModelValidator(validator =>
         {
             validator.RuleFor(x => x.NullableIntList)
-                .NotNull()
-                .ForEach(rule => rule
-                    .Transform(Convert.ToDouble)
-                    .GreaterThan(10d));
+                .NotNull(x => x
+                    .ForEach(x => x
+                        .Transform(Convert.ToDouble)
+                        .GreaterThan(10d)));
         });
         
         var action = () => parentModelValidator.Validate(_model);
@@ -162,9 +174,9 @@ public class RuleExtensionTests : IClassFixture<ModelValidatorFixture>
         var parentModelValidator = _modelValidatorFixture.CreateParentModelValidator(validator =>
         {
             validator.RuleFor(x => x.NullableIntList)
-                .NotNull()
-                .ForEach(rule => rule
-                    .GreaterThan(10));
+                .NotNull(x => x
+                    .ForEach(x => x
+                        .GreaterThan(10)));
         });
 
         var action = () => parentModelValidator.Validate(_model);
