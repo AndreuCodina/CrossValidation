@@ -15,4 +15,12 @@ public static class CustomShouldlyAssertions
             .Error
             .ShouldBeOfType<TError>();
     }
+
+    public static void ShouldThrowCrossError<TError>(this Func<object?> actual, string? customMessage = null)
+        where TError : CrossError
+    {
+        actual.ShouldThrow<CrossException>(customMessage)
+            .Error
+            .ShouldBeOfType<TError>(customMessage);
+    }
 }

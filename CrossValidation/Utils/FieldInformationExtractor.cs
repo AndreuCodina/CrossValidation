@@ -1,7 +1,15 @@
 ﻿using System.Linq.Expressions;
 using System.Reflection;
+using CrossValidation.Exceptions;
+using CrossValidation.Results;
+using static CrossValidation.Utils.FieldInformationExtractorError;
 
 namespace CrossValidation.Utils;
+
+public record FieldInformationExtractorError
+{
+    public record CodeCallInFieldSelector : CrossError;
+}
 
 public class FieldInformationExtractor<TField>
 {
@@ -29,7 +37,7 @@ public class FieldInformationExtractor<TField>
         }
         else if (fieldSelector.Body is MethodCallExpression)
         {
-            throw new InvalidOperationException("Cannot use a call in a field selector");
+            throw new CrossException(new CodeCallInFieldSelector());
         }
         else
         {
@@ -63,7 +71,7 @@ public class FieldInformationExtractor<TField>
 
         return currentNodeModel!;
     }
-    
+
     private static object ConvertToChildField(PropertyInfo propertyInfo, object parent)
     {
         var source = propertyInfo.GetValue(parent, null)!;

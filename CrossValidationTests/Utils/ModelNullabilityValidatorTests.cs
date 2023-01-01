@@ -19,7 +19,7 @@ public class ModelNullabilityValidatorTests : IClassFixture<Fixture>
         _fixture = fixture;
         _model = new ParentModelBuilder().Build();
     }
-    
+
     [Fact]
     public void Non_nullable_field_with_null_fails()
     {
@@ -28,12 +28,12 @@ public class ModelNullabilityValidatorTests : IClassFixture<Fixture>
             propertyName: nameof(ParentModel.String),
             propertyValue: null);
         var parentModelValidator = _fixture.CreateParentModelValidator(_ => { });
-        
+
         var action = () => parentModelValidator.Validate(_model);
 
-        action.ShouldThrowCrossError<ModelNullabilityValidator.Error.NonNullablePropertyIsNull>();
+        action.ShouldThrowCrossError<ModelNullabilityValidatorError.NonNullablePropertyIsNull>();
     }
-    
+
     [Fact]
     public void Collection_containing_non_nullable_items_with_null_fails()
     {
@@ -42,12 +42,12 @@ public class ModelNullabilityValidatorTests : IClassFixture<Fixture>
             propertyName: nameof(ParentModel.StringList),
             propertyValue: new List<string?> {"", null});
         var parentModelValidator = _fixture.CreateParentModelValidator(_ => { });
-        
+
         var action = () => parentModelValidator.Validate(_model);
 
-        action.ShouldThrowCrossError<ModelNullabilityValidator.Error.NonNullableItemCollectionWithNullItem>();
+        action.ShouldThrowCrossError<ModelNullabilityValidatorError.NonNullableItemCollectionWithNullItem>();
     }
-    
+
     [Fact]
     public void Non_nullable_nested_model_with_null_fails()
     {
@@ -56,10 +56,10 @@ public class ModelNullabilityValidatorTests : IClassFixture<Fixture>
             propertyName: nameof(ParentModel.NestedModel),
             propertyValue: null);
         var parentModelValidator = _fixture.CreateParentModelValidator(_ => { });
-        
+
         var action = () => parentModelValidator.Validate(_model);
 
-        action.ShouldThrowCrossError<ModelNullabilityValidator.Error.NonNullablePropertyIsNull>();
+        action.ShouldThrowCrossError<ModelNullabilityValidatorError.NonNullablePropertyIsNull>();
     }
 
     private void SetPropertyValue(object model, string propertyName, object? propertyValue)

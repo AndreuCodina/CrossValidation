@@ -2,17 +2,18 @@
 using System.Reflection;
 using CrossValidation.Exceptions;
 using CrossValidation.Results;
+using static CrossValidation.Utils.ModelNullabilityValidatorError;
 
 namespace CrossValidation.Utils;
 
+public record ModelNullabilityValidatorError
+{
+    public record NonNullablePropertyIsNull(string PropertyName) : CrossError;
+    public record NonNullableItemCollectionWithNullItem(string CollectionName) : CrossError;
+}
+
 public static class ModelNullabilityValidator
 {
-    public record Error : CrossError
-    {
-        public record NonNullablePropertyIsNull(string PropertyName) : Error;
-        public record NonNullableItemCollectionWithNullItem(string CollectionName) : Error;
-    }
-    
     /// <summary>
     /// Check model and nested models don't have nulls in non-nullable types
     /// </summary>
@@ -20,11 +21,11 @@ public static class ModelNullabilityValidator
     {
         ValidateModel(model!);
     }
-    
+
     private static void ValidateModel(object model)
     {
         var nullabilityContext = new NullabilityInfoContext();
-        
+
         foreach (var property in model!.GetType().GetProperties())
         {
             var propertyValue = property.GetValue(model);
@@ -58,7 +59,7 @@ public static class ModelNullabilityValidator
 
         if (isNonNullableProperty)
         {
-            throw new CrossException(new Error.NonNullablePropertyIsNull(property.Name));
+            throw new CrossException(new NonNullablePropertyIsNull(property.Name));
         }
     }
 
@@ -69,7 +70,7 @@ public static class ModelNullabilityValidator
     {
         var isCollection = typeof(IEnumerable).IsAssignableFrom(property.PropertyType)
                            && property.PropertyType != typeof(string);
-        
+
         if (isCollection)
         {
             var collection = (IEnumerable)property.GetValue(model)!;
@@ -80,7 +81,7 @@ public static class ModelNullabilityValidator
                 if (item is null &&
                     nullabilityInfo.GenericTypeArguments[0].WriteState is not NullabilityState.Nullable)
                 {
-                    throw new CrossException(new Error.NonNullableItemCollectionWithNullItem(property.Name));
+                    throw new CrossException(new NonNullableItemCollectionWithNullItem(property.Name));
                 }
             }
         }
