@@ -11,7 +11,7 @@ public static class CustomShouldlyAssertions
     public static void ShouldThrowCrossError<TError>(this Action actual, string? customMessage = null)
         where TError : CrossError
     {
-        actual.ShouldThrow<CrossErrorException>()
+        actual.ShouldThrow<CrossException>()
             .Error
             .ShouldBeOfType<TError>();
     }

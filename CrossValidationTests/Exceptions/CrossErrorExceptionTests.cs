@@ -10,7 +10,7 @@ public class CrossErrorExceptionTests
     [Fact]
     public void Retrieve_error_type()
     {
-        var exception = new CrossErrorException(new TestError.ErrorWithoutProperties());
+        var exception = new CrossException(new TestError.ErrorWithoutProperties());
 
         exception.Error.ShouldBeOfType<TestError.ErrorWithoutProperties>();
     }
@@ -18,13 +18,13 @@ public class CrossErrorExceptionTests
     [Fact]
     public void Retrieve_error_message()
     {
-        var exception = new CrossErrorException(new TestError.ErrorWithoutProperties());
+        var exception = new CrossException(new TestError.ErrorWithoutProperties());
         exception.Message.ShouldBe("ErrorWithoutProperties { }");
         
-        exception = new CrossErrorException(new TestError.ErrorWithProperties("Property1Value", null));
+        exception = new CrossException(new TestError.ErrorWithProperties("Property1Value", null));
         exception.Message.ShouldBe("ErrorWithProperties { Property1 = Property1Value, Property2 =  }");
         
-        exception = new CrossErrorException(new TestError.ErrorWithoutProperties(), "Custom message");
+        exception = new CrossException(new TestError.ErrorWithoutProperties(), "Custom message");
         exception.Message.ShouldBe("ErrorWithoutProperties { }. Custom message");
     }
 

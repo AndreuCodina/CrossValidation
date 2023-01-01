@@ -58,7 +58,7 @@ public static class ModelNullabilityValidator
 
         if (isNonNullableProperty)
         {
-            throw new CrossErrorException(new Error.NonNullablePropertyIsNull(property.Name));
+            throw new CrossException(new Error.NonNullablePropertyIsNull(property.Name));
         }
     }
 
@@ -80,7 +80,7 @@ public static class ModelNullabilityValidator
                 if (item is null &&
                     nullabilityInfo.GenericTypeArguments[0].WriteState is not NullabilityState.Nullable)
                 {
-                    throw new CrossErrorException(new Error.NonNullableItemCollectionWithNullItem(property.Name));
+                    throw new CrossException(new Error.NonNullableItemCollectionWithNullItem(property.Name));
                 }
             }
         }
