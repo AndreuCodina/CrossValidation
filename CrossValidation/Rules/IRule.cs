@@ -6,7 +6,7 @@ namespace CrossValidation.Rules;
 
 public interface IRule<out TField>
 {
-    bool IsValid { get;set; }
+    RuleState State { get;set; }
     ValidationContext Context { get; set; }
     string FieldFullPath { get; set; }
     TField GetFieldValue();

@@ -8,7 +8,7 @@ namespace CrossValidation;
 
 public abstract record ModelValidator<TModel>
 {
-    private ValidationMode _validationMode = ValidationMode.StopOnFirstError;
+    private ValidationMode _validationMode = ValidationMode.StopValidationOnFirstError;
     public ValidationContext? Context { get; set; }
     public TModel? Model { get; set; }
 

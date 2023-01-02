@@ -32,4 +32,8 @@
       </Compile>
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="Shouldly" Version="4.1.0" />
+    </ItemGroup>
+
 </Project>

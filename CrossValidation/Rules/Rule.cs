@@ -1,4 +1,5 @@
-﻿using System.Linq.Expressions;
+﻿using System.Diagnostics;
+using System.Linq.Expressions;
 using CrossValidation.Exceptions;
 using CrossValidation.Resources;
 using CrossValidation.Results;
@@ -10,7 +11,7 @@ namespace CrossValidation.Rules;
 
 public class Rule<TField> : IRule<TField>
 {
-    public bool IsValid { get; set; }
+    public RuleState State { get; set; }
     public TField FieldValue { get; set; }
     public ValidationContext Context { get; set; }
     public string FieldFullPath { get; set; }
@@ -22,7 +23,7 @@ public class Rule<TField> : IRule<TField>
         int? index = null,
         string? parentPath = null)
     {
-        IsValid = true;
+        State = RuleState.Valid;
         FieldValue = fieldValue;
         Context = context ?? new ValidationContext();
         Context.FieldValue = fieldValue;
@@ -76,36 +77,36 @@ public class Rule<TField> : IRule<TField>
     {
         return FieldValue;
     }
+
+    public bool CanContinueExecutingRule()
+    {
+        return State is RuleState.Valid
+               && Context.ExecuteNextValidator;
+    }
     
     public IRule<TField> SetValidator(Func<Validator> validator)
     {
-        if (Context.ExecuteNextValidator && IsValid)
+        if (CanContinueExecutingRule())
         {
             var error = validator().GetError();
 
             if (error is not null)
             {
                 FinishWithError(error);
-                IsValid = false;
+                State = RuleState.Invalid;
             }
         }
 
         Context.Clean();
         return this;
     }
-
-
-    public void FinishWithError(CrossValidationError error)
-    {
-        FillErrorWithCustomizations(error);
-        HandleError(error);
-    }
+    
 
     protected void HandleError(CrossValidationError error)
     {
         Context.AddError(error);
         
-        if (Context is {ValidationMode: ValidationMode.StopOnFirstError, Errors: { }})
+        if (Context is {ValidationMode: ValidationMode.StopValidationOnFirstError, Errors: { }})
         {
             throw new CrossValidationException(Context.Errors!);
         }
@@ -113,37 +114,61 @@ public class Rule<TField> : IRule<TField>
 
     public IRule<TField> WithMessage(string message)
     {
-        Context.SetMessage(message);
+        if (CanContinueExecutingRule())
+        {
+            Context.SetMessage(message);
+        }
+
         return this;
     }
 
     public IRule<TField> WithCode(string code)
     {
-        Context.SetCode(code);
+        if (CanContinueExecutingRule())
+        {
+            Context.SetCode(code);
+        }
+
         return this;
     }
     
     public IRule<TField> WithError(CrossValidationError error)
     {
-        Context.SetError(error);
+        if (CanContinueExecutingRule())
+        {
+            Context.SetError(error);
+        }
+
         return this;
     }
     
     public IRule<TField> WithFieldDisplayName(string fieldDisplayName)
     {
-        Context.SetFieldDisplayName(fieldDisplayName);
+        if (CanContinueExecutingRule())
+        {
+            Context.SetFieldDisplayName(fieldDisplayName);
+        }
+
         return this;
     }
     
     public IRule<TField> When(bool condition)
     {
-        Context.ExecuteNextValidator = condition;
+        if (CanContinueExecutingRule())
+        {
+            Context.ExecuteNextValidator = condition;
+        }
+        
         return this;
     }
     
     public IRule<TField> When(Func<TField, bool> condition)
     {
-        Context.ExecuteNextValidator = condition(FieldValue!);
+        if (CanContinueExecutingRule())
+        {
+            Context.ExecuteNextValidator = condition(FieldValue!);
+        }
+        
         return this;
     }
     
@@ -163,7 +188,7 @@ public class Rule<TField> : IRule<TField>
         {
             var error = FromExceptionToContext(e);
             FinishWithError(error);
-            throw new InvalidOperationException("Dead code");
+            throw new UnreachableException();
         }
     }
     
@@ -186,6 +211,12 @@ public class Rule<TField> : IRule<TField>
         validator.Context = oldContext;
         validator.Context.Errors = newErrors;
         return this;
+    }
+    
+    private void FinishWithError(CrossValidationError error)
+    {
+        FillErrorWithCustomizations(error);
+        HandleError(error);
     }
 
     private CrossValidationError FromExceptionToContext(CrossValidationException exception)

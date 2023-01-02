@@ -13,7 +13,7 @@ public class ValidationContext
     public CrossValidationError? Error { get; set; }
     public bool ExecuteNextValidator { get; set; } = true;
     public string? ParentPath { get; set; }
-    public ValidationMode ValidationMode { get; set; } = ValidationMode.StopOnFirstError;
+    public ValidationMode ValidationMode { get; set; } = ValidationMode.StopValidationOnFirstError;
     public bool IsChildContext { get; set; }
 
     public ValidationContext CloneForChildModelValidator(string parentPath)

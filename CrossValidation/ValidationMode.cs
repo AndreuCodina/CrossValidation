@@ -2,6 +2,6 @@ namespace CrossValidation;
 
 public enum ValidationMode
 {
-    StopOnFirstError = 1,
+    StopValidationOnFirstError = 1,
     AccumulateFirstErrorEachRule = 2
 }

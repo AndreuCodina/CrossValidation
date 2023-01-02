@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using CrossValidation.Extensions;
 using CrossValidation.Utils;
 using CrossValidationTests.Builders;
 using CrossValidationTests.Models;
-using CrossValidationTests.TestExtensions;
 using Shouldly;
 using Xunit;
 
@@ -27,11 +27,11 @@ public class FieldInformationExtractorTests
 
         var methodCall = () => FieldInformationExtractor<int>
             .Extract(_model, x => x.NullableIntList!.First());
-        methodCall.ShouldThrowCrossError<FieldInformationExtractorError.CodeCallInFieldSelector>();
+        methodCall.ShouldThrowError<FieldInformationExtractorError.CodeCallInFieldSelector>();
 
         var arrayIndexAccess = () => FieldInformationExtractor<int>
             .Extract(_model, x => x.NullableIntList![0]);
-        arrayIndexAccess.ShouldThrowCrossError<FieldInformationExtractorError.CodeCallInFieldSelector>();
+        arrayIndexAccess.ShouldThrowError<FieldInformationExtractorError.CodeCallInFieldSelector>();
     }
 
     [Fact]
