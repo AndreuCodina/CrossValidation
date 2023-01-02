@@ -1,5 +1,5 @@
 ﻿using CrossValidation;
-using CrossValidation.Exceptions;
+using CrossValidation.Extensions;
 using CrossValidation.Rules;
 using CrossValidationTests.Builders;
 using CrossValidationTests.Fixtures;
@@ -72,7 +72,7 @@ public class RuleExtensionTests_NotNull : IClassFixture<Fixture>
         
         var action = () => parentModelValidator.Validate(_model);
 
-        var errors = action.ShouldThrow<CrossValidationException>().Errors;
+        var errors = action.ShouldThrowValidationErrors();
         errors.Count.ShouldBe(3);
         errors[0].ShouldBeOfType<CommonCrossValidationError.NotNull>();
         errors[1].ShouldBeOfType<CommonCrossValidationError.LengthRange>();

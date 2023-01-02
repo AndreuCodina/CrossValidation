@@ -2,6 +2,7 @@
 using System.Linq;
 using CrossValidation;
 using CrossValidation.Exceptions;
+using CrossValidation.Extensions;
 using CrossValidation.Rules;
 using CrossValidationTests.Models;
 using Shouldly;
@@ -39,12 +40,12 @@ public class EnumValidatorTests
         var enumValue = (NestedEnum)nonExistentColorId;
         var enumAction = () => Validate.That(enumValue)
             .IsInEnum();
-        enumAction.ShouldThrow<CrossValidationException>();
+        enumAction.ShouldThrowValidationError();
          
         var intValue = nonExistentColorId;
         var intAction = () => Validate.That(intValue)
             .IsInEnum(typeof(NestedEnum));
-        intAction.ShouldThrow<CrossValidationException>();
+        intAction.ShouldThrowValidationError();
          
         var stringValue = new Bogus.Faker().Lorem.Sentence();
         var stringAction = () => Validate.That(stringValue)

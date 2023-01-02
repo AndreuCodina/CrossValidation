@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using CrossValidation;
-using CrossValidation.Exceptions;
+using CrossValidation.Extensions;
 using CrossValidation.Resources;
 using CrossValidation.Results;
 using CrossValidation.Rules;
@@ -53,7 +53,7 @@ public class ModelValidatorTests : IClassFixture<Fixture>
 
         var action = () => parentModelValidator.Validate(_model);
 
-        var error = action.ShouldThrow<CrossValidationException>().Errors[0];
+        var error = action.ShouldThrowValidationError();
         error.Code.ShouldBe(nameof(ErrorResource.NotNull));
     }
 
@@ -83,7 +83,7 @@ public class ModelValidatorTests : IClassFixture<Fixture>
 
         var action = () => parentModelValidator.Validate(_model);
 
-        var error = action.ShouldThrow<CrossValidationException>().Errors[0];
+        var error = action.ShouldThrowValidationError();
         error.FieldName.ShouldBe(expectedFieldName);
         error.FieldValue.ShouldBe(expectedFieldValue);
     }
@@ -106,7 +106,7 @@ public class ModelValidatorTests : IClassFixture<Fixture>
 
         var action = () => parentModelValidator.Validate(_model);
 
-        var error = action.ShouldThrow<CrossValidationException>().Errors[0];
+        var error = action.ShouldThrowValidationError();
         error.FieldName.ShouldBe(expectedFieldName);
         error.FieldValue.ShouldBe(expectedFieldValue);
     }
@@ -127,7 +127,7 @@ public class ModelValidatorTests : IClassFixture<Fixture>
 
         var action = () => parentModelValidator.Validate(_model);
 
-        var error = action.ShouldThrow<CrossValidationException>().Errors[0];
+        var error = action.ShouldThrowValidationError();
         error.FieldName.ShouldBe(expectedFieldName);
         error.FieldValue.ShouldBe(expectedFieldValue);
     }
@@ -165,9 +165,8 @@ public class ModelValidatorTests : IClassFixture<Fixture>
 
         var action = () => parentModelValidator.Validate(_model);
 
-        var errors = action.ShouldThrow<CrossValidationException>().Errors;
-        errors.Count.ShouldBe(1);
-        errors[0].Code.ShouldBe(expectedCode);
+        var error = action.ShouldThrowValidationError();
+        error.Code.ShouldBe(expectedCode);
     }
     
 
@@ -211,7 +210,7 @@ public class ModelValidatorTests : IClassFixture<Fixture>
 
         var action = () => parentModelValidator.Validate(_model);
 
-        var errors = action.ShouldThrow<CrossValidationException>().Errors;
+        var errors = action.ShouldThrowValidationErrors();
         errors.Select(x => x.Code).ShouldBe(expectedCodes);
     }
 
@@ -263,7 +262,7 @@ public class ModelValidatorTests : IClassFixture<Fixture>
     
         var action = () => parentModelValidator.Validate(_model);
     
-        var error = action.ShouldThrow<CrossValidationException>().Errors[0];
+        var error = action.ShouldThrowValidationError();
         error.FieldValue.ShouldBe(expectedTransformation);
     }
     
@@ -291,7 +290,7 @@ public class ModelValidatorTests : IClassFixture<Fixture>
     
         var action = () => parentModelValidator.Validate(_model);
     
-        var error = action.ShouldThrow<CrossValidationException>().Errors[0];
+        var error = action.ShouldThrowValidationError();
         error.FieldValue.ShouldBe(expectedTransformation);
     }
     
@@ -314,7 +313,7 @@ public class ModelValidatorTests : IClassFixture<Fixture>
     
         var action = () => parentModelValidator.Validate(_model);
     
-        var error = action.ShouldThrow<CrossValidationException>().Errors[0];
+        var error = action.ShouldThrowValidationError();
         error.FieldName.ShouldBe("");
         error.FieldValue.ShouldBe(expectedTransformation);
     }
@@ -330,7 +329,7 @@ public class ModelValidatorTests : IClassFixture<Fixture>
 
         var action = () => parentModelValidator.Validate(_model);
 
-        var error = action.ShouldThrow<CrossValidationException>().Errors[0];
+        var error = action.ShouldThrowValidationError();
         error.FieldValue.ShouldNotBeNull();
     }
     
@@ -346,7 +345,7 @@ public class ModelValidatorTests : IClassFixture<Fixture>
 
         var action = () => parentModelValidator.Validate(_model);
 
-        var error = action.ShouldThrow<CrossValidationException>().Errors[0];
+        var error = action.ShouldThrowValidationError();
         error.FieldValue.ShouldBe(expectedFieldValue);
     }
 
@@ -364,7 +363,7 @@ public class ModelValidatorTests : IClassFixture<Fixture>
 
         var action = () => parentModelValidator.Validate(_model);
 
-        var error = action.ShouldThrow<CrossValidationException>().Errors[0];
+        var error = action.ShouldThrowValidationError();
         error.Message.ShouldBe(expectedMessage);
     }
 
@@ -381,7 +380,7 @@ public class ModelValidatorTests : IClassFixture<Fixture>
 
         var action = () => parentModelValidator.Validate(_model);
 
-        var error = action.ShouldThrow<CrossValidationException>().Errors[0];
+        var error = action.ShouldThrowValidationError();
         error.Code.ShouldBe(expectedCode);
     }
     
@@ -397,8 +396,7 @@ public class ModelValidatorTests : IClassFixture<Fixture>
         
         var action = () => parentModelValidator.Validate(_model);
 
-        var error = action.ShouldThrow<CrossValidationException>().Errors[0];
-        error.ShouldBeOfType<CustomErrorWithCode>();
+        action.ShouldThrowValidationError<CustomErrorWithCode>();
     }
     
     [Fact]
@@ -414,7 +412,7 @@ public class ModelValidatorTests : IClassFixture<Fixture>
 
         var action = () => parentModelValidator.Validate(_model);
 
-        var error = action.ShouldThrow<CrossValidationException>().Errors[0];
+        var error = action.ShouldThrowValidationError();
         error.FieldDisplayName.ShouldBe(expectedDisplayName);
     }
     
@@ -430,8 +428,7 @@ public class ModelValidatorTests : IClassFixture<Fixture>
         
         var action = () => parentModelValidator.Validate(_model);
         
-        var errors = action.ShouldThrow<CrossValidationException>().Errors;
-        var error = errors[0].ShouldBeOfType<CommonCrossValidationError.GreaterThan<int>>();
+        var error = action.ShouldThrowValidationError<CommonCrossValidationError.GreaterThan<int>>();
         error.ComparisonValue.ShouldBe(comparisonValue);
         error.Code.ShouldBe("GreaterThan");
     }
@@ -451,8 +448,7 @@ public class ModelValidatorTests : IClassFixture<Fixture>
         
         var action = () => parentModelValidator.Validate(_model);
         
-        var error = action.ShouldThrow<CrossValidationException>().Errors[0];
-        error.ShouldBeOfType<CustomErrorWithCode>();
+        var error = action.ShouldThrowValidationError<CustomErrorWithCode>();
         error.Code.ShouldBe(expectedError.Code);
         error.Message.ShouldBe(expectedMessage);
     }
@@ -472,8 +468,7 @@ public class ModelValidatorTests : IClassFixture<Fixture>
         
         var action = () => parentModelValidator.Validate(_model);
         
-        var error = action.ShouldThrow<CrossValidationException>().Errors[0];
-        error.ShouldBeOfType<CustomErrorWithCode>();
+        var error = action.ShouldThrowValidationError<CustomErrorWithCode>();
         error.Code.ShouldBe(expectedError.Code);
         error.Message.ShouldBe(expectedMessage);
     }
@@ -501,10 +496,9 @@ public class ModelValidatorTests : IClassFixture<Fixture>
 
         var action = () => parentModelValidator.Validate(_model);
 
-        var error = action.ShouldThrow<CrossValidationException>().Errors[0];
+        var error = action.ShouldThrowValidationError<CommonCrossValidationError.GreaterThan<int>>();
         error.Message.ShouldBe(expectedMessage);
         error.Code.ShouldBe(expectedCode);
-        error.ShouldBeOfType<CommonCrossValidationError.GreaterThan<int>>();
     }
     
     [Fact]
@@ -525,7 +519,7 @@ public class ModelValidatorTests : IClassFixture<Fixture>
 
         var action = () => parentModelValidator.Validate(_model);
 
-        var error = action.ShouldThrow<CrossValidationException>().Errors[0];
+        var error = action.ShouldThrowValidationError();
         error.FieldName.ShouldBe("NullableString");
         error.FieldDisplayName.ShouldBe("NullableString");
     }
@@ -548,7 +542,7 @@ public class ModelValidatorTests : IClassFixture<Fixture>
 
         var action = () => parentModelValidator.Validate(_model);
 
-        var error = action.ShouldThrow<CrossValidationException>().Errors[0];
+        var error = action.ShouldThrowValidationError();
         error.Code.ShouldBe(expectedCode);
     }
 
@@ -569,7 +563,7 @@ public class ModelValidatorTests : IClassFixture<Fixture>
 
         var action = () => parentModelValidator.Validate(_model);
 
-        var error = action.ShouldThrow<CrossValidationException>().Errors[0];
+        var error = action.ShouldThrowValidationError();
         error.Code.ShouldBe(expectedCode);
     }
 
@@ -592,7 +586,7 @@ public class ModelValidatorTests : IClassFixture<Fixture>
 
         var action = () => parentModelValidator.Validate(_model);
 
-        var error = action.ShouldThrow<CrossValidationException>().Errors[0];
+        var error = action.ShouldThrowValidationError();
         error.Message.ShouldBe(expectedErrorMessage);
     }
     
@@ -610,7 +604,7 @@ public class ModelValidatorTests : IClassFixture<Fixture>
 
         var action = () => parentModelValidator.Validate(_model);
 
-        var error = action.ShouldThrow<CrossValidationException>().Errors[0];
+        var error = action.ShouldThrowValidationError();
         error.Message.ShouldBe(expectedMessage);
     }
     
@@ -628,7 +622,7 @@ public class ModelValidatorTests : IClassFixture<Fixture>
 
         var action = () => parentModelValidator.Validate(_model);
 
-        var error = action.ShouldThrow<CrossValidationException>().Errors[0];
+        var error = action.ShouldThrowValidationError();
         error.Message.ShouldBe(expectedMessage);
     }
 
@@ -647,7 +641,7 @@ public class ModelValidatorTests : IClassFixture<Fixture>
 
         var action = () => parentModelValidator.Validate(_model);
 
-        var error = action.ShouldThrow<CrossValidationException>().Errors[0];
+        var error = action.ShouldThrowValidationError();
         error.Message.ShouldBe(expectedMessage);
     }
     
@@ -662,8 +656,7 @@ public class ModelValidatorTests : IClassFixture<Fixture>
         
         var action = () => parentModelValidator.Validate(_model);
 
-        var error = action.ShouldThrow<CrossValidationException>().Errors[0];
-        error.ShouldBeOfType<CommonCrossValidationError.Predicate>();
+        action.ShouldThrowValidationError<CommonCrossValidationError.Predicate>();
     }
 
     public record CustomErrorWithCode(string Code) : CrossValidationError(Code: Code);

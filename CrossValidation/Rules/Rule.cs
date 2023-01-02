@@ -222,7 +222,6 @@ public class Rule<TField> : IRule<TField>
     private CrossValidationError FromExceptionToContext(CrossValidationException exception)
     {
         var error = exception.Errors[0];
-
         Context.Message = GetMessageFromException(error);
         Context.Code ??= error.Code;
         error.PlaceholderValues!.Clear();

@@ -1,5 +1,5 @@
 ﻿using CrossValidation;
-using CrossValidation.Exceptions;
+using CrossValidation.Extensions;
 using CrossValidation.Rules;
 using CrossValidationTests.Builders;
 using CrossValidationTests.Fixtures;
@@ -41,10 +41,9 @@ public class RuleExtensionTests_WhenNotNull : IClassFixture<Fixture>
             .WhenNotNull(x => x
                 .GreaterThan(_model.NullableInt!.Value));
 
-        var errors = action.ShouldThrow<CrossValidationException>().Errors;
-        errors.Count.ShouldBe(1);
-        errors[0].ShouldNotBeOfType<CommonCrossValidationError.GreaterThan<int?>>();
-        errors[0].ShouldBeOfType<CommonCrossValidationError.GreaterThan<int>>();
+        var error = action.ShouldThrowValidationError();
+        error.ShouldNotBeOfType<CommonCrossValidationError.GreaterThan<int?>>();
+        error.ShouldBeOfType<CommonCrossValidationError.GreaterThan<int>>();
     }
 
     [Fact]
@@ -58,10 +57,9 @@ public class RuleExtensionTests_WhenNotNull : IClassFixture<Fixture>
             .WhenNotNull(x => x
                 .Must(_fixture.NotBeValid));
 
-        var errors = action.ShouldThrow<CrossValidationException>().Errors;
-        errors.Count.ShouldBe(1);
-        errors[0].FieldValue.ShouldBeOfType<string?>();
-        errors[0].FieldValue.ShouldBeOfType<string?>();
+        var error = action.ShouldThrowValidationError();
+        error.FieldValue.ShouldBeOfType<string?>();
+        error.FieldValue.ShouldBeOfType<string?>();
     }
 
     [Fact]
@@ -72,10 +70,8 @@ public class RuleExtensionTests_WhenNotNull : IClassFixture<Fixture>
                 .Must(_fixture.BeValid))
             .NotNull();
 
-        var errors = action.ShouldThrow<CrossValidationException>().Errors;
-        errors.Count.ShouldBe(1);
-        errors[0].ShouldBeOfType<CommonCrossValidationError.NotNull>();
-        errors[0].FieldValue.ShouldNotBeOfType<int>();
-        errors[0].FieldValue.ShouldBeNull();
+        var error = action.ShouldThrowValidationError<CommonCrossValidationError.NotNull>();
+        error.FieldValue.ShouldNotBeOfType<int>();
+        error.FieldValue.ShouldBeNull();
     }
 }

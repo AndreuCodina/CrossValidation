@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using CrossValidation;
-using CrossValidation.Exceptions;
+using CrossValidation.Extensions;
 using CrossValidation.Rules;
 using CrossValidationTests.Builders;
 using CrossValidationTests.Fixtures;
@@ -60,7 +60,7 @@ public class RuleExtensionTests_ForEach : IClassFixture<Fixture>
         
         var action = () => parentModelValidator.Validate(_model);
 
-        var errors = action.ShouldThrow<CrossValidationException>().Errors;
+        var errors = action.ShouldThrowValidationErrors();
         errors.Count.ShouldBe(2);
         errors[0].FieldName.ShouldBe("NullableIntList[1]");
         errors[1].FieldName.ShouldBe("NullableIntList[3]");
@@ -83,7 +83,7 @@ public class RuleExtensionTests_ForEach : IClassFixture<Fixture>
         
         var action = () => parentModelValidator.Validate(_model);
 
-        var error = action.ShouldThrow<CrossValidationException>().Errors[0];
+        var error = action.ShouldThrowValidationError();
         error.FieldName.ShouldBe("NullableIntList[0]");
     }
     
@@ -103,8 +103,7 @@ public class RuleExtensionTests_ForEach : IClassFixture<Fixture>
 
         var action = () => parentModelValidator.Validate(_model);
 
-        var errors = action.ShouldThrow<CrossValidationException>().Errors;
-        errors.Count.ShouldBe(1);
-        errors[0].FieldName.ShouldBe("NullableIntList[1]");
+        var error = action.ShouldThrowValidationError();
+        error.FieldName.ShouldBe("NullableIntList[1]");
     }
 }

@@ -1,5 +1,6 @@
 ﻿using CrossValidation;
 using CrossValidation.Exceptions;
+using CrossValidation.Extensions;
 using CrossValidation.Resources;
 using CrossValidation.Results;
 using CrossValidation.Rules;
@@ -30,7 +31,7 @@ public class RuleTests
             .WithMessage(expectedMessage)
             .GreaterThan(_model.NestedModel.Int);
 
-        var error = action.ShouldThrow<CrossValidationException>().Errors[0];
+        var error = action.ShouldThrowValidationError();
         error.Message.ShouldBe(expectedMessage);
     }
     
@@ -44,7 +45,7 @@ public class RuleTests
             .WithError(new CustomErrorWithPlaceholderValue(_model.NestedModel.Int))
             .GreaterThan(_model.NestedModel.Int);
 
-        var error = action.ShouldThrow<CrossValidationException>().Errors[0];
+        var error = action.ShouldThrowValidationError();
         error.PlaceholderValues!
             .ShouldContain(x =>
                 x.Key == nameof(CustomErrorWithPlaceholderValue.Value)
@@ -59,8 +60,7 @@ public class RuleTests
         var action = () => Rule<NestedModel>.CreateFromField(_model.NestedModel)
             .Must(x => x.Int > x.Int);
 
-        var error = action.ShouldThrow<CrossValidationException>().Errors[0];
-        error.ShouldBeOfType<CommonCrossValidationError.Predicate>();
+        action.ShouldThrowValidationError<CommonCrossValidationError.Predicate>();
     }
     
     [Fact]
@@ -74,8 +74,7 @@ public class RuleTests
             .WithError(new CustomErrorWithPlaceholderValue(10))
             .Instance(UserAgeWithoutCustomization.Create);
 
-        var error = getAge.ShouldThrow<CrossValidationException>().Errors[0];
-        error.ShouldBeOfType<CustomErrorWithPlaceholderValue>();
+        var error = getAge.ShouldThrowValidationError<CustomErrorWithPlaceholderValue>();
         error.FieldName.ShouldBe("NestedModel.Int");
         error.Message.ShouldBe(expectedMessage);
     }
@@ -87,8 +86,7 @@ public class RuleTests
             .WithCode(nameof(ErrorResource.NotNull))
             .Instance(UserAgeWithoutCustomization.Create);
 
-        var error = getAge.ShouldThrow<CrossValidationException>().Errors[0];
-        error.ShouldBeOfType<CommonCrossValidationError.GreaterThan<int>>();
+        var error = getAge.ShouldThrowValidationError<CommonCrossValidationError.GreaterThan<int>>();
         error.Code.ShouldBe(nameof(ErrorResource.NotNull));
         error.Message.ShouldBe(ErrorResource.NotNull);
     }
@@ -99,8 +97,7 @@ public class RuleTests
         var getAge = () => Validate.Field(_model, x => x.NestedModel.Int)
             .Instance(UserAgeWithCustomization.Create);
 
-        var error = getAge.ShouldThrow<CrossValidationException>().Errors[0];
-        error.ShouldBeOfType<CommonCrossValidationError.GreaterThan<int>>();
+        var error = getAge.ShouldThrowValidationError<CommonCrossValidationError.GreaterThan<int>>();
         error.Code.ShouldBe(nameof(ErrorResource.GreaterThan));
         error.Message.ShouldBe("Expected message");
         error.FieldDisplayName.ShouldBe("Expected field display name");
