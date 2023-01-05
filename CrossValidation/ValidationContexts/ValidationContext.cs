@@ -1,4 +1,4 @@
-﻿using CrossValidation.Results;
+﻿using CrossValidation.Errors;
 
 namespace CrossValidation.ValidationContexts;
 
@@ -6,11 +6,11 @@ public class ValidationContext
 {
     public string? Code { get; set; }
     public string? Message { get; set; }
-    public List<CrossValidationError>? Errors { get; set; }
+    public List<ICrossValidationError>? Errors { get; set; }
     public string FieldName { get; set; } = "";
     public string? FieldDisplayName { get; set; }
     public object? FieldValue { get; set; } // Lazy<TField>?
-    public CrossValidationError? Error { get; set; }
+    public ICrossValidationError? Error { get; set; }
     public bool ExecuteNextValidator { get; set; } = true;
     public string? ParentPath { get; set; }
     public ValidationMode ValidationMode { get; set; } = ValidationMode.StopValidationOnFirstError;
@@ -28,9 +28,9 @@ public class ValidationContext
         return newContext;
     }
 
-    public void AddError(CrossValidationError error)
+    public void AddError(ICrossValidationError error)
     {
-        Errors ??= new List<CrossValidationError>();
+        Errors ??= new List<ICrossValidationError>();
         SetError(error);
         Error!.AddPlaceholderValues();
         Errors.Add(Error);
@@ -54,7 +54,7 @@ public class ValidationContext
         Message ??= message;
     }
     
-    public void SetError(CrossValidationError error)
+    public void SetError(ICrossValidationError error)
     {
         Error = CustomizationsToError(error);
     }
@@ -64,9 +64,9 @@ public class ValidationContext
         FieldDisplayName = fieldDisplayName;
     }
 
-    private CrossValidationError CustomizationsToError(CrossValidationError error)
+    private ICrossValidationError CustomizationsToError(ICrossValidationError error)
     {
-        CrossValidationError errorToCustomize;
+        ICrossValidationError errorToCustomize;
         
         if (Error is not null)
         {
@@ -83,7 +83,7 @@ public class ValidationContext
         return errorToCustomize;
     }
     
-    private void CombineErrors(CrossValidationError originalError, CrossValidationError errorToCombine)
+    private void CombineErrors(ICrossValidationError originalError, ICrossValidationError errorToCombine)
     {
         originalError.Code ??= errorToCombine.Code;
         originalError.Message ??= errorToCombine.Message;

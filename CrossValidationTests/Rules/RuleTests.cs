@@ -1,9 +1,9 @@
 ﻿using System;
 using CrossValidation;
+using CrossValidation.Errors;
 using CrossValidation.Exceptions;
 using CrossValidation.Extensions;
 using CrossValidation.Resources;
-using CrossValidation.Results;
 using CrossValidation.Rules;
 using CrossValidationTests.Builders;
 using CrossValidationTests.Fixtures;
@@ -24,21 +24,6 @@ public class RuleTests : IClassFixture<Fixture>
         _model = new ParentModelBuilder().Build();
     }
 
-    [Fact]
-    public void Validator_conditional_execution()
-    {
-        var expectedMessage = "TrueCase";
-        var action = () => Rule<int>.CreateFromField(() => _model.NestedModel.Int, RuleState.Valid)
-            .When(_ => false)
-            .GreaterThan(_model.NestedModel.Int + 1)
-            .When(true)
-            .WithMessage(expectedMessage)
-            .GreaterThan(_model.NestedModel.Int);
-
-        var error = action.ShouldThrowValidationError();
-        error.Message.ShouldBe(expectedMessage);
-    }
-    
     [Fact]
     public void Placeholder_values_are_added_automatically_when_they_are_not_added_and_it_is_enabled_in_configuration()
     {
@@ -126,6 +111,36 @@ public class RuleTests : IClassFixture<Fixture>
     
         action.ShouldThrow<InvalidOperationException>();
     }
+    
+    [Fact]
+    public void Validator_with_conditional_execution()
+    {
+        var expectedMessage = "TrueCase";
+        var action = () => Rule<int>.CreateFromField(() => _model.NestedModel.Int, RuleState.Valid)
+            .When(_fixture.NotBeValid)
+            .GreaterThan(_model.NestedModel.Int + 1)
+            .When(true)
+            .WithMessage(expectedMessage)
+            .GreaterThan(_model.NestedModel.Int);
+
+        var error = action.ShouldThrowValidationError();
+        error.Message.ShouldBe(expectedMessage);
+    }
+    
+    [Fact]
+    public void Validator_with_async_conditional_execution()
+    {
+        var expectedMessage = "TrueCase";
+        var action = () => Rule<int>.CreateFromField(() => _model.NestedModel.Int, RuleState.Valid)
+            .WhenAsync(_fixture.NotBeValidAsync)
+            .GreaterThan(_model.NestedModel.Int + 1)
+            .WhenAsync(_fixture.BeValidAsync)
+            .WithMessage(expectedMessage)
+            .GreaterThan(_model.NestedModel.Int);
+
+        var error = action.ShouldThrowValidationError();
+        error.Message.ShouldBe(expectedMessage);
+    }
 
     [Fact]
     public void Must()
@@ -135,12 +150,30 @@ public class RuleTests : IClassFixture<Fixture>
 
         action.ShouldNotThrow();
     }
-    
+
     [Fact]
     public void Must_fails()
     {
         var action = () => Validate.That(1)
             .Must(x => x != 1);
+
+        action.ShouldThrow<CrossValidationException>();
+    }
+    
+    [Fact]
+    public void MustAsync()
+    {
+        var action = () => Validate.That(1)
+            .MustAsync(_fixture.BeValidAsync);
+
+        action.ShouldNotThrow();
+    }
+    
+    [Fact]
+    public void MustAsync_fails()
+    {
+        var action = () => Validate.That(1)
+            .MustAsync(_fixture.NotBeValidAsync);
 
         action.ShouldThrow<CrossValidationException>();
     }

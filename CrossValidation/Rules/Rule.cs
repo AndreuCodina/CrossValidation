@@ -1,8 +1,8 @@
 ﻿using System.Diagnostics;
 using System.Linq.Expressions;
+using CrossValidation.Errors;
 using CrossValidation.Exceptions;
 using CrossValidation.Resources;
-using CrossValidation.Results;
 using CrossValidation.Utils;
 using CrossValidation.ValidationContexts;
 using CrossValidation.Validators;
@@ -31,13 +31,13 @@ public class Rule<TField> : IRule<TField>
         Context.FieldValue = fieldValue;
         Context.FieldDisplayName = null;
         FieldFullPath = fieldFullPath ?? "";
-        
+
         var indexRepresentation = index is not null
             ? $"[{index}]"
             : "";
-    
+
         var parentPathValue = "";
-        
+
         if (parentPath is not null)
         {
             parentPathValue = parentPath;
@@ -46,15 +46,15 @@ public class Rule<TField> : IRule<TField>
         {
             parentPathValue = Context.ParentPath;
         }
-        
+
         if (parentPathValue is not "")
         {
             parentPathValue += ".";
         }
-    
+
         Context.FieldName = parentPathValue + fieldFullPath + indexRepresentation;
     }
-    
+
     public static IRule<TField> CreateFromField(
         Func<TField> getFieldValue,
         RuleState state,
@@ -87,8 +87,8 @@ public class Rule<TField> : IRule<TField>
         return State is RuleState.Valid
                && Context.ExecuteNextValidator;
     }
-    
-    public IRule<TField> SetValidator(Func<Validator> validator)
+
+    public IRule<TField> SetValidator(Func<IValidator<ICrossValidationError>> validator)
     {
         if (CanContinueExecutingRule())
         {
@@ -104,12 +104,12 @@ public class Rule<TField> : IRule<TField>
         Context.Clean();
         return this;
     }
-    
 
-    protected void HandleError(CrossValidationError error)
+
+    protected void HandleError(ICrossValidationError error)
     {
         Context.AddError(error);
-        
+
         if (Context is {ValidationMode: ValidationMode.StopValidationOnFirstError, Errors: { }})
         {
             throw new CrossValidationException(Context.Errors!);
@@ -132,7 +132,7 @@ public class Rule<TField> : IRule<TField>
         {
             Context.SetCode(code);
         }
-        
+
         return this;
     }
 
@@ -145,7 +145,7 @@ public class Rule<TField> : IRule<TField>
 
         return this;
     }
-    
+
     public IRule<TField> WithFieldDisplayName(string fieldDisplayName)
     {
         if (CanContinueExecutingRule())
@@ -155,30 +155,51 @@ public class Rule<TField> : IRule<TField>
 
         return this;
     }
-    
+
     public IRule<TField> When(bool condition)
     {
         if (CanContinueExecutingRule())
         {
             Context.ExecuteNextValidator = condition;
         }
-        
+
         return this;
     }
-    
+
     public IRule<TField> When(Func<TField, bool> condition)
     {
         if (CanContinueExecutingRule())
         {
             Context.ExecuteNextValidator = condition(GetFieldValue());
         }
-        
+
         return this;
     }
     
+    public IRule<TField> WhenAsync(Func<TField, Task<bool>> condition)
+    {
+        if (CanContinueExecutingRule())
+        {
+            Context.ExecuteNextValidator = condition(GetFieldValue())
+                .GetAwaiter()
+                .GetResult();
+        }
+
+        return this;
+    }
+
     public IRule<TField> Must(Func<TField, bool> condition)
     {
         SetValidator(() => new PredicateValidator(condition(GetFieldValue())));
+        return this;
+    }
+
+    public IRule<TField> MustAsync(Func<TField, Task<bool>> condition)
+    {
+        SetValidator(() => new PredicateValidator(
+            condition(GetFieldValue())
+                .GetAwaiter()
+                .GetResult()));
         return this;
     }
 
@@ -188,7 +209,7 @@ public class Rule<TField> : IRule<TField>
         {
             throw new InvalidOperationException("Cannot call Instance from a model validator");
         }
-        
+
         try
         {
             return fieldToInstance(GetFieldValue());
@@ -200,19 +221,21 @@ public class Rule<TField> : IRule<TField>
             throw new UnreachableException();
         }
     }
-    
+
     public IRule<TFieldTransformed> Transform<TFieldTransformed>(
         Func<TField, TFieldTransformed> transformer)
     {
         if (CanContinueExecutingRule())
         {
             var fieldValueTransformed = transformer(GetFieldValue());
-            return Rule<TFieldTransformed>.CreateFromField(() => fieldValueTransformed, State, Context.FieldName, Context);
+            return Rule<TFieldTransformed>.CreateFromField(() => fieldValueTransformed, State, Context.FieldName,
+                Context);
         }
-        
-        return Rule<TFieldTransformed>.CreateFromField(() => throw new UnreachableException(), State, Context.FieldName, Context);
+
+        return Rule<TFieldTransformed>.CreateFromField(() => throw new UnreachableException(), State, Context.FieldName,
+            Context);
     }
-    
+
     public IRule<TField> SetModelValidator<TChildModel>(ModelValidator<TChildModel> validator)
     {
         Context.Clean(); // Ignore customizations for model validators
@@ -226,14 +249,14 @@ public class Rule<TField> : IRule<TField>
         validator.Context.Errors = newErrors;
         return this;
     }
-    
-    private void FinishWithError(CrossValidationError error)
+
+    private void FinishWithError(ICrossValidationError error)
     {
         FillErrorWithCustomizations(error);
         HandleError(error);
     }
 
-    private CrossValidationError FromExceptionToContext(CrossValidationException exception)
+    private ICrossValidationError FromExceptionToContext(CrossValidationException exception)
     {
         var error = exception.Errors[0];
         Context.Message = GetMessageFromException(error);
@@ -243,13 +266,13 @@ public class Rule<TField> : IRule<TField>
         return error;
     }
 
-    private string? GetMessageFromException(CrossValidationError error)
+    private string? GetMessageFromException(ICrossValidationError error)
     {
         if (Context.Message is not null)
         {
             return Context.Message;
         }
-        
+
         if (Context.Code is not null)
         {
             return ErrorResource.ResourceManager.GetString(Context.Code)!;
@@ -269,7 +292,7 @@ public class Rule<TField> : IRule<TField>
         return null;
     }
 
-    private void FillErrorWithCustomizations(CrossValidationError error)
+    private void FillErrorWithCustomizations(ICrossValidationError error)
     {
         error.FieldName = Context.FieldName;
         error.FieldValue = ((dynamic)Context.FieldValue!).Value;
@@ -277,14 +300,14 @@ public class Rule<TField> : IRule<TField>
         error.FieldDisplayName = GetFieldDisplayNameToFill(error);
     }
 
-    private string? GetMessageToFill(CrossValidationError error)
+    private string? GetMessageToFill(ICrossValidationError error)
     {
         return Context.Message is null && error.Message is null && error.Code is not null
             ? ErrorResource.ResourceManager.GetString(error.Code)
             : Context.Message;
     }
-    
-    private string GetFieldDisplayNameToFill(CrossValidationError error)
+
+    private string GetFieldDisplayNameToFill(ICrossValidationError error)
     {
         if (Context.FieldDisplayName is not null)
         {

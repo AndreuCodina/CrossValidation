@@ -1,4 +1,5 @@
-﻿using CrossValidation.Exceptions;
+﻿using CrossValidation.Errors;
+using CrossValidation.Exceptions;
 using CrossValidation.Results;
 using Shouldly;
 
@@ -35,14 +36,14 @@ public static class ShouldlyAssertions
             .ShouldBeOfType<TError>(customMessage);
     }
 
-    public static CrossValidationError ShouldThrowValidationError(this Action actual, string? customMessage = null)
+    public static ICrossValidationError ShouldThrowValidationError(this Action actual, string? customMessage = null)
     {
         var errors = actual.ShouldThrow<CrossValidationException>().Errors;
         errors.Count.ShouldBe(1);
         return errors[0];
     }
     
-    public static CrossValidationError ShouldThrowValidationError(this Func<object?> actual, string? customMessage = null)
+    public static ICrossValidationError ShouldThrowValidationError(this Func<object?> actual, string? customMessage = null)
     {
         var errors = actual.ShouldThrow<CrossValidationException>().Errors;
         errors.Count.ShouldBe(1);
@@ -50,7 +51,7 @@ public static class ShouldlyAssertions
     }
     
     public static TValidationError ShouldThrowValidationError<TValidationError>(this Action actual, string? customMessage = null)
-        where TValidationError : CrossValidationError
+        where TValidationError : ICrossValidationError
     {
         var errors = actual.ShouldThrow<CrossValidationException>().Errors;
         errors.Count.ShouldBe(1);
@@ -59,7 +60,7 @@ public static class ShouldlyAssertions
     }
     
     public static TValidationError ShouldThrowValidationError<TValidationError>(this Func<object?> actual, string? customMessage = null)
-        where TValidationError : CrossValidationError
+        where TValidationError : ICrossValidationError
     {
         var errors = actual.ShouldThrow<CrossValidationException>().Errors;
         errors.Count.ShouldBe(1);
@@ -67,14 +68,14 @@ public static class ShouldlyAssertions
         return error.ShouldBeOfType<TValidationError>(customMessage);
     }
     
-    public static List<CrossValidationError> ShouldThrowValidationErrors(this Action actual, string? customMessage = null)
+    public static List<ICrossValidationError> ShouldThrowValidationErrors(this Action actual, string? customMessage = null)
     {
         var errors = actual.ShouldThrow<CrossValidationException>().Errors;
         errors.Count.ShouldBeGreaterThan(1);
         return errors;
     }
     
-    public static List<CrossValidationError> ShouldThrowValidationErrors(this Func<object?> actual, string? customMessage = null)
+    public static List<ICrossValidationError> ShouldThrowValidationErrors(this Func<object?> actual, string? customMessage = null)
     {
         var errors = actual.ShouldThrow<CrossValidationException>().Errors;
         errors.Count.ShouldBeGreaterThan(1, customMessage);

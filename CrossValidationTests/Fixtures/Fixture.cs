@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using CrossValidationTests.Fixtures.Validators;
 using CrossValidationTests.Models;
 using Moq;
@@ -35,8 +36,23 @@ public class Fixture
         return true;
     }
     
+    public async Task<bool> BeValidAsync<T>(T parameter)
+    {
+        return await ReturnBoolTask(true);
+    }
+    
     public bool NotBeValid<T>(T parameter)
     {
         return false;
+    }
+    
+    public async Task<bool> NotBeValidAsync<T>(T parameter)
+    {
+        return await ReturnBoolTask(false);
+    }
+    
+    private Task<bool> ReturnBoolTask(bool value)
+    {
+        return Task.FromResult(value);
     }
 }

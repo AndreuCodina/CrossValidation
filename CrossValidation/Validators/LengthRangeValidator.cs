@@ -2,7 +2,7 @@
 
 namespace CrossValidation.Validators;
 
-public record LengthRangeValidator(string FieldValue, int Minimum, int Maximum) : Validator
+public record LengthRangeValidator(string FieldValue, int Minimum, int Maximum) : LengthValidator
 {
     public override bool IsValid()
     {
@@ -10,8 +10,8 @@ public record LengthRangeValidator(string FieldValue, int Minimum, int Maximum) 
                && FieldValue.Length <= Maximum;
     }
 
-    public override CrossValidationError CreateError()
+    public override ILengthError CreateError()
     {
-        return new CommonCrossValidationError.LengthRange(Minimum, Maximum);
+        return new CommonCrossValidationError.LengthRange(Minimum, Maximum, GetTotalLength(FieldValue));
     }
 }

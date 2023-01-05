@@ -1,12 +1,24 @@
 ﻿using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 
-namespace CrossValidation.Results;
+namespace CrossValidation.Errors;
 
-public record CrossValidationError
+public interface ICrossValidationError
+{
+    string? FieldName { get; set; }
+    string? FieldDisplayName { get; set; }
+    object? FieldValue { get; set; }
+    string? Code { get; set; }
+    string? Message { get; set; }
+    string? Details { get; set; }
+    Dictionary<string, object>? PlaceholderValues { get; set; }
+    void AddPlaceholderValues();
+}
+
+public record CrossValidationError : ICrossValidationError
 {
     private const string DefaultPlaceholderValue = "";
-    private static readonly Regex _placeholderRegex = new Regex("{([^{}:]+)}", RegexOptions.Compiled);
+    private static readonly Regex PlaceholderRegex = new Regex("{([^{}:]+)}", RegexOptions.Compiled);
     
     public string? FieldName { get; set; }
     public string? FieldDisplayName { get; set; }
@@ -86,7 +98,7 @@ public record CrossValidationError
             return;
         }
         
-        Message = _placeholderRegex.Replace(Message, evaluator =>
+        Message = PlaceholderRegex.Replace(Message, evaluator =>
         {
             var key = evaluator.Groups[1].Value;
 
@@ -98,5 +110,5 @@ public record CrossValidationError
     }
 }
 
-public record ResXValidationError(string Code)
-    : CrossValidationError(Code: Code);
+public record ResXValidationError(string Code) :
+    CrossValidationError(Code: Code);

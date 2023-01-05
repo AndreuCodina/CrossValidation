@@ -1,4 +1,5 @@
-﻿using CrossValidation.Resources;
+﻿using CrossValidation.Errors;
+using CrossValidation.Resources;
 using CrossValidation.Results;
 
 namespace CrossValidation;
@@ -21,13 +22,15 @@ public abstract record CommonCrossValidationError(string Code) : ResXValidationE
     
     public record Enum() : CommonCrossValidationError(nameof(ErrorResource.Enum));
     
-    public record LengthRange(int Minimum, int Maximum) :
-        CommonCrossValidationError(nameof(ErrorResource.LengthRange))
+    public record LengthRange(int Minimum, int Maximum, int TotalLength) :
+        CommonCrossValidationError(nameof(ErrorResource.LengthRange)),
+        ILengthError
     {
         public override void AddPlaceholderValues()
         {
             AddPlaceholderValue(Minimum);
             AddPlaceholderValue(Maximum);
+            AddPlaceholderValue(TotalLength);
             base.AddPlaceholderValues();
         }
     }

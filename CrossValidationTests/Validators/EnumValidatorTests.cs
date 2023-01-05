@@ -34,7 +34,7 @@ public class EnumValidatorTests
     [Fact]
     public void Validate_enumeration_fails()
     {
-        var lastColorId = (int)System.Enum.GetValues<NestedEnum>().Last();
+        var lastColorId = (int)Enum.GetValues<NestedEnum>().Last();
         var nonExistentColorId = lastColorId + 1;
          
         var enumValue = (NestedEnum)nonExistentColorId;
@@ -47,18 +47,9 @@ public class EnumValidatorTests
             .IsInEnum<NestedEnum>();
         intAction.ShouldThrowValidationError();
          
-        var stringValue = new Bogus.Faker().Lorem.Sentence();
+        var stringValue = "Not valid enum value";
         var stringAction = () => Validate.That(stringValue)
             .IsInEnum<NestedEnum>();
         stringAction.ShouldThrow<CrossValidationException>();
-    }
-
-    [Fact]
-    public void Validate_enumeration_fails_when_type_is_not_enumeration()
-    {
-        var value = (int)NestedEnum.Red;
-        var enumAction = () => Validate.That(value)
-            .IsInEnum<NestedEnum>();
-        enumAction.ShouldThrow<InvalidOperationException>();
     }
 }

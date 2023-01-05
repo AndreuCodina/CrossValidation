@@ -1,12 +1,12 @@
-﻿using CrossValidation.Results;
+﻿using CrossValidation.Errors;
 
 namespace CrossValidation.Exceptions;
 
 public class CrossValidationException : Exception
 {
-    public List<CrossValidationError> Errors { get; }
+    public List<ICrossValidationError> Errors { get; }
 
-    public CrossValidationException(List<CrossValidationError> errors)
+    public CrossValidationException(List<ICrossValidationError> errors)
     {
         Errors = errors;
     }

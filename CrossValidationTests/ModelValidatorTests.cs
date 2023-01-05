@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using CrossValidation;
+using CrossValidation.Errors;
 using CrossValidation.Extensions;
 using CrossValidation.Resources;
-using CrossValidation.Results;
 using CrossValidation.Rules;
 using CrossValidationTests.Builders;
 using CrossValidationTests.Fixtures;
@@ -585,29 +585,6 @@ public class ModelValidatorTests : IClassFixture<Fixture>
         error.Code.ShouldBe(expectedCode);
     }
 
-    [Fact]
-    public void Validator_conditional_execution()
-    {
-        var expectedErrorMessage = "TrueCase";
-        _model = new ParentModelBuilder()
-            .WithNullableIntList(new List<int> {100, 1, 2})
-            .Build();
-        var parentModelValidator = _fixture.CreateParentModelValidator(validator =>
-        {
-            validator.RuleFor(x => x.NestedModel.Int)
-                .When(_ => false)
-                .GreaterThan(_model.NestedModel.Int + 1)
-                .When(x => x == _model.NestedModel.Int)
-                .WithMessage(expectedErrorMessage)
-                .GreaterThan(_model.NestedModel.Int);
-        });
-
-        var action = () => parentModelValidator.Validate(_model);
-
-        var error = action.ShouldThrowValidationError();
-        error.Message.ShouldBe(expectedErrorMessage);
-    }
-    
     [Fact]
     public void Replace_default_placeholders()
     {

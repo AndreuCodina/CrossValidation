@@ -1,5 +1,5 @@
 ﻿using System.Numerics;
-using CrossValidation.Results;
+using CrossValidation.Errors;
 
 namespace CrossValidation.Validators;
 
