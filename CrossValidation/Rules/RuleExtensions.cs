@@ -20,7 +20,7 @@ public static class RuleExtensions
         rule.SetValidator(() => new NotNullValidator<TField?>(rule.GetFieldValue()));
         return rule.Transform(x => x!.Value);
     }
-    
+
     public static IRule<TField?> WhenNotNull<TField>(
         this IRule<TField?> rule,
         Action<IRule<TField>> notNullRule)
@@ -35,7 +35,7 @@ public static class RuleExtensions
 
         return rule;
     }
-    
+
     public static IRule<TField?> WhenNotNull<TField>(
         this IRule<TField?> rule,
         Action<IRule<TField>> notNullRule)
@@ -57,14 +57,14 @@ public static class RuleExtensions
     {
         return rule.SetValidator(() => new NullValidator<TField?>(rule.GetFieldValue()));
     }
-    
+
     public static IRule<TField?> Null<TField>(
         this IRule<TField?> rule)
         where TField : struct
     {
         return rule.SetValidator(() => new NullValidator<TField?>(rule.GetFieldValue()));
     }
-    
+
     public static IRule<TField> GreaterThan<TField>(
         this IRule<TField> rule,
         TField valueToCompare)
@@ -79,31 +79,21 @@ public static class RuleExtensions
     {
         return rule.SetValidator(() => new EnumValidator<TField>(rule.GetFieldValue(), typeof(TField)));
     }
-    
-    public static IRule<int> IsInEnum(
-        this IRule<int> rule,
-        Type enumType)
+
+    public static IRule<int> IsInEnum<TEnum>(
+        this IRule<int> rule)
+        where TEnum : Enum
     {
-        if (!enumType.IsEnum)
-        {
-            throw new InvalidOperationException($"Cannot use {nameof(IsInEnum)} if the type provided is not an enumeration");
-        }
-        
-        return rule.SetValidator(() => new EnumValidator<int>(rule.GetFieldValue(), enumType));
+        return rule.SetValidator(() => new EnumValidator<int>(rule.GetFieldValue(), typeof(TEnum)));
     }
-    
-    public static IRule<string> IsInEnum(
-        this IRule<string> rule,
-        Type enumType)
+
+    public static IRule<string> IsInEnum<TEnum>(
+        this IRule<string> rule)
+        where TEnum : Enum
     {
-        if (!enumType.IsEnum)
-        {
-            throw new InvalidOperationException($"Cannot use {nameof(IsInEnum)} if the type provided is not an enumeration");
-        }
-        
-        return rule.SetValidator(() => new EnumValidator<string>(rule.GetFieldValue(), enumType));
+        return rule.SetValidator(() => new EnumValidator<string>(rule.GetFieldValue(), typeof(TEnum)));
     }
-    
+
     public static IRule<string> Length(
         this IRule<string> rule,
         int minimum,
@@ -111,7 +101,7 @@ public static class RuleExtensions
     {
         return rule.SetValidator(() => new LengthRangeValidator(rule.GetFieldValue(), minimum, maximum));
     }
-    
+
     public static IRule<IEnumerable<TInnerType>> ForEach<TInnerType>(
         this IRule<IEnumerable<TInnerType>> rule,
         Action<IRule<TInnerType>> action)
@@ -119,7 +109,7 @@ public static class RuleExtensions
         var fieldCollection = rule.GetFieldValue();
         var fieldFullPath = rule.Context.FieldName;
         var index = 0;
-        
+
         foreach (var innerField in fieldCollection)
         {
             var newRule = Rule<TInnerType>.CreateFromField(
@@ -132,7 +122,7 @@ public static class RuleExtensions
             action(newRule);
             index++;
         }
-    
+
         return rule;
     }
 }

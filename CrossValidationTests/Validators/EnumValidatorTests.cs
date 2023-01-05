@@ -22,12 +22,12 @@ public class EnumValidatorTests
          
         var intValue = (int)NestedEnum.Red;
         var intAction = () => Validate.That(intValue)
-            .IsInEnum(typeof(NestedEnum));
+            .IsInEnum<NestedEnum>();
         intAction.ShouldNotThrow();
          
         var stringValue = nameof(NestedEnum.Red);
         var stringAction = () => Validate.That(stringValue)
-            .IsInEnum(typeof(NestedEnum));
+            .IsInEnum<NestedEnum>();
         stringAction.ShouldNotThrow();
     }
      
@@ -44,12 +44,12 @@ public class EnumValidatorTests
          
         var intValue = nonExistentColorId;
         var intAction = () => Validate.That(intValue)
-            .IsInEnum(typeof(NestedEnum));
+            .IsInEnum<NestedEnum>();
         intAction.ShouldThrowValidationError();
          
         var stringValue = new Bogus.Faker().Lorem.Sentence();
         var stringAction = () => Validate.That(stringValue)
-            .IsInEnum(typeof(NestedEnum));
+            .IsInEnum<NestedEnum>();
         stringAction.ShouldThrow<CrossValidationException>();
     }
 
@@ -58,7 +58,7 @@ public class EnumValidatorTests
     {
         var value = (int)NestedEnum.Red;
         var enumAction = () => Validate.That(value)
-            .IsInEnum(value.GetType());
+            .IsInEnum<NestedEnum>();
         enumAction.ShouldThrow<InvalidOperationException>();
     }
 }
