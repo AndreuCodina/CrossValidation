@@ -319,6 +319,23 @@ public class ModelValidatorTests : IClassFixture<Fixture>
     }
     
     [Fact]
+    public void Transform_invalid_rule()
+    {
+        var parentModelValidator = _fixture.CreateParentModelValidator(validator =>
+        {
+            validator.RuleFor(x => x.NullableInt)
+                .NotNull()
+                .Transform(x => x + 1)
+                .Transform(x => x.ToString())
+                .Length(0, 10);
+        });
+    
+        var action = () => parentModelValidator.Validate(_model);
+    
+        action.ShouldThrowValidationError<CommonCrossValidationError.NotNull>();
+    }
+    
+    [Fact]
     public void Field_value_has_value_when_model_and_field_selected_match()
     {
         var parentModelValidator = _fixture.CreateParentModelValidator(validator =>
