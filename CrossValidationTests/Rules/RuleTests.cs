@@ -1,22 +1,26 @@
-﻿using CrossValidation;
+﻿using System;
+using CrossValidation;
 using CrossValidation.Exceptions;
 using CrossValidation.Extensions;
 using CrossValidation.Resources;
 using CrossValidation.Results;
 using CrossValidation.Rules;
 using CrossValidationTests.Builders;
+using CrossValidationTests.Fixtures;
 using CrossValidationTests.Models;
 using Shouldly;
 using Xunit;
 
 namespace CrossValidationTests.Rules;
 
-public class RuleTests
+public class RuleTests : IClassFixture<Fixture>
 {
+    private readonly Fixture _fixture;
     private ParentModel _model;
 
-    public RuleTests()
+    public RuleTests(Fixture fixture)
     {
+        _fixture = fixture;
         _model = new ParentModelBuilder().Build();
     }
 
@@ -101,6 +105,26 @@ public class RuleTests
         error.Code.ShouldBe(nameof(ErrorResource.GreaterThan));
         error.Message.ShouldBe("Expected message");
         error.FieldDisplayName.ShouldBe("Expected field display name");
+    }
+    
+    [Fact]
+    public void Call_Instance_from_model_validator_with_error_accumulation_fails()
+    {
+        var parentModelValidator = _fixture.CreateParentModelValidator(validator =>
+        {
+            validator.ValidationMode = ValidationMode.AccumulateFirstErrorEachRule;
+
+            validator.RuleFor(x => x.NullableInt)
+                .NotNull()
+                .Transform(x => x + 1)
+                .Transform(x => x.ToString())
+                .Transform(int.Parse)
+                .Instance(UserAgeWithoutCustomization.Create);
+        });
+    
+        var action = () => parentModelValidator.Validate(_model);
+    
+        action.ShouldThrow<InvalidOperationException>();
     }
 
     [Fact]

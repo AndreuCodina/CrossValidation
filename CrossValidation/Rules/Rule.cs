@@ -184,6 +184,11 @@ public class Rule<TField> : IRule<TField>
 
     public TInstance Instance<TInstance>(Func<TField, TInstance> fieldToInstance)
     {
+        if (Context.Errors is not null && Context.Errors.Any())
+        {
+            throw new InvalidOperationException("Cannot call Instance from a model validator");
+        }
+        
         try
         {
             return fieldToInstance(GetFieldValue());

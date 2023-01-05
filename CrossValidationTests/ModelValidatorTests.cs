@@ -323,11 +323,15 @@ public class ModelValidatorTests : IClassFixture<Fixture>
     {
         var parentModelValidator = _fixture.CreateParentModelValidator(validator =>
         {
+            validator.ValidationMode = ValidationMode.AccumulateFirstErrorEachRule;
+
             validator.RuleFor(x => x.NullableInt)
                 .NotNull()
                 .Transform(x => x + 1)
                 .Transform(x => x.ToString())
-                .Length(0, 10);
+                .Length(0, 10)
+                .Transform(int.Parse)
+                .GreaterThan(int.MaxValue);
         });
     
         var action = () => parentModelValidator.Validate(_model);
