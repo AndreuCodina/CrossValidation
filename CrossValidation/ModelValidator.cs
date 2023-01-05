@@ -1,4 +1,5 @@
-﻿using System.Linq.Expressions;
+﻿using System.Diagnostics.Contracts;
+using System.Linq.Expressions;
 using CrossValidation.Exceptions;
 using CrossValidation.Rules;
 using CrossValidation.Utils;
@@ -27,9 +28,10 @@ public abstract record ModelValidator<TModel>
         }
     }
 
+    [Pure]
     public IRule<TField> RuleFor<TField>(Expression<Func<TModel, TField>> fieldSelector)
     {
-        return Rule<TField>.CreateFromFieldSelector(Model!, fieldSelector, Context!);
+        return Rule<TField>.CreateFromFieldSelector(Model!, fieldSelector, RuleState.Valid, Context!);
     }
 
     public abstract void CreateRules(TModel model);

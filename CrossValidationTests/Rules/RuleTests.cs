@@ -24,7 +24,7 @@ public class RuleTests
     public void Validator_conditional_execution()
     {
         var expectedMessage = "TrueCase";
-        var action = () => Rule<int>.CreateFromField(_model.NestedModel.Int)
+        var action = () => Rule<int>.CreateFromField(() => _model.NestedModel.Int, RuleState.Valid)
             .When(_ => false)
             .GreaterThan(_model.NestedModel.Int + 1)
             .When(true)
@@ -41,7 +41,7 @@ public class RuleTests
         var defaultConfiguration = CrossValidationConfiguration.GeneratePlaceholderValuesWhenTheyAreNotAdded;
         CrossValidationConfiguration.GeneratePlaceholderValuesWhenTheyAreNotAdded = true;
         
-        var action = () => Rule<int>.CreateFromField(_model.NestedModel.Int)
+        var action = () => Rule<int>.CreateFromField(() => _model.NestedModel.Int, RuleState.Valid)
             .WithError(new CustomErrorWithPlaceholderValue(_model.NestedModel.Int))
             .GreaterThan(_model.NestedModel.Int);
 
@@ -57,7 +57,7 @@ public class RuleTests
     [Fact]
     public void Validate_predicate()
     {
-        var action = () => Rule<NestedModel>.CreateFromField(_model.NestedModel)
+        var action = () => Rule<NestedModel>.CreateFromField(() => _model.NestedModel, RuleState.Valid)
             .Must(x => x.Int > x.Int);
 
         action.ShouldThrowValidationError<CommonCrossValidationError.Predicate>();

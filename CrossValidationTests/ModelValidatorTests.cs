@@ -253,11 +253,11 @@ public class ModelValidatorTests : IClassFixture<Fixture>
         var parentModelValidator = _fixture.CreateParentModelValidator(validator =>
         {
             validator.ValidationMode = ValidationMode.AccumulateFirstErrorEachRule;
-    
+
             validator.RuleFor(x => x.NullableString)
-                .NotNull(x => x
-                    .Transform(StringToInt)
-                    .GreaterThan(expectedTransformation));
+                .NotNull()
+                .Transform(StringToInt)
+                .GreaterThan(expectedTransformation);
         });
     
         var action = () => parentModelValidator.Validate(_model);
@@ -486,12 +486,9 @@ public class ModelValidatorTests : IClassFixture<Fixture>
             validator.RuleFor(x => x.NullableInt)
                 .WithCode(new Bogus.Faker().Lorem.Word())
                 .WithMessage(new Bogus.Faker().Lorem.Word())
-                // .NotNull()
-                // .WithMessage(expectedMessage)
-                // .GreaterThan(_model.NestedModel.Int + 1);
-                .NotNull(x => x
-                    .WithMessage(expectedMessage)
-                    .GreaterThan(_model.NestedModel.Int + 1));
+                .NotNull()
+                .WithMessage(expectedMessage)
+                .GreaterThan(_model.NestedModel.Int + 1);
         });
 
         var action = () => parentModelValidator.Validate(_model);

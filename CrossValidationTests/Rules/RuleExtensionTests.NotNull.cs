@@ -28,8 +28,8 @@ public class RuleExtensionTests_NotNull : IClassFixture<Fixture>
             .Build();
 
         var action = () => Validate.That(_model.NullableInt)
-            .NotNull(x => x
-                .GreaterThan(_model.NullableInt!.Value - 1));
+            .NotNull()
+            .GreaterThan(_model.NullableInt!.Value - 1);
         action.ShouldNotThrow();
     }
     
@@ -41,8 +41,8 @@ public class RuleExtensionTests_NotNull : IClassFixture<Fixture>
             .Build();
 
         var action = () => Validate.That(_model.NullableString)
-            .NotNull(x => x
-                .Must(_fixture.BeValid));
+            .NotNull()
+            .Must(_fixture.BeValid);
         action.ShouldNotThrow();
     }
     
@@ -53,18 +53,17 @@ public class RuleExtensionTests_NotNull : IClassFixture<Fixture>
         _model = new ParentModelBuilder()
             .WithNullableString("Value")
             .Build();
-        
         var parentModelValidator = _fixture.CreateParentModelValidator(validator =>
         {
             validator.ValidationMode = ValidationMode.AccumulateFirstErrorEachRule;
-            
+
             validator.RuleFor(x => x.NullableInt)
-                .NotNull(x => x
-                    .GreaterThan(-1));
-            
+                .NotNull()
+                .GreaterThan(-1);
+
             validator.RuleFor(x => x.NullableString)
-                .NotNull(x => x
-                    .Length(int.MaxValue, int.MaxValue));
+                .NotNull()
+                .Length(int.MaxValue, int.MaxValue);
 
             validator.RuleFor(x => x.NullableInt)
                 .NotNull();

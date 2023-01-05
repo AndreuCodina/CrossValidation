@@ -31,10 +31,10 @@ public class RuleExtensionTests_ForEach : IClassFixture<Fixture>
         var parentModelValidator = _fixture.CreateParentModelValidator(validator =>
         {
             validator.RuleFor(x => x.NullableIntList)
-                .NotNull(x => x
-                    .ForEach(x => x
-                        .GreaterThan(1)
-                        .GreaterThan(10)));
+                .NotNull()
+                .ForEach(x => x
+                    .GreaterThan(1)
+                    .GreaterThan(10));
         });
         
         var action = () => parentModelValidator.Validate(_model);
@@ -52,10 +52,10 @@ public class RuleExtensionTests_ForEach : IClassFixture<Fixture>
         {
             validator.ValidationMode = ValidationMode.AccumulateFirstErrorEachRule;
             validator.RuleFor(x => x.NullableIntList)
-                .NotNull(x => x
-                    .ForEach(x => x
-                        .GreaterThan(0)
-                        .GreaterThan(10)));
+                .NotNull()
+                .ForEach(x => x
+                    .GreaterThan(0)
+                    .GreaterThan(10));
         });
         
         var action = () => parentModelValidator.Validate(_model);
@@ -75,10 +75,10 @@ public class RuleExtensionTests_ForEach : IClassFixture<Fixture>
         var parentModelValidator = _fixture.CreateParentModelValidator(validator =>
         {
             validator.RuleFor(x => x.NullableIntList)
-                .NotNull(x => x
-                    .ForEach(x => x
-                        .Transform(Convert.ToDouble)
-                        .GreaterThan(10d)));
+                .NotNull()
+                .ForEach(x => x
+                    .Transform(Convert.ToDouble)
+                    .GreaterThan(10d));
         });
         
         var action = () => parentModelValidator.Validate(_model);
@@ -96,9 +96,9 @@ public class RuleExtensionTests_ForEach : IClassFixture<Fixture>
         var parentModelValidator = _fixture.CreateParentModelValidator(validator =>
         {
             validator.RuleFor(x => x.NullableIntList)
-                .NotNull(x => x
-                    .ForEach(x => x
-                        .GreaterThan(10)));
+                .NotNull()
+                .ForEach(x => x
+                    .GreaterThan(10));
         });
 
         var action = () => parentModelValidator.Validate(_model);

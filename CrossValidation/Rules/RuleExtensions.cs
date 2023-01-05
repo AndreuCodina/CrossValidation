@@ -5,46 +5,20 @@ namespace CrossValidation.Rules;
 
 public static class RuleExtensions
 {
-    public static void NotNull<TField>(
+    public static IRule<TField> NotNull<TField>(
         this IRule<TField?> rule)
         where TField : class
     {
         rule.SetValidator(() => new NotNullValidator<TField?>(rule.GetFieldValue()));
+        return rule.Transform(x => x!);
     }
-    
-    public static void NotNull<TField>(
-        this IRule<TField?> rule,
-        Action<IRule<TField>> notNullRule)
-        where TField : class
-    {
-        var validator = new NotNullValidator<TField?>(rule.GetFieldValue());
-        rule.SetValidator(() => validator);
 
-        if (validator.IsValid())
-        {
-            notNullRule(rule.Transform(x => x!));
-        }
-    }
-    
-    public static void NotNull<TField>(
+    public static IRule<TField> NotNull<TField>(
         this IRule<TField?> rule)
         where TField : struct
     {
         rule.SetValidator(() => new NotNullValidator<TField?>(rule.GetFieldValue()));
-    }
-    
-    public static void NotNull<TField>(
-        this IRule<TField?> rule,
-        Action<IRule<TField>> notNullRule)
-        where TField : struct
-    {
-        var validator = new NotNullValidator<TField?>(rule.GetFieldValue());
-        rule.SetValidator(() => validator);
-
-        if (validator.IsValid())
-        {
-            notNullRule(rule.Transform(x => x!.Value));
-        }
+        return rule.Transform(x => x!.Value);
     }
     
     public static IRule<TField?> WhenNotNull<TField>(
@@ -149,7 +123,8 @@ public static class RuleExtensions
         foreach (var innerField in fieldCollection)
         {
             var newRule = Rule<TInnerType>.CreateFromField(
-                innerField,
+                () => innerField,
+                rule.State,
                 fieldFullPath,
                 rule.Context,
                 index,

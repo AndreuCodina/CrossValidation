@@ -9,7 +9,7 @@ public class ValidationContext
     public List<CrossValidationError>? Errors { get; set; }
     public string FieldName { get; set; } = "";
     public string? FieldDisplayName { get; set; }
-    public object? FieldValue { get; set; }
+    public object? FieldValue { get; set; } // Lazy<TField>?
     public CrossValidationError? Error { get; set; }
     public bool ExecuteNextValidator { get; set; } = true;
     public string? ParentPath { get; set; }
