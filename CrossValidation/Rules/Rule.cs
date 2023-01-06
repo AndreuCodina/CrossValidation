@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Diagnostics.Contracts;
 using System.Linq.Expressions;
 using CrossValidation.Errors;
 using CrossValidation.Exceptions;
@@ -11,23 +12,48 @@ namespace CrossValidation.Rules;
 
 public interface IRule<out TField>
 {
-    RuleState State { get;set; }
+    RuleState State { get; set; }
+    
     ValidationContext Context { get; set; }
+    
     string FieldFullPath { get; set; }
+
+    [Pure]
     TField GetFieldValue();
+
     IRule<TField> SetValidator(Func<IValidator<ICrossValidationError>> validator);
+
+    [Pure]
     IRule<TFieldTransformed> Transform<TFieldTransformed>(
         Func<TField, TFieldTransformed> transformer);
+
+    [Pure]
     IRule<TField> WithMessage(string message);
+
+    [Pure]
     IRule<TField> WithCode(string code);
+
+    [Pure]
     IRule<TField> WithError(ICrossValidationError error);
+
+    [Pure]
     IRule<TField> WithFieldDisplayName(string fieldDisplayName);
+
+    [Pure]
     IRule<TField> When(bool condition);
+
+    [Pure]
     IRule<TField> When(Func<TField, bool> condition);
+
+    [Pure]
     IRule<TField> WhenAsync(Func<TField, Task<bool>> condition);
+
     IRule<TField> Must(Func<TField, bool> condition);
     IRule<TField> MustAsync(Func<TField, Task<bool>> condition);
+
+    [Pure]
     TInstance Instance<TInstance>(Func<TField, TInstance> fieldToInstance);
+
     IRule<TField> SetModelValidator<TChildModel>(ModelValidator<TChildModel> validator);
 }
 
@@ -197,7 +223,7 @@ public class Rule<TField> : IRule<TField>
 
         return this;
     }
-    
+
     public IRule<TField> WhenAsync(Func<TField, Task<bool>> condition)
     {
         if (CanContinueExecutingRule())
