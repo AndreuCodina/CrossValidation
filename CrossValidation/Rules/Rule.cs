@@ -227,9 +227,10 @@ public class Rule<TField> : IRule<TField>
 
     public TInstance Instance<TInstance>(Func<TField, TInstance> fieldToInstance)
     {
-        if (Context.Errors is not null && Context.Errors.Any())
+        if (State is RuleState.Invalid)
         {
-            throw new InvalidOperationException("Cannot call Instance from a model validator");
+            throw new InvalidOperationException(
+                $"Accumulate errors and call {nameof(Instance)} with an invalid rule is not allowed");
         }
 
         try

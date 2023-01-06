@@ -92,7 +92,7 @@ public class RuleTests : IClassFixture<CommonFixture>
     }
     
     [Fact]
-    public void Call_Instance_from_model_validator_with_error_accumulation_fails()
+    public void Call_Instance_from_invalid_rule_fails()
     {
         var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
         {
