@@ -177,9 +177,9 @@ public class RuleTests : IClassFixture<CommonFixture>
         action.ShouldThrow<CrossValidationException>();
     }
 
-    public record CustomErrorWithPlaceholderValue(int Value) : CrossValidationError;
+    private record CustomErrorWithPlaceholderValue(int Value) : CrossValidationError;
 
-    public record UserAgeWithoutCustomization
+    private record UserAgeWithoutCustomization
     {
         public required int Value { get; set; }
         
@@ -193,7 +193,7 @@ public class RuleTests : IClassFixture<CommonFixture>
         }
     }
     
-    public record UserAgeWithCustomization
+    private record UserAgeWithCustomization
     {
         public required int Value { get; set; }
         

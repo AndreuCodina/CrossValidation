@@ -28,7 +28,7 @@ public class CrossErrorExceptionTests
         exception.Message.ShouldBe("ErrorWithoutProperties { }. Custom message");
     }
 
-    public record TestError : CrossError
+    private record TestError : CrossError
     {
         public record ErrorWithoutProperties : TestError;
         public record ErrorWithProperties(string Property1, int? Property2) : TestError;

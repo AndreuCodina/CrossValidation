@@ -653,5 +653,5 @@ public class ModelValidatorTests : IClassFixture<CommonFixture>
         action.ShouldThrowValidationError<CommonCrossValidationError.Predicate>();
     }
 
-    public record CustomErrorWithCode(string Code) : CrossValidationError(Code: Code);
+    private record CustomErrorWithCode(string Code) : CrossValidationError(Code: Code);
 }
