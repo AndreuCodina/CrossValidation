@@ -1,8 +1,8 @@
 ﻿using CrossValidation.Results;
 
-namespace CrossValidation.Validators;
+namespace CrossValidation.Validators.LengthValidators;
 
-public abstract record LengthValidator : Validator<ILengthError>
+public abstract record LengthValidatorBase : Validator<ILengthError>
 {
     public int GetTotalLength(string value)
     {

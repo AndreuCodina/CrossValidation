@@ -87,6 +87,15 @@ namespace CrossValidation.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Debe tener al menos {Minimum} caracteres.
+        /// </summary>
+        internal static string MinimumLength {
+            get {
+                return ResourceManager.GetString("MinimumLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Debe tener un valor.
         /// </summary>
         internal static string NotNull {

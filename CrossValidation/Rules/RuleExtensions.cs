@@ -1,5 +1,6 @@
 ﻿using System.Numerics;
 using CrossValidation.Validators;
+using CrossValidation.Validators.LengthValidators;
 
 namespace CrossValidation.Rules;
 
@@ -94,12 +95,19 @@ public static class RuleExtensions
         return rule.SetValidator(() => new EnumValidator<string>(rule.GetFieldValue(), typeof(TEnum)));
     }
 
-    public static IRule<string> Length(
+    public static IRule<string> LengthRange(
         this IRule<string> rule,
         int minimum,
         int maximum)
     {
         return rule.SetValidator(() => new LengthRangeValidator(rule.GetFieldValue(), minimum, maximum));
+    }
+    
+    public static IRule<string> MinimumLength(
+        this IRule<string> rule,
+        int minimum)
+    {
+        return rule.SetValidator(() => new MinimumLengthValidator(rule.GetFieldValue(), minimum));
     }
 
     public static IRule<IEnumerable<TInnerType>> ForEach<TInnerType>(

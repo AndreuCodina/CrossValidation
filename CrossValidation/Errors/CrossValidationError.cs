@@ -13,6 +13,7 @@ public interface ICrossValidationError
     string? Details { get; set; }
     Dictionary<string, object>? PlaceholderValues { get; set; }
     void AddPlaceholderValues();
+    IEnumerable<string> GetFieldNames();
 }
 
 public record CrossValidationError : ICrossValidationError
@@ -44,7 +45,7 @@ public record CrossValidationError : ICrossValidationError
         this.Details = Details;
     }
 
-    protected void AddPlaceholderValue(object value, [CallerArgumentExpression(nameof(value))] string? name = null)
+    protected void AddPlaceholderValue(object? value, [CallerArgumentExpression(nameof(value))] string? name = null)
     {
         PlaceholderValues ??= new();
 
@@ -53,7 +54,7 @@ public record CrossValidationError : ICrossValidationError
             throw new InvalidOperationException("Cannot add a placeholder with the same name twice");
         }
         
-        PlaceholderValues.Add(name!, value);
+        PlaceholderValues.Add(name!, value ?? DefaultPlaceholderValue);
     }
     
     public virtual void AddPlaceholderValues()
@@ -63,10 +64,23 @@ public record CrossValidationError : ICrossValidationError
         ReplacePlaceholderValues();
     }
 
+    /// <summary>
+    /// Get error constructor parameter names
+    /// </summary>
+    public IEnumerable<string> GetFieldNames()
+    {
+        return GetType()
+            .GetConstructors()
+            .Single()
+            .GetParameters()
+            .Select(x => x.Name!);
+    }
+
     private void AddCommonPlaceholderValues()
     {
-        AddPlaceholderValue(FieldDisplayName ?? DefaultPlaceholderValue, nameof(FieldDisplayName));
-        AddPlaceholderValue(FieldValue ?? DefaultPlaceholderValue, nameof(FieldValue));
+        AddPlaceholderValue(FieldName);
+        AddPlaceholderValue(FieldDisplayName);
+        AddPlaceholderValue(FieldValue);
     }
 
     private void AddCustomErrorPlaceholderValues()
@@ -76,17 +90,14 @@ public record CrossValidationError : ICrossValidationError
         if (!arePlaceholderValuesAdded && CrossValidationConfiguration.GeneratePlaceholderValuesWhenTheyAreNotAdded)
         {
             var properties = GetType().GetProperties();
-            var customPlaceholders = GetType().GetConstructors()
-                .Single()
-                .GetParameters();
+            var customPlaceholderNames = GetFieldNames();
 
-            foreach (var customPlaceholder in customPlaceholders)
+            foreach (var customPlaceholderName in customPlaceholderNames)
             {
-                var name = customPlaceholder.Name;
-                var value = properties.Where(x => x.Name == name)
+                var value = properties.Where(x => x.Name == customPlaceholderName)
                     .Select(x => x.GetValue(this)!)
                     .FirstOrDefault();
-                AddPlaceholderValue(value ?? DefaultPlaceholderValue, name);
+                AddPlaceholderValue(value ?? DefaultPlaceholderValue, customPlaceholderName);
             }
         }
     }

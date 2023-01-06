@@ -1,5 +1,6 @@
 ﻿using CrossValidation;
 using CrossValidation.Extensions;
+using CrossValidation.Resources;
 using CrossValidation.Rules;
 using CrossValidationTests.Builders;
 using CrossValidationTests.Fixtures;
@@ -7,16 +8,16 @@ using CrossValidationTests.Models;
 using Shouldly;
 using Xunit;
 
-namespace CrossValidationTests.Rules;
+namespace CrossValidationTests.Rules.RuleExtensions;
 
-public class RuleExtensionTests_NotNull : IClassFixture<Fixture>
+public class NotNullTests : IClassFixture<CommonFixture>
 {
-    private readonly Fixture _fixture;
+    private readonly CommonFixture _commonFixture;
     private ParentModel _model;
 
-    public RuleExtensionTests_NotNull(Fixture fixture)
+    public NotNullTests(CommonFixture commonFixture)
     {
-        _fixture = fixture;
+        _commonFixture = commonFixture;
         _model = new ParentModelBuilder().Build();
     }
     
@@ -42,7 +43,7 @@ public class RuleExtensionTests_NotNull : IClassFixture<Fixture>
 
         var action = () => Validate.That(_model.NullableString)
             .NotNull()
-            .Must(_fixture.BeValid);
+            .Must(_commonFixture.BeValid);
         action.ShouldNotThrow();
     }
     
@@ -53,7 +54,7 @@ public class RuleExtensionTests_NotNull : IClassFixture<Fixture>
         _model = new ParentModelBuilder()
             .WithNullableString("Value")
             .Build();
-        var parentModelValidator = _fixture.CreateParentModelValidator(validator =>
+        var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
         {
             validator.ValidationMode = ValidationMode.AccumulateFirstErrorEachRule;
 
@@ -63,7 +64,7 @@ public class RuleExtensionTests_NotNull : IClassFixture<Fixture>
 
             validator.RuleFor(x => x.NullableString)
                 .NotNull()
-                .Length(int.MaxValue, int.MaxValue);
+                .LengthRange(int.MaxValue, int.MaxValue);
 
             validator.RuleFor(x => x.NullableInt)
                 .NotNull();
@@ -76,5 +77,17 @@ public class RuleExtensionTests_NotNull : IClassFixture<Fixture>
         errors[0].ShouldBeOfType<CommonCrossValidationError.NotNull>();
         errors[1].ShouldBeOfType<CommonCrossValidationError.LengthRange>();
         errors[2].ShouldBeOfType<CommonCrossValidationError.NotNull>();
+    }
+    
+    [Fact]
+    public void Return_error_when_the_validation_fails()
+    {
+        string? value = null;
+
+        var action = () => Validate.That(value)
+            .NotNull();
+
+        var error = action.ShouldThrowValidationError<CommonCrossValidationError.NotNull>();
+        error.Code.ShouldBe(nameof(ErrorResource.NotNull));
     }
 }

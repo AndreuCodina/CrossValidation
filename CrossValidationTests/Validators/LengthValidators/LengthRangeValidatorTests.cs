@@ -1,8 +1,8 @@
-﻿using CrossValidation.Validators;
+﻿using CrossValidation.Validators.LengthValidators;
 using Shouldly;
 using Xunit;
 
-namespace CrossValidationTests.Validators;
+namespace CrossValidationTests.Validators.LengthValidators;
 
 public class LengthRangeValidatorTests
 {
@@ -10,7 +10,7 @@ public class LengthRangeValidatorTests
     public void Validate_length()
     {
         var value = "123";
-        var validator = new LengthRangeValidator(value, 3, 3);
+        var validator = new LengthRangeValidator(value, value.Length, value.Length);
 
         var isValid = validator.IsValid();
 
@@ -21,7 +21,7 @@ public class LengthRangeValidatorTests
     public void Validate_length_fails()
     {
         var value = "123";
-        var validator = new LengthRangeValidator(value, 4, 3);
+        var validator = new LengthRangeValidator(value, value.Length + 1, value.Length);
 
         var isValid = validator.IsValid();
 

@@ -7,16 +7,16 @@ using CrossValidationTests.Models;
 using Shouldly;
 using Xunit;
 
-namespace CrossValidationTests.Rules;
+namespace CrossValidationTests.Rules.RuleExtensions;
 
-public class RuleExtensionTests_WhenNotNull : IClassFixture<Fixture>
+public class WhenNotNullTests : IClassFixture<CommonFixture>
 {
-    private readonly Fixture _fixture;
+    private readonly CommonFixture _commonFixture;
     private ParentModel _model;
 
-    public RuleExtensionTests_WhenNotNull(Fixture fixture)
+    public WhenNotNullTests(CommonFixture commonFixture)
     {
-        _fixture = fixture;
+        _commonFixture = commonFixture;
         _model = new ParentModelBuilder().Build();
     }
 
@@ -25,7 +25,7 @@ public class RuleExtensionTests_WhenNotNull : IClassFixture<Fixture>
     {
         var action = () => Validate.That(_model.NullableInt)
             .WhenNotNull(x => x
-                .Must(_fixture.NotBeValid));
+                .Must(_commonFixture.NotBeValid));
 
         action.ShouldNotThrow();
     }
@@ -55,7 +55,7 @@ public class RuleExtensionTests_WhenNotNull : IClassFixture<Fixture>
 
         var action = () => Validate.That(_model.NullableString)
             .WhenNotNull(x => x
-                .Must(_fixture.NotBeValid));
+                .Must(_commonFixture.NotBeValid));
 
         var error = action.ShouldThrowValidationError();
         error.FieldValue.ShouldBeOfType<string?>();
@@ -67,7 +67,7 @@ public class RuleExtensionTests_WhenNotNull : IClassFixture<Fixture>
     {
         var action = () => Validate.That(_model.NullableInt)
             .WhenNotNull(x => x
-                .Must(_fixture.BeValid))
+                .Must(_commonFixture.BeValid))
             .NotNull();
 
         var error = action.ShouldThrowValidationError<CommonCrossValidationError.NotNull>();

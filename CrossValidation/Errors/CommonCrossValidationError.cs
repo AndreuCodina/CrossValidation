@@ -35,5 +35,17 @@ public abstract record CommonCrossValidationError(string Code) : ResXValidationE
         }
     }
     
+    public record MinimumLength(int Minimum, int TotalLength) :
+        CommonCrossValidationError(nameof(ErrorResource.MinimumLength)),
+        ILengthError
+    {
+        public override void AddPlaceholderValues()
+        {
+            AddPlaceholderValue(Minimum);
+            AddPlaceholderValue(TotalLength);
+            base.AddPlaceholderValues();
+        }
+    }
+    
     public record Predicate() : CommonCrossValidationError(nameof(ErrorResource.Predicate));
 }

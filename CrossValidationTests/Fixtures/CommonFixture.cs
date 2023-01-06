@@ -6,7 +6,7 @@ using Moq;
 
 namespace CrossValidationTests.Fixtures;
 
-public class Fixture
+public class CommonFixture
 {
     public ParentModelValidator CreateParentModelValidator(Action<ParentModelValidator> validator)
     {

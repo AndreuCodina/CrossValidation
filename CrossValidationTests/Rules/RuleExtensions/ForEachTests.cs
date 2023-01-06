@@ -9,16 +9,16 @@ using CrossValidationTests.Models;
 using Shouldly;
 using Xunit;
 
-namespace CrossValidationTests.Rules;
+namespace CrossValidationTests.Rules.RuleExtensions;
 
-public class RuleExtensionTests_ForEach : IClassFixture<Fixture>
+public class ForEachTests : IClassFixture<CommonFixture>
 {
-    private readonly Fixture _fixture;
+    private readonly CommonFixture _commonFixture;
     private ParentModel _model;
 
-    public RuleExtensionTests_ForEach(Fixture fixture)
+    public ForEachTests(CommonFixture commonFixture)
     {
-        _fixture = fixture;
+        _commonFixture = commonFixture;
         _model = new ParentModelBuilder().Build();
     }
     
@@ -28,7 +28,7 @@ public class RuleExtensionTests_ForEach : IClassFixture<Fixture>
         _model = new ParentModelBuilder()
             .WithNullableIntList(new List<int> { 100, 90, 80 })
             .Build();
-        var parentModelValidator = _fixture.CreateParentModelValidator(validator =>
+        var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
         {
             validator.RuleFor(x => x.NullableIntList)
                 .NotNull()
@@ -48,7 +48,7 @@ public class RuleExtensionTests_ForEach : IClassFixture<Fixture>
         _model = new ParentModelBuilder()
             .WithNullableIntList(new List<int> { 100, 1, 90, 2 })
             .Build();
-        var parentModelValidator = _fixture.CreateParentModelValidator(validator =>
+        var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
         {
             validator.ValidationMode = ValidationMode.AccumulateFirstErrorEachRule;
             validator.RuleFor(x => x.NullableIntList)
@@ -72,7 +72,7 @@ public class RuleExtensionTests_ForEach : IClassFixture<Fixture>
         _model = new ParentModelBuilder()
             .WithNullableIntList(new List<int> { 1 })
             .Build();
-        var parentModelValidator = _fixture.CreateParentModelValidator(validator =>
+        var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
         {
             validator.RuleFor(x => x.NullableIntList)
                 .NotNull()
@@ -93,7 +93,7 @@ public class RuleExtensionTests_ForEach : IClassFixture<Fixture>
         _model = new ParentModelBuilder()
             .WithNullableIntList(new List<int> {100, 1, 2})
             .Build();
-        var parentModelValidator = _fixture.CreateParentModelValidator(validator =>
+        var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
         {
             validator.RuleFor(x => x.NullableIntList)
                 .NotNull()

@@ -1,8 +1,8 @@
 ﻿using CrossValidation.Results;
 
-namespace CrossValidation.Validators;
+namespace CrossValidation.Validators.LengthValidators;
 
-public record LengthRangeValidator(string FieldValue, int Minimum, int Maximum) : LengthValidator
+public record LengthRangeValidator(string FieldValue, int Minimum, int Maximum) : LengthValidatorBase
 {
     public override bool IsValid()
     {

@@ -10,14 +10,14 @@ using Xunit;
 
 namespace CrossValidationTests.Utils;
 
-public class ModelNullabilityValidatorTests : IClassFixture<Fixture>
+public class ModelNullabilityValidatorTests : IClassFixture<CommonFixture>
 {
-    private readonly Fixture _fixture;
+    private readonly CommonFixture _commonFixture;
     private ParentModel _model;
 
-    public ModelNullabilityValidatorTests(Fixture fixture)
+    public ModelNullabilityValidatorTests(CommonFixture commonFixture)
     {
-        _fixture = fixture;
+        _commonFixture = commonFixture;
         _model = new ParentModelBuilder().Build();
     }
 
@@ -28,7 +28,7 @@ public class ModelNullabilityValidatorTests : IClassFixture<Fixture>
             model: _model,
             propertyName: nameof(ParentModel.String),
             propertyValue: null);
-        var parentModelValidator = _fixture.CreateParentModelValidator(_ => { });
+        var parentModelValidator = _commonFixture.CreateParentModelValidator(_ => { });
 
         var action = () => parentModelValidator.Validate(_model);
 
@@ -43,7 +43,7 @@ public class ModelNullabilityValidatorTests : IClassFixture<Fixture>
             model: _model,
             propertyName: expectedCollectionName,
             propertyValue: new List<string?> {"", null});
-        var parentModelValidator = _fixture.CreateParentModelValidator(_ => { });
+        var parentModelValidator = _commonFixture.CreateParentModelValidator(_ => { });
 
         var action = () => parentModelValidator.Validate(_model);
 
@@ -59,7 +59,7 @@ public class ModelNullabilityValidatorTests : IClassFixture<Fixture>
             model: _model,
             propertyName: expectedPropertyName,
             propertyValue: null);
-        var parentModelValidator = _fixture.CreateParentModelValidator(_ => { });
+        var parentModelValidator = _commonFixture.CreateParentModelValidator(_ => { });
 
         var action = () => parentModelValidator.Validate(_model);
 

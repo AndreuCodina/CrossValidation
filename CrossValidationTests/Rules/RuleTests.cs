@@ -13,14 +13,14 @@ using Xunit;
 
 namespace CrossValidationTests.Rules;
 
-public class RuleTests : IClassFixture<Fixture>
+public class RuleTests : IClassFixture<CommonFixture>
 {
-    private readonly Fixture _fixture;
+    private readonly CommonFixture _commonFixture;
     private ParentModel _model;
 
-    public RuleTests(Fixture fixture)
+    public RuleTests(CommonFixture commonFixture)
     {
-        _fixture = fixture;
+        _commonFixture = commonFixture;
         _model = new ParentModelBuilder().Build();
     }
 
@@ -95,7 +95,7 @@ public class RuleTests : IClassFixture<Fixture>
     [Fact]
     public void Call_Instance_from_model_validator_with_error_accumulation_fails()
     {
-        var parentModelValidator = _fixture.CreateParentModelValidator(validator =>
+        var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
         {
             validator.ValidationMode = ValidationMode.AccumulateFirstErrorEachRule;
 
@@ -117,7 +117,7 @@ public class RuleTests : IClassFixture<Fixture>
     {
         var expectedMessage = "TrueCase";
         var action = () => Rule<int>.CreateFromField(() => _model.NestedModel.Int, RuleState.Valid)
-            .When(_fixture.NotBeValid)
+            .When(_commonFixture.NotBeValid)
             .GreaterThan(_model.NestedModel.Int + 1)
             .When(true)
             .WithMessage(expectedMessage)
@@ -132,9 +132,9 @@ public class RuleTests : IClassFixture<Fixture>
     {
         var expectedMessage = "TrueCase";
         var action = () => Rule<int>.CreateFromField(() => _model.NestedModel.Int, RuleState.Valid)
-            .WhenAsync(_fixture.NotBeValidAsync)
+            .WhenAsync(_commonFixture.NotBeValidAsync)
             .GreaterThan(_model.NestedModel.Int + 1)
-            .WhenAsync(_fixture.BeValidAsync)
+            .WhenAsync(_commonFixture.BeValidAsync)
             .WithMessage(expectedMessage)
             .GreaterThan(_model.NestedModel.Int);
 
@@ -164,7 +164,7 @@ public class RuleTests : IClassFixture<Fixture>
     public void MustAsync()
     {
         var action = () => Validate.That(1)
-            .MustAsync(_fixture.BeValidAsync);
+            .MustAsync(_commonFixture.BeValidAsync);
 
         action.ShouldNotThrow();
     }
@@ -173,7 +173,7 @@ public class RuleTests : IClassFixture<Fixture>
     public void MustAsync_fails()
     {
         var action = () => Validate.That(1)
-            .MustAsync(_fixture.NotBeValidAsync);
+            .MustAsync(_commonFixture.NotBeValidAsync);
 
         action.ShouldThrow<CrossValidationException>();
     }
@@ -186,7 +186,7 @@ public class RuleTests : IClassFixture<Fixture>
         
         public static UserAgeWithoutCustomization Create(int value)
         {
-            Validate.That(value).GreaterThan(int.MaxValue);
+            Validate.That(value).GreaterThan(value + 1);
             return new UserAgeWithoutCustomization
             {
                 Value = value
@@ -203,7 +203,7 @@ public class RuleTests : IClassFixture<Fixture>
             Validate.That(value)
                 .WithMessage("Expected message")
                 .WithFieldDisplayName("Expected field display name")
-                .GreaterThan(int.MaxValue);
+                .GreaterThan(value + 1);
             return new UserAgeWithCustomization
             {
                 Value = value
