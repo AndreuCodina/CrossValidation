@@ -26,7 +26,7 @@ public class CrossValidationErrorTests :
     public void Add_all_specific_error_fields_as_placeholders()
     {
         var action = () => Validate.That(true)
-            .WithError(() => new ErrorWithAllFieldsAddedAsPlaceholders("Alex", 30))
+            .WithError(new ErrorWithAllFieldsAddedAsPlaceholders("Alex", 30))
             .Must(_commonFixture.NotBeValid);
 
         var error = action.ShouldThrowValidationError<ErrorWithAllFieldsAddedAsPlaceholders>();
@@ -38,7 +38,7 @@ public class CrossValidationErrorTests :
     public void Do_not_add_all_specific_error_fields_as_placeholders_fails()
     {
         var action = () => Validate.That(true)
-            .WithError(() => new ErrorWithNotAllFieldsAddedAsPlaceholders("Alex", 30))
+            .WithError(new ErrorWithNotAllFieldsAddedAsPlaceholders("Alex", 30))
             .Must(_commonFixture.NotBeValid);
 
         var error = action.ShouldThrowValidationError<ErrorWithNotAllFieldsAddedAsPlaceholders>();
@@ -50,7 +50,7 @@ public class CrossValidationErrorTests :
     public void Add_null_placeholders_as_empty_strings()
     {
         var action = () => Validate.That(true)
-            .WithError(() => new ErrorWithNullFields(null, null))
+            .WithError(new ErrorWithNullFields(null, null))
             .Must(_commonFixture.NotBeValid);
 
         var error = action.ShouldThrowValidationError<ErrorWithNullFields>();
