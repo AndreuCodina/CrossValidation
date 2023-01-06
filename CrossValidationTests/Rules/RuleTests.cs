@@ -31,7 +31,7 @@ public class RuleTests : IClassFixture<CommonFixture>
         CrossValidationConfiguration.GeneratePlaceholderValuesWhenTheyAreNotAdded = true;
         
         var action = () => Rule<int>.CreateFromField(() => _model.NestedModel.Int, RuleState.Valid)
-            .WithError(new CustomErrorWithPlaceholderValue(_model.NestedModel.Int))
+            .WithError(() => new CustomErrorWithPlaceholderValue(_model.NestedModel.Int))
             .GreaterThan(_model.NestedModel.Int);
 
         var error = action.ShouldThrowValidationError();
@@ -60,7 +60,7 @@ public class RuleTests : IClassFixture<CommonFixture>
         
         var getAge = () => Validate.Field(_model, x => x.NestedModel.Int)
             .WithMessage(messageTemplate)
-            .WithError(new CustomErrorWithPlaceholderValue(10))
+            .WithError(() => new CustomErrorWithPlaceholderValue(10))
             .Instance(UserAgeWithoutCustomization.Create);
 
         var error = getAge.ShouldThrowValidationError<CustomErrorWithPlaceholderValue>();

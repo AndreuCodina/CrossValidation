@@ -20,7 +20,7 @@ public interface IRule<out TField>
         Func<TField, TFieldTransformed> transformer);
     IRule<TField> WithMessage(string message);
     IRule<TField> WithCode(string code);
-    IRule<TField> WithError(CrossValidationError error);
+    IRule<TField> WithError(Func<CrossValidationError> error);
     IRule<TField> WithFieldDisplayName(string fieldDisplayName);
     IRule<TField> When(bool condition);
     IRule<TField> When(Func<TField, bool> condition);
@@ -158,11 +158,11 @@ public class Rule<TField> : IRule<TField>
         return this;
     }
 
-    public IRule<TField> WithError(CrossValidationError error)
+    public IRule<TField> WithError(Func<CrossValidationError> error)
     {
         if (CanContinueExecutingRule())
         {
-            Context.SetError(error);
+            Context.SetError(error());
         }
 
         return this;

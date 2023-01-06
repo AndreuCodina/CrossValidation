@@ -411,7 +411,7 @@ public class ModelValidatorTests : IClassFixture<CommonFixture>
         var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
         {
             validator.RuleFor(x => x.NullableString)
-                .WithError(new CustomErrorWithCode("COD123"))
+                .WithError(() => new CustomErrorWithCode("COD123"))
                 .NotNull();
         });
         
@@ -462,7 +462,7 @@ public class ModelValidatorTests : IClassFixture<CommonFixture>
         var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
         {
             validator.RuleFor(x => x.NullableString)
-                .WithError(expectedError)
+                .WithError(() => expectedError)
                 .WithMessage(expectedMessage)
                 .NotNull();
         });
@@ -483,7 +483,7 @@ public class ModelValidatorTests : IClassFixture<CommonFixture>
         {
             validator.RuleFor(x => x.NullableString)
                 .WithMessage(expectedMessage)
-                .WithError(expectedError)
+                .WithError(() => expectedError)
                 .NotNull();
         });
         
