@@ -4,6 +4,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrossValidation", "CrossVal
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrossValidationTests", "CrossValidationTests\CrossValidationTests.csproj", "{5278047D-4B12-496B-9777-3207EBC5E4B4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrossValidation.Benchmarks", "CrossValidation.Benchmarks\CrossValidation.Benchmarks.csproj", "{A104696A-FEB9-4671-9212-EAE5B92AFDEB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +20,9 @@ Global
 		{5278047D-4B12-496B-9777-3207EBC5E4B4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5278047D-4B12-496B-9777-3207EBC5E4B4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5278047D-4B12-496B-9777-3207EBC5E4B4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A104696A-FEB9-4671-9212-EAE5B92AFDEB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A104696A-FEB9-4671-9212-EAE5B92AFDEB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A104696A-FEB9-4671-9212-EAE5B92AFDEB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A104696A-FEB9-4671-9212-EAE5B92AFDEB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
