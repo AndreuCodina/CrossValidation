@@ -11,7 +11,7 @@ public class ErrorLocalizationTests
     [Fact]
     public void Validator_error_is_localized()
     {
-        var action = () => Rule<string?>.CreateFromField(() => null, RuleState.Valid)
+        var action = () => ValidRule<string?>.CreateFromField(null)
             .NotNull();
 
         var error = action.ShouldThrowValidationError();

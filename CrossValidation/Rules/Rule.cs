@@ -12,16 +12,8 @@ namespace CrossValidation.Rules;
 
 public interface IRule<out TField>
 {
-    RuleState State { get; set; }
-    
-    ValidationContext Context { get; set; }
-    
-    string FieldFullPath { get; set; }
-
     [Pure]
-    TField GetFieldValue();
-
-    IRule<TField> SetValidator(Func<IValidator<ICrossValidationError>> validator);
+    IRule<TField> SetValidator(IValidator<ICrossValidationError> validator);
 
     [Pure]
     IRule<TFieldTransformed> Transform<TFieldTransformed>(
@@ -57,23 +49,175 @@ public interface IRule<out TField>
     IRule<TField> SetModelValidator<TChildModel>(ModelValidator<TChildModel> validator);
 }
 
-public class Rule<TField> : IRule<TField>
+public abstract class Rule<TField> : IRule<TField>
 {
-    public RuleState State { get; set; }
-    public Lazy<TField> FieldValue { get; set; }
+    public IRule<TField> SetValidator(IValidator<ICrossValidationError> validator)
+    {
+        if (this is ValidRule<TField> validRule)
+        {
+            if (validRule.Context.ExecuteNextValidator)
+            {
+                var error = validator.GetError();
+
+                if (error is not null)
+                {
+                    validRule.FinishWithError(error);
+                    return new InvalidRule<TField>();
+                }
+            }
+
+            validRule.Context.Clean();
+        }
+
+        return this;
+    }
+
+    public IRule<TField> WithMessage(string message)
+    {
+        if (this is ValidRule<TField> validRule && validRule.Context.ExecuteNextValidator)
+        {
+            validRule.Context.SetMessage(message);
+        }
+
+        return this;
+    }
+
+    public IRule<TField> WithCode(string code)
+    {
+        if (this is ValidRule<TField> validRule && validRule.Context.ExecuteNextValidator)
+        {
+            validRule.Context.SetCode(code);
+        }
+
+        return this;
+    }
+
+    public IRule<TField> WithError(ICrossValidationError error)
+    {
+        if (this is ValidRule<TField> validRule && validRule.Context.ExecuteNextValidator)
+        {
+            validRule.Context.SetError(error);
+        }
+
+        return this;
+    }
+
+    public IRule<TField> WithFieldDisplayName(string fieldDisplayName)
+    {
+        if (this is ValidRule<TField> validRule && validRule.Context.ExecuteNextValidator)
+        {
+            validRule.Context.SetFieldDisplayName(fieldDisplayName);
+        }
+
+        return this;
+    }
+
+    public IRule<TField> When(bool condition)
+    {
+        if (this is ValidRule<TField> validRule && validRule.Context.ExecuteNextValidator)
+        {
+            validRule.Context.ExecuteNextValidator = condition;
+        }
+
+        return this;
+    }
+
+    public IRule<TField> When(Func<TField, bool> condition)
+    {
+        if (this is ValidRule<TField> validRule && validRule.Context.ExecuteNextValidator)
+        {
+            validRule.Context.ExecuteNextValidator = condition(validRule.FieldValue);
+        }
+
+        return this;
+    }
+
+    public IRule<TField> WhenAsync(Func<TField, Task<bool>> condition)
+    {
+        if (this is ValidRule<TField> validRule && validRule.Context.ExecuteNextValidator)
+        {
+            validRule.Context.ExecuteNextValidator = condition(validRule.FieldValue)
+                .GetAwaiter()
+                .GetResult();
+        }
+
+        return this;
+    }
+
+    public IRule<TField> Must(Func<TField, bool> condition)
+    {
+        if (this is ValidRule<TField> validRule)
+        {
+            SetValidator(new PredicateValidator(condition(validRule.FieldValue)));
+        }
+
+        return this;
+    }
+
+    public IRule<TField> MustAsync(Func<TField, Task<bool>> condition)
+    {
+        if (this is ValidRule<TField> validRule)
+        {
+            return SetValidator(new PredicateValidator(
+                condition(validRule.FieldValue)
+                    .GetAwaiter()
+                    .GetResult()));
+        }
+
+        return this;
+    }
+
+    public abstract TInstance Instance<TInstance>(Func<TField, TInstance> fieldToInstance);
+
+    public IRule<TFieldTransformed> Transform<TFieldTransformed>(
+        Func<TField, TFieldTransformed> transformer)
+    {
+        if (this is ValidRule<TField> validRule && validRule.Context.ExecuteNextValidator)
+        {
+            var fieldValueTransformed = transformer(validRule.FieldValue);
+            return ValidRule<TFieldTransformed>.CreateFromField(fieldValueTransformed, validRule.Context.FieldName,
+                validRule.Context);
+        }
+
+        return new InvalidRule<TFieldTransformed>();
+    }
+
+    public IRule<TField> SetModelValidator<TChildModel>(ModelValidator<TChildModel> validator)
+    {
+        if (this is ValidRule<TField> validRule)
+        {
+            validRule.Context.Clean(); // Ignore customizations for model validators
+
+            if (validRule.Context.ExecuteNextValidator)
+            {
+                var oldContext = validRule.Context;
+                var childContext = validRule.Context.CloneForChildModelValidator(validRule.FieldFullPath);
+                validator.Context = childContext;
+                var childModel = (TChildModel)(object)validRule.FieldValue!;
+                validator.Validate(childModel);
+                var newErrors = validator.Context.Errors;
+                validator.Context = oldContext;
+                validator.Context.Errors = newErrors;
+            }
+        }
+
+        return this;
+    }
+}
+
+public class ValidRule<TField> : Rule<TField>
+{
+    public TField FieldValue { get; set; }
     public ValidationContext Context { get; set; }
     public string FieldFullPath { get; set; }
 
-    private Rule(
-        Func<TField> getFieldValue,
-        RuleState state,
+    private ValidRule(
+        TField fieldValue,
         string? fieldFullPath = null,
         ValidationContext? context = null,
         int? index = null,
         string? parentPath = null)
     {
-        var fieldValue = new Lazy<TField>(getFieldValue);
-        State = state;
         FieldValue = fieldValue;
         Context = context ?? new ValidationContext();
         Context.FieldValue = fieldValue;
@@ -104,57 +248,32 @@ public class Rule<TField> : IRule<TField>
     }
 
     public static IRule<TField> CreateFromField(
-        Func<TField> getFieldValue,
-        RuleState state,
+        TField fieldValue,
         string? fieldFullPath = null,
         ValidationContext? context = null,
         int? index = null,
         string? parentPath = null)
     {
-        return new Rule<TField>(getFieldValue, state, fieldFullPath, context, index, parentPath);
+        return new ValidRule<TField>(fieldValue, fieldFullPath, context, index, parentPath);
     }
 
     public static IRule<TField> CreateFromFieldSelector<TModel>(
         TModel model,
         Expression<Func<TModel, TField>> fieldSelector,
-        RuleState state,
         ValidationContext? context = null)
     {
         var fieldInformation = FieldInformationExtractor<TField>
             .Extract(model, fieldSelector);
-        return new Rule<TField>(() => fieldInformation.Value, state, fieldInformation.SelectionFullPath, context);
+        return new ValidRule<TField>(fieldInformation.Value, fieldInformation.SelectionFullPath, context);
     }
-
-    public TField GetFieldValue()
+    
+    public void FinishWithError(ICrossValidationError error)
     {
-        return FieldValue.Value;
+        FillErrorWithCustomizations(error);
+        HandleError(error);
     }
 
-    public bool CanContinueExecutingRule()
-    {
-        return State is RuleState.Valid
-               && Context.ExecuteNextValidator;
-    }
-
-    public IRule<TField> SetValidator(Func<IValidator<ICrossValidationError>> validator)
-    {
-        if (CanContinueExecutingRule())
-        {
-            var error = validator().GetError();
-
-            if (error is not null)
-            {
-                FinishWithError(error);
-                State = RuleState.Invalid;
-            }
-        }
-
-        Context.Clean();
-        return this;
-    }
-
-
-    protected void HandleError(ICrossValidationError error)
+    private void HandleError(ICrossValidationError error)
     {
         Context.AddError(error);
 
@@ -162,147 +281,6 @@ public class Rule<TField> : IRule<TField>
         {
             throw new CrossValidationException(Context.Errors!);
         }
-    }
-
-    public IRule<TField> WithMessage(string message)
-    {
-        if (CanContinueExecutingRule())
-        {
-            Context.SetMessage(message);
-        }
-
-        return this;
-    }
-
-    public IRule<TField> WithCode(string code)
-    {
-        if (CanContinueExecutingRule())
-        {
-            Context.SetCode(code);
-        }
-
-        return this;
-    }
-
-    public IRule<TField> WithError(ICrossValidationError error)
-    {
-        if (CanContinueExecutingRule())
-        {
-            Context.SetError(error);
-        }
-
-        return this;
-    }
-
-    public IRule<TField> WithFieldDisplayName(string fieldDisplayName)
-    {
-        if (CanContinueExecutingRule())
-        {
-            Context.SetFieldDisplayName(fieldDisplayName);
-        }
-
-        return this;
-    }
-
-    public IRule<TField> When(bool condition)
-    {
-        if (CanContinueExecutingRule())
-        {
-            Context.ExecuteNextValidator = condition;
-        }
-
-        return this;
-    }
-
-    public IRule<TField> When(Func<TField, bool> condition)
-    {
-        if (CanContinueExecutingRule())
-        {
-            Context.ExecuteNextValidator = condition(GetFieldValue());
-        }
-
-        return this;
-    }
-
-    public IRule<TField> WhenAsync(Func<TField, Task<bool>> condition)
-    {
-        if (CanContinueExecutingRule())
-        {
-            Context.ExecuteNextValidator = condition(GetFieldValue())
-                .GetAwaiter()
-                .GetResult();
-        }
-
-        return this;
-    }
-
-    public IRule<TField> Must(Func<TField, bool> condition)
-    {
-        SetValidator(() => new PredicateValidator(condition(GetFieldValue())));
-        return this;
-    }
-
-    public IRule<TField> MustAsync(Func<TField, Task<bool>> condition)
-    {
-        SetValidator(() => new PredicateValidator(
-            condition(GetFieldValue())
-                .GetAwaiter()
-                .GetResult()));
-        return this;
-    }
-
-    public TInstance Instance<TInstance>(Func<TField, TInstance> fieldToInstance)
-    {
-        if (State is RuleState.Invalid)
-        {
-            throw new InvalidOperationException(
-                $"Accumulate errors and call {nameof(Instance)} with an invalid rule is not allowed");
-        }
-
-        try
-        {
-            return fieldToInstance(GetFieldValue());
-        }
-        catch (CrossValidationException e)
-        {
-            var error = FromExceptionToContext(e);
-            FinishWithError(error);
-            throw new UnreachableException();
-        }
-    }
-
-    public IRule<TFieldTransformed> Transform<TFieldTransformed>(
-        Func<TField, TFieldTransformed> transformer)
-    {
-        if (CanContinueExecutingRule())
-        {
-            var fieldValueTransformed = transformer(GetFieldValue());
-            return Rule<TFieldTransformed>.CreateFromField(() => fieldValueTransformed, State, Context.FieldName,
-                Context);
-        }
-
-        return Rule<TFieldTransformed>.CreateFromField(() => throw new UnreachableException(), State, Context.FieldName,
-            Context);
-    }
-
-    public IRule<TField> SetModelValidator<TChildModel>(ModelValidator<TChildModel> validator)
-    {
-        Context.Clean(); // Ignore customizations for model validators
-        var oldContext = Context;
-        var childContext = Context.CloneForChildModelValidator(FieldFullPath);
-        validator.Context = childContext;
-        var childModel = (TChildModel)(dynamic)FieldValue.Value!;
-        validator.Validate(childModel);
-        var newErrors = validator.Context.Errors;
-        validator.Context = oldContext;
-        validator.Context.Errors = newErrors;
-        return this;
-    }
-
-    private void FinishWithError(ICrossValidationError error)
-    {
-        FillErrorWithCustomizations(error);
-        HandleError(error);
     }
 
     private ICrossValidationError FromExceptionToContext(CrossValidationException exception)
@@ -344,7 +322,7 @@ public class Rule<TField> : IRule<TField>
     private void FillErrorWithCustomizations(ICrossValidationError error)
     {
         error.FieldName = Context.FieldName;
-        error.FieldValue = ((dynamic)Context.FieldValue!).Value;
+        error.FieldValue = Context.FieldValue!;
         error.Message = GetMessageToFill(error);
         error.FieldDisplayName = GetFieldDisplayNameToFill(error);
     }
@@ -368,5 +346,28 @@ public class Rule<TField> : IRule<TField>
         }
 
         return error.FieldName!;
+    }
+
+    public override TInstance Instance<TInstance>(Func<TField, TInstance> fieldToInstance)
+    {
+        try
+        {
+            return fieldToInstance(FieldValue);
+        }
+        catch (CrossValidationException e)
+        {
+            var error = FromExceptionToContext(e);
+            FinishWithError(error);
+            throw new UnreachableException();
+        }
+    }
+}
+
+public class InvalidRule<TField> : Rule<TField>
+{
+    public override TInstance Instance<TInstance>(Func<TField, TInstance> fieldToInstance)
+    {
+        throw new InvalidOperationException(
+            $"Accumulate errors and call {nameof(Instance)} with an invalid rule is not allowed");
     }
 }

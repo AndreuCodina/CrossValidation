@@ -10,28 +10,51 @@ public static class RuleExtensions
         this IRule<TField?> rule)
         where TField : class
     {
-        rule.SetValidator(() => new NotNullValidator<TField?>(rule.GetFieldValue()));
-        return rule.Transform(x => x!);
+        var ruleToReturn = rule;
+        
+        if (rule is ValidRule<TField?> validRule)
+        {
+            ruleToReturn = validRule.SetValidator(new NotNullValidator<TField?>(validRule.FieldValue));
+        }
+
+        return ruleToReturn.Transform(x => x!);
     }
 
     public static IRule<TField> NotNull<TField>(
         this IRule<TField?> rule)
         where TField : struct
     {
-        rule.SetValidator(() => new NotNullValidator<TField?>(rule.GetFieldValue()));
-        return rule.Transform(x => x!.Value);
+        var ruleToReturn = rule;
+        
+        if (rule is ValidRule<TField?> validRule)
+        {
+            ruleToReturn = validRule.SetValidator(new NotNullValidator<TField?>(validRule.FieldValue));
+        }
+
+        return ruleToReturn.Transform(x => x!.Value);
     }
 
-    public static IRule<TField?> WhenNotNull<TField>(
+    public static IRule<TField?> WhenNotNull<TField, TReturnedField>(
         this IRule<TField?> rule,
-        Action<IRule<TField>> notNullRule)
+        Func<IRule<TField>, IRule<TReturnedField>> notNullRule)
         where TField : struct
     {
-        var validator = new NotNullValidator<TField?>(rule.GetFieldValue());
-
-        if (validator.IsValid())
+        if (rule is ValidRule<TField?> validRule)
         {
-            notNullRule(rule.Transform(x => x!.Value));
+            var validator = new NotNullValidator<TField?>(validRule.FieldValue);
+            
+            if (validator.IsValid())
+            {
+                var ruleReturned = notNullRule(rule.Transform(x => x!.Value));
+                
+                if (ruleReturned is InvalidRule<TReturnedField>)
+                {
+                    return new InvalidRule<TField?>();
+                }
+                
+                // TODO: Remove
+                // return ruleReturned.Transform<TField?>(x => x);
+            }
         }
 
         return rule;
@@ -39,14 +62,18 @@ public static class RuleExtensions
 
     public static IRule<TField?> WhenNotNull<TField>(
         this IRule<TField?> rule,
-        Action<IRule<TField>> notNullRule)
+        Func<IRule<TField>, IRule<TField>> notNullRule)
         where TField : class
     {
-        var validator = new NotNullValidator<TField?>(rule.GetFieldValue());
-
-        if (validator.IsValid())
+        if (rule is ValidRule<TField?> validRule)
         {
-            notNullRule(rule.Transform(x => x!));
+            var validator = new NotNullValidator<TField?>(validRule.FieldValue);
+            
+            if (validator.IsValid())
+            {
+                var ruleToReturn = notNullRule(rule.Transform(x => x!));
+                return ruleToReturn.Transform<TField?>(x => x);
+            }
         }
 
         return rule;
@@ -56,14 +83,24 @@ public static class RuleExtensions
         this IRule<TField?> rule)
         where TField : class
     {
-        return rule.SetValidator(() => new NullValidator<TField?>(rule.GetFieldValue()));
+        if (rule is ValidRule<TField?> validRule)
+        {
+            return rule.SetValidator(new NullValidator<TField?>(validRule.FieldValue));
+        }
+
+        return rule;
     }
 
     public static IRule<TField?> Null<TField>(
         this IRule<TField?> rule)
         where TField : struct
     {
-        return rule.SetValidator(() => new NullValidator<TField?>(rule.GetFieldValue()));
+        if (rule is ValidRule<TField?> validRule)
+        {
+            return rule.SetValidator(new NullValidator<TField?>(validRule.FieldValue));
+        }
+
+        return rule;
     }
 
     public static IRule<TField> GreaterThan<TField>(
@@ -71,28 +108,48 @@ public static class RuleExtensions
         TField valueToCompare)
         where TField : IComparisonOperators<TField, TField, bool>
     {
-        return rule.SetValidator(() => new GreaterThanValidator<TField>(rule.GetFieldValue(), valueToCompare));
+        if (rule is ValidRule<TField> validRule)
+        {
+            return rule.SetValidator(new GreaterThanValidator<TField>(validRule.FieldValue, valueToCompare));
+        }
+
+        return rule;
     }
 
     public static IRule<TField> IsInEnum<TField>(
         this IRule<TField> rule)
         where TField : Enum
     {
-        return rule.SetValidator(() => new EnumValidator<TField>(rule.GetFieldValue(), typeof(TField)));
+        if (rule is ValidRule<TField> validRule)
+        {
+            return rule.SetValidator(new EnumValidator<TField>(validRule.FieldValue, typeof(TField)));
+        }
+
+        return rule;
     }
 
     public static IRule<int> IsInEnum<TEnum>(
         this IRule<int> rule)
         where TEnum : Enum
     {
-        return rule.SetValidator(() => new EnumValidator<int>(rule.GetFieldValue(), typeof(TEnum)));
+        if (rule is ValidRule<int> validRule)
+        {
+            return rule.SetValidator(new EnumValidator<int>(validRule.FieldValue, typeof(TEnum)));
+        }
+
+        return rule;
     }
 
     public static IRule<string> IsInEnum<TEnum>(
         this IRule<string> rule)
         where TEnum : Enum
     {
-        return rule.SetValidator(() => new EnumValidator<string>(rule.GetFieldValue(), typeof(TEnum)));
+        if (rule is ValidRule<string> validRule)
+        {
+            return rule.SetValidator(new EnumValidator<string>(validRule.FieldValue, typeof(TEnum)));
+        }
+
+        return rule;
     }
 
     public static IRule<string> LengthRange(
@@ -100,35 +157,53 @@ public static class RuleExtensions
         int minimum,
         int maximum)
     {
-        return rule.SetValidator(() => new LengthRangeValidator(rule.GetFieldValue(), minimum, maximum));
+        if (rule is ValidRule<string> validRule)
+        {
+            return rule.SetValidator(new LengthRangeValidator(validRule.FieldValue, minimum, maximum));
+        }
+
+        return rule;
     }
     
     public static IRule<string> MinimumLength(
         this IRule<string> rule,
         int minimum)
     {
-        return rule.SetValidator(() => new MinimumLengthValidator(rule.GetFieldValue(), minimum));
+        if (rule is ValidRule<string> validRule)
+        {
+            return rule.SetValidator(new MinimumLengthValidator(validRule.FieldValue, minimum));
+        }
+
+        return rule;
     }
 
-    public static IRule<IEnumerable<TInnerType>> ForEach<TInnerType>(
+    public static IRule<IEnumerable<TInnerType>> ForEach<TInnerType, TReturnedField>(
         this IRule<IEnumerable<TInnerType>> rule,
-        Action<IRule<TInnerType>> action)
+        Func<IRule<TInnerType>, IRule<TReturnedField>> action)
     {
-        var fieldCollection = rule.GetFieldValue();
-        var fieldFullPath = rule.Context.FieldName;
-        var index = 0;
-
-        foreach (var innerField in fieldCollection)
+        if (rule is ValidRule<IEnumerable<TInnerType>> validRule)
         {
-            var newRule = Rule<TInnerType>.CreateFromField(
-                () => innerField,
-                rule.State,
-                fieldFullPath,
-                rule.Context,
-                index,
-                rule.Context.ParentPath);
-            action(newRule);
-            index++;
+            var fieldCollection = validRule.FieldValue;
+            var fieldFullPath = validRule.Context.FieldName;
+            var index = 0;
+
+            foreach (var innerField in fieldCollection)
+            {
+                var newRule = ValidRule<TInnerType>.CreateFromField(
+                    innerField,
+                    fieldFullPath,
+                    validRule.Context,
+                    index,
+                    validRule.Context.ParentPath);
+                var ruleReturned = action(newRule);
+
+                if (ruleReturned is InvalidRule<TReturnedField>)
+                {
+                    return new InvalidRule<IEnumerable<TInnerType>>();
+                }
+                
+                index++;
+            }
         }
 
         return rule;

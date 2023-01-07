@@ -9,7 +9,7 @@ public static class Validate
     [Pure]
     public static IRule<TField> That<TField>(TField fieldValue)
     {
-        return Rule<TField>.CreateFromField(() => fieldValue, RuleState.Valid);
+        return ValidRule<TField>.CreateFromField(fieldValue);
     }
 
     [Pure]
@@ -17,6 +17,6 @@ public static class Validate
         TModel model,
         Expression<Func<TModel, TField>> fieldSelector)
     {
-        return Rule<TField>.CreateFromFieldSelector(model, fieldSelector, RuleState.Valid);
+        return ValidRule<TField>.CreateFromFieldSelector(model, fieldSelector);
     }
 }

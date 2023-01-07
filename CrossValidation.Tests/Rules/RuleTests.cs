@@ -29,7 +29,7 @@ public class RuleTests : IClassFixture<CommonFixture>
         var defaultConfiguration = CrossValidationConfiguration.GeneratePlaceholderValuesWhenTheyAreNotAdded;
         CrossValidationConfiguration.GeneratePlaceholderValuesWhenTheyAreNotAdded = true;
         
-        var action = () => Rule<int>.CreateFromField(() => _model.NestedModel.Int, RuleState.Valid)
+        var action = () => ValidRule<int>.CreateFromField(_model.NestedModel.Int)
             .WithError(new CustomErrorWithPlaceholderValue(_model.NestedModel.Int))
             .GreaterThan(_model.NestedModel.Int);
 
@@ -45,8 +45,8 @@ public class RuleTests : IClassFixture<CommonFixture>
     [Fact]
     public void Validate_predicate()
     {
-        var action = () => Rule<NestedModel>.CreateFromField(() => _model.NestedModel, RuleState.Valid)
-            .Must(x => x.Int > x.Int);
+        var action = () => ValidRule<NestedModel>.CreateFromField( _model.NestedModel)
+            .Must(_commonFixture.NotBeValid);
 
         action.ShouldThrowValidationError<CommonCrossValidationError.Predicate>();
     }
@@ -115,7 +115,7 @@ public class RuleTests : IClassFixture<CommonFixture>
     public void Validator_with_conditional_execution()
     {
         var expectedMessage = "TrueCase";
-        var action = () => Rule<int>.CreateFromField(() => _model.NestedModel.Int, RuleState.Valid)
+        var action = () => ValidRule<int>.CreateFromField(_model.NestedModel.Int)
             .When(_commonFixture.NotBeValid)
             .GreaterThan(_model.NestedModel.Int + 1)
             .When(true)
@@ -130,7 +130,7 @@ public class RuleTests : IClassFixture<CommonFixture>
     public void Validator_with_async_conditional_execution()
     {
         var expectedMessage = "TrueCase";
-        var action = () => Rule<int>.CreateFromField(() => _model.NestedModel.Int, RuleState.Valid)
+        var action = () => ValidRule<int>.CreateFromField(_model.NestedModel.Int)
             .WhenAsync(_commonFixture.NotBeValidAsync)
             .GreaterThan(_model.NestedModel.Int + 1)
             .WhenAsync(_commonFixture.BeValidAsync)
