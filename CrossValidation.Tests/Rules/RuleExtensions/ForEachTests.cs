@@ -50,6 +50,7 @@ public class ForEachTests : IClassFixture<CommonFixture>
         var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
         {
             validator.ValidationMode = ValidationMode.AccumulateFirstErrorEachRule;
+            
             validator.RuleFor(x => x.NullableIntList)
                 .NotNull()
                 .ForEach(x => x
@@ -59,10 +60,8 @@ public class ForEachTests : IClassFixture<CommonFixture>
         
         var action = () => parentModelValidator.Validate(_model);
 
-        var errors = action.ShouldThrowValidationErrors();
-        errors.Count.ShouldBe(2);
-        errors[0].FieldName.ShouldBe("NullableIntList[1]");
-        errors[1].FieldName.ShouldBe("NullableIntList[3]");
+        var error = action.ShouldThrowValidationError();
+        error.FieldName.ShouldBe("NullableIntList[1]");
     }
     
     [Fact]

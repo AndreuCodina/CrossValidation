@@ -53,7 +53,7 @@ public abstract class Rule<TField> : IRule<TField>
 {
     public IRule<TField> SetValidator(IValidator<ICrossValidationError> validator)
     {
-        if (this is ValidRule<TField> validRule)
+        if (this is IValidRule<TField> validRule)
         {
             if (validRule.Context.ExecuteNextValidator)
             {
@@ -74,7 +74,7 @@ public abstract class Rule<TField> : IRule<TField>
 
     public IRule<TField> WithMessage(string message)
     {
-        if (this is ValidRule<TField> validRule && validRule.Context.ExecuteNextValidator)
+        if (this is IValidRule<TField> validRule && validRule.Context.ExecuteNextValidator)
         {
             validRule.Context.SetMessage(message);
         }
@@ -84,7 +84,7 @@ public abstract class Rule<TField> : IRule<TField>
 
     public IRule<TField> WithCode(string code)
     {
-        if (this is ValidRule<TField> validRule && validRule.Context.ExecuteNextValidator)
+        if (this is IValidRule<TField> validRule && validRule.Context.ExecuteNextValidator)
         {
             validRule.Context.SetCode(code);
         }
@@ -94,7 +94,7 @@ public abstract class Rule<TField> : IRule<TField>
 
     public IRule<TField> WithError(ICrossValidationError error)
     {
-        if (this is ValidRule<TField> validRule && validRule.Context.ExecuteNextValidator)
+        if (this is IValidRule<TField> validRule && validRule.Context.ExecuteNextValidator)
         {
             validRule.Context.SetError(error);
         }
@@ -104,7 +104,7 @@ public abstract class Rule<TField> : IRule<TField>
 
     public IRule<TField> WithFieldDisplayName(string fieldDisplayName)
     {
-        if (this is ValidRule<TField> validRule && validRule.Context.ExecuteNextValidator)
+        if (this is IValidRule<TField> validRule && validRule.Context.ExecuteNextValidator)
         {
             validRule.Context.SetFieldDisplayName(fieldDisplayName);
         }
@@ -114,7 +114,7 @@ public abstract class Rule<TField> : IRule<TField>
 
     public IRule<TField> When(bool condition)
     {
-        if (this is ValidRule<TField> validRule && validRule.Context.ExecuteNextValidator)
+        if (this is IValidRule<TField> validRule && validRule.Context.ExecuteNextValidator)
         {
             validRule.Context.ExecuteNextValidator = condition;
         }
@@ -124,9 +124,9 @@ public abstract class Rule<TField> : IRule<TField>
 
     public IRule<TField> When(Func<TField, bool> condition)
     {
-        if (this is ValidRule<TField> validRule && validRule.Context.ExecuteNextValidator)
+        if (this is IValidRule<TField> validRule && validRule.Context.ExecuteNextValidator)
         {
-            validRule.Context.ExecuteNextValidator = condition(validRule.FieldValue);
+            validRule.Context.ExecuteNextValidator = condition(validRule.GetFieldValue());
         }
 
         return this;
@@ -134,9 +134,9 @@ public abstract class Rule<TField> : IRule<TField>
 
     public IRule<TField> WhenAsync(Func<TField, Task<bool>> condition)
     {
-        if (this is ValidRule<TField> validRule && validRule.Context.ExecuteNextValidator)
+        if (this is IValidRule<TField> validRule && validRule.Context.ExecuteNextValidator)
         {
-            validRule.Context.ExecuteNextValidator = condition(validRule.FieldValue)
+            validRule.Context.ExecuteNextValidator = condition(validRule.GetFieldValue())
                 .GetAwaiter()
                 .GetResult();
         }
@@ -146,9 +146,9 @@ public abstract class Rule<TField> : IRule<TField>
 
     public IRule<TField> Must(Func<TField, bool> condition)
     {
-        if (this is ValidRule<TField> validRule)
+        if (this is IValidRule<TField> validRule)
         {
-            SetValidator(new PredicateValidator(condition(validRule.FieldValue)));
+            SetValidator(new PredicateValidator(condition(validRule.GetFieldValue())));
         }
 
         return this;
@@ -156,10 +156,10 @@ public abstract class Rule<TField> : IRule<TField>
 
     public IRule<TField> MustAsync(Func<TField, Task<bool>> condition)
     {
-        if (this is ValidRule<TField> validRule)
+        if (this is IValidRule<TField> validRule)
         {
             return SetValidator(new PredicateValidator(
-                condition(validRule.FieldValue)
+                condition(validRule.GetFieldValue())
                     .GetAwaiter()
                     .GetResult()));
         }
@@ -172,9 +172,9 @@ public abstract class Rule<TField> : IRule<TField>
     public IRule<TFieldTransformed> Transform<TFieldTransformed>(
         Func<TField, TFieldTransformed> transformer)
     {
-        if (this is ValidRule<TField> validRule && validRule.Context.ExecuteNextValidator)
+        if (this is IValidRule<TField> validRule && validRule.Context.ExecuteNextValidator)
         {
-            var fieldValueTransformed = transformer(validRule.FieldValue);
+            var fieldValueTransformed = transformer(validRule.GetFieldValue());
             return ValidRule<TFieldTransformed>.CreateFromField(fieldValueTransformed, validRule.Context.FieldName,
                 validRule.Context);
         }
@@ -184,7 +184,7 @@ public abstract class Rule<TField> : IRule<TField>
 
     public IRule<TField> SetModelValidator<TChildModel>(ModelValidator<TChildModel> validator)
     {
-        if (this is ValidRule<TField> validRule)
+        if (this is IValidRule<TField> validRule)
         {
             validRule.Context.Clean(); // Ignore customizations for model validators
 
@@ -193,7 +193,7 @@ public abstract class Rule<TField> : IRule<TField>
                 var oldContext = validRule.Context;
                 var childContext = validRule.Context.CloneForChildModelValidator(validRule.FieldFullPath);
                 validator.Context = childContext;
-                var childModel = (TChildModel)(object)validRule.FieldValue!;
+                var childModel = (TChildModel)(object)validRule.GetFieldValue()!;
                 validator.Validate(childModel);
                 var newErrors = validator.Context.Errors;
                 validator.Context = oldContext;
@@ -205,7 +205,17 @@ public abstract class Rule<TField> : IRule<TField>
     }
 }
 
-public class ValidRule<TField> : Rule<TField>
+public interface IValidRule<out TField> : IRule<TField>
+{
+    public TField GetFieldValue();
+    public ValidationContext Context { get; set; }
+    public string FieldFullPath { get; set; }
+    void FinishWithError(ICrossValidationError error);
+}
+
+public class ValidRule<TField> :
+    Rule<TField>,
+    IValidRule<TField>
 {
     public TField FieldValue { get; set; }
     public ValidationContext Context { get; set; }
@@ -266,7 +276,12 @@ public class ValidRule<TField> : Rule<TField>
             .Extract(model, fieldSelector);
         return new ValidRule<TField>(fieldInformation.Value, fieldInformation.SelectionFullPath, context);
     }
-    
+
+    public TField GetFieldValue()
+    {
+        return FieldValue;
+    }
+
     public void FinishWithError(ICrossValidationError error)
     {
         FillErrorWithCustomizations(error);
@@ -277,7 +292,7 @@ public class ValidRule<TField> : Rule<TField>
     {
         Context.AddError(error);
 
-        if (Context is {ValidationMode: ValidationMode.StopValidationOnFirstError, Errors: { }})
+        if (Context is {ValidationMode: ValidationMode.StopValidationOnFirstError})
         {
             throw new CrossValidationException(Context.Errors!);
         }
@@ -363,7 +378,13 @@ public class ValidRule<TField> : Rule<TField>
     }
 }
 
-public class InvalidRule<TField> : Rule<TField>
+public interface IInvalidRule<out TField> : IRule<TField>
+{
+}
+
+public class InvalidRule<TField> :
+    Rule<TField>,
+    IInvalidRule<TField>
 {
     public override TInstance Instance<TInstance>(Func<TField, TInstance> fieldToInstance)
     {

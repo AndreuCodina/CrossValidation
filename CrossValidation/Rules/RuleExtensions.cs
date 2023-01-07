@@ -12,9 +12,9 @@ public static class RuleExtensions
     {
         var ruleToReturn = rule;
         
-        if (rule is ValidRule<TField?> validRule)
+        if (rule is IValidRule<TField?> validRule)
         {
-            ruleToReturn = validRule.SetValidator(new NotNullValidator<TField?>(validRule.FieldValue));
+            ruleToReturn = validRule.SetValidator(new NotNullValidator<TField?>(validRule.GetFieldValue()));
         }
 
         return ruleToReturn.Transform(x => x!);
@@ -26,9 +26,9 @@ public static class RuleExtensions
     {
         var ruleToReturn = rule;
         
-        if (rule is ValidRule<TField?> validRule)
+        if (rule is IValidRule<TField?> validRule)
         {
-            ruleToReturn = validRule.SetValidator(new NotNullValidator<TField?>(validRule.FieldValue));
+            ruleToReturn = validRule.SetValidator(new NotNullValidator<TField?>(validRule.GetFieldValue()));
         }
 
         return ruleToReturn.Transform(x => x!.Value);
@@ -39,15 +39,15 @@ public static class RuleExtensions
         Func<IRule<TField>, IRule<TReturnedField>> notNullRule)
         where TField : struct
     {
-        if (rule is ValidRule<TField?> validRule)
+        if (rule is IValidRule<TField?> validRule)
         {
-            var validator = new NotNullValidator<TField?>(validRule.FieldValue);
+            var validator = new NotNullValidator<TField?>(validRule.GetFieldValue());
             
             if (validator.IsValid())
             {
                 var ruleReturned = notNullRule(rule.Transform(x => x!.Value));
                 
-                if (ruleReturned is InvalidRule<TReturnedField>)
+                if (ruleReturned is IInvalidRule<TReturnedField>)
                 {
                     return new InvalidRule<TField?>();
                 }
@@ -65,9 +65,9 @@ public static class RuleExtensions
         Func<IRule<TField>, IRule<TField>> notNullRule)
         where TField : class
     {
-        if (rule is ValidRule<TField?> validRule)
+        if (rule is IValidRule<TField?> validRule)
         {
-            var validator = new NotNullValidator<TField?>(validRule.FieldValue);
+            var validator = new NotNullValidator<TField?>(validRule.GetFieldValue());
             
             if (validator.IsValid())
             {
@@ -83,9 +83,9 @@ public static class RuleExtensions
         this IRule<TField?> rule)
         where TField : class
     {
-        if (rule is ValidRule<TField?> validRule)
+        if (rule is IValidRule<TField?> validRule)
         {
-            return rule.SetValidator(new NullValidator<TField?>(validRule.FieldValue));
+            return rule.SetValidator(new NullValidator<TField?>(validRule.GetFieldValue()));
         }
 
         return rule;
@@ -95,9 +95,9 @@ public static class RuleExtensions
         this IRule<TField?> rule)
         where TField : struct
     {
-        if (rule is ValidRule<TField?> validRule)
+        if (rule is IValidRule<TField?> validRule)
         {
-            return rule.SetValidator(new NullValidator<TField?>(validRule.FieldValue));
+            return rule.SetValidator(new NullValidator<TField?>(validRule.GetFieldValue()));
         }
 
         return rule;
@@ -108,9 +108,9 @@ public static class RuleExtensions
         TField valueToCompare)
         where TField : IComparisonOperators<TField, TField, bool>
     {
-        if (rule is ValidRule<TField> validRule)
+        if (rule is IValidRule<TField> validRule)
         {
-            return rule.SetValidator(new GreaterThanValidator<TField>(validRule.FieldValue, valueToCompare));
+            return rule.SetValidator(new GreaterThanValidator<TField>(validRule.GetFieldValue(), valueToCompare));
         }
 
         return rule;
@@ -120,9 +120,9 @@ public static class RuleExtensions
         this IRule<TField> rule)
         where TField : Enum
     {
-        if (rule is ValidRule<TField> validRule)
+        if (rule is IValidRule<TField> validRule)
         {
-            return rule.SetValidator(new EnumValidator<TField>(validRule.FieldValue, typeof(TField)));
+            return rule.SetValidator(new EnumValidator<TField>(validRule.GetFieldValue(), typeof(TField)));
         }
 
         return rule;
@@ -132,9 +132,9 @@ public static class RuleExtensions
         this IRule<int> rule)
         where TEnum : Enum
     {
-        if (rule is ValidRule<int> validRule)
+        if (rule is IValidRule<int> validRule)
         {
-            return rule.SetValidator(new EnumValidator<int>(validRule.FieldValue, typeof(TEnum)));
+            return rule.SetValidator(new EnumValidator<int>(validRule.GetFieldValue(), typeof(TEnum)));
         }
 
         return rule;
@@ -144,9 +144,9 @@ public static class RuleExtensions
         this IRule<string> rule)
         where TEnum : Enum
     {
-        if (rule is ValidRule<string> validRule)
+        if (rule is IValidRule<string> validRule)
         {
-            return rule.SetValidator(new EnumValidator<string>(validRule.FieldValue, typeof(TEnum)));
+            return rule.SetValidator(new EnumValidator<string>(validRule.GetFieldValue(), typeof(TEnum)));
         }
 
         return rule;
@@ -157,9 +157,9 @@ public static class RuleExtensions
         int minimum,
         int maximum)
     {
-        if (rule is ValidRule<string> validRule)
+        if (rule is IValidRule<string> validRule)
         {
-            return rule.SetValidator(new LengthRangeValidator(validRule.FieldValue, minimum, maximum));
+            return rule.SetValidator(new LengthRangeValidator(validRule.GetFieldValue(), minimum, maximum));
         }
 
         return rule;
@@ -169,9 +169,9 @@ public static class RuleExtensions
         this IRule<string> rule,
         int minimum)
     {
-        if (rule is ValidRule<string> validRule)
+        if (rule is IValidRule<string> validRule)
         {
-            return rule.SetValidator(new MinimumLengthValidator(validRule.FieldValue, minimum));
+            return rule.SetValidator(new MinimumLengthValidator(validRule.GetFieldValue(), minimum));
         }
 
         return rule;
@@ -181,9 +181,10 @@ public static class RuleExtensions
         this IRule<IEnumerable<TInnerType>> rule,
         Func<IRule<TInnerType>, IRule<TReturnedField>> action)
     {
-        if (rule is ValidRule<IEnumerable<TInnerType>> validRule)
+        
+        if (rule is IValidRule<IEnumerable<TInnerType>> validRule)
         {
-            var fieldCollection = validRule.FieldValue;
+            var fieldCollection = validRule.GetFieldValue();
             var fieldFullPath = validRule.Context.FieldName;
             var index = 0;
 
@@ -196,8 +197,8 @@ public static class RuleExtensions
                     index,
                     validRule.Context.ParentPath);
                 var ruleReturned = action(newRule);
-
-                if (ruleReturned is InvalidRule<TReturnedField>)
+            
+                if (ruleReturned is IInvalidRule<TReturnedField>)
                 {
                     return new InvalidRule<IEnumerable<TInnerType>>();
                 }
