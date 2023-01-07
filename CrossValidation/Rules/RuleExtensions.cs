@@ -49,7 +49,7 @@ public static class RuleExtensions
                 
                 if (ruleReturned is IInvalidRule<TReturnedField>)
                 {
-                    return new InvalidRule<TField?>();
+                    return IInvalidRule<TField?>.Create();
                 }
                 
                 // TODO: Remove
@@ -190,7 +190,7 @@ public static class RuleExtensions
 
             foreach (var innerField in fieldCollection)
             {
-                var newRule = ValidRule<TInnerType>.CreateFromField(
+                var newRule = IValidRule<TInnerType>.CreateFromField(
                     innerField,
                     fieldFullPath,
                     validRule.Context,
@@ -200,7 +200,7 @@ public static class RuleExtensions
             
                 if (ruleReturned is IInvalidRule<TReturnedField>)
                 {
-                    return new InvalidRule<IEnumerable<TInnerType>>();
+                    return IInvalidRule<IEnumerable<TInnerType>>.Create();
                 }
                 
                 index++;

@@ -31,7 +31,7 @@ public abstract record ModelValidator<TModel>
     [Pure]
     public IRule<TField> RuleFor<TField>(Expression<Func<TModel, TField>> fieldSelector)
     {
-        return ValidRule<TField>.CreateFromFieldSelector(Model!, fieldSelector, Context!);
+        return IValidRule<TField>.CreateFromFieldSelector(Model!, fieldSelector, Context!);
     }
 
     public abstract void CreateRules(TModel model);

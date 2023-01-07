@@ -148,7 +148,7 @@ public abstract class Rule<TField> : IRule<TField>
     {
         if (this is IValidRule<TField> validRule)
         {
-            SetValidator(new PredicateValidator(condition(validRule.GetFieldValue())));
+            return SetValidator(new PredicateValidator(condition(validRule.GetFieldValue())));
         }
 
         return this;
@@ -175,7 +175,7 @@ public abstract class Rule<TField> : IRule<TField>
         if (this is IValidRule<TField> validRule && validRule.Context.ExecuteNextValidator)
         {
             var fieldValueTransformed = transformer(validRule.GetFieldValue());
-            return ValidRule<TFieldTransformed>.CreateFromField(fieldValueTransformed, validRule.Context.FieldName,
+            return IValidRule<TFieldTransformed>.CreateFromField(fieldValueTransformed, validRule.Context.FieldName,
                 validRule.Context);
         }
 
@@ -211,9 +211,29 @@ public interface IValidRule<out TField> : IRule<TField>
     public ValidationContext Context { get; set; }
     public string FieldFullPath { get; set; }
     void FinishWithError(ICrossValidationError error);
+    
+    public static IRule<TField> CreateFromField(
+        TField fieldValue,
+        string? fieldFullPath = null,
+        ValidationContext? context = null,
+        int? index = null,
+        string? parentPath = null)
+    {
+        return new ValidRule<TField>(fieldValue, fieldFullPath, context, index, parentPath);
+    }
+
+    public static IRule<TField> CreateFromFieldSelector<TModel>(
+        TModel model,
+        Expression<Func<TModel, TField>> fieldSelector,
+        ValidationContext? context = null)
+    {
+        var fieldInformation = FieldInformationExtractor<TField>
+            .Extract(model, fieldSelector);
+        return new ValidRule<TField>(fieldInformation.Value, fieldInformation.SelectionFullPath, context);
+    }
 }
 
-public class ValidRule<TField> :
+file class ValidRule<TField> :
     Rule<TField>,
     IValidRule<TField>
 {
@@ -221,7 +241,7 @@ public class ValidRule<TField> :
     public ValidationContext Context { get; set; }
     public string FieldFullPath { get; set; }
 
-    private ValidRule(
+    public ValidRule(
         TField fieldValue,
         string? fieldFullPath = null,
         ValidationContext? context = null,
@@ -255,26 +275,6 @@ public class ValidRule<TField> :
         }
 
         Context.FieldName = parentPathValue + fieldFullPath + indexRepresentation;
-    }
-
-    public static IRule<TField> CreateFromField(
-        TField fieldValue,
-        string? fieldFullPath = null,
-        ValidationContext? context = null,
-        int? index = null,
-        string? parentPath = null)
-    {
-        return new ValidRule<TField>(fieldValue, fieldFullPath, context, index, parentPath);
-    }
-
-    public static IRule<TField> CreateFromFieldSelector<TModel>(
-        TModel model,
-        Expression<Func<TModel, TField>> fieldSelector,
-        ValidationContext? context = null)
-    {
-        var fieldInformation = FieldInformationExtractor<TField>
-            .Extract(model, fieldSelector);
-        return new ValidRule<TField>(fieldInformation.Value, fieldInformation.SelectionFullPath, context);
     }
 
     public TField GetFieldValue()
@@ -380,9 +380,13 @@ public class ValidRule<TField> :
 
 public interface IInvalidRule<out TField> : IRule<TField>
 {
+    public static IRule<TField> Create()
+    {
+        return new InvalidRule<TField>();
+    }
 }
 
-public class InvalidRule<TField> :
+file class InvalidRule<TField> :
     Rule<TField>,
     IInvalidRule<TField>
 {
