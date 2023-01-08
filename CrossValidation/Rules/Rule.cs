@@ -19,10 +19,13 @@ public interface IRule<out TField>
         Func<TField, TFieldTransformed> transformer);
 
     [Pure]
-    IRule<TField> WithMessage(string message);
-
-    [Pure]
     IRule<TField> WithCode(string code);
+    
+    [Pure]
+    IRule<TField> WithMessage(string message);
+    
+    [Pure]
+    IRule<TField> WithDetails(string details);
 
     [Pure]
     IRule<TField> WithError(ICrossValidationError error);
@@ -72,21 +75,31 @@ public abstract class Rule<TField> : IRule<TField>
         return this;
     }
 
-    public IRule<TField> WithMessage(string message)
-    {
-        if (this is IValidRule<TField> validRule && validRule.Context.ExecuteNextValidator)
-        {
-            validRule.Context.SetMessage(message);
-        }
-
-        return this;
-    }
-
     public IRule<TField> WithCode(string code)
     {
         if (this is IValidRule<TField> validRule && validRule.Context.ExecuteNextValidator)
         {
-            validRule.Context.SetCode(code);
+            validRule.Context.Code = code;
+        }
+
+        return this;
+    }
+    
+    public IRule<TField> WithMessage(string message)
+    {
+        if (this is IValidRule<TField> validRule && validRule.Context.ExecuteNextValidator)
+        {
+            validRule.Context.Message = message;
+        }
+
+        return this;
+    }
+    
+    public IRule<TField> WithDetails(string details)
+    {
+        if (this is IValidRule<TField> validRule && validRule.Context.ExecuteNextValidator)
+        {
+            validRule.Context.Details = details;
         }
 
         return this;
@@ -107,7 +120,7 @@ public abstract class Rule<TField> : IRule<TField>
     {
         if (this is IValidRule<TField> validRule && validRule.Context.ExecuteNextValidator)
         {
-            validRule.Context.SetFieldDisplayName(fieldDisplayName);
+            validRule.Context.FieldDisplayName = fieldDisplayName;
         }
 
         return this;
@@ -298,11 +311,10 @@ file class ValidRule<TField> :
                 Context.Message = error.Message;
             }
         
-            // TODO
-            // if (error.Details is not null)
-            // {
-            //     Context.Details = error.Details;
-            // }
+            if (error.Details is not null)
+            {
+                Context.Details = error.Details;
+            }
         }
     }
 

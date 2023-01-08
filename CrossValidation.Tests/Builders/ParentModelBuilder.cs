@@ -24,6 +24,7 @@ public class ParentModelBuilder
             NullableIntList = _nullableIntList,
             StringList = new List<string> {"1", "2", "3"},
             NullableStringList = null,
+            Int = 1,
             NullableInt = _nullableInt,
             NestedEnum = NestedEnum.Red
         };

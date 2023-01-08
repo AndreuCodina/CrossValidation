@@ -504,22 +504,26 @@ public class ModelValidatorTests : IClassFixture<CommonFixture>
             .WithNullableInt(1)
             .Build();
         var expectedMessage = "Error message";
-        var expectedCode = "GreaterThan";
+        var expectedCode = nameof(CommonCrossValidationError.Predicate);
+        var expectedDetails = "Details";
         var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
         {
             validator.RuleFor(x => x.NullableInt)
                 .WithCode(new Bogus.Faker().Lorem.Word())
                 .WithMessage(new Bogus.Faker().Lorem.Word())
+                .WithDetails(new Bogus.Faker().Lorem.Word())
                 .NotNull()
                 .WithMessage(expectedMessage)
-                .GreaterThan(_model.NestedModel.Int + 1);
+                .WithDetails(expectedDetails)
+                .Must(_commonFixture.NotBeValid);
         });
 
         var action = () => parentModelValidator.Validate(_model);
 
-        var error = action.ShouldThrowValidationError<CommonCrossValidationError.GreaterThan<int>>();
+        var error = action.ShouldThrowValidationError<CommonCrossValidationError.Predicate>();
         error.Message.ShouldBe(expectedMessage);
         error.Code.ShouldBe(expectedCode);
+        error.Details.ShouldBe(expectedDetails);
     }
     
     [Fact]

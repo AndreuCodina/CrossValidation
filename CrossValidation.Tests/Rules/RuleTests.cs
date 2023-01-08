@@ -111,13 +111,13 @@ public class RuleTests : IClassFixture<CommonFixture>
     [Fact]
     public void Keep_instance_customizations()
     {
-        var getAge = () => Validate.Field(_model, x => x.NestedModel.Int)
+        var getAge = () => Validate.That(_model.Int)
             .Instance(UserAgeWithCustomization.Create);
 
         var error = getAge.ShouldThrowValidationError<CommonCrossValidationError.GreaterThan<int>>();
         error.Code.ShouldBe(nameof(ErrorResource.GreaterThan));
         error.Message.ShouldBe("Expected message");
-        // TODO: error.Details.ShouldBe("Expected details");
+        error.Details.ShouldBe("Expected details");
     }
     
     [Fact]
@@ -230,6 +230,7 @@ public class RuleTests : IClassFixture<CommonFixture>
         {
             Validate.That(value)
                 .WithMessage("Expected message")
+                .WithDetails("Expected details")
                 .GreaterThan(value + 1);
             return new UserAgeWithCustomization
             {

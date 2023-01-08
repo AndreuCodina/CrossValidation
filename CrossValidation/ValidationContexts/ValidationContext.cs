@@ -7,11 +7,12 @@ public class ValidationContext
 {
     public string? Code { get; set; }
     public string? Message { get; set; }
+    public string? Details { get; set; }
     public ICrossValidationError? Error { get; set; }
     public List<ICrossValidationError>? ErrorsCollected { get; set; }
     public string FieldName { get; set; } = "";
     public string? FieldDisplayName { get; set; }
-    public object? FieldValue { get; set; } // Lazy<TField>?
+    public object? FieldValue { get; set; }
     public bool ExecuteNextValidator { get; set; } = true;
     public string? ParentPath { get; set; }
     public ValidationMode ValidationMode { get; set; } = ValidationMode.StopValidationOnFirstError;
@@ -41,23 +42,9 @@ public class ValidationContext
     {
         Code = null;
         Message = null;
+        Details = null;
         Error = null;
         ExecuteNextValidator = true;
-    }
-
-    public void SetCode(string code)
-    {
-        Code ??= code;
-    }
-    
-    public void SetMessage(string message)
-    {
-        Message ??= message;
-    }
-
-    public void SetFieldDisplayName(string fieldDisplayName)
-    {
-        FieldDisplayName = fieldDisplayName;
     }
 
     private void AddCustomizationsToError(ICrossValidationError error)
@@ -65,7 +52,6 @@ public class ValidationContext
         error.FieldName = FieldName;
         error.FieldDisplayName = GetFieldDisplayNameToFill(error);
         error.FieldValue = FieldValue;
-        // error.Code = Code ?? error.Code;
 
         if (Code is not null)
         {
@@ -73,7 +59,11 @@ public class ValidationContext
         }
         
         error.Message = GetMessageToFill(error);
-        // TODO: error.Details = Details ?? error.Details;
+
+        if (Details is not null)
+        {
+            error.Details = Details;
+        }
     }
     
     private string? GetMessageToFill(ICrossValidationError error)
