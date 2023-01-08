@@ -5,15 +5,12 @@ namespace CrossValidation.Exceptions;
 public class CrossException : Exception
 {
     public CrossError Error { get; }
-    
-    public CrossException(CrossError error) : base(message: error.BuildMessage())
-    {
-        Error = error;
-    }
-    
-    public CrossException(CrossError error, string messageDescription) :
+    public string? MessageDescription { get; }
+
+    internal CrossException(CrossError error, string? messageDescription = null) :
         base(message: error.BuildMessage(messageDescription))
     {
         Error = error;
+        MessageDescription = messageDescription;
     }
 }

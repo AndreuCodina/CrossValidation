@@ -4,12 +4,12 @@ namespace CrossValidation.Results;
 
 public record CrossError
 {
-    public CrossException ToException()
+    public CrossException ToException(string? messageDescription = null)
     {
-        return new CrossException(this);
+        return new CrossException(this, messageDescription);
     }
-    
-    public string BuildMessage(string? messageDescription = null)
+
+    internal string BuildMessage(string? messageDescription = null)
     {
         var errorStructure = ToString();
         var message = errorStructure;
