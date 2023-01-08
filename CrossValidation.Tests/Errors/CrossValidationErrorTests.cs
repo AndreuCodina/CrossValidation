@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 using CrossValidation.Errors;
-using CrossValidation.Extensions;
+using CrossValidation.ShouldlyAssertions;
 using CrossValidation.Tests.Fixtures;
 using CrossValidation.Tests.Fixtures.Validators;
 using Shouldly;

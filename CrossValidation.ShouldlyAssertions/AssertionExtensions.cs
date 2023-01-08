@@ -3,10 +3,10 @@ using CrossValidation.Exceptions;
 using CrossValidation.Results;
 using Shouldly;
 
-namespace CrossValidation.Extensions;
+namespace CrossValidation.ShouldlyAssertions;
 
 [ShouldlyMethods]
-public static class ShouldlyAssertions
+public static class AssertionExtensions
 {
     public static CrossError ShouldThrowError(this Action actual, string? customMessage = null)
     {

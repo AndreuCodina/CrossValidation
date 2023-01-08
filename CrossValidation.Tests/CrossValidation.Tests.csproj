@@ -26,6 +26,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\CrossValidation.ShouldlyAssertions\CrossValidation.ShouldlyAssertions.csproj" />
       <ProjectReference Include="..\CrossValidation\CrossValidation.csproj" />
     </ItemGroup>
 

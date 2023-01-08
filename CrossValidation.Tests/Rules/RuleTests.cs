@@ -1,9 +1,9 @@
 ﻿using System;
 using CrossValidation.Errors;
 using CrossValidation.Exceptions;
-using CrossValidation.Extensions;
 using CrossValidation.Resources;
 using CrossValidation.Rules;
+using CrossValidation.ShouldlyAssertions;
 using CrossValidation.Tests.Builders;
 using CrossValidation.Tests.Fixtures;
 using CrossValidation.Tests.Models;
