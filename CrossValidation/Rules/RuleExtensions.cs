@@ -11,7 +11,7 @@ public static class RuleExtensions
         where TField : class
     {
         var ruleToReturn = rule;
-        
+
         if (rule is IValidRule<TField?> validRule)
         {
             ruleToReturn = validRule.SetValidator(new NotNullValidator<TField?>(validRule.GetFieldValue()));
@@ -25,7 +25,7 @@ public static class RuleExtensions
         where TField : struct
     {
         var ruleToReturn = rule;
-        
+
         if (rule is IValidRule<TField?> validRule)
         {
             ruleToReturn = validRule.SetValidator(new NotNullValidator<TField?>(validRule.GetFieldValue()));
@@ -41,38 +41,35 @@ public static class RuleExtensions
     {
         if (rule is IValidRule<TField?> validRule)
         {
-            var validator = new NotNullValidator<TField?>(validRule.GetFieldValue());
-            
-            if (validator.IsValid())
+            if (validRule.GetFieldValue() is not null)
             {
                 var ruleReturned = notNullRule(rule.Transform(x => x!.Value));
-                
+
                 if (ruleReturned is IInvalidRule<TReturnedField>)
                 {
                     return IInvalidRule<TField?>.Create();
                 }
-                
-                // TODO: Remove
-                // return ruleReturned.Transform<TField?>(x => x);
             }
         }
 
         return rule;
     }
 
-    public static IRule<TField?> WhenNotNull<TField>(
+    public static IRule<TField?> WhenNotNull<TField, TReturnedField>(
         this IRule<TField?> rule,
-        Func<IRule<TField>, IRule<TField>> notNullRule)
+        Func<IRule<TField>, IRule<TReturnedField>> notNullRule)
         where TField : class
     {
         if (rule is IValidRule<TField?> validRule)
         {
-            var validator = new NotNullValidator<TField?>(validRule.GetFieldValue());
-            
-            if (validator.IsValid())
+            if (validRule.GetFieldValue() is not null)
             {
-                var ruleToReturn = notNullRule(rule.Transform(x => x!));
-                return ruleToReturn.Transform<TField?>(x => x);
+                var ruleReturned = notNullRule(rule.Transform(x => x!));
+
+                if (ruleReturned is IInvalidRule<TReturnedField>)
+                {
+                    return IInvalidRule<TField?>.Create();
+                }
             }
         }
 
@@ -164,7 +161,7 @@ public static class RuleExtensions
 
         return rule;
     }
-    
+
     public static IRule<string> MinimumLength(
         this IRule<string> rule,
         int minimum)
@@ -181,7 +178,6 @@ public static class RuleExtensions
         this IRule<IEnumerable<TInnerType>> rule,
         Func<IRule<TInnerType>, IRule<TReturnedField>> action)
     {
-        
         if (rule is IValidRule<IEnumerable<TInnerType>> validRule)
         {
             var fieldCollection = validRule.GetFieldValue();
@@ -197,12 +193,12 @@ public static class RuleExtensions
                     index,
                     validRule.Context.ParentPath);
                 var ruleReturned = action(newRule);
-            
+
                 if (ruleReturned is IInvalidRule<TReturnedField>)
                 {
                     return IInvalidRule<IEnumerable<TInnerType>>.Create();
                 }
-                
+
                 index++;
             }
         }
