@@ -1,6 +1,5 @@
 ﻿using System.Linq.Expressions;
 using System.Reflection;
-using CrossValidation.Exceptions;
 using CrossValidation.Results;
 using static CrossValidation.Utils.FieldInformationExtractorError;
 
@@ -37,7 +36,7 @@ public class FieldInformationExtractor<TField>
         }
         else if (fieldSelector.Body is MethodCallExpression)
         {
-            throw new CrossException(new CodeCallInFieldSelector());
+            throw new CodeCallInFieldSelector().ToException();
         }
         else
         {

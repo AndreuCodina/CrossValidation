@@ -1,7 +1,14 @@
-﻿namespace CrossValidation.Results;
+﻿using CrossValidation.Exceptions;
+
+namespace CrossValidation.Results;
 
 public record CrossError
 {
+    public CrossException ToException()
+    {
+        return new CrossException(this);
+    }
+    
     public string BuildMessage(string? messageDescription = null)
     {
         var errorStructure = ToString();
