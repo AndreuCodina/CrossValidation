@@ -1,14 +1,13 @@
 ﻿using System.Collections;
 using System.Reflection;
 using CrossValidation.Results;
-using static CrossValidation.Utils.ModelNullabilityValidatorError;
 
 namespace CrossValidation.Utils;
 
-public record ModelNullabilityValidatorError
+public record ModelNullabilityValidatorError : CrossError
 {
-    public record NonNullablePropertyIsNull(string PropertyName) : CrossError;
-    public record NonNullableItemCollectionWithNullItem(string CollectionName) : CrossError;
+    public record NonNullablePropertyIsNull(string PropertyName) : ModelNullabilityValidatorError;
+    public record NonNullableItemCollectionWithNullItem(string CollectionName) : ModelNullabilityValidatorError;
 }
 
 public static class ModelNullabilityValidator
@@ -25,7 +24,7 @@ public static class ModelNullabilityValidator
     {
         var nullabilityContext = new NullabilityInfoContext();
 
-        foreach (var property in model!.GetType().GetProperties())
+        foreach (var property in model.GetType().GetProperties())
         {
             var propertyValue = property.GetValue(model);
             var nullabilityInfo = nullabilityContext.Create(property);
@@ -58,7 +57,7 @@ public static class ModelNullabilityValidator
 
         if (isNonNullableProperty)
         {
-            throw new NonNullablePropertyIsNull(property.Name).ToException();
+            throw new ModelNullabilityValidatorError.NonNullablePropertyIsNull(property.Name).ToException();
         }
     }
 
@@ -80,7 +79,7 @@ public static class ModelNullabilityValidator
                 if (item is null &&
                     nullabilityInfo.GenericTypeArguments[0].WriteState is not NullabilityState.Nullable)
                 {
-                    throw new NonNullableItemCollectionWithNullItem(property.Name).ToException();
+                    throw new ModelNullabilityValidatorError.NonNullableItemCollectionWithNullItem(property.Name).ToException();
                 }
             }
         }
