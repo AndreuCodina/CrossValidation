@@ -80,6 +80,35 @@ public class RuleTests : IClassFixture<CommonFixture>
     }
     
     [Fact]
+    public void Keep_message_before_create_instance()
+    {
+        var getAge = () => Validate.Field(_model, x => x.NestedModel.Int)
+            .WithMessage(ErrorResource.NotNull)
+            .Instance(UserAgeWithoutCustomization.Create);
+
+        var error = getAge.ShouldThrowValidationError<CommonCrossValidationError.GreaterThan<int>>();
+        error.Message.ShouldBe(ErrorResource.NotNull);
+    }
+    
+    [Fact]
+    public void Keep_message_inside_create_instance()
+    {
+        var expectedMessage = "Expected message";
+        
+        var action = () => Validate.That(_model.String)
+            .Instance(x =>
+            {
+                Validate.That(x)
+                    .WithMessage(expectedMessage)
+                    .Must(_commonFixture.NotBeValid);
+                return x;
+            });
+        
+        var error = action.ShouldThrowValidationError<CommonCrossValidationError.Predicate>();
+        error.Message.ShouldBe(expectedMessage);
+    }
+    
+    [Fact]
     public void Keep_instance_customizations()
     {
         var getAge = () => Validate.Field(_model, x => x.NestedModel.Int)
@@ -88,7 +117,7 @@ public class RuleTests : IClassFixture<CommonFixture>
         var error = getAge.ShouldThrowValidationError<CommonCrossValidationError.GreaterThan<int>>();
         error.Code.ShouldBe(nameof(ErrorResource.GreaterThan));
         error.Message.ShouldBe("Expected message");
-        error.FieldDisplayName.ShouldBe("Expected field display name");
+        // TODO: error.Details.ShouldBe("Expected details");
     }
     
     [Fact]
@@ -201,7 +230,6 @@ public class RuleTests : IClassFixture<CommonFixture>
         {
             Validate.That(value)
                 .WithMessage("Expected message")
-                .WithFieldDisplayName("Expected field display name")
                 .GreaterThan(value + 1);
             return new UserAgeWithCustomization
             {

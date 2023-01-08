@@ -1,4 +1,5 @@
 ﻿using CrossValidation.Errors;
+using CrossValidation.Resources;
 
 namespace CrossValidation.ValidationContexts;
 
@@ -6,11 +7,11 @@ public class ValidationContext
 {
     public string? Code { get; set; }
     public string? Message { get; set; }
-    public List<ICrossValidationError>? Errors { get; set; }
+    public ICrossValidationError? Error { get; set; }
+    public List<ICrossValidationError>? ErrorsCollected { get; set; }
     public string FieldName { get; set; } = "";
     public string? FieldDisplayName { get; set; }
     public object? FieldValue { get; set; } // Lazy<TField>?
-    public ICrossValidationError? Error { get; set; }
     public bool ExecuteNextValidator { get; set; } = true;
     public string? ParentPath { get; set; }
     public ValidationMode ValidationMode { get; set; } = ValidationMode.StopValidationOnFirstError;
@@ -22,7 +23,7 @@ public class ValidationContext
         {
             IsChildContext = true,
             ParentPath = parentPath,
-            Errors = Errors,
+            ErrorsCollected = ErrorsCollected,
             ValidationMode = ValidationMode
         };
         return newContext;
@@ -30,10 +31,10 @@ public class ValidationContext
 
     public void AddError(ICrossValidationError error)
     {
-        Errors ??= new List<ICrossValidationError>();
-        SetError(error);
-        Error!.AddPlaceholderValues();
-        Errors.Add(Error);
+        AddCustomizationsToError(error);
+        ErrorsCollected ??= new List<ICrossValidationError>();
+        error.AddPlaceholderValues();
+        ErrorsCollected.Add(error);
     }
 
     public void Clean()
@@ -53,41 +54,60 @@ public class ValidationContext
     {
         Message ??= message;
     }
-    
-    public void SetError(ICrossValidationError error)
-    {
-        Error = CustomizationsToError(error);
-    }
 
     public void SetFieldDisplayName(string fieldDisplayName)
     {
         FieldDisplayName = fieldDisplayName;
     }
 
-    private ICrossValidationError CustomizationsToError(ICrossValidationError error)
+    private void AddCustomizationsToError(ICrossValidationError error)
     {
-        ICrossValidationError errorToCustomize;
-        
-        if (Error is not null)
+        error.FieldName = FieldName;
+        error.FieldDisplayName = GetFieldDisplayNameToFill(error);
+        error.FieldValue = FieldValue;
+        // error.Code = Code ?? error.Code;
+
+        if (Code is not null)
         {
-            errorToCustomize = Error;
-            CombineErrors(errorToCustomize, error);
-        }
-        else
-        {
-            errorToCustomize = error;
+            error.Code = Code;
         }
         
-        errorToCustomize.Code = Code ?? error.Code;
-        errorToCustomize.Message = Message ?? error.Message;
-        return errorToCustomize;
+        error.Message = GetMessageToFill(error);
+        // TODO: error.Details = Details ?? error.Details;
     }
     
-    private void CombineErrors(ICrossValidationError originalError, ICrossValidationError errorToCombine)
+    private string? GetMessageToFill(ICrossValidationError error)
     {
-        originalError.Code ??= errorToCombine.Code;
-        originalError.Message ??= errorToCombine.Message;
-        originalError.FieldName ??= errorToCombine.FieldName;
-        originalError.FieldDisplayName ??= errorToCombine.FieldDisplayName;
+        if (Message is not null)
+        {
+            return Message;
+        }
+        
+        if (Code is not null)
+        {
+            return ErrorResource.ResourceManager.GetString(Code);
+        }
+        
+        if (error.Message is not null)
+        {
+            return error.Message;
+        }
+
+        if (error.Code is not null)
+        {
+            return ErrorResource.ResourceManager.GetString(error.Code);
+        }
+
+        return null;
+    }
+
+    private string GetFieldDisplayNameToFill(ICrossValidationError error)
+    {
+        if (FieldDisplayName is not null)
+        {
+            return FieldDisplayName;
+        }
+
+        return error.FieldName!;
     }
 }

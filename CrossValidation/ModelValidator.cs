@@ -47,9 +47,9 @@ public abstract record ModelValidator<TModel>
         Model = model;
         CreateRules(model);
 
-        if (!Context.IsChildContext && Context.Errors is not null)
+        if (!Context.IsChildContext && Context.ErrorsCollected is not null)
         {
-            throw new CrossValidationException(Context.Errors!);
+            throw new CrossValidationException(Context.ErrorsCollected!);
         }
     }
 }

@@ -3,7 +3,6 @@ using System.Diagnostics.Contracts;
 using System.Linq.Expressions;
 using CrossValidation.Errors;
 using CrossValidation.Exceptions;
-using CrossValidation.Resources;
 using CrossValidation.Utils;
 using CrossValidation.ValidationContexts;
 using CrossValidation.Validators;
@@ -61,7 +60,8 @@ public abstract class Rule<TField> : IRule<TField>
 
                 if (error is not null)
                 {
-                    validRule.FinishWithError(error);
+                    validRule.HandleError(error);
+                    validRule.Context.Clean();
                     return new InvalidRule<TField>();
                 }
             }
@@ -96,7 +96,8 @@ public abstract class Rule<TField> : IRule<TField>
     {
         if (this is IValidRule<TField> validRule && validRule.Context.ExecuteNextValidator)
         {
-            validRule.Context.SetError(error);
+            validRule.TakeErrorCustomizations(error, overrideContextCustomizations: true);
+            validRule.Context.Error = error;
         }
 
         return this;
@@ -195,9 +196,9 @@ public abstract class Rule<TField> : IRule<TField>
                 validator.Context = childContext;
                 var childModel = (TChildModel)(object)validRule.GetFieldValue()!;
                 validator.Validate(childModel);
-                var newErrors = validator.Context.Errors;
+                var newErrors = validator.Context.ErrorsCollected;
                 validator.Context = oldContext;
-                validator.Context.Errors = newErrors;
+                validator.Context.ErrorsCollected = newErrors;
             }
         }
 
@@ -210,7 +211,8 @@ public interface IValidRule<out TField> : IRule<TField>
     public TField GetFieldValue();
     public ValidationContext Context { get; set; }
     public string FieldFullPath { get; set; }
-    void FinishWithError(ICrossValidationError error);
+    void HandleError(ICrossValidationError error);
+    void TakeErrorCustomizations(ICrossValidationError error, bool overrideContextCustomizations);
     
     public static IRule<TField> CreateFromField(
         TField fieldValue,
@@ -281,86 +283,38 @@ file class ValidRule<TField> :
     {
         return FieldValue;
     }
-
-    public void FinishWithError(ICrossValidationError error)
+    
+    public void TakeErrorCustomizations(ICrossValidationError error, bool overrideContextCustomizations)
     {
-        FillErrorWithCustomizations(error);
-        HandleError(error);
+        if (overrideContextCustomizations)
+        {
+            if (error.Code is not null)
+            {
+                Context.Code = error.Code;
+            }
+
+            if (error.Message is not null)
+            {
+                Context.Message = error.Message;
+            }
+        
+            // TODO
+            // if (error.Details is not null)
+            // {
+            //     Context.Details = error.Details;
+            // }
+        }
     }
 
-    private void HandleError(ICrossValidationError error)
+    public void HandleError(ICrossValidationError error)
     {
-        Context.AddError(error);
+        var errorToAdd = Context.Error ?? error;
+        Context.AddError(errorToAdd);
 
         if (Context is {ValidationMode: ValidationMode.StopValidationOnFirstError})
         {
-            throw new CrossValidationException(Context.Errors!);
+            throw new CrossValidationException(Context.ErrorsCollected!);
         }
-    }
-
-    private ICrossValidationError FromExceptionToContext(CrossValidationException exception)
-    {
-        var error = exception.Errors[0];
-        Context.Message = GetMessageFromException(error);
-        Context.Code ??= error.Code;
-        error.PlaceholderValues!.Clear();
-        Context.Error ??= error;
-        return error;
-    }
-
-    private string? GetMessageFromException(ICrossValidationError error)
-    {
-        if (Context.Message is not null)
-        {
-            return Context.Message;
-        }
-
-        if (Context.Code is not null)
-        {
-            return ErrorResource.ResourceManager.GetString(Context.Code)!;
-        }
-        else
-        {
-            if (error.Message is not null)
-            {
-                return error.Message;
-            }
-            else if (error.Code is not null)
-            {
-                return ErrorResource.ResourceManager.GetString(error.Code)!;
-            }
-        }
-
-        return null;
-    }
-
-    private void FillErrorWithCustomizations(ICrossValidationError error)
-    {
-        error.FieldName = Context.FieldName;
-        error.FieldValue = Context.FieldValue!;
-        error.Message = GetMessageToFill(error);
-        error.FieldDisplayName = GetFieldDisplayNameToFill(error);
-    }
-
-    private string? GetMessageToFill(ICrossValidationError error)
-    {
-        return Context.Message is null && error.Message is null && error.Code is not null
-            ? ErrorResource.ResourceManager.GetString(error.Code)
-            : Context.Message;
-    }
-
-    private string GetFieldDisplayNameToFill(ICrossValidationError error)
-    {
-        if (Context.FieldDisplayName is not null)
-        {
-            return Context.FieldDisplayName;
-        }
-        else if (error.FieldDisplayName is not null and not "")
-        {
-            return error.FieldDisplayName;
-        }
-
-        return error.FieldName!;
     }
 
     public override TInstance Instance<TInstance>(Func<TField, TInstance> fieldToInstance)
@@ -371,8 +325,13 @@ file class ValidRule<TField> :
         }
         catch (CrossValidationException e)
         {
-            var error = FromExceptionToContext(e);
-            FinishWithError(error);
+            var error = e.Errors[0];
+            error.FieldName = null;
+            error.FieldDisplayName = null;
+            error.FieldValue = null;
+            error.PlaceholderValues = null;
+            TakeErrorCustomizations(error, overrideContextCustomizations: false);
+            HandleError(error);
             throw new UnreachableException();
         }
     }
