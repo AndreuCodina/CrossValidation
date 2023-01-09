@@ -11,7 +11,7 @@ public class ValidateTests
     [Fact]
     public void ValidateIs()
     {
-        var action = () => Validate.Is(false);
+        var action = () => Validate.IsTrue(false);
 
         action.ShouldThrowValidationError();
     }
@@ -27,7 +27,7 @@ public class ValidateTests
             Details = expectedDetails
         };
 
-        var action = () => Validate.Is(false, errorForValidation);
+        var action = () => Validate.IsTrue(false, errorForValidation);
 
         var error = action.ShouldThrowValidationError();
         error.Code.ShouldBe(expectedCode);
@@ -38,14 +38,14 @@ public class ValidateTests
     [Fact]
     public void ValidateIs_with_raw_customizations()
     {
-        var expectedCode = "Expected code";
         var expectedMessage = "Expected message";
+        var expectedCode = "Expected code";
         var expectedDetails = "Expected details";
 
-        var action = () => Validate.Is(
+        var action = () => Validate.IsTrue(
             false,
-            expectedCode,
             message: expectedMessage,
+            code: expectedCode,
             details: expectedDetails);
 
         var error = action.ShouldThrowValidationError();

@@ -21,29 +21,29 @@ public static class Validate
         return IValidRule<TField>.CreateFromFieldSelector(model, fieldSelector);
     }
 
-    public static void Is(bool condition, ValidationError error)
+    public static void IsTrue(bool condition, ValidationError error)
     {
-        InternalIs(condition, error: error);
+        InternalIsTrue(condition, error: error);
     }
     
-    public static void Is(
+    public static void IsTrue(
         bool condition,
         string? message = null,
         string? code = null,
         string? details = null)
     {
-        InternalIs(
+        InternalIsTrue(
             condition,
             message: message,
             code: code,
             details: details);
     }
 
-    private static void InternalIs(
+    private static void InternalIsTrue(
         bool condition,
         ValidationError? error = null,
-        string? code = null,
         string? message = null,
+        string? code = null,
         string? details = null)
     {
         if (!condition)
@@ -55,16 +55,16 @@ public static class Validate
                 rule = rule.WithError(error);
             }
             
-            if (code is not null)
-            {
-                rule = rule.WithCode(code);
-            }
-            
             if (message is not null)
             {
                 rule = rule.WithMessage(message);
             }
             
+            if (code is not null)
+            {
+                rule = rule.WithCode(code);
+            }
+
             if (details is not null)
             {
                 rule = rule.WithDetails(details);
