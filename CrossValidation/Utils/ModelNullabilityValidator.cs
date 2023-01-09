@@ -5,7 +5,7 @@ using static CrossValidation.Utils.ModelNullabilityValidatorError;
 
 namespace CrossValidation.Utils;
 
-public record ModelNullabilityValidatorError : CrossError
+public record ModelNullabilityValidatorError : Error
 {
     public record NonNullablePropertyIsNullError(string PropertyName) : ModelNullabilityValidatorError;
     public record NonNullableItemCollectionWithNullItemError(string CollectionName) : ModelNullabilityValidatorError;

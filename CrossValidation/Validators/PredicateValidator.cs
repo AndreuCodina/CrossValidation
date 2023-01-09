@@ -9,8 +9,8 @@ public record PredicateValidator(bool Condition) : Validator
         return Condition;
     }
 
-    public override CrossValidationError CreateError()
+    public override ValidationError CreateError()
     {
-        return new CommonCrossValidationError.Predicate();
+        return new CommonValidationError.Predicate();
     }
 }

@@ -48,7 +48,7 @@ public class RuleTests : IClassFixture<CommonFixture>
         var action = () => IValidRule<NestedModel>.CreateFromField( _model.NestedModel)
             .Must(_commonFixture.NotBeValid);
 
-        action.ShouldThrowValidationError<CommonCrossValidationError.Predicate>();
+        action.ShouldThrowValidationError<CommonValidationError.Predicate>();
     }
     
     [Fact]
@@ -74,7 +74,7 @@ public class RuleTests : IClassFixture<CommonFixture>
             .WithCode(nameof(ErrorResource.NotNull))
             .Instance(UserAgeWithoutCustomization.Create);
 
-        var error = getAge.ShouldThrowValidationError<CommonCrossValidationError.GreaterThan<int>>();
+        var error = getAge.ShouldThrowValidationError<CommonValidationError.GreaterThan<int>>();
         error.Code.ShouldBe(nameof(ErrorResource.NotNull));
         error.Message.ShouldBe(ErrorResource.NotNull);
     }
@@ -86,7 +86,7 @@ public class RuleTests : IClassFixture<CommonFixture>
             .WithMessage(ErrorResource.NotNull)
             .Instance(UserAgeWithoutCustomization.Create);
 
-        var error = getAge.ShouldThrowValidationError<CommonCrossValidationError.GreaterThan<int>>();
+        var error = getAge.ShouldThrowValidationError<CommonValidationError.GreaterThan<int>>();
         error.Message.ShouldBe(ErrorResource.NotNull);
     }
     
@@ -104,7 +104,7 @@ public class RuleTests : IClassFixture<CommonFixture>
                 return x;
             });
         
-        var error = action.ShouldThrowValidationError<CommonCrossValidationError.Predicate>();
+        var error = action.ShouldThrowValidationError<CommonValidationError.Predicate>();
         error.Message.ShouldBe(expectedMessage);
     }
     
@@ -114,7 +114,7 @@ public class RuleTests : IClassFixture<CommonFixture>
         var getAge = () => Validate.That(_model.Int)
             .Instance(UserAgeWithCustomization.Create);
 
-        var error = getAge.ShouldThrowValidationError<CommonCrossValidationError.GreaterThan<int>>();
+        var error = getAge.ShouldThrowValidationError<CommonValidationError.GreaterThan<int>>();
         error.Code.ShouldBe(nameof(ErrorResource.GreaterThan));
         error.Message.ShouldBe("Expected message");
         error.Details.ShouldBe("Expected details");
@@ -206,7 +206,7 @@ public class RuleTests : IClassFixture<CommonFixture>
         action.ShouldThrow<CrossValidationException>();
     }
 
-    private record CustomErrorWithPlaceholderValue(int Value) : CrossValidationError;
+    private record CustomErrorWithPlaceholderValue(int Value) : ValidationError;
 
     private record UserAgeWithoutCustomization
     {

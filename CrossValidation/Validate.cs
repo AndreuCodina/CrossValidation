@@ -26,7 +26,7 @@ public static class Validate
         InternalIs(condition);
     }
 
-    public static void Is(bool condition, CrossValidationError error)
+    public static void Is(bool condition, ValidationError error)
     {
         InternalIs(condition, error: error);
     }
@@ -46,7 +46,7 @@ public static class Validate
 
     private static void InternalIs(
         bool condition,
-        CrossValidationError? error = null,
+        ValidationError? error = null,
         string? code = null,
         string? message = null,
         string? details = null)

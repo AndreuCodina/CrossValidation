@@ -2,7 +2,7 @@
 
 namespace CrossValidation.Results;
 
-public record CrossError
+public record Error
 {
     public CrossException ToException(string? messageDescription = null)
     {

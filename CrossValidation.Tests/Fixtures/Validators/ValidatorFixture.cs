@@ -5,7 +5,7 @@ namespace CrossValidation.Tests.Fixtures.Validators;
 
 public class ValidatorFixture
 {
-    public bool AllFieldsAreAddedAsPlaceholders(ICrossValidationError error)
+    public bool AllFieldsAreAddedAsPlaceholders(IValidationError error)
     {
         var placeholderNamesAdded = error.PlaceholderValues!
             .Select(x => x.Key)
@@ -13,13 +13,13 @@ public class ValidatorFixture
         var areSpecificErrorFieldsAddedAsPlaceholders = error.GetFieldNames()
             .All(fieldName => placeholderNamesAdded.Contains(fieldName));
         var errorContainsCommonPlaceholders =
-            ErrorContainsPlaceholder(error, nameof(CrossValidationError.FieldName))
-            && ErrorContainsPlaceholder(error, nameof(CrossValidationError.FieldDisplayName))
-            && ErrorContainsPlaceholder(error, nameof(CrossValidationError.FieldValue));
+            ErrorContainsPlaceholder(error, nameof(ValidationError.FieldName))
+            && ErrorContainsPlaceholder(error, nameof(ValidationError.FieldDisplayName))
+            && ErrorContainsPlaceholder(error, nameof(ValidationError.FieldValue));
         return areSpecificErrorFieldsAddedAsPlaceholders && errorContainsCommonPlaceholders;
     }
 
-    private bool ErrorContainsPlaceholder(ICrossValidationError error, string placeholderName)
+    private bool ErrorContainsPlaceholder(IValidationError error, string placeholderName)
     {
         return error.PlaceholderValues!
             .Select(x => x.Key)

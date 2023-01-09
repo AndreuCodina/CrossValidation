@@ -27,11 +27,11 @@ public class FieldInformationExtractorTests
 
         var methodCall = () => FieldInformationExtractor<int>
             .Extract(_model, x => x.NullableIntList!.First());
-        methodCall.ShouldThrowError<FieldInformationExtractorError.CodeCallInFieldSelector>();
+        methodCall.ShouldThrowError<FieldInformationExtractorError.CodeCallInFieldSelectorError>();
 
         var arrayIndexAccess = () => FieldInformationExtractor<int>
             .Extract(_model, x => x.NullableIntList![0]);
-        arrayIndexAccess.ShouldThrowError<FieldInformationExtractorError.CodeCallInFieldSelector>();
+        arrayIndexAccess.ShouldThrowError<FieldInformationExtractorError.CodeCallInFieldSelectorError>();
     }
 
     [Fact]

@@ -2,7 +2,7 @@
 
 namespace CrossValidation.Results;
 
-public interface ILengthError : ICrossValidationError
+public interface ILengthError : IValidationError
 {
     public int TotalLength { get; }
 }

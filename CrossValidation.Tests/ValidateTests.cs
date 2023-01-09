@@ -21,7 +21,7 @@ public class ValidateTests
     {
         var expectedCode = nameof(ErrorResource.NotNull);
         var expectedDetails = "Details";
-        var errorForValidation = new CrossValidationError
+        var errorForValidation = new ValidationError
         {
             Code = expectedCode,
             Details = expectedDetails

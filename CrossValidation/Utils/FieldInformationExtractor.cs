@@ -5,9 +5,9 @@ using static CrossValidation.Utils.FieldInformationExtractorError;
 
 namespace CrossValidation.Utils;
 
-public record FieldInformationExtractorError
+public record FieldInformationExtractorError : Error
 {
-    public record CodeCallInFieldSelector : CrossError;
+    public record CodeCallInFieldSelectorError : FieldInformationExtractorError;
 }
 
 public class FieldInformationExtractor<TField>
@@ -36,7 +36,7 @@ public class FieldInformationExtractor<TField>
         }
         else if (fieldSelector.Body is MethodCallExpression)
         {
-            throw new CodeCallInFieldSelector().ToException();
+            throw new CodeCallInFieldSelectorError().ToException();
         }
         else
         {

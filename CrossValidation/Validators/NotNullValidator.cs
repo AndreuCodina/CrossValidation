@@ -9,8 +9,8 @@ public record NotNullValidator<TField>(TField? FieldValue) : Validator
         return FieldValue is not null;
     }
 
-    public override CrossValidationError CreateError()
+    public override ValidationError CreateError()
     {
-        return new CommonCrossValidationError.NotNull();
+        return new CommonValidationError.NotNull();
     }
 }

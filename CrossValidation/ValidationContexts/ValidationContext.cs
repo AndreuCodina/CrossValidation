@@ -8,8 +8,8 @@ public class ValidationContext
     public string? Code { get; set; }
     public string? Message { get; set; }
     public string? Details { get; set; }
-    public ICrossValidationError? Error { get; set; }
-    public List<ICrossValidationError>? ErrorsCollected { get; set; }
+    public IValidationError? Error { get; set; }
+    public List<IValidationError>? ErrorsCollected { get; set; }
     public string FieldName { get; set; } = "";
     public string? FieldDisplayName { get; set; }
     public object? FieldValue { get; set; }
@@ -30,10 +30,10 @@ public class ValidationContext
         return newContext;
     }
 
-    public void AddError(ICrossValidationError error)
+    public void AddError(IValidationError error)
     {
         AddCustomizationsToError(error);
-        ErrorsCollected ??= new List<ICrossValidationError>();
+        ErrorsCollected ??= new List<IValidationError>();
         error.AddPlaceholderValues();
         ErrorsCollected.Add(error);
     }
@@ -47,7 +47,7 @@ public class ValidationContext
         ExecuteNextValidator = true;
     }
 
-    private void AddCustomizationsToError(ICrossValidationError error)
+    private void AddCustomizationsToError(IValidationError error)
     {
         error.FieldName = FieldName;
         error.FieldDisplayName = GetFieldDisplayNameToFill(error);
@@ -66,7 +66,7 @@ public class ValidationContext
         }
     }
     
-    private string? GetMessageToFill(ICrossValidationError error)
+    private string? GetMessageToFill(IValidationError error)
     {
         if (Message is not null)
         {
@@ -91,7 +91,7 @@ public class ValidationContext
         return null;
     }
 
-    private string GetFieldDisplayNameToFill(ICrossValidationError error)
+    private string GetFieldDisplayNameToFill(IValidationError error)
     {
         if (FieldDisplayName is not null)
         {

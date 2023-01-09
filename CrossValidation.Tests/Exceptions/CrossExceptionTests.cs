@@ -36,7 +36,7 @@ public class CrossExceptionTests
         exception.Message.ShouldContain(expectedMessageDescription);
     }
 
-    private record TestError : CrossError
+    private record TestError : Error
     {
         public record ErrorWithoutProperties : TestError;
         public record ErrorWithProperties(string Property1, int? Property2) : TestError;

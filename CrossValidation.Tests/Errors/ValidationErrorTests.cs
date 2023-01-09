@@ -8,14 +8,14 @@ using Xunit;
 
 namespace CrossValidation.Tests.Errors;
 
-public class CrossValidationErrorTests :
+public class ValidationErrorTests :
     IClassFixture<CommonFixture>,
     IClassFixture<ValidatorFixture>
 {
     private readonly CommonFixture _commonFixture;
     private readonly ValidatorFixture _validatorFixture;
 
-    public CrossValidationErrorTests(CommonFixture commonFixture, ValidatorFixture validatorFixture)
+    public ValidationErrorTests(CommonFixture commonFixture, ValidatorFixture validatorFixture)
     {
         _commonFixture = commonFixture;
         _validatorFixture = validatorFixture;
@@ -54,12 +54,12 @@ public class CrossValidationErrorTests :
 
         var error = action.ShouldThrowValidationError<ErrorWithNullFields>();
 
-        error.PlaceholderValues![nameof(CrossValidationError.FieldName)].ShouldBe("");
+        error.PlaceholderValues![nameof(ValidationError.FieldName)].ShouldBe("");
         error.PlaceholderValues![nameof(ErrorWithNullFields.Name)].ShouldBe("");
         error.PlaceholderValues![nameof(ErrorWithNullFields.Age)].ShouldBe("");
     }
     
-    private bool AllFieldsAreAddedAsPlaceholders(ICrossValidationError error)
+    private bool AllFieldsAreAddedAsPlaceholders(IValidationError error)
     {
         var placeholderNamesAdded = error.PlaceholderValues!
             .Select(x => x.Key)
@@ -67,20 +67,20 @@ public class CrossValidationErrorTests :
         var areSpecificErrorFieldsAddedAsPlaceholders = error.GetFieldNames()
             .All(fieldName => placeholderNamesAdded.Contains(fieldName));
         var errorContainsCommonPlaceholders =
-            ErrorContainsPlaceholder(error, nameof(CrossValidationError.FieldName))
-            && ErrorContainsPlaceholder(error, nameof(CrossValidationError.FieldDisplayName))
-            && ErrorContainsPlaceholder(error, nameof(CrossValidationError.FieldValue));
+            ErrorContainsPlaceholder(error, nameof(ValidationError.FieldName))
+            && ErrorContainsPlaceholder(error, nameof(ValidationError.FieldDisplayName))
+            && ErrorContainsPlaceholder(error, nameof(ValidationError.FieldValue));
         return areSpecificErrorFieldsAddedAsPlaceholders && errorContainsCommonPlaceholders;
     }
 
-    private bool ErrorContainsPlaceholder(ICrossValidationError error, string placeholderName)
+    private bool ErrorContainsPlaceholder(IValidationError error, string placeholderName)
     {
         return error.PlaceholderValues!
             .Select(x => x.Key)
             .Contains(placeholderName);
     }
 
-    private record ErrorWithAllFieldsAddedAsPlaceholders(string Name, int Age) : CrossValidationError
+    private record ErrorWithAllFieldsAddedAsPlaceholders(string Name, int Age) : ValidationError
     {
         public override void AddPlaceholderValues()
         {
@@ -90,7 +90,7 @@ public class CrossValidationErrorTests :
         }
     }
     
-    private record ErrorWithNotAllFieldsAddedAsPlaceholders(string Name, int Age) : CrossValidationError
+    private record ErrorWithNotAllFieldsAddedAsPlaceholders(string Name, int Age) : ValidationError
     {
         public override void AddPlaceholderValues()
         {
@@ -99,7 +99,7 @@ public class CrossValidationErrorTests :
         }
     }
     
-    private record ErrorWithNullFields(string? Name, int? Age) : CrossValidationError
+    private record ErrorWithNullFields(string? Name, int? Age) : ValidationError
     {
         public override void AddPlaceholderValues()
         {

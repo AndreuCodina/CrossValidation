@@ -12,7 +12,7 @@ namespace CrossValidation.Rules;
 public interface IRule<out TField>
 {
     [Pure]
-    IRule<TField> SetValidator(IValidator<ICrossValidationError> validator);
+    IRule<TField> SetValidator(IValidator<IValidationError> validator);
 
     [Pure]
     IRule<TFieldTransformed> Transform<TFieldTransformed>(
@@ -28,7 +28,7 @@ public interface IRule<out TField>
     IRule<TField> WithDetails(string details);
 
     [Pure]
-    IRule<TField> WithError(ICrossValidationError error);
+    IRule<TField> WithError(IValidationError error);
 
     [Pure]
     IRule<TField> WithFieldDisplayName(string fieldDisplayName);
@@ -53,7 +53,7 @@ public interface IRule<out TField>
 
 public abstract class Rule<TField> : IRule<TField>
 {
-    public IRule<TField> SetValidator(IValidator<ICrossValidationError> validator)
+    public IRule<TField> SetValidator(IValidator<IValidationError> validator)
     {
         if (this is IValidRule<TField> validRule)
         {
@@ -105,7 +105,7 @@ public abstract class Rule<TField> : IRule<TField>
         return this;
     }
 
-    public IRule<TField> WithError(ICrossValidationError error)
+    public IRule<TField> WithError(IValidationError error)
     {
         if (this is IValidRule<TField> validRule && validRule.Context.ExecuteNextValidator)
         {
@@ -224,8 +224,8 @@ public interface IValidRule<out TField> : IRule<TField>
     public TField GetFieldValue();
     public ValidationContext Context { get; set; }
     public string FieldFullPath { get; set; }
-    void HandleError(ICrossValidationError error);
-    void TakeErrorCustomizations(ICrossValidationError error, bool overrideContextCustomizations);
+    void HandleError(IValidationError error);
+    void TakeErrorCustomizations(IValidationError error, bool overrideContextCustomizations);
     
     public static IRule<TField> CreateFromField(
         TField fieldValue,
@@ -297,7 +297,7 @@ file class ValidRule<TField> :
         return FieldValue;
     }
     
-    public void TakeErrorCustomizations(ICrossValidationError error, bool overrideContextCustomizations)
+    public void TakeErrorCustomizations(IValidationError error, bool overrideContextCustomizations)
     {
         if (overrideContextCustomizations)
         {
@@ -318,7 +318,7 @@ file class ValidRule<TField> :
         }
     }
 
-    public void HandleError(ICrossValidationError error)
+    public void HandleError(IValidationError error)
     {
         var errorToAdd = Context.Error ?? error;
         Context.AddError(errorToAdd);

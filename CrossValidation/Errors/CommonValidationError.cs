@@ -4,14 +4,14 @@ using CrossValidation.Results;
 
 namespace CrossValidation;
 
-public abstract record CommonCrossValidationError(string Code) : ValidationErrorByCode(Code)
+public abstract record CommonValidationError(string Code) : ValidationErrorByCode(Code)
 {
-    public record NotNull() : CommonCrossValidationError(nameof(ErrorResource.NotNull));
+    public record NotNull() : CommonValidationError(nameof(ErrorResource.NotNull));
     
-    public record Null() : CommonCrossValidationError(nameof(ErrorResource.Null));
+    public record Null() : CommonValidationError(nameof(ErrorResource.Null));
 
     public record GreaterThan<TField>(TField ComparisonValue) :
-        CommonCrossValidationError(nameof(ErrorResource.GreaterThan))
+        CommonValidationError(nameof(ErrorResource.GreaterThan))
     {
         public override void AddPlaceholderValues()
         {
@@ -20,10 +20,10 @@ public abstract record CommonCrossValidationError(string Code) : ValidationError
         }
     }
     
-    public record Enum() : CommonCrossValidationError(nameof(ErrorResource.Enum));
+    public record Enum() : CommonValidationError(nameof(ErrorResource.Enum));
     
     public record LengthRange(int Minimum, int Maximum, int TotalLength) :
-        CommonCrossValidationError(nameof(ErrorResource.LengthRange)),
+        CommonValidationError(nameof(ErrorResource.LengthRange)),
         ILengthError
     {
         public override void AddPlaceholderValues()
@@ -36,7 +36,7 @@ public abstract record CommonCrossValidationError(string Code) : ValidationError
     }
     
     public record MinimumLength(int Minimum, int TotalLength) :
-        CommonCrossValidationError(nameof(ErrorResource.MinimumLength)),
+        CommonValidationError(nameof(ErrorResource.MinimumLength)),
         ILengthError
     {
         public override void AddPlaceholderValues()
@@ -47,5 +47,5 @@ public abstract record CommonCrossValidationError(string Code) : ValidationError
         }
     }
     
-    public record Predicate() : CommonCrossValidationError(nameof(ErrorResource.Predicate));
+    public record Predicate() : CommonValidationError(nameof(ErrorResource.Predicate));
 }
