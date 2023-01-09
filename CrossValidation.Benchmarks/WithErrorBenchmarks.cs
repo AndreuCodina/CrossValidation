@@ -1,13 +1,10 @@
 ﻿using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Order;
 using CrossValidation.Errors;
 using CrossValidation.Rules;
 
 namespace CrossValidation.Benchmarks;
 
 [MemoryDiagnoser]
-[HtmlExporter]
-[Orderer(SummaryOrderPolicy.FastestToSlowest)]
 [RankColumn]
 public class WithErrorBenchmarks
 {

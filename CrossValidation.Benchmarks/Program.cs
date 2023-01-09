@@ -2,11 +2,10 @@
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
-using BenchmarkDotNet.Validators;
 
-var configuration = new ManualConfig()
-    .WithOptions(ConfigOptions.DisableOptimizationsValidator)
-    .AddValidator(JitOptimizationsValidator.DontFailOnError)
+var configuration = ManualConfig.Create(DefaultConfig.Instance)
+    .WithOptions(ConfigOptions.JoinSummary)
     .AddLogger(ConsoleLogger.Default)
+    .WithOptions(ConfigOptions.DisableLogFile)
     .AddColumnProvider(DefaultColumnProviders.Instance);
 BenchmarkRunner.Run(typeof(Program).Assembly, configuration);

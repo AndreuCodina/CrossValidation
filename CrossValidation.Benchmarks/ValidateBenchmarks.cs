@@ -1,11 +1,8 @@
 ﻿using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Order;
 
 namespace CrossValidation.Benchmarks;
 
 [MemoryDiagnoser]
-[HtmlExporter]
-[Orderer(SummaryOrderPolicy.FastestToSlowest)]
 [RankColumn]
 public class ValidateBenchmarks
 {
