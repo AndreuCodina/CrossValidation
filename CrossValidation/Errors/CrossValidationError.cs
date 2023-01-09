@@ -121,5 +121,5 @@ public record CrossValidationError : ICrossValidationError
     }
 }
 
-public record ResXValidationError(string Code) :
+public record ValidationErrorByCode(string Code) :
     CrossValidationError(Code: Code);
