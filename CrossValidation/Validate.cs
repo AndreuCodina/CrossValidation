@@ -21,11 +21,6 @@ public static class Validate
         return IValidRule<TField>.CreateFromFieldSelector(model, fieldSelector);
     }
 
-    public static void Is(bool condition)
-    {
-        InternalIs(condition);
-    }
-
     public static void Is(bool condition, ValidationError error)
     {
         InternalIs(condition, error: error);
@@ -33,14 +28,14 @@ public static class Validate
     
     public static void Is(
         bool condition,
-        string code,
         string? message = null,
+        string? code = null,
         string? details = null)
     {
         InternalIs(
             condition,
-            code: code,
             message: message,
+            code: code,
             details: details);
     }
 
