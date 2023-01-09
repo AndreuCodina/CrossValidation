@@ -4,7 +4,7 @@ using CrossValidation.Results;
 
 namespace CrossValidation;
 
-public abstract record CommonValidationError(string Code) : ValidationErrorByCode(Code)
+public record CommonValidationError(string Code) : ValidationErrorByCode(Code)
 {
     public record NotNull() : CommonValidationError(nameof(ErrorResource.NotNull));
     
