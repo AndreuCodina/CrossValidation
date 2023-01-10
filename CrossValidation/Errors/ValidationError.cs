@@ -20,7 +20,7 @@ public record ValidationError : IValidationError
 {
     private const string DefaultPlaceholderValue = "";
     private static readonly Regex PlaceholderRegex = new Regex("{([^{}:]+)}", RegexOptions.Compiled);
-    
+
     public string? FieldName { get; set; }
     public string? FieldDisplayName { get; set; }
     public object? FieldValue { get; set; }
@@ -53,10 +53,10 @@ public record ValidationError : IValidationError
         {
             throw new InvalidOperationException("Cannot add a placeholder with the same name twice");
         }
-        
+
         PlaceholderValues.Add(name!, value ?? DefaultPlaceholderValue);
     }
-    
+
     public virtual void AddPlaceholderValues()
     {
         AddCommonPlaceholderValues();
@@ -108,7 +108,7 @@ public record ValidationError : IValidationError
         {
             return;
         }
-        
+
         Message = PlaceholderRegex.Replace(Message, evaluator =>
         {
             var key = evaluator.Groups[1].Value;
@@ -121,5 +121,8 @@ public record ValidationError : IValidationError
     }
 }
 
-public record ValidationErrorByCode(string Code) :
+public record ValidationErrorCode(string Code) :
     ValidationError(Code: Code);
+
+public record ValidationErrorMessage(string Message) :
+    ValidationError(Message: Message);

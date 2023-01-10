@@ -2,7 +2,7 @@
 
 namespace CrossValidation.Errors;
 
-public record CommonValidationError(string Code) : ValidationErrorByCode(Code)
+public record CommonValidationError(string Code) : ValidationErrorCode(Code)
 {
     public record NotNull() : CommonValidationError(nameof(ErrorResource.NotNull));
     
