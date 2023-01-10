@@ -9,15 +9,15 @@ namespace CrossValidation.Tests;
 public class ValidateTests
 {
     [Fact]
-    public void ValidateIs()
+    public void ValidateMust()
     {
-        var action = () => Validate.IsTrue(false);
+        var action = () => Validate.Must(false);
 
         action.ShouldThrowValidationError();
     }
 
     [Fact]
-    public void ValidateIs_with_error()
+    public void ValidateMust_with_error()
     {
         var expectedCode = nameof(ErrorResource.NotNull);
         var expectedDetails = "Details";
@@ -27,7 +27,7 @@ public class ValidateTests
             Details = expectedDetails
         };
 
-        var action = () => Validate.IsTrue(false, errorForValidation);
+        var action = () => Validate.Must(false, errorForValidation);
 
         var error = action.ShouldThrowValidationError();
         error.Code.ShouldBe(expectedCode);
@@ -36,13 +36,13 @@ public class ValidateTests
     }
 
     [Fact]
-    public void ValidateIs_with_raw_customizations()
+    public void ValidateMust_with_raw_customizations()
     {
         var expectedMessage = "Expected message";
         var expectedCode = "Expected code";
         var expectedDetails = "Expected details";
 
-        var action = () => Validate.IsTrue(
+        var action = () => Validate.Must(
             false,
             message: expectedMessage,
             code: expectedCode,
