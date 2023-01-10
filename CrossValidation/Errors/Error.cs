@@ -1,6 +1,6 @@
 ﻿using CrossValidation.Exceptions;
 
-namespace CrossValidation.Results;
+namespace CrossValidation.Errors;
 
 public record Error
 {

@@ -1,6 +1,5 @@
 ﻿using CrossValidation.Errors;
 using CrossValidation.Exceptions;
-using CrossValidation.Results;
 using Shouldly;
 
 namespace CrossValidation.ShouldlyAssertions;

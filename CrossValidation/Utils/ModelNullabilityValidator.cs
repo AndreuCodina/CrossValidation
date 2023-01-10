@@ -1,6 +1,6 @@
 ﻿using System.Collections;
 using System.Reflection;
-using CrossValidation.Results;
+using CrossValidation.Errors;
 using static CrossValidation.Utils.ModelNullabilityValidatorError;
 
 namespace CrossValidation.Utils;

@@ -46,6 +46,24 @@ public class ValidateBenchmarks
         {
         }
     }
+    
+    [Benchmark]
+    public void ModelValidator_with_error_accumulation()
+    {
+        new ModelValidatorErrorAccumulationSuccess().Validate(_model);
+    }
+    
+    [Benchmark]
+    public void ModelValidator_with_error_accumulation_fails()
+    {
+        try
+        {
+            new ModelValidatorErrorAccumulationFail().Validate(_model);
+        }
+        catch (Exception)
+        {
+        }
+    }
 
     private record Model(int Value);
 
@@ -64,6 +82,28 @@ public class ValidateBenchmarks
         {
             RuleFor(x => x.Value)
                 .Must(_ => false);
+        }
+    }
+    
+    private record ModelValidatorErrorAccumulationSuccess : ModelValidator<Model>
+    {
+        public override void CreateRules(Model model)
+        {
+            RuleFor(x => x.Value)
+                .Must(_ => true)
+                .Transform(x => x.ToString())
+                .Must(_ => true);
+        }
+    }
+    
+    private record ModelValidatorErrorAccumulationFail : ModelValidator<Model>
+    {
+        public override void CreateRules(Model model)
+        {
+            RuleFor(x => x.Value)
+                .Must(_ => false)
+                .Transform(x => x.ToString())
+                .Must(_ => true);
         }
     }
 }

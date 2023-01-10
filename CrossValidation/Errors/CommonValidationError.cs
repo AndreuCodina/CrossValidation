@@ -1,8 +1,6 @@
-﻿using CrossValidation.Errors;
-using CrossValidation.Resources;
-using CrossValidation.Results;
+﻿using CrossValidation.Resources;
 
-namespace CrossValidation;
+namespace CrossValidation.Errors;
 
 public record CommonValidationError(string Code) : ValidationErrorByCode(Code)
 {

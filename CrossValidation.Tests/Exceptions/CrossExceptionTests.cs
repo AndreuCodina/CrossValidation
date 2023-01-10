@@ -1,4 +1,4 @@
-﻿using CrossValidation.Results;
+﻿using CrossValidation.Errors;
 using Shouldly;
 using Xunit;
 

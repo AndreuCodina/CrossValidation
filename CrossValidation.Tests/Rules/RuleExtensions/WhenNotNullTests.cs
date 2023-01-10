@@ -1,4 +1,5 @@
-﻿using CrossValidation.Rules;
+﻿using CrossValidation.Errors;
+using CrossValidation.Rules;
 using CrossValidation.ShouldlyAssertions;
 using CrossValidation.Tests.Builders;
 using CrossValidation.Tests.Fixtures;

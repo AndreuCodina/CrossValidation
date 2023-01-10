@@ -1,6 +1,4 @@
-﻿using CrossValidation.Errors;
-
-namespace CrossValidation.Results;
+﻿namespace CrossValidation.Errors;
 
 public interface ILengthError : IValidationError
 {

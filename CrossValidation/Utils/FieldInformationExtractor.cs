@@ -1,6 +1,6 @@
 ﻿using System.Linq.Expressions;
 using System.Reflection;
-using CrossValidation.Results;
+using CrossValidation.Errors;
 using static CrossValidation.Utils.FieldInformationExtractorError;
 
 namespace CrossValidation.Utils;
