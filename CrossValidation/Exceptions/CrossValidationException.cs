@@ -2,6 +2,9 @@
 
 namespace CrossValidation.Exceptions;
 
+/// <summary>
+/// Contains data to show to the user
+/// </summary>
 public class CrossValidationException : Exception
 {
     public List<IValidationError> Errors { get; }

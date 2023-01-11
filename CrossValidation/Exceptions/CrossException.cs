@@ -2,6 +2,9 @@
 
 namespace CrossValidation.Exceptions;
 
+/// <summary>
+/// Common exception for non-exceptional situations
+/// </summary>
 public class CrossException : Exception
 {
     public Error Error { get; }
