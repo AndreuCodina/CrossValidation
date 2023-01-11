@@ -13,4 +13,8 @@ public class CrossValidationException : Exception
     {
         Errors = errors;
     }
+
+#if !DEBUG
+    public override string? StackTrace { get; } = null;
+#endif
 }

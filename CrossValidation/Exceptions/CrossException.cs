@@ -16,4 +16,8 @@ public class CrossException : Exception
         Error = error;
         MessageDescription = messageDescription;
     }
+    
+#if !DEBUG
+    public override string? StackTrace { get; } = null;
+#endif
 }
