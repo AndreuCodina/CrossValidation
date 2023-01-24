@@ -39,16 +39,18 @@ public static class RuleExtensions
         Func<IRule<TField>, IRule<TReturnedField>> notNullRule)
         where TField : struct
     {
-        if (rule is IValidRule<TField?> validRule)
+        if (rule is not IValidRule<TField?> validRule)
         {
-            if (validRule.GetFieldValue() is not null)
-            {
-                var ruleReturned = notNullRule(rule.Transform(x => x!.Value));
+            return rule;
+        }
 
-                if (ruleReturned is IInvalidRule<TReturnedField>)
-                {
-                    return IInvalidRule<TField?>.Create();
-                }
+        if (validRule.GetFieldValue() is not null)
+        {
+            var ruleReturned = notNullRule(rule.Transform(x => x!.Value));
+
+            if (ruleReturned is IInvalidRule<TReturnedField>)
+            {
+                return IInvalidRule<TField?>.Create();
             }
         }
 
@@ -60,16 +62,18 @@ public static class RuleExtensions
         Func<IRule<TField>, IRule<TReturnedField>> notNullRule)
         where TField : class
     {
-        if (rule is IValidRule<TField?> validRule)
+        if (rule is not IValidRule<TField?> validRule)
         {
-            if (validRule.GetFieldValue() is not null)
-            {
-                var ruleReturned = notNullRule(rule.Transform(x => x!));
+            return rule;
+        }
 
-                if (ruleReturned is IInvalidRule<TReturnedField>)
-                {
-                    return IInvalidRule<TField?>.Create();
-                }
+        if (validRule.GetFieldValue() is not null)
+        {
+            var ruleReturned = notNullRule(rule.Transform(x => x!));
+
+            if (ruleReturned is IInvalidRule<TReturnedField>)
+            {
+                return IInvalidRule<TField?>.Create();
             }
         }
 
