@@ -103,6 +103,11 @@ file class ValidRule<TField> :
             {
                 Context.Details = error.Details;
             }
+            
+            if (error.HttpStatusCode is not null)
+            {
+                Context.HttpStatusCode = error.HttpStatusCode;
+            }
         }
     }
 

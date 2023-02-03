@@ -58,20 +58,6 @@ public class ValidationErrorTests :
         error.PlaceholderValues![nameof(ErrorWithNullFields.Name)].ShouldBe("");
         error.PlaceholderValues![nameof(ErrorWithNullFields.Age)].ShouldBe("");
     }
-    
-    private bool AllFieldsAreAddedAsPlaceholders(IValidationError error)
-    {
-        var placeholderNamesAdded = error.PlaceholderValues!
-            .Select(x => x.Key)
-            .ToList();
-        var areSpecificErrorFieldsAddedAsPlaceholders = error.GetFieldNames()
-            .All(fieldName => placeholderNamesAdded.Contains(fieldName));
-        var errorContainsCommonPlaceholders =
-            ErrorContainsPlaceholder(error, nameof(ValidationError.FieldName))
-            && ErrorContainsPlaceholder(error, nameof(ValidationError.FieldDisplayName))
-            && ErrorContainsPlaceholder(error, nameof(ValidationError.FieldValue));
-        return areSpecificErrorFieldsAddedAsPlaceholders && errorContainsCommonPlaceholders;
-    }
 
     private bool ErrorContainsPlaceholder(IValidationError error, string placeholderName)
     {

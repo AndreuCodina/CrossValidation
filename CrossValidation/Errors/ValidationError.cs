@@ -1,4 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.Net;
+using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 
 namespace CrossValidation.Errors;
@@ -11,6 +12,7 @@ public interface IValidationError
     string? Code { get; set; }
     string? Message { get; set; }
     string? Details { get; set; }
+    HttpStatusCode? HttpStatusCode { get; set; }
     Dictionary<string, object>? PlaceholderValues { get; set; }
     void AddPlaceholderValues();
     IEnumerable<string> GetFieldNames();
@@ -27,6 +29,7 @@ public record ValidationError : IValidationError
     public string? Code { get; set; }
     public string? Message { get; set; }
     public string? Details { get; set; }
+    public HttpStatusCode? HttpStatusCode { get; set; }
     public Dictionary<string, object>? PlaceholderValues { get; set; }
 
     public ValidationError(
@@ -35,7 +38,8 @@ public record ValidationError : IValidationError
         object? FieldValue = null,
         string? Code = null,
         string? Message = null,
-        string? Details = null)
+        string? Details = null,
+        HttpStatusCode? HttpStatusCode = null)
     {
         this.FieldName = FieldName;
         this.FieldDisplayName = FieldDisplayName;
@@ -43,6 +47,7 @@ public record ValidationError : IValidationError
         this.Code = Code;
         this.Message = Message;
         this.Details = Details;
+        this.HttpStatusCode = HttpStatusCode;
     }
 
     protected void AddPlaceholderValue(object? value, [CallerArgumentExpression(nameof(value))] string? name = null)

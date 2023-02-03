@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics.Contracts;
 using System.Linq.Expressions;
+using System.Net;
 using CrossValidation.Errors;
 using CrossValidation.Rules;
 
@@ -30,21 +31,23 @@ public static class Validate
         bool condition,
         string? message = null,
         string? code = null,
-        string? details = null)
+        string? details = null,
+        HttpStatusCode? httpStatusCode = null)
     {
         InternalMust(
             condition,
             message: message,
             code: code,
-            details: details);
+            details: details,
+            httpStatusCode: httpStatusCode);
     }
 
-    private static void InternalMust(
-        bool condition,
+    private static void InternalMust(bool condition,
         ValidationError? error = null,
         string? message = null,
         string? code = null,
-        string? details = null)
+        string? details = null,
+        HttpStatusCode? httpStatusCode = null)
     {
         if (!condition)
         {
@@ -68,6 +71,11 @@ public static class Validate
             if (details is not null)
             {
                 rule = rule.WithDetails(details);
+            }
+            
+            if (httpStatusCode is not null)
+            {
+                rule = rule.WithHttpStatusCode(httpStatusCode.Value);
             }
 
             rule.Must(_ => false);

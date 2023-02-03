@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using CrossValidation.Errors;
 using CrossValidation.Resources;
 using CrossValidation.Rules;
@@ -506,15 +507,18 @@ public class ModelValidatorTests : IClassFixture<CommonFixture>
         var expectedMessage = "Error message";
         var expectedCode = nameof(CommonCodeValidationError.Predicate);
         var expectedDetails = "Details";
+        var expectedHttpStatusCode = HttpStatusCode.Accepted;
         var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
         {
             validator.RuleFor(x => x.NullableInt)
                 .WithCode(new Bogus.Faker().Lorem.Word())
                 .WithMessage(new Bogus.Faker().Lorem.Word())
                 .WithDetails(new Bogus.Faker().Lorem.Word())
+                .WithHttpStatusCode(HttpStatusCode.Created)
                 .NotNull()
                 .WithMessage(expectedMessage)
                 .WithDetails(expectedDetails)
+                .WithHttpStatusCode(expectedHttpStatusCode)
                 .Must(_commonFixture.NotBeValid);
         });
 
@@ -524,6 +528,7 @@ public class ModelValidatorTests : IClassFixture<CommonFixture>
         error.Message.ShouldBe(expectedMessage);
         error.Code.ShouldBe(expectedCode);
         error.Details.ShouldBe(expectedDetails);
+        error.HttpStatusCode.ShouldBe(expectedHttpStatusCode);
     }
     
     [Fact]

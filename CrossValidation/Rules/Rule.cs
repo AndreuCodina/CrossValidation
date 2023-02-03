@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.Contracts;
+using System.Net;
 using CrossValidation.Errors;
 using CrossValidation.Validators;
 
@@ -27,6 +28,9 @@ public interface IRule<out TField>
 
     [Pure]
     IRule<TField> WithFieldDisplayName(string fieldDisplayName);
+    
+    [Pure]
+    IRule<TField> WithHttpStatusCode(HttpStatusCode code);
 
     [Pure]
     IRule<TField> When(bool condition);
@@ -116,6 +120,16 @@ internal abstract class Rule<TField> : IRule<TField>
         if (this is IValidRule<TField> validRule && validRule.Context.ExecuteNextValidator)
         {
             validRule.Context.FieldDisplayName = fieldDisplayName;
+        }
+
+        return this;
+    }
+
+    public IRule<TField> WithHttpStatusCode(HttpStatusCode code)
+    {
+        if (this is IValidRule<TField> validRule && validRule.Context.ExecuteNextValidator)
+        {
+            validRule.Context.HttpStatusCode = code;
         }
 
         return this;

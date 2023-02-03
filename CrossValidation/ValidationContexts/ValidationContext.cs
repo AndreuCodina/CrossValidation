@@ -1,4 +1,5 @@
-﻿using CrossValidation.Errors;
+﻿using System.Net;
+using CrossValidation.Errors;
 using CrossValidation.Resources;
 
 namespace CrossValidation.ValidationContexts;
@@ -15,6 +16,7 @@ public class ValidationContext
     public List<IValidationError>? ErrorsCollected { get; set; }
     public string FieldName { get; set; } = "";
     public string? FieldDisplayName { get; set; }
+    public HttpStatusCode? HttpStatusCode { get; set; }
     public object? FieldValue { get; set; }
     public bool ExecuteNextValidator { get; set; } = true;
     public string? ParentPath { get; set; }
@@ -48,6 +50,7 @@ public class ValidationContext
         Details = null;
         Error = null;
         ExecuteNextValidator = true;
+        HttpStatusCode = null;
     }
 
     private void AddCustomizationsToError(IValidationError error)
@@ -66,6 +69,11 @@ public class ValidationContext
         if (Details is not null)
         {
             error.Details = Details;
+        }
+        
+        if (HttpStatusCode is not null)
+        {
+            error.HttpStatusCode = HttpStatusCode;
         }
     }
     

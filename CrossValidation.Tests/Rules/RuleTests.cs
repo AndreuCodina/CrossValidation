@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 using CrossValidation.Errors;
 using CrossValidation.Exceptions;
 using CrossValidation.Resources;
@@ -237,15 +238,18 @@ public class RuleTests : IClassFixture<CommonFixture>
     public void Validators_do_not_override_customization()
     {
         var expectedDetails = "Expected details";
+        var expectedHttpStatusCode = HttpStatusCode.Created;
         var action = () => Validate.That(_model.Int)
             .WithCode(nameof(ErrorResource.NotNull))
             .WithDetails(expectedDetails)
+            .WithHttpStatusCode(HttpStatusCode.Created)
             .GreaterThan(_model.Int);
 
         var error = action.ShouldThrowValidationError<CommonCodeValidationError.GreaterThan<int>>();
         error.Code.ShouldBe(nameof(ErrorResource.NotNull));
         error.Message.ShouldBe(ErrorResource.NotNull);
         error.Details.ShouldBe(expectedDetails);
+        error.HttpStatusCode.ShouldBe(expectedHttpStatusCode);
     }
     
     [Fact]
@@ -260,6 +264,7 @@ public class RuleTests : IClassFixture<CommonFixture>
         error.Code.ShouldBe(nameof(ErrorResource.NotNull));
         error.Message.ShouldBe(ErrorResource.NotNull);
         error.Details.ShouldBe(expectedDetails);
+        error.HttpStatusCode.ShouldBe(HttpStatusCode.Created);
     }
 
     private record CustomErrorWithPlaceholderValue(int Value) : ValidationError;
@@ -297,5 +302,6 @@ public class RuleTests : IClassFixture<CommonFixture>
 
     private record ErrorWithCustomization() : ValidationError(
         Code: nameof(CommonCodeValidationError.NotNull),
-        Details: "Expected details");
+        Details: "Expected details",
+        HttpStatusCode: System.Net.HttpStatusCode.Created);
 }
