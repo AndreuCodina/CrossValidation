@@ -122,8 +122,8 @@ You can throw CrossException (the built-in equivalent of AppException) when you 
 ```csharp
 public record UserServiceError
 {
-    public record UserNotFoundError() : ValidationErrorMessage("Couldn't find the user")
-    public record NicknameNotAvailableError(string Nickname) : ValidationErrorMessage($"'{Nickname}' is not available")
+    public record UserNotFoundError() : MessageValidationError("Couldn't find the user")
+    public record NicknameNotAvailableError(string Nickname) : MessageValidationError($"'{Nickname}' is not available")
 }
 
 public class UserService
