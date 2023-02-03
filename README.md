@@ -130,11 +130,28 @@ public class UserService
 {  
     public void ChangeNickname(UserDto userDto)
     {
-        var user = _context.Users.FirstOrDefault(x => x.Id == user.Id);
+        var user = _context.Users.FirstOrDefault(x => x.Id == userDto.Id);
         Validate.Must(user != null, new UserNotFoundError());
     
         var isNicknameAvailable = _context.Users.Any(x => x.Nickname != userDto.Nickname);
         Validate.Must(isNicknameAvailable, new NicknameIsNotAvailableError(userDto.Nickname))
+    
+        user.Nickname = userDto.Nickname;
+        _context.Update(user);
+        _context.SaveChanges();
+    }
+}
+```
+
+This can be refactored to this:
+
+```csharp
+public class UserService
+{  
+    public void ChangeNickname(UserDto userDto)
+    {
+        var user = GetUser(userDto);
+        CheckNicknameAvailable(userDto)
     
         user.Nickname = userDto.Nickname;
         _context.Update(user);
