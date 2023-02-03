@@ -11,7 +11,7 @@ public record ModelNullabilityValidatorError
     public record NonNullableItemCollectionWithNullItemError(string CollectionName) : Error;
 }
 
-public static class ModelNullabilityValidator
+internal static class ModelNullabilityValidator
 {
     /// <summary>
     /// Check model and nested models don't have nulls in non-nullable types

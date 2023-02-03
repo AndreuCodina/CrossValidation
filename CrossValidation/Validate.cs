@@ -3,6 +3,7 @@ using System.Linq.Expressions;
 using System.Net;
 using CrossValidation.Errors;
 using CrossValidation.Rules;
+using CrossValidation.Utils;
 
 namespace CrossValidation;
 
@@ -80,5 +81,10 @@ public static class Validate
 
             rule.Must(_ => false);
         }
+    }
+
+    public static void ModelNullability<TModel>(TModel model)
+    {
+        ModelNullabilityValidator.Validate(model);
     }
 }

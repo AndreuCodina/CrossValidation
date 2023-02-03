@@ -28,9 +28,8 @@ public class ModelNullabilityValidatorTests : IClassFixture<CommonFixture>
             model: _model,
             propertyName: nameof(ParentModel.String),
             propertyValue: null);
-        var parentModelValidator = _commonFixture.CreateParentModelValidator(_ => { });
 
-        var action = () => parentModelValidator.Validate(_model);
+        var action = () => Validate.ModelNullability(_model);
 
         action.ShouldThrowError<ModelNullabilityValidatorError.NonNullablePropertyIsNullError>();
     }
@@ -43,9 +42,8 @@ public class ModelNullabilityValidatorTests : IClassFixture<CommonFixture>
             model: _model,
             propertyName: expectedCollectionName,
             propertyValue: new List<string?> {"", null});
-        var parentModelValidator = _commonFixture.CreateParentModelValidator(_ => { });
 
-        var action = () => parentModelValidator.Validate(_model);
+        var action = () => Validate.ModelNullability(_model);
 
         var error = action.ShouldThrowError<ModelNullabilityValidatorError.NonNullableItemCollectionWithNullItemError>();
         error.CollectionName.ShouldBe(expectedCollectionName);
@@ -59,9 +57,8 @@ public class ModelNullabilityValidatorTests : IClassFixture<CommonFixture>
             model: _model,
             propertyName: expectedPropertyName,
             propertyValue: null);
-        var parentModelValidator = _commonFixture.CreateParentModelValidator(_ => { });
 
-        var action = () => parentModelValidator.Validate(_model);
+        var action = () => Validate.ModelNullability(_model);
 
         var error = action.ShouldThrowError<ModelNullabilityValidatorError.NonNullablePropertyIsNullError>();
         error.PropertyName.ShouldBe(expectedPropertyName);

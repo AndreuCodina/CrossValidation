@@ -2,7 +2,6 @@
 using System.Linq.Expressions;
 using CrossValidation.Exceptions;
 using CrossValidation.Rules;
-using CrossValidation.Utils;
 using CrossValidation.ValidationContexts;
 
 namespace CrossValidation;
@@ -40,7 +39,7 @@ public abstract record ModelValidator<TModel>
     {
         if (Context is not {IsChildContext: true})
         {
-            ModelNullabilityValidator.Validate(model);
+            CrossValidation.Validate.ModelNullability(model);
             Context = new ValidationContext();
         }
 
