@@ -20,7 +20,6 @@ public abstract record Validator<TValidationError> : IValidator<TValidationError
     
     public TValidationError? GetError()
     {
-        var error = (TValidationError?)CreateError();
-        return !IsValid() ? error : null;
+        return !IsValid() ? (TValidationError?)CreateError() : null;
     }
 }
