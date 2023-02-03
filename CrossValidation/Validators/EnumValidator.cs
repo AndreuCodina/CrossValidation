@@ -13,6 +13,6 @@ public record EnumValidator<TField>(
 
     public override ValidationError CreateError()
     {
-        return new CommonValidationError.Enum();
+        return new CommonCodeValidationError.Enum();
     }
 }

@@ -74,9 +74,9 @@ public class NotNullTests : IClassFixture<CommonFixture>
 
         var errors = action.ShouldThrowValidationErrors();
         errors.Count.ShouldBe(3);
-        errors[0].ShouldBeOfType<CommonValidationError.NotNull>();
-        errors[1].ShouldBeOfType<CommonValidationError.LengthRange>();
-        errors[2].ShouldBeOfType<CommonValidationError.NotNull>();
+        errors[0].ShouldBeOfType<CommonCodeValidationError.NotNull>();
+        errors[1].ShouldBeOfType<CommonCodeValidationError.LengthRange>();
+        errors[2].ShouldBeOfType<CommonCodeValidationError.NotNull>();
     }
     
     [Fact]
@@ -87,7 +87,7 @@ public class NotNullTests : IClassFixture<CommonFixture>
         var action = () => Validate.That(value)
             .NotNull();
 
-        var error = action.ShouldThrowValidationError<CommonValidationError.NotNull>();
+        var error = action.ShouldThrowValidationError<CommonCodeValidationError.NotNull>();
         error.Code.ShouldBe(nameof(ErrorResource.NotNull));
     }
 }

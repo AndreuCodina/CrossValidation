@@ -15,6 +15,6 @@ public record GreaterThanValidator<TField>(
 
     public override ValidationError CreateError()
     {
-        return new CommonValidationError.GreaterThan<TField>(ComparisonValue);
+        return new CommonCodeValidationError.GreaterThan<TField>(ComparisonValue);
     }
 }

@@ -2,14 +2,14 @@
 
 namespace CrossValidation.Errors;
 
-public record CommonValidationError(string Code) : ValidationErrorCode(Code)
+public record CommonCodeValidationError(string Code) : CodeValidationError(Code)
 {
-    public record NotNull() : CommonValidationError(nameof(ErrorResource.NotNull));
+    public record NotNull() : CommonCodeValidationError(nameof(ErrorResource.NotNull));
     
-    public record Null() : CommonValidationError(nameof(ErrorResource.Null));
+    public record Null() : CommonCodeValidationError(nameof(ErrorResource.Null));
 
     public record GreaterThan<TField>(TField ComparisonValue) :
-        CommonValidationError(nameof(ErrorResource.GreaterThan))
+        CommonCodeValidationError(nameof(ErrorResource.GreaterThan))
     {
         public override void AddPlaceholderValues()
         {
@@ -18,10 +18,10 @@ public record CommonValidationError(string Code) : ValidationErrorCode(Code)
         }
     }
     
-    public record Enum() : CommonValidationError(nameof(ErrorResource.Enum));
+    public record Enum() : CommonCodeValidationError(nameof(ErrorResource.Enum));
     
     public record LengthRange(int Minimum, int Maximum, int TotalLength) :
-        CommonValidationError(nameof(ErrorResource.LengthRange)),
+        CommonCodeValidationError(nameof(ErrorResource.LengthRange)),
         ILengthError
     {
         public override void AddPlaceholderValues()
@@ -34,7 +34,7 @@ public record CommonValidationError(string Code) : ValidationErrorCode(Code)
     }
     
     public record MinimumLength(int Minimum, int TotalLength) :
-        CommonValidationError(nameof(ErrorResource.MinimumLength)),
+        CommonCodeValidationError(nameof(ErrorResource.MinimumLength)),
         ILengthError
     {
         public override void AddPlaceholderValues()
@@ -45,5 +45,5 @@ public record CommonValidationError(string Code) : ValidationErrorCode(Code)
         }
     }
     
-    public record Predicate() : CommonValidationError(nameof(ErrorResource.Predicate));
+    public record Predicate() : CommonCodeValidationError(nameof(ErrorResource.Predicate));
 }

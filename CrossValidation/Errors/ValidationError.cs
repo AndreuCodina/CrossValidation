@@ -121,8 +121,8 @@ public record ValidationError : IValidationError
     }
 }
 
-public record ValidationErrorCode(string Code) :
+public record CodeValidationError(string Code) :
     ValidationError(Code: Code);
 
-public record ValidationErrorMessage(string Message) :
+public record MessageValidationError(string Message) :
     ValidationError(Message: Message);

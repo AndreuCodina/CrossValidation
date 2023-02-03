@@ -11,6 +11,6 @@ public record PredicateValidator(bool Condition) : Validator
 
     public override ValidationError CreateError()
     {
-        return new CommonValidationError.Predicate();
+        return new CommonCodeValidationError.Predicate();
     }
 }
