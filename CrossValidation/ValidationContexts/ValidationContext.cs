@@ -3,6 +3,9 @@ using CrossValidation.Resources;
 
 namespace CrossValidation.ValidationContexts;
 
+/// <summary>
+/// Common context for all Rules and RuleSteps
+/// </summary>
 public class ValidationContext
 {
     public string? Code { get; set; }
