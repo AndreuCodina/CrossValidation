@@ -128,7 +128,7 @@ public class RuleTests : IClassFixture<CommonFixture>
         {
             validator.ValidationMode = ValidationMode.AccumulateFirstErrorEachRule;
 
-            validator.RuleFor(x => x.NullableInt)
+            validator.Field(x => x.NullableInt)
                 .NotNull()
                 .Transform(x => x + 1)
                 .Transform(x => x.ToString())

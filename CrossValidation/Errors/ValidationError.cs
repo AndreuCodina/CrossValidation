@@ -50,16 +50,16 @@ public record ValidationError : IValidationError
         this.HttpStatusCode = HttpStatusCode;
     }
 
-    protected void AddPlaceholderValue(object? value, [CallerArgumentExpression(nameof(value))] string? name = null)
+    protected void AddPlaceholderValue(object? value, [CallerArgumentExpression(nameof(value))] string name = "")
     {
         PlaceholderValues ??= new();
 
-        if (PlaceholderValues.ContainsKey(name!))
+        if (PlaceholderValues.ContainsKey(name))
         {
             throw new InvalidOperationException("Cannot add a placeholder with the same name twice");
         }
 
-        PlaceholderValues.Add(name!, value ?? DefaultPlaceholderValue);
+        PlaceholderValues.Add(name, value ?? DefaultPlaceholderValue);
     }
 
     public virtual void AddPlaceholderValues()

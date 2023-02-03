@@ -58,15 +58,15 @@ public class NotNullTests : IClassFixture<CommonFixture>
         {
             validator.ValidationMode = ValidationMode.AccumulateFirstErrorEachRule;
 
-            validator.RuleFor(x => x.NullableInt)
+            validator.Field(x => x.NullableInt)
                 .NotNull()
                 .GreaterThan(-1);
 
-            validator.RuleFor(x => x.NullableString)
+            validator.Field(x => x.NullableString)
                 .NotNull()
                 .LengthRange(int.MaxValue, int.MaxValue);
 
-            validator.RuleFor(x => x.NullableInt)
+            validator.Field(x => x.NullableInt)
                 .NotNull();
         });
         

@@ -28,9 +28,15 @@ public abstract record ModelValidator<TModel>
     }
 
     [Pure]
-    public IRule<TField> RuleFor<TField>(Expression<Func<TModel, TField>> fieldSelector)
+    public IRule<TField> Field<TField>(Expression<Func<TModel, TField>> fieldSelector)
     {
-        return IValidRule<TField>.CreateFromFieldSelector(Dsl.Validate, Model!, fieldSelector, Context!);
+        return IValidRule<TField>.CreateFromFieldSelector(Dsl.Validate, Model!, fieldSelector, Context);
+    }
+    
+    [Pure]
+    public IRule<TField> That<TField>(TField fieldValue)
+    {
+        return IValidRule<TField>.CreateFromField(Dsl.Validate, fieldValue, context: Context);
     }
 
     public abstract void CreateRules(TModel model);

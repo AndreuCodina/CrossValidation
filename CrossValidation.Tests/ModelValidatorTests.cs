@@ -33,7 +33,7 @@ public class ModelValidatorTests : IClassFixture<CommonFixture>
             .Build();
         var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
         {
-            validator.RuleFor(x => x.NullableString)
+            validator.Field(x => x.NullableString)
                 .NotNull();
         });
 
@@ -47,7 +47,7 @@ public class ModelValidatorTests : IClassFixture<CommonFixture>
     {
         var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
         {
-            validator.RuleFor(x => x.NullableString)
+            validator.Field(x => x.NullableString)
                 .NotNull();
         });
 
@@ -62,7 +62,7 @@ public class ModelValidatorTests : IClassFixture<CommonFixture>
     {
         var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
         {
-            validator.RuleFor(x => x);
+            validator.Field(x => x);
         });
 
         var action = () => parentModelValidator.Validate(_model);
@@ -77,7 +77,7 @@ public class ModelValidatorTests : IClassFixture<CommonFixture>
         var expectedFieldValue = _model.NestedModel.Int;
         var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
         {
-            validator.RuleFor(x => x.NestedModel.Int)
+            validator.Field(x => x.NestedModel.Int)
                 .GreaterThan(_model.NestedModel.Int);
         });
 
@@ -95,12 +95,12 @@ public class ModelValidatorTests : IClassFixture<CommonFixture>
         var expectedFieldValue = _model.NestedModel.Int;
         var nestedModelValidator = _commonFixture.CreateNestedModelValidator(validator =>
         {
-            validator.RuleFor(x => x.Int)
+            validator.Field(x => x.Int)
                 .GreaterThan(10);
         });
         var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
         {
-            validator.RuleFor(x => x.NestedModel)
+            validator.Field(x => x.NestedModel)
                 .SetModelValidator(nestedModelValidator);
         });
 
@@ -119,9 +119,9 @@ public class ModelValidatorTests : IClassFixture<CommonFixture>
 
         var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
         {
-            validator.RuleFor(x => x.NestedModel)
+            validator.Field(x => x.NestedModel)
                 .Must(_commonFixture.BeValid);
-            validator.RuleFor(x => x.NullableString)
+            validator.Field(x => x.NullableString)
                 .NotNull();
         });
 
@@ -138,13 +138,13 @@ public class ModelValidatorTests : IClassFixture<CommonFixture>
         var expectedCode = "ExpectedCode";
         var nestedModelValidator = _commonFixture.CreateNestedModelValidator(validator =>
         {
-            validator.RuleFor(x => x.Int)
+            validator.Field(x => x.Int)
                 .WithCode("UnexpectedCode2")
                 .GreaterThan(_model.NestedModel.Int - 1)
                 .WithCode("UnexpectedCode3")
                 .GreaterThan(_model.NestedModel.Int - 1);
 
-            validator.RuleFor(x => x.NestedNestedModel)
+            validator.Field(x => x.NestedNestedModel)
                 .WithCode("UnexpectedCode4")
                 .Must(_commonFixture.BeValid)
                 .WithCode(expectedCode)
@@ -154,10 +154,10 @@ public class ModelValidatorTests : IClassFixture<CommonFixture>
         });
         var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
         {
-            validator.RuleFor(x => x.NullableString)
+            validator.Field(x => x.NullableString)
                 .WithCode("UnexpectedCode1")
                 .Null();
-            validator.RuleFor(x => x.NestedModel)
+            validator.Field(x => x.NestedModel)
                 .SetModelValidator(nestedModelValidator)
                 .WithCode("UnexpectedCode6")
                 .Must(_commonFixture.BeValid);
@@ -180,13 +180,13 @@ public class ModelValidatorTests : IClassFixture<CommonFixture>
 
         var nestedModelValidator = _commonFixture.CreateNestedModelValidator(validator =>
         {
-            validator.RuleFor(x => x.Int)
+            validator.Field(x => x.Int)
                 .WithCode(expectedCodes[1])
                 .GreaterThan(_model.NestedModel.Int)
                 .WithCode("UnexpectedErrorCode")
                 .GreaterThan(_model.NestedModel.Int);
             
-            validator.RuleFor(x => x.NestedNestedModel)
+            validator.Field(x => x.NestedNestedModel)
                 .WithCode("UnexpectedErrorCode")
                 .Must(_commonFixture.BeValid)
                 .WithCode(expectedCodes[2])
@@ -196,16 +196,16 @@ public class ModelValidatorTests : IClassFixture<CommonFixture>
         {
             validator.ValidationMode = ValidationMode.AccumulateFirstErrorEachRule;
             
-            validator.RuleFor(x => x.NullableString)
+            validator.Field(x => x.NullableString)
                 .WithCode(expectedCodes[0])
                 .NotNull();
             
-            validator.RuleFor(x => x.NestedModel)
+            validator.Field(x => x.NestedModel)
                 .SetModelValidator(nestedModelValidator)
                 .WithCode(expectedCodes[3])
                 .Must(_commonFixture.NotBeValid);
             
-            validator.RuleFor(x => x.NestedModel.Int)
+            validator.Field(x => x.NestedModel.Int)
                 .WithCode(expectedCodes[4])
                 .GreaterThan(_model.NestedModel.Int)
                 .WithCode("UnexpectedErrorCode")
@@ -224,15 +224,15 @@ public class ModelValidatorTests : IClassFixture<CommonFixture>
         var nestedModelValidator = _commonFixture.CreateNestedModelValidator(validator =>
         {
             validator.ValidationMode = ValidationMode.AccumulateFirstErrorEachRule;
-            validator.RuleFor(x => x.Int)
+            validator.Field(x => x.Int)
                 .GreaterThan(10);
-            validator.RuleFor(x => x.Int)
+            validator.Field(x => x.Int)
                 .WithCode("UnexpectedErrorCode")
                 .GreaterThan(_model.NestedModel.Int);
         });
         var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
         {
-            validator.RuleFor(x => x.NestedModel)
+            validator.Field(x => x.NestedModel)
                 .SetModelValidator(nestedModelValidator);
         });
 
@@ -258,7 +258,7 @@ public class ModelValidatorTests : IClassFixture<CommonFixture>
         {
             validator.ValidationMode = ValidationMode.AccumulateFirstErrorEachRule;
 
-            validator.RuleFor(x => x.NullableString)
+            validator.Field(x => x.NullableString)
                 .NotNull()
                 .Transform(StringToInt)
                 .GreaterThan(expectedTransformation);
@@ -287,7 +287,7 @@ public class ModelValidatorTests : IClassFixture<CommonFixture>
         {
             validator.ValidationMode = ValidationMode.AccumulateFirstErrorEachRule;
 
-            validator.RuleFor(x => x.NullableIntList)
+            validator.Field(x => x.NullableIntList)
                 .Transform(x => TransformValues(x!))
                 .Null();
         });
@@ -310,7 +310,7 @@ public class ModelValidatorTests : IClassFixture<CommonFixture>
         var expectedTransformation = ChangeValue(_model);
         var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
         {
-            validator.RuleFor(x => x)
+            validator.Field(x => x)
                 .Transform(ChangeValue)
                 .Must(_commonFixture.NotBeValid);
         });
@@ -329,7 +329,7 @@ public class ModelValidatorTests : IClassFixture<CommonFixture>
         {
             validator.ValidationMode = ValidationMode.AccumulateFirstErrorEachRule;
 
-            validator.RuleFor(x => x.NullableInt)
+            validator.Field(x => x.NullableInt)
                 .NotNull()
                 .Transform(x => x + 1)
                 .Transform(x => x.ToString())
@@ -348,7 +348,7 @@ public class ModelValidatorTests : IClassFixture<CommonFixture>
     {
         var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
         {
-            validator.RuleFor(x => x)
+            validator.Field(x => x)
                 .Must(_commonFixture.NotBeValid);
         });
 
@@ -364,7 +364,7 @@ public class ModelValidatorTests : IClassFixture<CommonFixture>
         var expectedFieldValue = _model.NestedModel.Int;
         var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
         {
-            validator.RuleFor(x => x.NestedModel.Int)
+            validator.Field(x => x.NestedModel.Int)
                 .GreaterThan(_model.NestedModel.Int);
         });
 
@@ -381,7 +381,7 @@ public class ModelValidatorTests : IClassFixture<CommonFixture>
 
         var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
         {
-            validator.RuleFor(x => x.NullableString)
+            validator.Field(x => x.NullableString)
                 .WithMessage(expectedMessage)
                 .NotNull();
         });
@@ -398,7 +398,7 @@ public class ModelValidatorTests : IClassFixture<CommonFixture>
         var expectedCode = "MyCode";
         var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
         {
-            validator.RuleFor(x => x.NullableString)
+            validator.Field(x => x.NullableString)
                 .WithCode(expectedCode)
                 .NotNull();
         });
@@ -414,7 +414,7 @@ public class ModelValidatorTests : IClassFixture<CommonFixture>
     {
         var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
         {
-            validator.RuleFor(x => x.NullableString)
+            validator.Field(x => x.NullableString)
                 .WithError(new CustomErrorWithCode("COD123"))
                 .NotNull();
         });
@@ -430,7 +430,7 @@ public class ModelValidatorTests : IClassFixture<CommonFixture>
         var expectedDisplayName = "My display name";
         var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
         {
-            validator.RuleFor(x => x.NullableString)
+            validator.Field(x => x.NullableString)
                 .WithFieldDisplayName(expectedDisplayName)
                 .NotNull();
         });
@@ -447,7 +447,7 @@ public class ModelValidatorTests : IClassFixture<CommonFixture>
         var comparisonValue = _model.NestedModel.Int + 1;
         var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
         {
-            validator.RuleFor(x => x.NestedModel.Int)
+            validator.Field(x => x.NestedModel.Int)
                 .GreaterThan(comparisonValue);
         });
         
@@ -465,7 +465,7 @@ public class ModelValidatorTests : IClassFixture<CommonFixture>
         var expectedError = new CustomErrorWithCode("COD123");
         var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
         {
-            validator.RuleFor(x => x.NullableString)
+            validator.Field(x => x.NullableString)
                 .WithError(expectedError)
                 .WithMessage(expectedMessage)
                 .NotNull();
@@ -485,7 +485,7 @@ public class ModelValidatorTests : IClassFixture<CommonFixture>
         var expectedError = new CustomErrorWithCode("COD123");
         var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
         {
-            validator.RuleFor(x => x.NullableString)
+            validator.Field(x => x.NullableString)
                 .WithMessage(expectedMessage)
                 .WithError(expectedError)
                 .NotNull();
@@ -510,7 +510,7 @@ public class ModelValidatorTests : IClassFixture<CommonFixture>
         var expectedHttpStatusCode = HttpStatusCode.Accepted;
         var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
         {
-            validator.RuleFor(x => x.NullableInt)
+            validator.Field(x => x.NullableInt)
                 .WithCode(new Bogus.Faker().Lorem.Word())
                 .WithMessage(new Bogus.Faker().Lorem.Word())
                 .WithDetails(new Bogus.Faker().Lorem.Word())
@@ -539,11 +539,11 @@ public class ModelValidatorTests : IClassFixture<CommonFixture>
             .Build();
         var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
         {
-            validator.RuleFor(x => x.NullableInt)
+            validator.Field(x => x.NullableInt)
                 .WithFieldDisplayName("Field display name")
                 .NotNull();
 
-            validator.RuleFor(x => x.NullableString)
+            validator.Field(x => x.NullableString)
                 .NotNull();
         });
 
@@ -560,12 +560,12 @@ public class ModelValidatorTests : IClassFixture<CommonFixture>
         var expectedCode = "GreaterThan";
         var nestedModelValidator = _commonFixture.CreateNestedModelValidator(validator =>
         {
-            validator.RuleFor(x => x.Int)
+            validator.Field(x => x.Int)
                 .GreaterThan(10);
         });
         var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
         {
-            validator.RuleFor(x => x.NestedModel)
+            validator.Field(x => x.NestedModel)
                 .WithMessage("Message to be cleaned")
                 .SetModelValidator(nestedModelValidator);
         });
@@ -582,12 +582,12 @@ public class ModelValidatorTests : IClassFixture<CommonFixture>
         var expectedCode = "GreaterThan";
         var nestedModelValidator = _commonFixture.CreateNestedModelValidator(validator =>
         {
-            validator.RuleFor(x => x.Int)
+            validator.Field(x => x.Int)
                 .GreaterThan(10);
         });
         var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
         {
-            validator.RuleFor(x => x.NestedModel)
+            validator.Field(x => x.NestedModel)
                 .SetModelValidator(nestedModelValidator);
         });
 
@@ -604,7 +604,7 @@ public class ModelValidatorTests : IClassFixture<CommonFixture>
         var expectedMessage = $"NullableString is ";
         var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
         {
-            validator.RuleFor(x => x.NullableString)
+            validator.Field(x => x.NullableString)
                 .WithMessage(template)
                 .NotNull();
         });
@@ -622,7 +622,7 @@ public class ModelValidatorTests : IClassFixture<CommonFixture>
         var expectedMessage = $"{{PlaceholderNotReplaced}} is {_model.NestedModel.Int}";
         var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
         {
-            validator.RuleFor(x => x.NestedModel.Int)
+            validator.Field(x => x.NestedModel.Int)
                 .WithMessage(template)
                 .GreaterThan(_model.NestedModel.Int);
         });
@@ -641,7 +641,7 @@ public class ModelValidatorTests : IClassFixture<CommonFixture>
         var expectedMessage = $"{_model.NestedModel.Int} is not greater than {comparisonValue}";
         var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
         {
-            validator.RuleFor(x => x.NestedModel.Int)
+            validator.Field(x => x.NestedModel.Int)
                 .WithMessage(template)
                 .GreaterThan(comparisonValue);
         });
@@ -657,7 +657,7 @@ public class ModelValidatorTests : IClassFixture<CommonFixture>
     {
         var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
         {
-            validator.RuleFor(x => x.NestedModel)
+            validator.Field(x => x.NestedModel)
                 .Must(x => x.Int > _model.NestedModel.Int);
         });
         
@@ -671,20 +671,20 @@ public class ModelValidatorTests : IClassFixture<CommonFixture>
     {
         var nestedModelValidator = _commonFixture.CreateNestedModelValidator(validator =>
         {
-            validator.RuleFor(x => x.Int)
+            validator.Field(x => x.Int)
                 .Must(_commonFixture.NotBeValid);
         });
         var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
         {
             validator.ValidationMode = ValidationMode.AccumulateFirstErrorEachRule;
 
-            validator.RuleFor(x => x.Int)
+            validator.Field(x => x.Int)
                 .Must(_commonFixture.NotBeValid);
             
-            validator.RuleFor(x => x.NestedModel)
+            validator.Field(x => x.NestedModel)
                 .SetModelValidator(nestedModelValidator);
             
-            validator.RuleFor(x => x.Int)
+            validator.Field(x => x.Int)
                 .Must(_commonFixture.NotBeValid);
         });
 
@@ -692,6 +692,21 @@ public class ModelValidatorTests : IClassFixture<CommonFixture>
 
         var errors = action.ShouldThrowValidationErrors();
         errors.Count.ShouldBe(3);
+    }
+    
+    [Fact]
+    public void ValidateThat_returns_empty_field_name()
+    {
+        var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
+        {
+            validator.That(_model.NullableInt)
+                .NotNull();
+        });
+        
+        var action = () => parentModelValidator.Validate(_model);
+
+        var error = action.ShouldThrowValidationError();
+        error.FieldName.ShouldBeEmpty();
     }
 
     private record CustomErrorWithCode(string Code) : ValidationError(Code: Code);

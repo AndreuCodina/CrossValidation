@@ -29,7 +29,7 @@ public class ForEachTests : IClassFixture<CommonFixture>
             .Build();
         var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
         {
-            validator.RuleFor(x => x.NullableIntList)
+            validator.Field(x => x.NullableIntList)
                 .NotNull()
                 .ForEach(x => x
                     .GreaterThan(1)
@@ -51,7 +51,7 @@ public class ForEachTests : IClassFixture<CommonFixture>
         {
             validator.ValidationMode = ValidationMode.AccumulateFirstErrorEachRule;
             
-            validator.RuleFor(x => x.NullableIntList)
+            validator.Field(x => x.NullableIntList)
                 .NotNull()
                 .ForEach(x => x
                     .GreaterThan(0)
@@ -72,7 +72,7 @@ public class ForEachTests : IClassFixture<CommonFixture>
             .Build();
         var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
         {
-            validator.RuleFor(x => x.NullableIntList)
+            validator.Field(x => x.NullableIntList)
                 .NotNull()
                 .ForEach(x => x
                     .Transform(Convert.ToDouble)
@@ -93,7 +93,7 @@ public class ForEachTests : IClassFixture<CommonFixture>
             .Build();
         var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
         {
-            validator.RuleFor(x => x.NullableIntList)
+            validator.Field(x => x.NullableIntList)
                 .NotNull()
                 .ForEach(x => x
                     .GreaterThan(10));
