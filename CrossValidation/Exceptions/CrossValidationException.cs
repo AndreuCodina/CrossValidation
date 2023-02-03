@@ -5,7 +5,7 @@ namespace CrossValidation.Exceptions;
 /// <summary>
 /// Contains data to show to the user
 /// </summary>
-public class CrossValidationException : Exception
+public class CrossValidationException : NoStackTraceException
 {
     public List<IValidationError> Errors { get; }
 
@@ -13,8 +13,4 @@ public class CrossValidationException : Exception
     {
         Errors = errors;
     }
-
-#if !DEBUG
-    public override string? StackTrace { get; } = null;
-#endif
 }

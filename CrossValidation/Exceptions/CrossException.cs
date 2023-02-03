@@ -5,7 +5,7 @@ namespace CrossValidation.Exceptions;
 /// <summary>
 /// Common exception for non-exceptional situations
 /// </summary>
-public class CrossException : Exception
+public class CrossException : NoStackTraceException
 {
     public Error Error { get; }
     public string? MessageDescription { get; }
@@ -16,8 +16,4 @@ public class CrossException : Exception
         Error = error;
         MessageDescription = messageDescription;
     }
-    
-#if !DEBUG
-    public override string? StackTrace { get; } = null;
-#endif
 }
