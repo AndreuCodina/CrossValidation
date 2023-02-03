@@ -660,6 +660,34 @@ public class ModelValidatorTests : IClassFixture<CommonFixture>
 
         action.ShouldThrowValidationError<CommonValidationError.Predicate>();
     }
+    
+    [Fact]
+    public void Add_child_model_validator_errors_to_existing_ones()
+    {
+        var nestedModelValidator = _commonFixture.CreateNestedModelValidator(validator =>
+        {
+            validator.RuleFor(x => x.Int)
+                .Must(_commonFixture.NotBeValid);
+        });
+        var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
+        {
+            validator.ValidationMode = ValidationMode.AccumulateFirstErrorEachRule;
+
+            validator.RuleFor(x => x.Int)
+                .Must(_commonFixture.NotBeValid);
+            
+            validator.RuleFor(x => x.NestedModel)
+                .SetModelValidator(nestedModelValidator);
+            
+            validator.RuleFor(x => x.Int)
+                .Must(_commonFixture.NotBeValid);
+        });
+
+        var action = () => parentModelValidator.Validate(_model);
+
+        var errors = action.ShouldThrowValidationErrors();
+        errors.Count.ShouldBe(3);
+    }
 
     private record CustomErrorWithCode(string Code) : ValidationError(Code: Code);
 }

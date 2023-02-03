@@ -45,7 +45,7 @@ public class RuleTests : IClassFixture<CommonFixture>
     [Fact]
     public void Validate_predicate()
     {
-        var action = () => IValidRule<NestedModel>.CreateFromField( _model.NestedModel)
+        var action = () => IValidRule<NestedModel>.CreateFromField(_model.NestedModel)
             .Must(_commonFixture.NotBeValid);
 
         action.ShouldThrowValidationError<CommonValidationError.Predicate>();
@@ -60,7 +60,7 @@ public class RuleTests : IClassFixture<CommonFixture>
         var getAge = () => Validate.Field(_model, x => x.NestedModel.Int)
             .WithMessage(messageTemplate)
             .WithError(new CustomErrorWithPlaceholderValue(10))
-            .Instance(UserAgeWithoutCustomization.Create);
+            .Instance(ValueObjectWithoutCustomization.Create);
 
         var error = getAge.ShouldThrowValidationError<CustomErrorWithPlaceholderValue>();
         error.FieldName.ShouldBe("NestedModel.Int");
@@ -72,7 +72,7 @@ public class RuleTests : IClassFixture<CommonFixture>
     {
         var getAge = () => Validate.Field(_model, x => x.NestedModel.Int)
             .WithCode(nameof(ErrorResource.NotNull))
-            .Instance(UserAgeWithoutCustomization.Create);
+            .Instance(ValueObjectWithoutCustomization.Create);
 
         var error = getAge.ShouldThrowValidationError<CommonValidationError.GreaterThan<int>>();
         error.Code.ShouldBe(nameof(ErrorResource.NotNull));
@@ -84,7 +84,7 @@ public class RuleTests : IClassFixture<CommonFixture>
     {
         var getAge = () => Validate.Field(_model, x => x.NestedModel.Int)
             .WithMessage(ErrorResource.NotNull)
-            .Instance(UserAgeWithoutCustomization.Create);
+            .Instance(ValueObjectWithoutCustomization.Create);
 
         var error = getAge.ShouldThrowValidationError<CommonValidationError.GreaterThan<int>>();
         error.Message.ShouldBe(ErrorResource.NotNull);
@@ -112,7 +112,7 @@ public class RuleTests : IClassFixture<CommonFixture>
     public void Keep_instance_customizations()
     {
         var getAge = () => Validate.That(_model.Int)
-            .Instance(UserAgeWithCustomization.Create);
+            .Instance(ValueObjectWithCustomization.Create);
 
         var error = getAge.ShouldThrowValidationError<CommonValidationError.GreaterThan<int>>();
         error.Code.ShouldBe(nameof(ErrorResource.GreaterThan));
@@ -132,7 +132,7 @@ public class RuleTests : IClassFixture<CommonFixture>
                 .Transform(x => x + 1)
                 .Transform(x => x.ToString())
                 .Transform(int.Parse)
-                .Instance(UserAgeWithoutCustomization.Create);
+                .Instance(ValueObjectWithoutCustomization.Create);
         });
     
         var action = () => parentModelValidator.Validate(_model);
@@ -205,37 +205,97 @@ public class RuleTests : IClassFixture<CommonFixture>
 
         action.ShouldThrow<CrossValidationException>();
     }
+    
+    [Fact]
+    public void Repeat_customization_applies_new_customization()
+    {
+        var expectedMessage = "Expected message";
+
+        var action = () => Validate.That(_model.NullableInt)
+            .WithMessage("Old message")
+            .WithMessage(expectedMessage)
+            .NotNull();
+
+        var error = action.ShouldThrowValidationError();
+        error.Message.ShouldBe(expectedMessage);
+    }
+    
+    [Fact]
+    public void Repeat_error_customization_applies_new_error()
+    {
+        var action = () => Validate.That(_model.NullableInt)
+            .WithError(new CommonValidationError.NotNull())
+            .WithError(new CommonValidationError.Enum())
+            .Must(_commonFixture.NotBeValid);
+
+        var error = action.ShouldThrowValidationError<CommonValidationError.Enum>();
+        error.Code.ShouldBe(nameof(ErrorResource.Enum));
+        error.Message.ShouldBe(ErrorResource.Enum);
+    }
+    
+    [Fact]
+    public void Validators_do_not_override_customization()
+    {
+        var expectedDetails = "Expected details";
+        var action = () => Validate.That(_model.Int)
+            .WithCode(nameof(ErrorResource.NotNull))
+            .WithDetails(expectedDetails)
+            .GreaterThan(_model.Int);
+
+        var error = action.ShouldThrowValidationError<CommonValidationError.GreaterThan<int>>();
+        error.Code.ShouldBe(nameof(ErrorResource.NotNull));
+        error.Message.ShouldBe(ErrorResource.NotNull);
+        error.Details.ShouldBe(expectedDetails);
+    }
+    
+    [Fact]
+    public void Validators_do_not_override_error_customization()
+    {
+        var expectedDetails = "Expected details";
+        var action = () => Validate.That(_model.Int)
+            .WithError(new ErrorWithCustomization())
+            .GreaterThan(_model.Int);
+
+        var error = action.ShouldThrowValidationError<ErrorWithCustomization>();
+        error.Code.ShouldBe(nameof(ErrorResource.NotNull));
+        error.Message.ShouldBe(ErrorResource.NotNull);
+        error.Details.ShouldBe(expectedDetails);
+    }
 
     private record CustomErrorWithPlaceholderValue(int Value) : ValidationError;
 
-    private record UserAgeWithoutCustomization
+    private record ValueObjectWithoutCustomization
     {
         public required int Value { get; set; }
         
-        public static UserAgeWithoutCustomization Create(int value)
+        public static ValueObjectWithoutCustomization Create(int value)
         {
             Validate.That(value).GreaterThan(value + 1);
-            return new UserAgeWithoutCustomization
+            return new ValueObjectWithoutCustomization
             {
                 Value = value
             };
         }
     }
     
-    private record UserAgeWithCustomization
+    private record ValueObjectWithCustomization
     {
         public required int Value { get; set; }
         
-        public static UserAgeWithCustomization Create(int value)
+        public static ValueObjectWithCustomization Create(int value)
         {
             Validate.That(value)
                 .WithMessage("Expected message")
                 .WithDetails("Expected details")
                 .GreaterThan(value + 1);
-            return new UserAgeWithCustomization
+            return new ValueObjectWithCustomization
             {
                 Value = value
             };
         }
     }
+
+    private record ErrorWithCustomization() : ValidationError(
+        Code: nameof(CommonValidationError.NotNull),
+        Details: "Expected details");
 }
