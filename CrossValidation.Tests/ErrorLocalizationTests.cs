@@ -1,6 +1,8 @@
 ﻿using CrossValidation.Resources;
 using CrossValidation.Rules;
 using CrossValidation.ShouldlyAssertions;
+using CrossValidation.Tests.Builders;
+using CrossValidation.Tests.Models;
 using Shouldly;
 using Xunit;
 
@@ -8,10 +10,17 @@ namespace CrossValidation.Tests;
 
 public class ErrorLocalizationTests
 {
+    private ParentModel _model;
+
+    public ErrorLocalizationTests()
+    {
+        _model = new ParentModelBuilder().Build();
+    }
+    
     [Fact]
     public void Validator_error_is_localized()
     {
-        var action = () => IValidRule<string?>.CreateFromField(null)
+        var action = () => Validate.That(_model.NullableString)
             .NotNull();
 
         var error = action.ShouldThrowValidationError();

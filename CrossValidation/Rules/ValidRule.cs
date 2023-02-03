@@ -16,23 +16,25 @@ public interface IValidRule<out TField> : IRule<TField>
     void TakeErrorCustomizations(IValidationError error, bool overrideContextCustomizations);
     
     public static IRule<TField> CreateFromField(
+        Dsl dsl,
         TField fieldValue,
         string? fieldFullPath = null,
         ValidationContext? context = null,
         int? index = null,
         string? parentPath = null)
     {
-        return new ValidRule<TField>(fieldValue, fieldFullPath, context, index, parentPath);
+        return new ValidRule<TField>(dsl, fieldValue, fieldFullPath, context, index, parentPath);
     }
 
     public static IRule<TField> CreateFromFieldSelector<TModel>(
+        Dsl dsl,
         TModel model,
         Expression<Func<TModel, TField>> fieldSelector,
         ValidationContext? context = null)
     {
         var fieldInformation = FieldInformationExtractor<TField>
             .Extract(model, fieldSelector);
-        return new ValidRule<TField>(fieldInformation.Value, fieldInformation.SelectionFullPath, context);
+        return new ValidRule<TField>(dsl, fieldInformation.Value, fieldInformation.SelectionFullPath, context);
     }
 }
 
@@ -45,6 +47,7 @@ file class ValidRule<TField> :
     public string FieldFullPath { get; set; }
 
     public ValidRule(
+        Dsl dsl,
         TField fieldValue,
         string? fieldFullPath = null,
         ValidationContext? context = null,
@@ -53,6 +56,7 @@ file class ValidRule<TField> :
     {
         FieldValue = fieldValue;
         Context = context ?? new ValidationContext();
+        Context.Dsl = dsl;
         Context.FieldValue = fieldValue;
         Context.FieldDisplayName = null;
         FieldFullPath = fieldFullPath ?? "";
@@ -118,7 +122,18 @@ file class ValidRule<TField> :
 
         if (Context is {ValidationMode: ValidationMode.StopValidationOnFirstError})
         {
-            throw new CrossValidationException(Context.ErrorsCollected!);
+            if (Context.Dsl == Dsl.Validate)
+            {
+                throw new CrossValidationException(Context.ErrorsCollected!);
+            }
+            else if (Context.Dsl == Dsl.Ensure)
+            {
+                throw new EnsureException();
+            }
+            else
+            {
+                throw new UnreachableException();
+            }
         }
     }
 
@@ -134,6 +149,7 @@ file class ValidRule<TField> :
             error.FieldName = null;
             error.FieldDisplayName = null;
             error.FieldValue = null;
+            error.HttpStatusCode = null;
             error.PlaceholderValues = null;
             TakeErrorCustomizations(error, overrideContextCustomizations: false);
             HandleError(error);

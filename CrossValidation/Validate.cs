@@ -12,7 +12,7 @@ public static class Validate
     [Pure]
     public static IRule<TField> That<TField>(TField fieldValue)
     {
-        return IValidRule<TField>.CreateFromField(fieldValue);
+        return IValidRule<TField>.CreateFromField(Dsl.Validate, fieldValue);
     }
 
     [Pure]
@@ -20,7 +20,7 @@ public static class Validate
         TModel model,
         Expression<Func<TModel, TField>> fieldSelector)
     {
-        return IValidRule<TField>.CreateFromFieldSelector(model, fieldSelector);
+        return IValidRule<TField>.CreateFromFieldSelector(Dsl.Validate, model, fieldSelector);
     }
 
     public static void Must(bool condition, ValidationError error)
@@ -52,7 +52,7 @@ public static class Validate
     {
         if (!condition)
         {
-            var rule = IValidRule<bool>.CreateFromField(condition);
+            var rule = IValidRule<bool>.CreateFromField(Dsl.Validate, condition);
 
             if (error is not null)
             {

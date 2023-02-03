@@ -198,7 +198,10 @@ internal abstract class Rule<TField> : IRule<TField>
         if (this is IValidRule<TField> validRule && validRule.Context.ExecuteNextValidator)
         {
             var fieldValueTransformed = transformer(validRule.GetFieldValue());
-            return IValidRule<TFieldTransformed>.CreateFromField(fieldValueTransformed, validRule.Context.FieldName,
+            return IValidRule<TFieldTransformed>.CreateFromField(
+                validRule.Context.Dsl,
+                fieldValueTransformed,
+                validRule.Context.FieldName,
                 validRule.Context);
         }
 

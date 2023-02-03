@@ -30,7 +30,7 @@ public class RuleTests : IClassFixture<CommonFixture>
         var defaultConfiguration = CrossValidationConfiguration.GeneratePlaceholderValuesWhenTheyAreNotAdded;
         CrossValidationConfiguration.GeneratePlaceholderValuesWhenTheyAreNotAdded = true;
         
-        var action = () => IValidRule<int>.CreateFromField(_model.NestedModel.Int)
+        var action = () => Validate.That(_model.NestedModel.Int)
             .WithError(new CustomErrorWithPlaceholderValue(_model.NestedModel.Int))
             .GreaterThan(_model.NestedModel.Int);
 
@@ -46,7 +46,7 @@ public class RuleTests : IClassFixture<CommonFixture>
     [Fact]
     public void Validate_predicate()
     {
-        var action = () => IValidRule<NestedModel>.CreateFromField(_model.NestedModel)
+        var action = () => Validate.That(_model.NestedModel)
             .Must(_commonFixture.NotBeValid);
 
         action.ShouldThrowValidationError<CommonCodeValidationError.Predicate>();
@@ -145,7 +145,7 @@ public class RuleTests : IClassFixture<CommonFixture>
     public void Validator_with_conditional_execution()
     {
         var expectedMessage = "TrueCase";
-        var action = () => IValidRule<int>.CreateFromField(_model.NestedModel.Int)
+        var action = () => Validate.That(_model.NestedModel.Int)
             .When(_commonFixture.NotBeValid)
             .GreaterThan(_model.NestedModel.Int + 1)
             .When(true)
@@ -160,7 +160,7 @@ public class RuleTests : IClassFixture<CommonFixture>
     public void Validator_with_async_conditional_execution()
     {
         var expectedMessage = "TrueCase";
-        var action = () => IValidRule<int>.CreateFromField(_model.NestedModel.Int)
+        var action = () => Validate.That(_model.NestedModel.Int)
             .WhenAsync(_commonFixture.NotBeValidAsync)
             .GreaterThan(_model.NestedModel.Int + 1)
             .WhenAsync(_commonFixture.BeValidAsync)
