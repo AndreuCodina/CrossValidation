@@ -134,7 +134,7 @@ public class UserService
         Validate.Must(user != null, new UserNotFoundError());
     
         var isNicknameAvailable = _context.Users.Any(x => x.Nickname != userDto.Nickname);
-        Validate.Must(isNicknameAvailable, new NicknameIsNotAvailableError(userDto.Nickname))
+        Validate.Must(isNicknameAvailable, new NicknameNotAvailableError(userDto.Nickname))
     
         user.Nickname = userDto.Nickname;
         _context.Update(user);
@@ -150,8 +150,8 @@ public class UserService
 {  
     public void ChangeNickname(UserDto userDto)
     {
-        var user = GetUser(userDto);
-        CheckNicknameAvailable(userDto)
+        var user = GetUser(userDto.Id);
+        CheckNicknameAvailable(userDto.Nickname)
     
         user.Nickname = userDto.Nickname;
         _context.Update(user);
@@ -177,21 +177,20 @@ public record ModelValidator : ModelValidator<Model>
     {
         if (model.CustomerIsPreferred)
         {
-            RuleFor(x => x.CustomerDiscount)
+            Field(model.CustomerDiscount)
                 .NotNull()
                 .GreaterThan(0);
-            RuleFor(x => x.CreditCardNumber)
+            Field(model.CreditCardNumber)
                 .NotNull();
-                
-            RuleFor(model.CustomerDiscount)
+            Field(model.CustomerDiscount)
                 .NotNull()
                 .GreaterThan(0);
-            RuleFor(x => x.CreditCardNumber)
+            Field(model.CreditCardNumber)
                 .NotNull();
         }
         else
         {
-            RuleFor(x => x.CustomerDiscount)
+            Field(model.CustomerDiscount)
                 .Null();
         }
     }
