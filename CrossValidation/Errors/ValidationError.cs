@@ -50,7 +50,9 @@ public record ValidationError : IValidationError
         this.HttpStatusCode = HttpStatusCode;
     }
 
-    protected void AddPlaceholderValue(object? value, [CallerArgumentExpression(nameof(value))] string name = "")
+    protected void AddPlaceholderValue(
+        object? value,
+        [CallerArgumentExpression(nameof(value))] string name = "")
     {
         PlaceholderValues ??= new();
 

@@ -67,12 +67,12 @@ public class WhenNotNullTests : IClassFixture<CommonFixture>
         {
             validator.ValidationMode = ValidationMode.AccumulateFirstErrorEachRule;
             
-            var structRuleAction = validator.Field(x => x.NullableInt)
+            var structRuleAction = validator.Field(_model.NullableInt)
                 .WhenNotNull(x => x
                     .Must(_commonFixture.NotBeValid));
             (structRuleAction is IInvalidRule<int?>).ShouldBeTrue();
             
-            var classRuleAction = validator.Field(x => x.NullableString)
+            var classRuleAction = validator.Field(_model.NullableString)
                 .WhenNotNull(x => x
                     .Must(_commonFixture.NotBeValid));
             (classRuleAction is IInvalidRule<string>).ShouldBeTrue();

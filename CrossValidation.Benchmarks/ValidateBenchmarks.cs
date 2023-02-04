@@ -71,7 +71,7 @@ public class ValidateBenchmarks
     {
         public override void CreateRules(Model model)
         {
-            Field(x => x.Value)
+            Field(model.Value)
                 .Must(_ => true);
         }
     }
@@ -80,7 +80,7 @@ public class ValidateBenchmarks
     {
         public override void CreateRules(Model model)
         {
-            Field(x => x.Value)
+            Field(model.Value)
                 .Must(_ => false);
         }
     }
@@ -89,7 +89,7 @@ public class ValidateBenchmarks
     {
         public override void CreateRules(Model model)
         {
-            Field(x => x.Value)
+            Field(model.Value)
                 .Must(_ => true)
                 .Transform(x => x.ToString())
                 .Must(_ => true);
@@ -100,7 +100,7 @@ public class ValidateBenchmarks
     {
         public override void CreateRules(Model model)
         {
-            Field(x => x.Value)
+            Field(model.Value)
                 .Must(_ => false)
                 .Transform(x => x.ToString())
                 .Must(_ => true);

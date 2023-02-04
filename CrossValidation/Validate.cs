@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics.Contracts;
-using System.Linq.Expressions;
 using System.Net;
+using System.Runtime.CompilerServices;
 using CrossValidation.Errors;
 using CrossValidation.Rules;
 using CrossValidation.Utils;
@@ -14,13 +14,13 @@ public static class Validate
     {
         return IValidRule<TField>.CreateFromField(Dsl.Validate, fieldValue);
     }
-
+    
     [Pure]
-    public static IRule<TField> Field<TModel, TField>(
-        TModel model,
-        Expression<Func<TModel, TField>> fieldSelector)
+    public static IRule<TField> Field<TField>(
+        TField field,
+        [CallerArgumentExpression(nameof(field))] string fieldName = "")
     {
-        return IValidRule<TField>.CreateFromFieldSelector(Dsl.Validate, model, fieldSelector);
+        return IValidRule<TField>.CreateFromFieldName(Dsl.Validate, field, fieldName);
     }
 
     public static void Must(bool condition, ValidationError error)

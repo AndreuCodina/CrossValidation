@@ -58,7 +58,7 @@ public class RuleTests : IClassFixture<CommonFixture>
         var messageTemplate = "{FieldDisplayName}: Expected message";
         var expectedMessage = "NestedModel.Int: Expected message";
         
-        var getAge = () => Validate.Field(_model, x => x.NestedModel.Int)
+        var getAge = () => Validate.Field(_model.NestedModel.Int)
             .WithMessage(messageTemplate)
             .WithError(new CustomErrorWithPlaceholderValue(10))
             .Instance(ValueObjectWithoutCustomization.Create);
@@ -71,7 +71,7 @@ public class RuleTests : IClassFixture<CommonFixture>
     [Fact]
     public void Keep_localized_message_before_create_instance()
     {
-        var getAge = () => Validate.Field(_model, x => x.NestedModel.Int)
+        var getAge = () => Validate.Field(_model.NestedModel.Int)
             .WithCode(nameof(ErrorResource.NotNull))
             .Instance(ValueObjectWithoutCustomization.Create);
 
@@ -83,7 +83,7 @@ public class RuleTests : IClassFixture<CommonFixture>
     [Fact]
     public void Keep_message_before_create_instance()
     {
-        var getAge = () => Validate.Field(_model, x => x.NestedModel.Int)
+        var getAge = () => Validate.Field(_model.NestedModel.Int)
             .WithMessage(ErrorResource.NotNull)
             .Instance(ValueObjectWithoutCustomization.Create);
 
@@ -128,7 +128,7 @@ public class RuleTests : IClassFixture<CommonFixture>
         {
             validator.ValidationMode = ValidationMode.AccumulateFirstErrorEachRule;
 
-            validator.Field(x => x.NullableInt)
+            validator.Field(_model.NullableInt)
                 .NotNull()
                 .Transform(x => x + 1)
                 .Transform(x => x.ToString())

@@ -1,8 +1,6 @@
 ﻿using System.Diagnostics;
-using System.Linq.Expressions;
 using CrossValidation.Errors;
 using CrossValidation.Exceptions;
-using CrossValidation.Utils;
 using CrossValidation.ValidationContexts;
 
 namespace CrossValidation.Rules;
@@ -26,15 +24,19 @@ public interface IValidRule<out TField> : IRule<TField>
         return new ValidRule<TField>(dsl, fieldValue, fieldFullPath, context, index, parentPath);
     }
 
-    public static IRule<TField> CreateFromFieldSelector<TModel>(
+    public static IRule<TField> CreateFromFieldName(
         Dsl dsl,
-        TModel model,
-        Expression<Func<TModel, TField>> fieldSelector,
+        TField fieldValue,
+        string fieldName,
         ValidationContext? context = null)
     {
-        var fieldInformation = FieldInformationExtractor<TField>
-            .Extract(model, fieldSelector);
-        return new ValidRule<TField>(dsl, fieldInformation.Value, fieldInformation.SelectionFullPath, context);
+        if (!fieldName.Contains("."))
+        {
+            throw new ArgumentException("Use Field without a model is not allowed");
+        }
+
+        var selectionFullPath = fieldName.Substring(fieldName.IndexOf('.') + 1);
+        return new ValidRule<TField>(dsl, fieldValue, selectionFullPath, context);
     }
 }
 

@@ -76,7 +76,7 @@ public class ValidateTests : IClassFixture<CommonFixture>
         rule.ShouldBeAssignableTo<IValidRule<int>>();
         ((IValidRule<int>)rule).Context.Dsl.ShouldBe(Dsl.Validate);
         
-        rule = Validate.Field(_model, x => x.Int);
+        rule = Validate.Field(_model.Int);
         rule.ShouldBeAssignableTo<IValidRule<int>>();
         ((IValidRule<int>)rule).Context.Dsl.ShouldBe(Dsl.Validate);
 
