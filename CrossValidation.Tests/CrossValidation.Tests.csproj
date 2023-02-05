@@ -10,6 +10,7 @@
 
     <ItemGroup>
         <PackageReference Include="Bogus" Version="34.0.2" />
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="7.0.2" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.11.0" />
         <PackageReference Include="Moq" Version="4.18.4" />
         <PackageReference Include="Shouldly" Version="4.1.0" />
@@ -27,6 +28,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\CrossValidation.ShouldlyAssertions\CrossValidation.ShouldlyAssertions.csproj" />
+      <ProjectReference Include="..\CrossValidation.WebApplication\CrossValidation.WebApplication.csproj" />
       <ProjectReference Include="..\CrossValidation\CrossValidation.csproj" />
     </ItemGroup>
 
