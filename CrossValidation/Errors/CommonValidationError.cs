@@ -2,14 +2,14 @@
 
 namespace CrossValidation.Errors;
 
-public record CommonCodeValidationError(string Code) : CodeValidationError(Code)
+public record CommonValidationError(string Code) : CodeValidationError(Code)
 {
-    public record NotNull() : CommonCodeValidationError(nameof(ErrorResource.NotNull));
+    public record NotNull() : CommonValidationError(nameof(ErrorResource.NotNull));
     
-    public record Null() : CommonCodeValidationError(nameof(ErrorResource.Null));
+    public record Null() : CommonValidationError(nameof(ErrorResource.Null));
 
     public record GreaterThan<TField>(TField ComparisonValue) :
-        CommonCodeValidationError(nameof(ErrorResource.GreaterThan))
+        CommonValidationError(nameof(ErrorResource.GreaterThan))
     {
         public override void AddPlaceholderValues()
         {
@@ -18,10 +18,10 @@ public record CommonCodeValidationError(string Code) : CodeValidationError(Code)
         }
     }
     
-    public record Enum() : CommonCodeValidationError(nameof(ErrorResource.Enum));
+    public record Enum() : CommonValidationError(nameof(ErrorResource.Enum));
     
     public record LengthRange(int Minimum, int Maximum, int TotalLength) :
-        CommonCodeValidationError(nameof(ErrorResource.LengthRange)),
+        CommonValidationError(nameof(ErrorResource.LengthRange)),
         ILengthError
     {
         public override void AddPlaceholderValues()
@@ -34,7 +34,7 @@ public record CommonCodeValidationError(string Code) : CodeValidationError(Code)
     }
     
     public record MinimumLength(int Minimum, int TotalLength) :
-        CommonCodeValidationError(nameof(ErrorResource.MinimumLength)),
+        CommonValidationError(nameof(ErrorResource.MinimumLength)),
         ILengthError
     {
         public override void AddPlaceholderValues()
@@ -45,5 +45,5 @@ public record CommonCodeValidationError(string Code) : CodeValidationError(Code)
         }
     }
     
-    public record Predicate() : CommonCodeValidationError(nameof(ErrorResource.Predicate));
+    public record Predicate() : CommonValidationError(nameof(ErrorResource.Predicate));
 }

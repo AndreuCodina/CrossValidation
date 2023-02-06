@@ -11,6 +11,6 @@ public record NotNullValidator<TField>(TField? FieldValue) : Validator
 
     public override ValidationError CreateError()
     {
-        return new CommonCodeValidationError.NotNull();
+        return new CommonValidationError.NotNull();
     }
 }

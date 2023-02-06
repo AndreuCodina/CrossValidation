@@ -329,7 +329,7 @@ public class ModelValidatorTests : IClassFixture<CommonFixture>
     
         var action = () => parentModelValidator.Validate(_model);
     
-        action.ShouldThrowValidationError<CommonCodeValidationError.NotNull>();
+        action.ShouldThrowValidationError<CommonValidationError.NotNull>();
     }
     
     [Fact]
@@ -441,7 +441,7 @@ public class ModelValidatorTests : IClassFixture<CommonFixture>
         
         var action = () => parentModelValidator.Validate(_model);
         
-        var error = action.ShouldThrowValidationError<CommonCodeValidationError.GreaterThan<int>>();
+        var error = action.ShouldThrowValidationError<CommonValidationError.GreaterThan<int>>();
         error.ComparisonValue.ShouldBe(comparisonValue);
         error.Code.ShouldBe("GreaterThan");
     }
@@ -493,7 +493,7 @@ public class ModelValidatorTests : IClassFixture<CommonFixture>
             .WithNullableInt(1)
             .Build();
         var expectedMessage = "Error message";
-        var expectedCode = nameof(CommonCodeValidationError.Predicate);
+        var expectedCode = nameof(CommonValidationError.Predicate);
         var expectedDetails = "Details";
         var expectedHttpStatusCode = HttpStatusCode.Accepted;
         var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
@@ -512,7 +512,7 @@ public class ModelValidatorTests : IClassFixture<CommonFixture>
 
         var action = () => parentModelValidator.Validate(_model);
 
-        var error = action.ShouldThrowValidationError<CommonCodeValidationError.Predicate>();
+        var error = action.ShouldThrowValidationError<CommonValidationError.Predicate>();
         error.Message.ShouldBe(expectedMessage);
         error.Code.ShouldBe(expectedCode);
         error.Details.ShouldBe(expectedDetails);
@@ -651,7 +651,7 @@ public class ModelValidatorTests : IClassFixture<CommonFixture>
         
         var action = () => parentModelValidator.Validate(_model);
 
-        action.ShouldThrowValidationError<CommonCodeValidationError.Predicate>();
+        action.ShouldThrowValidationError<CommonValidationError.Predicate>();
     }
     
     [Fact]

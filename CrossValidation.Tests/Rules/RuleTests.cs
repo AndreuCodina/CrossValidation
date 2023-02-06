@@ -49,7 +49,7 @@ public class RuleTests : IClassFixture<CommonFixture>
         var action = () => Validate.That(_model.NestedModel)
             .Must(_commonFixture.NotBeValid);
 
-        action.ShouldThrowValidationError<CommonCodeValidationError.Predicate>();
+        action.ShouldThrowValidationError<CommonValidationError.Predicate>();
     }
     
     [Fact]
@@ -75,7 +75,7 @@ public class RuleTests : IClassFixture<CommonFixture>
             .WithCode(nameof(ErrorResource.NotNull))
             .Instance(ValueObjectWithoutCustomization.Create);
 
-        var error = getAge.ShouldThrowValidationError<CommonCodeValidationError.GreaterThan<int>>();
+        var error = getAge.ShouldThrowValidationError<CommonValidationError.GreaterThan<int>>();
         error.Code.ShouldBe(nameof(ErrorResource.NotNull));
         error.Message.ShouldBe(ErrorResource.NotNull);
     }
@@ -87,7 +87,7 @@ public class RuleTests : IClassFixture<CommonFixture>
             .WithMessage(ErrorResource.NotNull)
             .Instance(ValueObjectWithoutCustomization.Create);
 
-        var error = getAge.ShouldThrowValidationError<CommonCodeValidationError.GreaterThan<int>>();
+        var error = getAge.ShouldThrowValidationError<CommonValidationError.GreaterThan<int>>();
         error.Message.ShouldBe(ErrorResource.NotNull);
     }
     
@@ -105,7 +105,7 @@ public class RuleTests : IClassFixture<CommonFixture>
                 return x;
             });
         
-        var error = action.ShouldThrowValidationError<CommonCodeValidationError.Predicate>();
+        var error = action.ShouldThrowValidationError<CommonValidationError.Predicate>();
         error.Message.ShouldBe(expectedMessage);
     }
     
@@ -115,7 +115,7 @@ public class RuleTests : IClassFixture<CommonFixture>
         var getAge = () => Validate.That(_model.Int)
             .Instance(ValueObjectWithCustomization.Create);
 
-        var error = getAge.ShouldThrowValidationError<CommonCodeValidationError.GreaterThan<int>>();
+        var error = getAge.ShouldThrowValidationError<CommonValidationError.GreaterThan<int>>();
         error.Code.ShouldBe(nameof(ErrorResource.GreaterThan));
         error.Message.ShouldBe("Expected message");
         error.Details.ShouldBe("Expected details");
@@ -225,11 +225,11 @@ public class RuleTests : IClassFixture<CommonFixture>
     public void Repeat_error_customization_applies_new_error()
     {
         var action = () => Validate.That(_model.NullableInt)
-            .WithError(new CommonCodeValidationError.NotNull())
-            .WithError(new CommonCodeValidationError.Enum())
+            .WithError(new CommonValidationError.NotNull())
+            .WithError(new CommonValidationError.Enum())
             .Must(_commonFixture.NotBeValid);
 
-        var error = action.ShouldThrowValidationError<CommonCodeValidationError.Enum>();
+        var error = action.ShouldThrowValidationError<CommonValidationError.Enum>();
         error.Code.ShouldBe(nameof(ErrorResource.Enum));
         error.Message.ShouldBe(ErrorResource.Enum);
     }
@@ -245,7 +245,7 @@ public class RuleTests : IClassFixture<CommonFixture>
             .WithHttpStatusCode(HttpStatusCode.Created)
             .GreaterThan(_model.Int);
 
-        var error = action.ShouldThrowValidationError<CommonCodeValidationError.GreaterThan<int>>();
+        var error = action.ShouldThrowValidationError<CommonValidationError.GreaterThan<int>>();
         error.Code.ShouldBe(nameof(ErrorResource.NotNull));
         error.Message.ShouldBe(ErrorResource.NotNull);
         error.Details.ShouldBe(expectedDetails);
@@ -301,7 +301,7 @@ public class RuleTests : IClassFixture<CommonFixture>
     }
 
     private record ErrorWithCustomization() : ValidationError(
-        Code: nameof(CommonCodeValidationError.NotNull),
+        Code: nameof(CommonValidationError.NotNull),
         Details: "Expected details",
         HttpStatusCode: System.Net.HttpStatusCode.Created);
 }
