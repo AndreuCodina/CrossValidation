@@ -31,7 +31,23 @@ public class ModelNullabilityValidatorTests : IClassFixture<CommonFixture>
 
         var action = () => Validate.ModelNullability(_model);
 
-        action.ShouldThrowError<ModelNullabilityValidatorError.NonNullablePropertyIsNullError>();
+        var error = action.ShouldThrowEnsureError<ModelNullabilityValidatorError.NonNullablePropertyIsNullError>();
+        error.PropertyName.ShouldBe(nameof(ParentModel.String));
+    }
+    
+    [Fact]
+    public void Non_nullable_nested_model_with_null_fails()
+    {
+        var expectedPropertyName = nameof(ParentModel.NestedModel);
+        SetPropertyValue(
+            model: _model,
+            propertyName: expectedPropertyName,
+            propertyValue: null);
+
+        var action = () => Validate.ModelNullability(_model);
+
+        var error = action.ShouldThrowEnsureError<ModelNullabilityValidatorError.NonNullablePropertyIsNullError>();
+        error.PropertyName.ShouldBe(expectedPropertyName);
     }
 
     [Fact]
@@ -45,23 +61,8 @@ public class ModelNullabilityValidatorTests : IClassFixture<CommonFixture>
 
         var action = () => Validate.ModelNullability(_model);
 
-        var error = action.ShouldThrowError<ModelNullabilityValidatorError.NonNullableItemCollectionWithNullItemError>();
+        var error = action.ShouldThrowEnsureError<ModelNullabilityValidatorError.NonNullableItemCollectionWithNullItemError>();
         error.CollectionName.ShouldBe(expectedCollectionName);
-    }
-
-    [Fact]
-    public void Non_nullable_nested_model_with_null_fails()
-    {
-        var expectedPropertyName = nameof(ParentModel.NestedModel);
-        SetPropertyValue(
-            model: _model,
-            propertyName: expectedPropertyName,
-            propertyValue: null);
-
-        var action = () => Validate.ModelNullability(_model);
-
-        var error = action.ShouldThrowError<ModelNullabilityValidatorError.NonNullablePropertyIsNullError>();
-        error.PropertyName.ShouldBe(expectedPropertyName);
     }
 
     private void SetPropertyValue(object model, string propertyName, object? propertyValue)

@@ -21,7 +21,7 @@ public abstract record ModelValidator<TModel>
             {
                 throw new InvalidOperationException("Cannot change the validation mode in a child model validator");
             }
-            
+
             _validationMode = value;
             Context!.ValidationMode = _validationMode;
         }
@@ -30,11 +30,12 @@ public abstract record ModelValidator<TModel>
     [Pure]
     public IRule<TField> Field<TField>(
         TField field,
-        [CallerArgumentExpression(nameof(field))] string fieldName = "")
+        [CallerArgumentExpression(nameof(field))]
+        string fieldName = "")
     {
         return IValidRule<TField>.CreateFromFieldName(Dsl.Validate, field, fieldName, Context);
     }
-    
+
     [Pure]
     public IRule<TField> That<TField>(TField fieldValue)
     {
@@ -56,7 +57,14 @@ public abstract record ModelValidator<TModel>
 
         if (!Context.IsChildContext && Context.ErrorsCollected is not null)
         {
-            throw new CrossValidationException(Context.ErrorsCollected!);
+            if (Context.ErrorsCollected.Count == 1)
+            {
+                throw new ValidationException(Context.ErrorsCollected[0]);
+            }
+            else
+            {
+                throw new ValidationListException(Context.ErrorsCollected);
+            }
         }
     }
 }

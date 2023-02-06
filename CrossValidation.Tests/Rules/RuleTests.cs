@@ -186,7 +186,7 @@ public class RuleTests : IClassFixture<CommonFixture>
         var action = () => Validate.That(1)
             .Must(x => x != 1);
 
-        action.ShouldThrow<CrossValidationException>();
+        action.ShouldThrow<ValidationException>();
     }
     
     [Fact]
@@ -204,7 +204,7 @@ public class RuleTests : IClassFixture<CommonFixture>
         var action = () => Validate.That(1)
             .MustAsync(_commonFixture.NotBeValidAsync);
 
-        action.ShouldThrow<CrossValidationException>();
+        action.ShouldThrow<ValidationException>();
     }
     
     [Fact]

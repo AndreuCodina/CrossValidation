@@ -49,6 +49,6 @@ public class EnumValidatorTests
         var stringValue = "Not valid enum value";
         var stringAction = () => Validate.That(stringValue)
             .IsInEnum<NestedEnum>();
-        stringAction.ShouldThrow<CrossValidationException>();
+        stringAction.ShouldThrow<ValidationException>();
     }
 }

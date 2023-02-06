@@ -117,20 +117,33 @@ file class ValidRule<TField> :
         }
     }
 
+    private EnsureError ToEnsureError(IValidationError error)
+    {
+        return new EnsureError
+        {
+            Details = error.Details,
+            HttpStatusCode = error.HttpStatusCode
+        };
+    }
+
     public void HandleError(IValidationError error)
     {
         var errorToAdd = Context.Error ?? error;
         Context.AddError(errorToAdd);
+        
+        if (Context.Dsl == Dsl.Ensure)
+        {
+            throw new EnsureException(ToEnsureError(Context.ErrorsCollected![0]));
+        }
 
         if (Context is {ValidationMode: ValidationMode.StopValidationOnFirstError})
         {
             if (Context.Dsl == Dsl.Validate)
             {
-                throw new CrossValidationException(Context.ErrorsCollected!);
-            }
-            else if (Context.Dsl == Dsl.Ensure)
-            {
-                throw new EnsureException();
+                if (Context.ErrorsCollected!.Count == 1)
+                {
+                    throw Context.ErrorsCollected[0].ToException();
+                }
             }
             else
             {
@@ -145,16 +158,15 @@ file class ValidRule<TField> :
         {
             return fieldToInstance(FieldValue);
         }
-        catch (CrossValidationException e)
+        catch (ValidationException e)
         {
-            var error = e.Errors[0];
-            error.FieldName = null;
-            error.FieldDisplayName = null;
-            error.FieldValue = null;
-            error.HttpStatusCode = null;
-            error.PlaceholderValues = null;
-            TakeErrorCustomizations(error, overrideContextCustomizations: false);
-            HandleError(error);
+            e.Error.FieldName = null;
+            e.Error.FieldDisplayName = null;
+            e.Error.FieldValue = null;
+            e.Error.HttpStatusCode = null;
+            e.Error.PlaceholderValues = null;
+            TakeErrorCustomizations(e.Error, overrideContextCustomizations: false);
+            HandleError(e.Error);
             throw new UnreachableException();
         }
     }

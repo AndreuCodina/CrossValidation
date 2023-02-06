@@ -37,7 +37,7 @@ internal class CrossValidationMiddleware : IMiddleware
         var genericError = "An error occurred";
         var httpStatusCode = HttpStatusCode.InternalServerError;
 
-        if (exception is CrossValidationException crossValidationException)
+        if (exception is ValidationException or ValidationListException)
         {
             httpStatusCode = HttpStatusCode.UnprocessableEntity;
             problemDetails.Title = "One or more validation errors occurred";
@@ -47,7 +47,7 @@ internal class CrossValidationMiddleware : IMiddleware
             httpStatusCode = HttpStatusCode.UnprocessableEntity;
             problemDetails.Title = genericError;
         }
-        else if (exception is CrossException {Error: ModelNullabilityValidatorError})
+        else if (exception is EnsureException {Error: ModelNullabilityValidatorError})
         {
             httpStatusCode = HttpStatusCode.BadRequest;
             problemDetails.Title = "Nullability error";

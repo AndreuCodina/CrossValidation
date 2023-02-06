@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
+using CrossValidation.Exceptions;
 
 namespace CrossValidation.Errors;
 
@@ -16,12 +17,13 @@ public interface IValidationError
     Dictionary<string, object>? PlaceholderValues { get; set; }
     void AddPlaceholderValues();
     IEnumerable<string> GetFieldNames();
+    ValidationException ToException();
 }
 
 public record ValidationError : IValidationError
 {
     private const string DefaultPlaceholderValue = "";
-    private static readonly Regex PlaceholderRegex = new Regex("{([^{}:]+)}", RegexOptions.Compiled);
+    private static readonly Regex PlaceholderRegex = new("{([^{}:]+)}", RegexOptions.Compiled);
 
     public string? FieldName { get; set; }
     public string? FieldDisplayName { get; set; }
@@ -81,6 +83,11 @@ public record ValidationError : IValidationError
             .Single()
             .GetParameters()
             .Select(x => x.Name!);
+    }
+
+    public ValidationException ToException()
+    {
+        throw new ValidationException(this);
     }
 
     private void AddCommonPlaceholderValues()
