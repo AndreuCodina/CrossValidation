@@ -1,7 +1,6 @@
 ﻿using System.Net;
 using CrossValidation.Errors;
 using CrossValidation.Resources;
-using CrossValidation.Rules;
 using CrossValidation.ShouldlyAssertions;
 using CrossValidation.Tests.Builders;
 using CrossValidation.Tests.Fixtures;
@@ -67,20 +66,5 @@ public class ValidateTests : IClassFixture<CommonFixture>
         error.Message.ShouldBe(expectedMessage);
         error.Details.ShouldBe(expectedDetails);
         error.HttpStatusCode.ShouldBe(expectedHttpStatusCode);
-    }
-    
-    [Fact]
-    public void Mark_dsl_as_Validate()
-    {
-        var rule = Validate.That(_model.Int);
-        rule.ShouldBeAssignableTo<IValidRule<int>>();
-        ((IValidRule<int>)rule).Context.Dsl.ShouldBe(Dsl.Validate);
-        
-        rule = Validate.Field(_model.Int);
-        rule.ShouldBeAssignableTo<IValidRule<int>>();
-        ((IValidRule<int>)rule).Context.Dsl.ShouldBe(Dsl.Validate);
-
-        var action = () => Validate.Must(false);
-        action.ShouldThrowValidationError();
     }
 }

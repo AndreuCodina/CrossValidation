@@ -7,34 +7,6 @@ namespace CrossValidation.ShouldlyAssertions;
 [ShouldlyMethods]
 public static class AssertionExtensions
 {
-    public static EnsureError ShouldThrowEnsureError(this Action actual, string? customMessage = null)
-    {
-        return actual.ShouldThrow<EnsureException>(customMessage)
-            .Error;
-    }
-    
-    public static TError ShouldThrowEnsureError<TError>(this Action actual, string? customMessage = null)
-        where TError : EnsureError
-    {
-        return actual.ShouldThrow<EnsureException>()
-            .Error
-            .ShouldBeOfType<TError>(customMessage);
-    }
-    
-    public static EnsureError ShouldThrowEnsureError(this Func<object?> actual, string? customMessage = null)
-    {
-        return actual.ShouldThrow<EnsureException>(customMessage)
-            .Error;
-    }
-
-    public static TError ShouldThrowEnsureError<TError>(this Func<object?> actual, string? customMessage = null)
-        where TError : EnsureError
-    {
-        return actual.ShouldThrow<EnsureException>()
-            .Error
-            .ShouldBeOfType<TError>(customMessage);
-    }
-
     public static ICrossError ShouldThrowValidationError(this Action actual, string? customMessage = null)
     {
         return actual.ShouldThrow<CrossException>().Error;

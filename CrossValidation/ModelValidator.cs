@@ -33,13 +33,13 @@ public abstract record ModelValidator<TModel>
         [CallerArgumentExpression(nameof(field))]
         string fieldName = "")
     {
-        return IValidRule<TField>.CreateFromFieldName(Dsl.Validate, field, fieldName, Context);
+        return IValidRule<TField>.CreateFromFieldName(field, fieldName, Context);
     }
 
     [Pure]
     public IRule<TField> That<TField>(TField fieldValue)
     {
-        return IValidRule<TField>.CreateFromField(Dsl.Validate, fieldValue, context: Context);
+        return IValidRule<TField>.CreateFromField(fieldValue, context: Context);
     }
 
     public abstract void CreateRules(TModel model);

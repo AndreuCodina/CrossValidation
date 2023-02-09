@@ -9,7 +9,6 @@ namespace CrossValidation.ValidationContexts;
 /// </summary>
 public class ValidationContext
 {
-    public Dsl Dsl { get; set; }
     public string? Code { get; set; }
     public string? Message { get; set; }
     public string? Details { get; set; }
@@ -28,7 +27,6 @@ public class ValidationContext
     {
         var newContext = new ValidationContext
         {
-            Dsl = Dsl,
             IsChildContext = true,
             ParentPath = parentPath,
             ErrorsCollected = ErrorsCollected,

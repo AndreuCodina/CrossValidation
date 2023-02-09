@@ -9,7 +9,7 @@ public static class Ensure
     [Pure]
     public static IRule<TField> That<TField>(TField fieldValue)
     {
-        return IValidRule<TField>.CreateFromField(dsl: Dsl.Ensure, fieldValue);
+        return IValidRule<TField>.CreateFromField(fieldValue);
     }
     
     public static void ModelNullability<TModel>(TModel model)

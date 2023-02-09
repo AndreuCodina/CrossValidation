@@ -199,7 +199,6 @@ internal abstract class Rule<TField> : IRule<TField>
         {
             var fieldValueTransformed = transformer(validRule.GetFieldValue());
             return IValidRule<TFieldTransformed>.CreateFromField(
-                validRule.Context.Dsl,
                 fieldValueTransformed,
                 validRule.Context.FieldName,
                 validRule.Context);

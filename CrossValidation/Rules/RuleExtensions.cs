@@ -191,7 +191,6 @@ public static class RuleExtensions
             foreach (var innerField in fieldCollection)
             {
                 var newRule = IValidRule<TInnerType>.CreateFromField(
-                    validRule.Context.Dsl,
                     innerField,
                     fieldFullPath,
                     validRule.Context,

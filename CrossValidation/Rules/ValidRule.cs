@@ -14,18 +14,16 @@ public interface IValidRule<out TField> : IRule<TField>
     void TakeErrorCustomizations(ICrossError error, bool overrideContextCustomizations);
     
     public static IRule<TField> CreateFromField(
-        Dsl dsl,
         TField fieldValue,
         string? fieldFullPath = null,
         ValidationContext? context = null,
         int? index = null,
         string? parentPath = null)
     {
-        return new ValidRule<TField>(dsl, fieldValue, fieldFullPath, context, index, parentPath);
+        return new ValidRule<TField>(fieldValue, fieldFullPath, context, index, parentPath);
     }
 
     public static IRule<TField> CreateFromFieldName(
-        Dsl dsl,
         TField fieldValue,
         string fieldName,
         ValidationContext? context = null)
@@ -36,7 +34,7 @@ public interface IValidRule<out TField> : IRule<TField>
         }
 
         var selectionFullPath = fieldName.Substring(fieldName.IndexOf('.') + 1);
-        return new ValidRule<TField>(dsl, fieldValue, selectionFullPath, context);
+        return new ValidRule<TField>(fieldValue, selectionFullPath, context);
     }
 }
 
@@ -49,7 +47,6 @@ file class ValidRule<TField> :
     public string FieldFullPath { get; set; }
 
     public ValidRule(
-        Dsl dsl,
         TField fieldValue,
         string? fieldFullPath = null,
         ValidationContext? context = null,
@@ -58,7 +55,6 @@ file class ValidRule<TField> :
     {
         FieldValue = fieldValue;
         Context = context ?? new ValidationContext();
-        Context.Dsl = dsl;
         Context.FieldValue = fieldValue;
         Context.FieldDisplayName = null;
         FieldFullPath = fieldFullPath ?? "";
@@ -117,37 +113,16 @@ file class ValidRule<TField> :
         }
     }
 
-    private EnsureError ToEnsureError(ICrossError error)
-    {
-        return new EnsureError
-        {
-            Details = error.Details,
-            HttpStatusCode = error.HttpStatusCode
-        };
-    }
-
     public void HandleError(ICrossError error)
     {
         var errorToAdd = Context.Error ?? error;
         Context.AddError(errorToAdd);
-        
-        if (Context.Dsl == Dsl.Ensure)
-        {
-            throw new EnsureException(ToEnsureError(Context.ErrorsCollected![0]));
-        }
 
         if (Context is {ValidationMode: ValidationMode.StopValidationOnFirstError})
         {
-            if (Context.Dsl == Dsl.Validate)
+            if (Context.ErrorsCollected!.Count == 1)
             {
-                if (Context.ErrorsCollected!.Count == 1)
-                {
-                    throw Context.ErrorsCollected[0].ToException();
-                }
-            }
-            else
-            {
-                throw new UnreachableException();
+                throw Context.ErrorsCollected[0].ToException();
             }
         }
     }
