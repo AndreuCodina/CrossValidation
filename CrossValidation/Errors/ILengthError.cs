@@ -1,6 +1,6 @@
 ﻿namespace CrossValidation.Errors;
 
-public interface ILengthError : IValidationError
+public interface ILengthError : ICrossError
 {
     public int TotalLength { get; }
 }

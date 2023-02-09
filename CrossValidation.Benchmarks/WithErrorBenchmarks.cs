@@ -20,7 +20,7 @@ public class WithErrorBenchmarks
     public void WithError()
     {
         _rule
-            .WithError(new ValidationError(Message: "Error message"))
+            .WithError(new CrossError(Message: "Error message"))
             .Must(_ => true);
     }
 }

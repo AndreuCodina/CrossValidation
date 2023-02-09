@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using CrossValidation.ShouldlyAssertions;
 using CrossValidation.Tests.Builders;
 using CrossValidation.Tests.Fixtures;
 using CrossValidation.Tests.Models;
@@ -24,15 +23,16 @@ public class ModelNullabilityValidatorTests : IClassFixture<CommonFixture>
     [Fact]
     public void Non_nullable_field_with_null_fails()
     {
+        var expectedPropertyName = nameof(ParentModel.String);
         SetPropertyValue(
             model: _model,
-            propertyName: nameof(ParentModel.String),
+            propertyName: expectedPropertyName,
             propertyValue: null);
 
         var action = () => Validate.ModelNullability(_model);
 
-        var error = action.ShouldThrowEnsureError<ModelNullabilityValidatorError.NonNullablePropertyIsNullError>();
-        error.PropertyName.ShouldBe(nameof(ParentModel.String));
+        var exception = action.ShouldThrow<NonNullablePropertyIsNullException>();
+        exception.PropertyName.ShouldBe(expectedPropertyName);
     }
     
     [Fact]
@@ -46,8 +46,8 @@ public class ModelNullabilityValidatorTests : IClassFixture<CommonFixture>
 
         var action = () => Validate.ModelNullability(_model);
 
-        var error = action.ShouldThrowEnsureError<ModelNullabilityValidatorError.NonNullablePropertyIsNullError>();
-        error.PropertyName.ShouldBe(expectedPropertyName);
+        var exception = action.ShouldThrow<NonNullablePropertyIsNullException>();
+        exception.PropertyName.ShouldBe(expectedPropertyName);
     }
 
     [Fact]
@@ -61,8 +61,8 @@ public class ModelNullabilityValidatorTests : IClassFixture<CommonFixture>
 
         var action = () => Validate.ModelNullability(_model);
 
-        var error = action.ShouldThrowEnsureError<ModelNullabilityValidatorError.NonNullableItemCollectionWithNullItemError>();
-        error.CollectionName.ShouldBe(expectedCollectionName);
+        var exception = action.ShouldThrow<NonNullableItemCollectionWithNullItemException>();
+        exception.CollectionName.ShouldBe(expectedCollectionName);
     }
 
     private void SetPropertyValue(object model, string propertyName, object? propertyValue)

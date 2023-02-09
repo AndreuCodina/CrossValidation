@@ -49,7 +49,7 @@ public class RuleTests : IClassFixture<CommonFixture>
         var action = () => Validate.That(_model.NestedModel)
             .Must(_commonFixture.NotBeValid);
 
-        action.ShouldThrowValidationError<CommonValidationError.Predicate>();
+        action.ShouldThrowValidationError<CommonCrossError.Predicate>();
     }
     
     [Fact]
@@ -75,7 +75,7 @@ public class RuleTests : IClassFixture<CommonFixture>
             .WithCode(nameof(ErrorResource.NotNull))
             .Instance(ValueObjectWithoutCustomization.Create);
 
-        var error = getAge.ShouldThrowValidationError<CommonValidationError.GreaterThan<int>>();
+        var error = getAge.ShouldThrowValidationError<CommonCrossError.GreaterThan<int>>();
         error.Code.ShouldBe(nameof(ErrorResource.NotNull));
         error.Message.ShouldBe(ErrorResource.NotNull);
     }
@@ -87,7 +87,7 @@ public class RuleTests : IClassFixture<CommonFixture>
             .WithMessage(ErrorResource.NotNull)
             .Instance(ValueObjectWithoutCustomization.Create);
 
-        var error = getAge.ShouldThrowValidationError<CommonValidationError.GreaterThan<int>>();
+        var error = getAge.ShouldThrowValidationError<CommonCrossError.GreaterThan<int>>();
         error.Message.ShouldBe(ErrorResource.NotNull);
     }
     
@@ -105,7 +105,7 @@ public class RuleTests : IClassFixture<CommonFixture>
                 return x;
             });
         
-        var error = action.ShouldThrowValidationError<CommonValidationError.Predicate>();
+        var error = action.ShouldThrowValidationError<CommonCrossError.Predicate>();
         error.Message.ShouldBe(expectedMessage);
     }
     
@@ -115,7 +115,7 @@ public class RuleTests : IClassFixture<CommonFixture>
         var getAge = () => Validate.That(_model.Int)
             .Instance(ValueObjectWithCustomization.Create);
 
-        var error = getAge.ShouldThrowValidationError<CommonValidationError.GreaterThan<int>>();
+        var error = getAge.ShouldThrowValidationError<CommonCrossError.GreaterThan<int>>();
         error.Code.ShouldBe(nameof(ErrorResource.GreaterThan));
         error.Message.ShouldBe("Expected message");
         error.Details.ShouldBe("Expected details");
@@ -186,7 +186,7 @@ public class RuleTests : IClassFixture<CommonFixture>
         var action = () => Validate.That(1)
             .Must(x => x != 1);
 
-        action.ShouldThrow<ValidationException>();
+        action.ShouldThrow<CrossException>();
     }
     
     [Fact]
@@ -204,7 +204,7 @@ public class RuleTests : IClassFixture<CommonFixture>
         var action = () => Validate.That(1)
             .MustAsync(_commonFixture.NotBeValidAsync);
 
-        action.ShouldThrow<ValidationException>();
+        action.ShouldThrow<CrossException>();
     }
     
     [Fact]
@@ -225,11 +225,11 @@ public class RuleTests : IClassFixture<CommonFixture>
     public void Repeat_error_customization_applies_new_error()
     {
         var action = () => Validate.That(_model.NullableInt)
-            .WithError(new CommonValidationError.NotNull())
-            .WithError(new CommonValidationError.Enum())
+            .WithError(new CommonCrossError.NotNull())
+            .WithError(new CommonCrossError.Enum())
             .Must(_commonFixture.NotBeValid);
 
-        var error = action.ShouldThrowValidationError<CommonValidationError.Enum>();
+        var error = action.ShouldThrowValidationError<CommonCrossError.Enum>();
         error.Code.ShouldBe(nameof(ErrorResource.Enum));
         error.Message.ShouldBe(ErrorResource.Enum);
     }
@@ -245,7 +245,7 @@ public class RuleTests : IClassFixture<CommonFixture>
             .WithHttpStatusCode(HttpStatusCode.Created)
             .GreaterThan(_model.Int);
 
-        var error = action.ShouldThrowValidationError<CommonValidationError.GreaterThan<int>>();
+        var error = action.ShouldThrowValidationError<CommonCrossError.GreaterThan<int>>();
         error.Code.ShouldBe(nameof(ErrorResource.NotNull));
         error.Message.ShouldBe(ErrorResource.NotNull);
         error.Details.ShouldBe(expectedDetails);
@@ -267,7 +267,7 @@ public class RuleTests : IClassFixture<CommonFixture>
         error.HttpStatusCode.ShouldBe(HttpStatusCode.Created);
     }
 
-    private record CustomErrorWithPlaceholderValue(int Value) : ValidationError;
+    private record CustomErrorWithPlaceholderValue(int Value) : CrossError;
 
     private record ValueObjectWithoutCustomization
     {
@@ -300,8 +300,8 @@ public class RuleTests : IClassFixture<CommonFixture>
         }
     }
 
-    private record ErrorWithCustomization() : ValidationError(
-        Code: nameof(CommonValidationError.NotNull),
+    private record ErrorWithCustomization() : CrossError(
+        Code: nameof(CommonCrossError.NotNull),
         Details: "Expected details",
         HttpStatusCode: System.Net.HttpStatusCode.Created);
 }

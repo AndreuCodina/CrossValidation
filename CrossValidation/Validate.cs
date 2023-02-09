@@ -23,7 +23,7 @@ public static class Validate
         return IValidRule<TField>.CreateFromFieldName(Dsl.Validate, field, fieldName);
     }
 
-    public static void Must(bool condition, ValidationError error)
+    public static void Must(bool condition, CrossError error)
     {
         InternalMust(condition, error: error);
     }
@@ -44,7 +44,7 @@ public static class Validate
     }
 
     private static void InternalMust(bool condition,
-        ValidationError? error = null,
+        CrossError? error = null,
         string? message = null,
         string? code = null,
         string? details = null,

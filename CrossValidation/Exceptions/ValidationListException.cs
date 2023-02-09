@@ -4,9 +4,9 @@ namespace CrossValidation.Exceptions;
 
 public class ValidationListException : NoStackTraceException
 {
-    public List<IValidationError> Errors { get; }
+    public List<ICrossError> Errors { get; }
 
-    public ValidationListException(List<IValidationError> errors)
+    public ValidationListException(List<ICrossError> errors)
     {
         Errors = errors;
     }

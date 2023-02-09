@@ -10,12 +10,12 @@ app.UseCrossValidation();
 
 app.MapGet("/validationException", () =>
 {
-    throw new ValidationListException(new List<IValidationError>());
+    throw new ValidationListException(new List<ICrossError>());
 });
 
 app.MapGet("/exception", () =>
 {
-    throw new ValidationListException(new List<IValidationError>());
+    throw new ValidationListException(new List<ICrossError>());
 });
 
 app.Run();

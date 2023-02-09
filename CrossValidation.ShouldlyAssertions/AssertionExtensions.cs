@@ -35,37 +35,37 @@ public static class AssertionExtensions
             .ShouldBeOfType<TError>(customMessage);
     }
 
-    public static IValidationError ShouldThrowValidationError(this Action actual, string? customMessage = null)
+    public static ICrossError ShouldThrowValidationError(this Action actual, string? customMessage = null)
     {
-        return actual.ShouldThrow<ValidationException>().Error;
+        return actual.ShouldThrow<CrossException>().Error;
     }
     
-    public static IValidationError ShouldThrowValidationError(this Func<object?> actual, string? customMessage = null)
+    public static ICrossError ShouldThrowValidationError(this Func<object?> actual, string? customMessage = null)
     {
-        return actual.ShouldThrow<ValidationException>().Error;
+        return actual.ShouldThrow<CrossException>().Error;
     }
     
     public static TValidationError ShouldThrowValidationError<TValidationError>(this Action actual, string? customMessage = null)
-        where TValidationError : IValidationError
+        where TValidationError : ICrossError
     {
-        var error = actual.ShouldThrow<ValidationException>().Error;
+        var error = actual.ShouldThrow<CrossException>().Error;
         return error.ShouldBeOfType<TValidationError>(customMessage);
     }
     
     public static TValidationError ShouldThrowValidationError<TValidationError>(this Func<object?> actual, string? customMessage = null)
-        where TValidationError : IValidationError
+        where TValidationError : ICrossError
     {
-        var error = actual.ShouldThrow<ValidationException>().Error;
+        var error = actual.ShouldThrow<CrossException>().Error;
         return error.ShouldBeOfType<TValidationError>(customMessage);
     }
     
-    public static List<IValidationError> ShouldThrowValidationErrors(this Action actual, string? customMessage = null)
+    public static List<ICrossError> ShouldThrowValidationErrors(this Action actual, string? customMessage = null)
     {
         var errors = actual.ShouldThrow<ValidationListException>().Errors;
         return errors;
     }
     
-    public static List<IValidationError> ShouldThrowValidationErrors(this Func<object?> actual, string? customMessage = null)
+    public static List<ICrossError> ShouldThrowValidationErrors(this Func<object?> actual, string? customMessage = null)
     {
         var errors = actual.ShouldThrow<ValidationListException>().Errors;
         return errors;

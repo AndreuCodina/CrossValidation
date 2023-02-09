@@ -33,7 +33,7 @@ public class ValidateTests : IClassFixture<CommonFixture>
     {
         var expectedCode = nameof(ErrorResource.NotNull);
         var expectedDetails = "Details";
-        var errorForValidation = new ValidationError
+        var errorForValidation = new CrossError
         {
             Code = expectedCode,
             Details = expectedDetails

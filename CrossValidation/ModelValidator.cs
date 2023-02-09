@@ -59,7 +59,7 @@ public abstract record ModelValidator<TModel>
         {
             if (Context.ErrorsCollected.Count == 1)
             {
-                throw new ValidationException(Context.ErrorsCollected[0]);
+                throw new CrossException(Context.ErrorsCollected[0]);
             }
             else
             {

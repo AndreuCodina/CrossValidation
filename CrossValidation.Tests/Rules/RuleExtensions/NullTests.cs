@@ -49,7 +49,7 @@ public class NullTests : IClassFixture<CommonFixture>
         var action = () => Validate.That(value)
             .Null();
 
-        var error = action.ShouldThrowValidationError<CommonValidationError.Null>();
+        var error = action.ShouldThrowValidationError<CommonCrossError.Null>();
         error.Code.ShouldBe(nameof(ErrorResource.Null));
     }
 }

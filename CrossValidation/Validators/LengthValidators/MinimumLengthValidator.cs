@@ -11,6 +11,6 @@ public record MinimumLengthValidator(string FieldValue, int Minimum) : LengthVal
 
     public override ILengthError CreateError()
     {
-        return new CommonValidationError.MinimumLength(Minimum, GetTotalLength(FieldValue));
+        return new CommonCrossError.MinimumLength(Minimum, GetTotalLength(FieldValue));
     }
 }

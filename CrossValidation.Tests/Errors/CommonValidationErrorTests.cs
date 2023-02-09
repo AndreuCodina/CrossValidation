@@ -18,15 +18,15 @@ public class CommonValidationErrorTests : IClassFixture<ValidatorFixture>
     [Fact]
     public void All_common_errors_add_their_placeholders()
     {
-        var errors = new List<CommonValidationError>
+        var errors = new List<CommonCrossError>
         {
-            new CommonValidationError.NotNull(),
-            new CommonValidationError.Null(),
-            new CommonValidationError.GreaterThan<int>(1),
-            new CommonValidationError.Enum(),
-            new CommonValidationError.LengthRange(1, 1, 1),
-            new CommonValidationError.MinimumLength(1, 1),
-            new CommonValidationError.Predicate(),
+            new CommonCrossError.NotNull(),
+            new CommonCrossError.Null(),
+            new CommonCrossError.GreaterThan<int>(1),
+            new CommonCrossError.Enum(),
+            new CommonCrossError.LengthRange(1, 1, 1),
+            new CommonCrossError.MinimumLength(1, 1),
+            new CommonCrossError.Predicate(),
         };
         errors.ForEach(error =>
         {

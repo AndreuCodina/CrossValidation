@@ -2,5 +2,5 @@
 
 public class NoStackTraceException : Exception
 {
-    public override string? StackTrace { get; } = null;
+    public override string? StackTrace => null;
 }

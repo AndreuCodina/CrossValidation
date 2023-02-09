@@ -5,7 +5,7 @@ using CrossValidation.Exceptions;
 
 namespace CrossValidation.Errors;
 
-public interface IValidationError
+public interface ICrossError
 {
     string? FieldName { get; set; }
     string? FieldDisplayName { get; set; }
@@ -17,10 +17,10 @@ public interface IValidationError
     Dictionary<string, object>? PlaceholderValues { get; set; }
     void AddPlaceholderValues();
     IEnumerable<string> GetFieldNames();
-    ValidationException ToException();
+    CrossException ToException();
 }
 
-public record ValidationError : IValidationError
+public record CrossError : ICrossError
 {
     private const string DefaultPlaceholderValue = "";
     private static readonly Regex PlaceholderRegex = new("{([^{}:]+)}", RegexOptions.Compiled);
@@ -34,7 +34,7 @@ public record ValidationError : IValidationError
     public HttpStatusCode? HttpStatusCode { get; set; }
     public Dictionary<string, object>? PlaceholderValues { get; set; }
 
-    public ValidationError(
+    public CrossError(
         string? FieldName = null,
         string? FieldDisplayName = null,
         object? FieldValue = null,
@@ -85,9 +85,9 @@ public record ValidationError : IValidationError
             .Select(x => x.Name!);
     }
 
-    public ValidationException ToException()
+    public CrossException ToException()
     {
-        throw new ValidationException(this);
+        throw new CrossException(this);
     }
 
     private void AddCommonPlaceholderValues()
@@ -128,15 +128,17 @@ public record ValidationError : IValidationError
             var key = evaluator.Groups[1].Value;
 
             if (!PlaceholderValues!.TryGetValue(key, out var value))
+            {
                 return evaluator.Value;
+            }
 
             return value.ToString()!;
         });
     }
 }
 
-public record CodeValidationError(string Code) :
-    ValidationError(Code: Code);
+public record CodeCrossError(string Code) :
+    CrossError(Code: Code);
 
-public record MessageValidationError(string Message) :
-    ValidationError(Message: Message);
+public record MessageCrossError(string Message) :
+    CrossError(Message: Message);

@@ -54,19 +54,19 @@ public class ValidationErrorTests :
 
         var error = action.ShouldThrowValidationError<ErrorWithNullFields>();
 
-        error.PlaceholderValues![nameof(ValidationError.FieldName)].ShouldBe("");
+        error.PlaceholderValues![nameof(CrossError.FieldName)].ShouldBe("");
         error.PlaceholderValues![nameof(ErrorWithNullFields.Name)].ShouldBe("");
         error.PlaceholderValues![nameof(ErrorWithNullFields.Age)].ShouldBe("");
     }
 
-    private bool ErrorContainsPlaceholder(IValidationError error, string placeholderName)
+    private bool ErrorContainsPlaceholder(ICrossError error, string placeholderName)
     {
         return error.PlaceholderValues!
             .Select(x => x.Key)
             .Contains(placeholderName);
     }
 
-    private record ErrorWithAllFieldsAddedAsPlaceholders(string Name, int Age) : ValidationError
+    private record ErrorWithAllFieldsAddedAsPlaceholders(string Name, int Age) : CrossError
     {
         public override void AddPlaceholderValues()
         {
@@ -76,7 +76,7 @@ public class ValidationErrorTests :
         }
     }
     
-    private record ErrorWithNotAllFieldsAddedAsPlaceholders(string Name, int Age) : ValidationError
+    private record ErrorWithNotAllFieldsAddedAsPlaceholders(string Name, int Age) : CrossError
     {
         public override void AddPlaceholderValues()
         {
@@ -85,7 +85,7 @@ public class ValidationErrorTests :
         }
     }
     
-    private record ErrorWithNullFields(string? Name, int? Age) : ValidationError
+    private record ErrorWithNullFields(string? Name, int? Age) : CrossError
     {
         public override void AddPlaceholderValues()
         {

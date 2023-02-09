@@ -10,8 +10,8 @@ public interface IValidRule<out TField> : IRule<TField>
     public TField GetFieldValue();
     public ValidationContext Context { get; set; }
     public string FieldFullPath { get; set; }
-    void HandleError(IValidationError error);
-    void TakeErrorCustomizations(IValidationError error, bool overrideContextCustomizations);
+    void HandleError(ICrossError error);
+    void TakeErrorCustomizations(ICrossError error, bool overrideContextCustomizations);
     
     public static IRule<TField> CreateFromField(
         Dsl dsl,
@@ -91,7 +91,7 @@ file class ValidRule<TField> :
         return FieldValue;
     }
     
-    public void TakeErrorCustomizations(IValidationError error, bool overrideContextCustomizations)
+    public void TakeErrorCustomizations(ICrossError error, bool overrideContextCustomizations)
     {
         if (overrideContextCustomizations)
         {
@@ -117,7 +117,7 @@ file class ValidRule<TField> :
         }
     }
 
-    private EnsureError ToEnsureError(IValidationError error)
+    private EnsureError ToEnsureError(ICrossError error)
     {
         return new EnsureError
         {
@@ -126,7 +126,7 @@ file class ValidRule<TField> :
         };
     }
 
-    public void HandleError(IValidationError error)
+    public void HandleError(ICrossError error)
     {
         var errorToAdd = Context.Error ?? error;
         Context.AddError(errorToAdd);
@@ -158,7 +158,7 @@ file class ValidRule<TField> :
         {
             return fieldToInstance(FieldValue);
         }
-        catch (ValidationException e)
+        catch (CrossException e)
         {
             e.Error.FieldName = null;
             e.Error.FieldDisplayName = null;

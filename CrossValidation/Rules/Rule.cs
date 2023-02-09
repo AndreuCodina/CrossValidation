@@ -8,7 +8,7 @@ namespace CrossValidation.Rules;
 public interface IRule<out TField>
 {
     [Pure]
-    IRule<TField> SetValidator(IValidator<IValidationError> validator);
+    IRule<TField> SetValidator(IValidator<ICrossError> validator);
 
     [Pure]
     IRule<TFieldTransformed> Transform<TFieldTransformed>(
@@ -24,7 +24,7 @@ public interface IRule<out TField>
     IRule<TField> WithDetails(string details);
 
     [Pure]
-    IRule<TField> WithError(IValidationError error);
+    IRule<TField> WithError(ICrossError error);
 
     [Pure]
     IRule<TField> WithFieldDisplayName(string fieldDisplayName);
@@ -52,7 +52,7 @@ public interface IRule<out TField>
 
 internal abstract class Rule<TField> : IRule<TField>
 {
-    public IRule<TField> SetValidator(IValidator<IValidationError> validator)
+    public IRule<TField> SetValidator(IValidator<ICrossError> validator)
     {
         if (this is IValidRule<TField> validRule)
         {
@@ -104,7 +104,7 @@ internal abstract class Rule<TField> : IRule<TField>
         return this;
     }
 
-    public IRule<TField> WithError(IValidationError error)
+    public IRule<TField> WithError(ICrossError error)
     {
         if (this is IValidRule<TField> validRule && validRule.Context.ExecuteNextValidator)
         {

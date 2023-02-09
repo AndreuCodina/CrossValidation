@@ -106,7 +106,7 @@ public class WhenNotNullTests : IClassFixture<CommonFixture>
                 .Must(_commonFixture.BeValid))
             .NotNull();
 
-        var error = action.ShouldThrowValidationError<CommonValidationError.NotNull>();
+        var error = action.ShouldThrowValidationError<CommonCrossError.NotNull>();
         error.FieldValue.ShouldNotBeOfType<int>();
         error.FieldValue.ShouldBeNull();
     }

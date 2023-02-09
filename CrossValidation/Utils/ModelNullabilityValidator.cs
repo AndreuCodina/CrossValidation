@@ -1,14 +1,16 @@
 ﻿using System.Collections;
 using System.Reflection;
-using CrossValidation.Errors;
-using static CrossValidation.Utils.ModelNullabilityValidatorError;
 
 namespace CrossValidation.Utils;
 
-public record ModelNullabilityValidatorError : EnsureError
+public class NonNullablePropertyIsNullException : Exception
 {
-    public record NonNullablePropertyIsNullError(string PropertyName) : ModelNullabilityValidatorError;
-    public record NonNullableItemCollectionWithNullItemError(string CollectionName) : ModelNullabilityValidatorError;
+    public required string PropertyName { get; set; }
+}
+
+public class NonNullableItemCollectionWithNullItemException : Exception
+{
+    public required string CollectionName { get; set; }
 }
 
 internal static class ModelNullabilityValidator
@@ -58,7 +60,10 @@ internal static class ModelNullabilityValidator
 
         if (isNonNullableProperty)
         {
-            throw new NonNullablePropertyIsNullError(property.Name).ToException();
+            throw new NonNullablePropertyIsNullException
+            {
+                PropertyName = property.Name
+            };
         }
     }
 
@@ -80,7 +85,10 @@ internal static class ModelNullabilityValidator
                 if (item is null &&
                     nullabilityInfo.GenericTypeArguments[0].WriteState is not NullabilityState.Nullable)
                 {
-                    throw new NonNullableItemCollectionWithNullItemError(property.Name).ToException();
+                    throw new NonNullableItemCollectionWithNullItemException
+                    {
+                        CollectionName = property.Name
+                    };
                 }
             }
         }
