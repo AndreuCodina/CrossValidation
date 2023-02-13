@@ -1,0 +1,35 @@
+name: Release
+
+on:
+  release:
+    types:
+      - published
+
+env:
+  CROSS_VALIDATION_PROJECT: CrossValidation\CrossValidation.csproj
+  NUGET_OUTPUT_FOLDER: ${{ github.workspace }}\CrossValidationNuget
+
+jobs:
+  publish_nuget:
+    name: Publish NuGet
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '7.0.x'
+
+      - name: Restore CrossValidation dependencies
+        run: dotnet restore ${{ env.CROSS_VALIDATION_PROJECT }}
+
+      - name: Build CrossValidation
+        run: dotnet build ${{ env.CROSS_VALIDATION_PROJECT }} --configuration Release --no-restore
+      
+      - name: Create CrossValidation package
+        run: dotnet pack ${{ env.CROSS_VALIDATION_PROJECT }} --configuration Release --no-build --output ${{ env.NUGET_OUTPUT_FOLDER }} --include-symbols
+      
+      - name: Push CrossValidation package
+        run: dotnet nuget push ${{ env.NUGET_OUTPUT_FOLDER }}\*.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_API_KEY }}
