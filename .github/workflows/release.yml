@@ -7,12 +7,12 @@ on:
 
 env:
   CROSS_VALIDATION_PROJECT: CrossValidation/CrossValidation.csproj
-  CROSS_VALIDATION_SHOULDLY_ASSERTIONS_PROJECT: CrossValidation/CrossValidation.csproj
+  CROSS_VALIDATION_SHOULDLY_ASSERTIONS_PROJECT: CrossValidation.ShouldlyAssertions/CrossValidation.ShouldlyAssertions.csproj
   NUGET_OUTPUT_FOLDER: ${{ github.workspace }}/Nuget
 
 jobs:
-  publish_nuget:
-    name: Publish NuGet
+  publish_nuget_packages:
+    name: Publish NuGet packages
     runs-on: ubuntu-latest
     steps:
       - name: Set release version
@@ -36,7 +36,7 @@ jobs:
         run: dotnet pack ${{ env.CROSS_VALIDATION_PROJECT }} --configuration Release --no-build --output ${{ env.NUGET_OUTPUT_FOLDER }} -p:PackageVersion=${{ env.RELEASE_VERSION }}
       
       - name: Push CrossValidation package
-        run: dotnet nuget push ${{ env.NUGET_OUTPUT_FOLDER }}/CrossValidation.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_API_KEY }}
+        run: dotnet nuget push ${{ format('{0}/CrossValidation.{1}.nupkg', env.NUGET_OUTPUT_FOLDER, env.RELEASE_VERSION) }} --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_API_KEY }}
 
       - name: Restore CrossValidation.ShouldlyAssertions dependencies
         run: dotnet restore ${{ env.CROSS_VALIDATION_SHOULDLY_ASSERTIONS_PROJECT }}
@@ -48,4 +48,4 @@ jobs:
         run: dotnet pack ${{ env.CROSS_VALIDATION_SHOULDLY_ASSERTIONS_PROJECT }} --configuration Release --no-build --output ${{ env.NUGET_OUTPUT_FOLDER }} -p:PackageVersion=${{ env.RELEASE_VERSION }}
       
       - name: Push CrossValidation.ShouldlyAssertions package
-        run: dotnet nuget push ${{ env.NUGET_OUTPUT_FOLDER }}/CrossValidation.ShouldlyAssertions.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_API_KEY }}
+        run: dotnet nuget push ${{ format('{0}/CrossValidation.ShouldlyAssertions.{1}.nupkg', env.NUGET_OUTPUT_FOLDER, env.RELEASE_VERSION) }} --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_API_KEY }}
