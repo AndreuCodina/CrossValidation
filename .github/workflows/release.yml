@@ -7,7 +7,8 @@ on:
 
 env:
   CROSS_VALIDATION_PROJECT: CrossValidation/CrossValidation.csproj
-  NUGET_OUTPUT_FOLDER: ${{ github.workspace }}/CrossValidationNuget
+  CROSS_VALIDATION_SHOULDLY_ASSERTIONS_PROJECT: CrossValidation/CrossValidation.csproj
+  NUGET_OUTPUT_FOLDER: ${{ github.workspace }}/Nuget
 
 jobs:
   publish_nuget:
@@ -35,4 +36,16 @@ jobs:
         run: dotnet pack ${{ env.CROSS_VALIDATION_PROJECT }} --configuration Release --no-build --output ${{ env.NUGET_OUTPUT_FOLDER }} -p:PackageVersion=${{ env.RELEASE_VERSION }}
       
       - name: Push CrossValidation package
-        run: dotnet nuget push ${{ env.NUGET_OUTPUT_FOLDER }}/*.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_API_KEY }}
+        run: dotnet nuget push ${{ env.NUGET_OUTPUT_FOLDER }}/CrossValidation.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_API_KEY }}
+
+      - name: Restore CrossValidation.ShouldlyAssertions dependencies
+        run: dotnet restore ${{ env.CROSS_VALIDATION_SHOULDLY_ASSERTIONS_PROJECT }}
+
+      - name: Build CrossValidation.ShouldlyAssertions
+        run: dotnet build ${{ env.CROSS_VALIDATION_SHOULDLY_ASSERTIONS_PROJECT }} --configuration Release --no-restore
+      
+      - name: Create CrossValidation.ShouldlyAssertions package
+        run: dotnet pack ${{ env.CROSS_VALIDATION_SHOULDLY_ASSERTIONS_PROJECT }} --configuration Release --no-build --output ${{ env.NUGET_OUTPUT_FOLDER }} -p:PackageVersion=${{ env.RELEASE_VERSION }}
+      
+      - name: Push CrossValidation.ShouldlyAssertions package
+        run: dotnet nuget push ${{ env.NUGET_OUTPUT_FOLDER }}/CrossValidation.ShouldlyAssertions.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_API_KEY }}
