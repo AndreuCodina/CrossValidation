@@ -1,6 +1,8 @@
-# CrossValidation
+![CrossValidation logo](https://user-images.githubusercontent.com/30506301/218343967-ba157171-c491-4a96-960c-73fb663467f0.png)
 
-State-of-the-art .NET library to use typed errors and validate data in your backend or library.
+[![CI workflow state](https://github.com/AndreuCodina/CrossValidation/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/AndreuCodina/CrossValidation/actions/workflows/dotnet.yml)
+
+State-of-the-art .NET library to handle errors and validate data.
 
 ## Impact of this library in your company:
 
@@ -151,7 +153,7 @@ public class UserService
     public void ChangeNickname(UserDto userDto)
     {
         var user = GetUser(userDto.Id);
-        CheckNicknameAvailable(userDto.Nickname)
+        CheckNicknameIsAvailable(userDto.Nickname)
     
         user.Nickname = userDto.Nickname;
         _context.Update(user);
