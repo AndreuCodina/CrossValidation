@@ -6,7 +6,7 @@ on:
       - published
 
 env:
-  CROSS_VALIDATION_PROJECT: CrossValidation\CrossValidation.csproj
+  CROSS_VALIDATION_PROJECT: CrossValidation/CrossValidation.csproj
   NUGET_OUTPUT_FOLDER: ${{ github.workspace }}\CrossValidationNuget
 
 jobs:
