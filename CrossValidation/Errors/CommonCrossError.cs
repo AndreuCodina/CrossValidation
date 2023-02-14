@@ -20,6 +20,8 @@ public record CommonCrossError(string Code) : CodeCrossError(Code)
     
     public record Enum() : CommonCrossError(nameof(ErrorResource.Enum));
     
+    public record EnumRange() : CommonCrossError(nameof(ErrorResource.Enum));
+    
     public record LengthRange(int Minimum, int Maximum, int TotalLength) :
         CommonCrossError(nameof(ErrorResource.LengthRange)),
         ILengthError

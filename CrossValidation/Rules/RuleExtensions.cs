@@ -151,10 +151,59 @@ public static class RuleExtensions
         
         if (rule is IValidRule<string> validRule)
         {
-            ruleToReturn = validRule.SetValidator(new EnumValidator<string>(validRule.GetFieldValue(), typeof(TEnum)));
+            ruleToReturn = validRule.SetValidator(
+                new EnumValidator<string>(validRule.GetFieldValue(), typeof(TEnum)));
         }
 
-        return ruleToReturn.Transform(x => (TEnum)System.Enum.Parse(typeof(TEnum), x, ignoreCase: true));
+        return ruleToReturn.Transform(x =>
+            (TEnum)System.Enum.Parse(typeof(TEnum), x, ignoreCase: true));
+    }
+
+    public static IRule<TField> Enum<TField>(
+        this IRule<TField> rule,
+        params TField[] allowedValues)
+        where TField : Enum
+    {
+        if (rule is IValidRule<TField> validRule)
+        {
+            return rule.SetValidator(
+                new EnumRangeValidator<TField, TField>(validRule.GetFieldValue(), allowedValues));
+        }
+
+        return rule;
+    }
+    
+    public static IRule<TEnum> Enum<TEnum>(
+        this IRule<int> rule,
+        params TEnum[] allowedValues)
+        where TEnum : Enum
+    {
+        var ruleToReturn = rule;
+        
+        if (rule is IValidRule<int> validRule)
+        {
+            ruleToReturn = validRule.SetValidator(
+                new EnumRangeValidator<int, TEnum>(validRule.GetFieldValue(), allowedValues));
+        }
+        
+        return ruleToReturn.Transform(x => (TEnum)(object)x);
+    }
+    
+    public static IRule<TEnum> Enum<TEnum>(
+        this IRule<string> rule,
+        params TEnum[] allowedValues)
+        where TEnum : Enum
+    {
+        var ruleToReturn = rule;
+        
+        if (rule is IValidRule<string> validRule)
+        {
+            ruleToReturn = validRule.SetValidator(
+                new EnumRangeValidator<string, TEnum>(validRule.GetFieldValue(), allowedValues));
+        }
+        
+        return ruleToReturn.Transform(x =>
+            (TEnum)System.Enum.Parse(typeof(TEnum), x, ignoreCase: true));
     }
 
     public static IRule<string> LengthRange(

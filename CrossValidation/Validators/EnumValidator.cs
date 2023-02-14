@@ -4,11 +4,11 @@ namespace CrossValidation.Validators;
 
 public record EnumValidator<TField>(
     TField FieldValue,
-    Type enumType) : Validator
+    Type EnumType) : Validator
 {
     public override bool IsValid()
     {
-        return Enum.IsDefined(enumType, FieldValue!);
+        return Enum.IsDefined(EnumType, FieldValue!);
     }
 
     public override CrossError CreateError()
