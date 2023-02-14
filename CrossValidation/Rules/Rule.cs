@@ -45,6 +45,9 @@ public interface IRule<out TField>
     IRule<TField> MustAsync(Func<TField, Task<bool>> condition);
 
     [Pure]
+    TField Instance();
+    
+    [Pure]
     TInstance Instance<TInstance>(Func<TField, TInstance> fieldToInstance);
 
     IRule<TField> SetModelValidator<TChildModel>(ModelValidator<TChildModel> validator);
@@ -190,6 +193,8 @@ internal abstract class Rule<TField> : IRule<TField>
         return this;
     }
 
+    public abstract TField Instance();
+    
     public abstract TInstance Instance<TInstance>(Func<TField, TInstance> fieldToInstance);
 
     public IRule<TFieldTransformed> Transform<TFieldTransformed>(

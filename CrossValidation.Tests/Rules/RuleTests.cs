@@ -133,6 +133,26 @@ public class RuleTests : IClassFixture<CommonFixture>
                 .Transform(x => x + 1)
                 .Transform(x => x.ToString())
                 .Transform(int.Parse)
+                .Instance();
+        });
+    
+        var action = () => parentModelValidator.Validate(_model);
+    
+        action.ShouldThrow<InvalidOperationException>();
+    }
+    
+    [Fact]
+    public void Call_Instance_with_function_from_invalid_rule_fails()
+    {
+        var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
+        {
+            validator.ValidationMode = ValidationMode.AccumulateFirstErrorEachRule;
+
+            validator.Field(_model.NullableInt)
+                .NotNull()
+                .Transform(x => x + 1)
+                .Transform(x => x.ToString())
+                .Transform(int.Parse)
                 .Instance(ValueObjectWithoutCustomization.Create);
         });
     
@@ -141,6 +161,42 @@ public class RuleTests : IClassFixture<CommonFixture>
         action.ShouldThrow<InvalidOperationException>();
     }
     
+    [Fact]
+    public void Get_instance()
+    {
+        Validate.That(_model.Int)
+            .Instance()
+            .ShouldBe(_model.Int);
+
+        Validate.That(_model.NullableInt)
+            .Instance()
+            .ShouldBe(_model.NullableInt);
+    }
+    
+    [Fact]
+    public void Get_transformed_instance()
+    {
+        var expectedValue = 1;
+        _model = new ParentModelBuilder()
+            .WithNullableInt(expectedValue)
+            .Build();
+
+        Validate.That(_model.NullableInt)
+            .NotNull()
+            .Instance()
+            .ShouldBe(expectedValue);
+        
+        Validate.That(_model.Int)
+            .Transform(_ => expectedValue)
+            .Instance()
+            .ShouldBe(expectedValue);
+        
+        Validate.That(nameof(ParentModelEnum.Red))
+            .Enum<ParentModelEnum>()
+            .Instance()
+            .ShouldBe(ParentModelEnum.Red);
+    }
+
     [Fact]
     public void Validator_with_conditional_execution()
     {
@@ -269,34 +325,24 @@ public class RuleTests : IClassFixture<CommonFixture>
 
     private record CustomErrorWithPlaceholderValue(int Value) : CrossError;
 
-    private record ValueObjectWithoutCustomization
+    private record ValueObjectWithoutCustomization(int Value)
     {
-        public required int Value { get; set; }
-        
         public static ValueObjectWithoutCustomization Create(int value)
         {
             Validate.That(value).GreaterThan(value + 1);
-            return new ValueObjectWithoutCustomization
-            {
-                Value = value
-            };
+            return new(value);
         }
     }
-    
-    private record ValueObjectWithCustomization
+
+    private record ValueObjectWithCustomization(int Value)
     {
-        public required int Value { get; set; }
-        
         public static ValueObjectWithCustomization Create(int value)
         {
             Validate.That(value)
                 .WithMessage("Expected message")
                 .WithDetails("Expected details")
                 .GreaterThan(value + 1);
-            return new ValueObjectWithCustomization
-            {
-                Value = value
-            };
+            return new(value);
         }
     }
 

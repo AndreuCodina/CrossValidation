@@ -126,6 +126,11 @@ file class ValidRule<TField> :
             }
         }
     }
+    
+    public override TField Instance()
+    {
+        return FieldValue;
+    }
 
     public override TInstance Instance<TInstance>(Func<TField, TInstance> fieldToInstance)
     {

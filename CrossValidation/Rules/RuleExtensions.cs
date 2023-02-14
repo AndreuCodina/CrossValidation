@@ -117,7 +117,7 @@ public static class RuleExtensions
         return rule;
     }
 
-    public static IRule<TField> IsInEnum<TField>(
+    public static IRule<TField> Enum<TField>(
         this IRule<TField> rule)
         where TField : Enum
     {
@@ -129,28 +129,32 @@ public static class RuleExtensions
         return rule;
     }
 
-    public static IRule<int> IsInEnum<TEnum>(
+    public static IRule<TEnum> Enum<TEnum>(
         this IRule<int> rule)
         where TEnum : Enum
     {
+        var ruleToReturn = rule;
+        
         if (rule is IValidRule<int> validRule)
         {
-            return rule.SetValidator(new EnumValidator<int>(validRule.GetFieldValue(), typeof(TEnum)));
+            ruleToReturn = validRule.SetValidator(new EnumValidator<int>(validRule.GetFieldValue(), typeof(TEnum)));
         }
-
-        return rule;
+        
+        return ruleToReturn.Transform(x => (TEnum)(object)x);
     }
 
-    public static IRule<string> IsInEnum<TEnum>(
+    public static IRule<TEnum> Enum<TEnum>(
         this IRule<string> rule)
         where TEnum : Enum
     {
+        var ruleToReturn = rule;
+        
         if (rule is IValidRule<string> validRule)
         {
-            return rule.SetValidator(new EnumValidator<string>(validRule.GetFieldValue(), typeof(TEnum)));
+            ruleToReturn = validRule.SetValidator(new EnumValidator<string>(validRule.GetFieldValue(), typeof(TEnum)));
         }
 
-        return rule;
+        return ruleToReturn.Transform(x => (TEnum)System.Enum.Parse(typeof(TEnum), x));
     }
 
     public static IRule<string> LengthRange(

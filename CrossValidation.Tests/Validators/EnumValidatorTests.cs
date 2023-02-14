@@ -14,41 +14,41 @@ public class EnumValidatorTests
     [Fact]
     public void Validate_enumeration()
     {
-        var enumValue = NestedEnum.Red;
+        var enumValue = ParentModelEnum.Red;
         var enumAction = () => Validate.That(enumValue)
-            .IsInEnum();
+            .Enum();
         enumAction.ShouldNotThrow();
          
-        var intValue = (int)NestedEnum.Red;
+        var intValue = (int)ParentModelEnum.Red;
         var intAction = () => Validate.That(intValue)
-            .IsInEnum<NestedEnum>();
+            .Enum<ParentModelEnum>();
         intAction.ShouldNotThrow();
          
-        var stringValue = nameof(NestedEnum.Red);
+        var stringValue = nameof(ParentModelEnum.Red);
         var stringAction = () => Validate.That(stringValue)
-            .IsInEnum<NestedEnum>();
+            .Enum<ParentModelEnum>();
         stringAction.ShouldNotThrow();
     }
      
     [Fact]
     public void Validate_enumeration_fails()
     {
-        var lastColorId = (int)Enum.GetValues<NestedEnum>().Last();
+        var lastColorId = (int)Enum.GetValues<ParentModelEnum>().Last();
         var nonExistentColorId = lastColorId + 1;
          
-        var enumValue = (NestedEnum)nonExistentColorId;
+        var enumValue = (ParentModelEnum)nonExistentColorId;
         var enumAction = () => Validate.That(enumValue)
-            .IsInEnum();
+            .Enum();
         enumAction.ShouldThrowValidationError();
          
         var intValue = nonExistentColorId;
         var intAction = () => Validate.That(intValue)
-            .IsInEnum<NestedEnum>();
+            .Enum<ParentModelEnum>();
         intAction.ShouldThrowValidationError();
          
         var stringValue = "Not valid enum value";
         var stringAction = () => Validate.That(stringValue)
-            .IsInEnum<NestedEnum>();
+            .Enum<ParentModelEnum>();
         stringAction.ShouldThrow<CrossException>();
     }
 }
