@@ -96,7 +96,7 @@ Why AppException? Because it's a general exception that can be used in any layer
 
 Depending on the project you have worked, AppException will have a unique response such as inform the user, or do nothing, but it'll never log AppException because it's not an exceptional error to be solved by the developers.
 
-An **exceptional situation or not expected situation** is, for example, when you:
+An **exceptional situation or unexpected situation** is, for example, when you:
   - Execute a SQL query and the database is down, then you have a network error
   - Access to an array item out of bounds
   - A null reference exception.
