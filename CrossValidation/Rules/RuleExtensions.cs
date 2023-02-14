@@ -154,7 +154,7 @@ public static class RuleExtensions
             ruleToReturn = validRule.SetValidator(new EnumValidator<string>(validRule.GetFieldValue(), typeof(TEnum)));
         }
 
-        return ruleToReturn.Transform(x => (TEnum)System.Enum.Parse(typeof(TEnum), x));
+        return ruleToReturn.Transform(x => (TEnum)System.Enum.Parse(typeof(TEnum), x, ignoreCase: true));
     }
 
     public static IRule<string> LengthRange(
