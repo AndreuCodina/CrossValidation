@@ -1,6 +1,6 @@
 ﻿using BenchmarkDotNet.Attributes;
 using CrossValidation.Errors;
-using CrossValidation.Rules;
+using CrossValidation.Validations;
 
 namespace CrossValidation.Benchmarks;
 
@@ -8,18 +8,18 @@ namespace CrossValidation.Benchmarks;
 [RankColumn]
 public class WithErrorBenchmarks
 {
-    private IRule<int> _rule = default!;
+    private IValidation<int> _validation = default!;
 
     [GlobalSetup]
     public void Setup()
     {
-        _rule = Validate.That(1);
+        _validation = Validate.That(1);
     }
     
     [Benchmark(Baseline = true)]
     public void WithError()
     {
-        _rule
+        _validation
             .WithError(new CrossError(Message: "Error message"))
             .Must(_ => true);
     }

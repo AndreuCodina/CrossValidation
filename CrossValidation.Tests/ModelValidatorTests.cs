@@ -4,11 +4,11 @@ using System.Linq;
 using System.Net;
 using CrossValidation.Errors;
 using CrossValidation.Resources;
-using CrossValidation.Rules;
 using CrossValidation.ShouldlyAssertions;
 using CrossValidation.Tests.Builders;
 using CrossValidation.Tests.Fixtures;
 using CrossValidation.Tests.Models;
+using CrossValidation.Validations;
 using Shouldly;
 using Xunit;
 
@@ -28,7 +28,7 @@ public class ModelValidatorTests : IClassFixture<CommonFixture>
     }
     
     [Fact]
-    public void One_rule_with_a_field_validator()
+    public void One_validation_with_a_field_validator()
     {
         _model = new ParentModelBuilder()
             .WithNullableString("Coupon1")
@@ -45,7 +45,7 @@ public class ModelValidatorTests : IClassFixture<CommonFixture>
     }
 
     [Fact]
-    public void Rule_fails_when_the_field_does_not_pass_the_validator()
+    public void Validation_fails_when_the_field_does_not_pass_the_validator()
     {
         var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
         {
@@ -101,7 +101,7 @@ public class ModelValidatorTests : IClassFixture<CommonFixture>
     }
 
     [Fact]
-    public void Set_field_information_to_the_error_when_using_several_rule_in_the_same_model_validator()
+    public void Set_field_information_to_the_error_when_using_several_validation_in_the_same_model_validator()
     {
         var expectedFieldName = "NullableString";
         string? expectedFieldValue = null;
@@ -183,7 +183,7 @@ public class ModelValidatorTests : IClassFixture<CommonFixture>
         });
         var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
         {
-            validator.ValidationMode = ValidationMode.AccumulateFirstErrorEachRule;
+            validator.ValidationMode = ValidationMode.AccumulateFirstErrorEachValidation;
             
             validator.Field(_model.NullableString)
                 .WithCode(expectedCodes[0])
@@ -212,7 +212,7 @@ public class ModelValidatorTests : IClassFixture<CommonFixture>
     {
         var nestedModelValidator = _commonFixture.CreateNestedModelValidator(validator =>
         {
-            validator.ValidationMode = ValidationMode.AccumulateFirstErrorEachRule;
+            validator.ValidationMode = ValidationMode.AccumulateFirstErrorEachValidation;
             validator.Field(_nestedModel.Int)
                 .GreaterThan(10);
             validator.Field(_nestedModel.Int)
@@ -245,7 +245,7 @@ public class ModelValidatorTests : IClassFixture<CommonFixture>
             .Build();
         var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
         {
-            validator.ValidationMode = ValidationMode.AccumulateFirstErrorEachRule;
+            validator.ValidationMode = ValidationMode.AccumulateFirstErrorEachValidation;
 
             validator.Field(_model.NullableString)
                 .NotNull()
@@ -274,7 +274,7 @@ public class ModelValidatorTests : IClassFixture<CommonFixture>
             .Build();
         var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
         {
-            validator.ValidationMode = ValidationMode.AccumulateFirstErrorEachRule;
+            validator.ValidationMode = ValidationMode.AccumulateFirstErrorEachValidation;
 
             validator.Field(_model.NullableIntList)
                 .Transform(x => TransformValues(x!))
@@ -312,11 +312,11 @@ public class ModelValidatorTests : IClassFixture<CommonFixture>
     }
     
     [Fact]
-    public void Transform_invalid_rule()
+    public void Transform_invalid_validation()
     {
         var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
         {
-            validator.ValidationMode = ValidationMode.AccumulateFirstErrorEachRule;
+            validator.ValidationMode = ValidationMode.AccumulateFirstErrorEachValidation;
 
             validator.Field(_model.NullableInt)
                 .NotNull()
@@ -520,7 +520,7 @@ public class ModelValidatorTests : IClassFixture<CommonFixture>
     }
     
     [Fact]
-    public void New_rule_overrides_field_display_name_customization()
+    public void New_validation_overrides_field_display_name_customization()
     {
         _model = new ParentModelBuilder()
             .WithNullableInt(1)
@@ -664,7 +664,7 @@ public class ModelValidatorTests : IClassFixture<CommonFixture>
         });
         var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
         {
-            validator.ValidationMode = ValidationMode.AccumulateFirstErrorEachRule;
+            validator.ValidationMode = ValidationMode.AccumulateFirstErrorEachValidation;
 
             validator.Field(_model.Int)
                 .Must(_commonFixture.NotBeValid);

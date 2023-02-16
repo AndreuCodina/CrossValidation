@@ -1,11 +1,11 @@
 ﻿using CrossValidation.Errors;
 using CrossValidation.Resources;
-using CrossValidation.Rules;
 using CrossValidation.ShouldlyAssertions;
+using CrossValidation.Validations;
 using Shouldly;
 using Xunit;
 
-namespace CrossValidation.Tests.Rules.RuleExtensions;
+namespace CrossValidation.Tests.Validations.ValidationExtensions;
 
 public class LengthRangeTests
 {

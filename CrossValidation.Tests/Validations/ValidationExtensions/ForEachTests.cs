@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using CrossValidation.Rules;
 using CrossValidation.ShouldlyAssertions;
 using CrossValidation.Tests.Builders;
 using CrossValidation.Tests.Fixtures;
 using CrossValidation.Tests.Models;
+using CrossValidation.Validations;
 using Shouldly;
 using Xunit;
 
-namespace CrossValidation.Tests.Rules.RuleExtensions;
+namespace CrossValidation.Tests.Validations.ValidationExtensions;
 
 public class ForEachTests : IClassFixture<CommonFixture>
 {
@@ -49,7 +49,7 @@ public class ForEachTests : IClassFixture<CommonFixture>
             .Build();
         var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
         {
-            validator.ValidationMode = ValidationMode.AccumulateFirstErrorEachRule;
+            validator.ValidationMode = ValidationMode.AccumulateFirstErrorEachValidation;
             
             validator.Field(_model.NullableIntList)
                 .NotNull()

@@ -3,9 +3,9 @@ using CrossValidation.Errors;
 using CrossValidation.Exceptions;
 using CrossValidation.ValidationContexts;
 
-namespace CrossValidation.Rules;
+namespace CrossValidation.Validations;
 
-public interface IValidRule<out TField> : IRule<TField>
+public interface IValidValidation<out TField> : IValidation<TField>
 {
     public TField GetFieldValue();
     public ValidationContext Context { get; set; }
@@ -13,17 +13,17 @@ public interface IValidRule<out TField> : IRule<TField>
     void HandleError(ICrossError error);
     void TakeErrorCustomizations(ICrossError error, bool overrideContextCustomizations);
     
-    public static IRule<TField> CreateFromField(
+    public static IValidation<TField> CreateFromField(
         TField fieldValue,
         string? fieldFullPath = null,
         ValidationContext? context = null,
         int? index = null,
         string? parentPath = null)
     {
-        return new ValidRule<TField>(fieldValue, fieldFullPath, context, index, parentPath);
+        return new ValidValidation<TField>(fieldValue, fieldFullPath, context, index, parentPath);
     }
 
-    public static IRule<TField> CreateFromFieldName(
+    public static IValidation<TField> CreateFromFieldName(
         TField fieldValue,
         string fieldName,
         ValidationContext? context = null)
@@ -34,19 +34,19 @@ public interface IValidRule<out TField> : IRule<TField>
         }
 
         var selectionFullPath = fieldName.Substring(fieldName.IndexOf('.') + 1);
-        return new ValidRule<TField>(fieldValue, selectionFullPath, context);
+        return new ValidValidation<TField>(fieldValue, selectionFullPath, context);
     }
 }
 
-file class ValidRule<TField> :
-    Rule<TField>,
-    IValidRule<TField>
+file class ValidValidation<TField> :
+    Validation<TField>,
+    IValidValidation<TField>
 {
     public TField FieldValue { get; set; }
     public ValidationContext Context { get; set; }
     public string FieldFullPath { get; set; }
 
-    public ValidRule(
+    public ValidValidation(
         TField fieldValue,
         string? fieldFullPath = null,
         ValidationContext? context = null,

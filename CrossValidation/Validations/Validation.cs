@@ -3,46 +3,47 @@ using System.Net;
 using CrossValidation.Errors;
 using CrossValidation.Validators;
 
-namespace CrossValidation.Rules;
+namespace CrossValidation.Validations;
 
-public interface IRule<out TField>
+public interface IValidation<out TField>
 {
     [Pure]
-    IRule<TField> SetValidator(IValidator<ICrossError> validator);
+    IValidation<TField> SetValidator(IValidator<ICrossError> validator);
 
     [Pure]
-    IRule<TFieldTransformed> Transform<TFieldTransformed>(
+    IValidation<TFieldTransformed> Transform<TFieldTransformed>(
         Func<TField, TFieldTransformed> transformer);
 
     [Pure]
-    IRule<TField> WithCode(string code);
+    IValidation<TField> WithCode(string code);
     
     [Pure]
-    IRule<TField> WithMessage(string message);
+    IValidation<TField> WithMessage(string message);
     
     [Pure]
-    IRule<TField> WithDetails(string details);
+    IValidation<TField> WithDetails(string details);
 
     [Pure]
-    IRule<TField> WithError(ICrossError error);
+    IValidation<TField> WithError(ICrossError error);
 
     [Pure]
-    IRule<TField> WithFieldDisplayName(string fieldDisplayName);
+    IValidation<TField> WithFieldDisplayName(string fieldDisplayName);
     
     [Pure]
-    IRule<TField> WithHttpStatusCode(HttpStatusCode code);
+    IValidation<TField> WithHttpStatusCode(HttpStatusCode code);
 
     [Pure]
-    IRule<TField> When(bool condition);
+    IValidation<TField> When(bool condition);
 
     [Pure]
-    IRule<TField> When(Func<TField, bool> condition);
+    IValidation<TField> When(Func<TField, bool> condition);
 
     [Pure]
-    IRule<TField> WhenAsync(Func<TField, Task<bool>> condition);
+    IValidation<TField> WhenAsync(Func<TField, Task<bool>> condition);
 
-    IRule<TField> Must(Func<TField, bool> condition);
-    IRule<TField> MustAsync(Func<TField, Task<bool>> condition);
+    IValidation<TField> Must(Func<TField, bool> condition);
+    
+    IValidation<TField> MustAsync(Func<TField, Task<bool>> condition);
 
     [Pure]
     TField Instance();
@@ -50,14 +51,14 @@ public interface IRule<out TField>
     [Pure]
     TInstance Instance<TInstance>(Func<TField, TInstance> fieldToInstance);
 
-    IRule<TField> SetModelValidator<TChildModel>(ModelValidator<TChildModel> validator);
+    IValidation<TField> SetModelValidator<TChildModel>(ModelValidator<TChildModel> validator);
 }
 
-internal abstract class Rule<TField> : IRule<TField>
+internal abstract class Validation<TField> : IValidation<TField>
 {
-    public IRule<TField> SetValidator(IValidator<ICrossError> validator)
+    public IValidation<TField> SetValidator(IValidator<ICrossError> validator)
     {
-        if (this is IValidRule<TField> validRule)
+        if (this is IValidValidation<TField> validRule)
         {
             if (validRule.Context.ExecuteNextValidator)
             {
@@ -67,7 +68,7 @@ internal abstract class Rule<TField> : IRule<TField>
                 {
                     validRule.HandleError(error);
                     validRule.Context.Clean();
-                    return IInvalidRule<TField>.Create();
+                    return IInvalidValidation<TField>.Create();
                 }
             }
 
@@ -77,9 +78,9 @@ internal abstract class Rule<TField> : IRule<TField>
         return this;
     }
 
-    public IRule<TField> WithCode(string code)
+    public IValidation<TField> WithCode(string code)
     {
-        if (this is IValidRule<TField> validRule && validRule.Context.ExecuteNextValidator)
+        if (this is IValidValidation<TField> validRule && validRule.Context.ExecuteNextValidator)
         {
             validRule.Context.Code = code;
         }
@@ -87,9 +88,9 @@ internal abstract class Rule<TField> : IRule<TField>
         return this;
     }
     
-    public IRule<TField> WithMessage(string message)
+    public IValidation<TField> WithMessage(string message)
     {
-        if (this is IValidRule<TField> validRule && validRule.Context.ExecuteNextValidator)
+        if (this is IValidValidation<TField> validRule && validRule.Context.ExecuteNextValidator)
         {
             validRule.Context.Message = message;
         }
@@ -97,9 +98,9 @@ internal abstract class Rule<TField> : IRule<TField>
         return this;
     }
     
-    public IRule<TField> WithDetails(string details)
+    public IValidation<TField> WithDetails(string details)
     {
-        if (this is IValidRule<TField> validRule && validRule.Context.ExecuteNextValidator)
+        if (this is IValidValidation<TField> validRule && validRule.Context.ExecuteNextValidator)
         {
             validRule.Context.Details = details;
         }
@@ -107,9 +108,9 @@ internal abstract class Rule<TField> : IRule<TField>
         return this;
     }
 
-    public IRule<TField> WithError(ICrossError error)
+    public IValidation<TField> WithError(ICrossError error)
     {
-        if (this is IValidRule<TField> validRule && validRule.Context.ExecuteNextValidator)
+        if (this is IValidValidation<TField> validRule && validRule.Context.ExecuteNextValidator)
         {
             validRule.TakeErrorCustomizations(error, overrideContextCustomizations: true);
             validRule.Context.Error = error;
@@ -118,9 +119,9 @@ internal abstract class Rule<TField> : IRule<TField>
         return this;
     }
 
-    public IRule<TField> WithFieldDisplayName(string fieldDisplayName)
+    public IValidation<TField> WithFieldDisplayName(string fieldDisplayName)
     {
-        if (this is IValidRule<TField> validRule && validRule.Context.ExecuteNextValidator)
+        if (this is IValidValidation<TField> validRule && validRule.Context.ExecuteNextValidator)
         {
             validRule.Context.FieldDisplayName = fieldDisplayName;
         }
@@ -128,9 +129,9 @@ internal abstract class Rule<TField> : IRule<TField>
         return this;
     }
 
-    public IRule<TField> WithHttpStatusCode(HttpStatusCode code)
+    public IValidation<TField> WithHttpStatusCode(HttpStatusCode code)
     {
-        if (this is IValidRule<TField> validRule && validRule.Context.ExecuteNextValidator)
+        if (this is IValidValidation<TField> validRule && validRule.Context.ExecuteNextValidator)
         {
             validRule.Context.HttpStatusCode = code;
         }
@@ -138,9 +139,9 @@ internal abstract class Rule<TField> : IRule<TField>
         return this;
     }
 
-    public IRule<TField> When(bool condition)
+    public IValidation<TField> When(bool condition)
     {
-        if (this is IValidRule<TField> validRule && validRule.Context.ExecuteNextValidator)
+        if (this is IValidValidation<TField> validRule && validRule.Context.ExecuteNextValidator)
         {
             validRule.Context.ExecuteNextValidator = condition;
         }
@@ -148,9 +149,9 @@ internal abstract class Rule<TField> : IRule<TField>
         return this;
     }
 
-    public IRule<TField> When(Func<TField, bool> condition)
+    public IValidation<TField> When(Func<TField, bool> condition)
     {
-        if (this is IValidRule<TField> validRule && validRule.Context.ExecuteNextValidator)
+        if (this is IValidValidation<TField> validRule && validRule.Context.ExecuteNextValidator)
         {
             validRule.Context.ExecuteNextValidator = condition(validRule.GetFieldValue());
         }
@@ -158,9 +159,9 @@ internal abstract class Rule<TField> : IRule<TField>
         return this;
     }
 
-    public IRule<TField> WhenAsync(Func<TField, Task<bool>> condition)
+    public IValidation<TField> WhenAsync(Func<TField, Task<bool>> condition)
     {
-        if (this is IValidRule<TField> validRule && validRule.Context.ExecuteNextValidator)
+        if (this is IValidValidation<TField> validRule && validRule.Context.ExecuteNextValidator)
         {
             validRule.Context.ExecuteNextValidator = condition(validRule.GetFieldValue())
                 .GetAwaiter()
@@ -170,9 +171,9 @@ internal abstract class Rule<TField> : IRule<TField>
         return this;
     }
 
-    public IRule<TField> Must(Func<TField, bool> condition)
+    public IValidation<TField> Must(Func<TField, bool> condition)
     {
-        if (this is IValidRule<TField> validRule)
+        if (this is IValidValidation<TField> validRule)
         {
             return SetValidator(new PredicateValidator(condition(validRule.GetFieldValue())));
         }
@@ -180,9 +181,9 @@ internal abstract class Rule<TField> : IRule<TField>
         return this;
     }
 
-    public IRule<TField> MustAsync(Func<TField, Task<bool>> condition)
+    public IValidation<TField> MustAsync(Func<TField, Task<bool>> condition)
     {
-        if (this is IValidRule<TField> validRule)
+        if (this is IValidValidation<TField> validRule)
         {
             return SetValidator(new PredicateValidator(
                 condition(validRule.GetFieldValue())
@@ -197,24 +198,24 @@ internal abstract class Rule<TField> : IRule<TField>
     
     public abstract TInstance Instance<TInstance>(Func<TField, TInstance> fieldToInstance);
 
-    public IRule<TFieldTransformed> Transform<TFieldTransformed>(
+    public IValidation<TFieldTransformed> Transform<TFieldTransformed>(
         Func<TField, TFieldTransformed> transformer)
     {
-        if (this is IValidRule<TField> validRule && validRule.Context.ExecuteNextValidator)
+        if (this is IValidValidation<TField> validRule && validRule.Context.ExecuteNextValidator)
         {
             var fieldValueTransformed = transformer(validRule.GetFieldValue());
-            return IValidRule<TFieldTransformed>.CreateFromField(
+            return IValidValidation<TFieldTransformed>.CreateFromField(
                 fieldValueTransformed,
                 validRule.Context.FieldName,
                 validRule.Context);
         }
 
-        return IInvalidRule<TFieldTransformed>.Create();
+        return IInvalidValidation<TFieldTransformed>.Create();
     }
 
-    public IRule<TField> SetModelValidator<TChildModel>(ModelValidator<TChildModel> validator)
+    public IValidation<TField> SetModelValidator<TChildModel>(ModelValidator<TChildModel> validator)
     {
-        if (this is IValidRule<TField> validRule)
+        if (this is IValidValidation<TField> validRule)
         {
             validRule.Context.Clean(); // Ignore customizations for model validators
 

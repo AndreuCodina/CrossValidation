@@ -1,16 +1,16 @@
-﻿namespace CrossValidation.Rules;
+﻿namespace CrossValidation.Validations;
 
-public interface IInvalidRule<out TField> : IRule<TField>
+public interface IInvalidValidation<out TField> : IValidation<TField>
 {
-    public static IRule<TField> Create()
+    public static IValidation<TField> Create()
     {
-        return new InvalidRule<TField>();
+        return new InvalidValidation<TField>();
     }
 }
 
-file class InvalidRule<TField> :
-    Rule<TField>,
-    IInvalidRule<TField>
+file class InvalidValidation<TField> :
+    Validation<TField>,
+    IInvalidValidation<TField>
 {
     public override TField Instance()
     {

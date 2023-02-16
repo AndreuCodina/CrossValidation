@@ -2,25 +2,25 @@
 using System.Net;
 using System.Runtime.CompilerServices;
 using CrossValidation.Errors;
-using CrossValidation.Rules;
 using CrossValidation.Utils;
+using CrossValidation.Validations;
 
 namespace CrossValidation;
 
 public static class Validate
 {
     [Pure]
-    public static IRule<TField> That<TField>(TField fieldValue)
+    public static IValidation<TField> That<TField>(TField fieldValue)
     {
-        return IValidRule<TField>.CreateFromField(fieldValue);
+        return IValidValidation<TField>.CreateFromField(fieldValue);
     }
     
     [Pure]
-    public static IRule<TField> Field<TField>(
+    public static IValidation<TField> Field<TField>(
         TField field,
         [CallerArgumentExpression(nameof(field))] string fieldName = "")
     {
-        return IValidRule<TField>.CreateFromFieldName(field, fieldName);
+        return IValidValidation<TField>.CreateFromFieldName(field, fieldName);
     }
 
     public static void Must(bool condition, CrossError error)
@@ -52,7 +52,7 @@ public static class Validate
     {
         if (!condition)
         {
-            var rule = IValidRule<bool>.CreateFromField(condition);
+            var rule = IValidValidation<bool>.CreateFromField(condition);
 
             if (error is not null)
             {

@@ -1,13 +1,13 @@
 ﻿using CrossValidation.Errors;
-using CrossValidation.Rules;
 using CrossValidation.ShouldlyAssertions;
 using CrossValidation.Tests.Builders;
 using CrossValidation.Tests.Fixtures;
 using CrossValidation.Tests.Models;
+using CrossValidation.Validations;
 using Shouldly;
 using Xunit;
 
-namespace CrossValidation.Tests.Rules.RuleExtensions;
+namespace CrossValidation.Tests.Validations.ValidationExtensions;
 
 public class WhenNotNullTests : IClassFixture<CommonFixture>
 {
@@ -23,15 +23,15 @@ public class WhenNotNullTests : IClassFixture<CommonFixture>
     [Fact]
     public void WhenNotNull_does_not_fail_when_field_is_null()
     {
-        var structRuleAction = () => Validate.That(_model.NullableInt)
+        var structValidationAction = () => Validate.That(_model.NullableInt)
             .WhenNotNull(x => x
                 .Must(_commonFixture.NotBeValid));
-        structRuleAction.ShouldNotThrow();
+        structValidationAction.ShouldNotThrow();
 
-        var classRuleAction = () => Validate.That(_model.NullableString)
+        var classValidationAction = () => Validate.That(_model.NullableString)
             .WhenNotNull(x => x
                 .Must(_commonFixture.NotBeValid));
-        classRuleAction.ShouldNotThrow();
+        classValidationAction.ShouldNotThrow();
     }
 
     [Fact]
@@ -42,22 +42,22 @@ public class WhenNotNullTests : IClassFixture<CommonFixture>
             .WithNullableString("Value")
             .Build();
         
-        var structRuleAction = () => Validate.That(_model.NullableInt)
+        var structValidationAction = () => Validate.That(_model.NullableInt)
             .WhenNotNull(x => x
                 .GreaterThan(_model.NullableInt!.Value));
-        var error = structRuleAction.ShouldThrowValidationError();
+        var error = structValidationAction.ShouldThrowValidationError();
         error.FieldValue.ShouldNotBeOfType<int?>();
         error.FieldValue.ShouldBeOfType<int>();
 
-        var classRuleAction = () => Validate.That(_model.NullableString)
+        var classValidationAction = () => Validate.That(_model.NullableString)
             .WhenNotNull(x => x
                 .Must(_commonFixture.NotBeValid));
-        error = classRuleAction.ShouldThrowValidationError();
+        error = classValidationAction.ShouldThrowValidationError();
         error.FieldValue.ShouldBeOfType<string>();
     }
     
     [Fact]
-    public void Return_invalid_rule_when_inner_validation_fail()
+    public void Return_invalid_validation_when_inner_validation_fail()
     {
         _model = new ParentModelBuilder()
             .WithNullableInt(1)
@@ -65,17 +65,17 @@ public class WhenNotNullTests : IClassFixture<CommonFixture>
             .Build();
         var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
         {
-            validator.ValidationMode = ValidationMode.AccumulateFirstErrorEachRule;
+            validator.ValidationMode = ValidationMode.AccumulateFirstErrorEachValidation;
             
-            var structRuleAction = validator.Field(_model.NullableInt)
+            var structValidationAction = validator.Field(_model.NullableInt)
                 .WhenNotNull(x => x
                     .Must(_commonFixture.NotBeValid));
-            (structRuleAction is IInvalidRule<int?>).ShouldBeTrue();
+            (structValidationAction is IInvalidValidation<int?>).ShouldBeTrue();
             
-            var classRuleAction = validator.Field(_model.NullableString)
+            var classValidationAction = validator.Field(_model.NullableString)
                 .WhenNotNull(x => x
                     .Must(_commonFixture.NotBeValid));
-            (classRuleAction is IInvalidRule<string>).ShouldBeTrue();
+            (classValidationAction is IInvalidValidation<string>).ShouldBeTrue();
         });
 
         var action = () => parentModelValidator.Validate(_model);
@@ -84,22 +84,22 @@ public class WhenNotNullTests : IClassFixture<CommonFixture>
     }
 
     [Fact]
-    public void Inner_rules_can_return_a_different_type()
+    public void Inner_validations_can_return_a_different_type()
     {
-        var structRuleAction = () => Validate.That(_model.NullableInt)
+        var structValidationAction = () => Validate.That(_model.NullableInt)
             .WhenNotNull(x => x
                 .Transform(x => x.ToString()));
-        structRuleAction.ShouldNotThrow();
+        structValidationAction.ShouldNotThrow();
         
-        var classRuleAction = () => Validate.That(_model.NullableString)
+        var classValidationAction = () => Validate.That(_model.NullableString)
             .WhenNotNull(x => x
                 .Transform(x => x.ToString()));
-        classRuleAction.ShouldNotThrow();
+        classValidationAction.ShouldNotThrow();
     }
 
 
     [Fact]
-    public void Keep_type_after_rule_nested_transformed()
+    public void Keep_type_after_validation_nested_transformed()
     {
         var action = () => Validate.That(_model.NullableInt)
             .WhenNotNull(x => x

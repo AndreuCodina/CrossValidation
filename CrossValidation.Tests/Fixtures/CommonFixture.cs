@@ -14,7 +14,7 @@ public class CommonFixture
         {
             CallBase = true
         };
-        validatorMock.Setup(x => x.CreateRules(It.IsAny<ParentModel>()))
+        validatorMock.Setup(x => x.CreateValidations(It.IsAny<ParentModel>()))
             .Callback(() => validator(validatorMock.Object));
         return validatorMock.Object;
     }
@@ -26,7 +26,7 @@ public class CommonFixture
         {
             CallBase = true
         };
-        validatorMock.Setup(x => x.CreateRules(It.IsAny<NestedModel>()))
+        validatorMock.Setup(x => x.CreateValidations(It.IsAny<NestedModel>()))
             .Callback(() => validator(validatorMock.Object));
         return validatorMock.Object;
     }

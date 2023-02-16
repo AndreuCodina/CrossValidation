@@ -69,7 +69,7 @@ public class ValidateBenchmarks
 
     private record ModelValidatorSuccess : ModelValidator<Model>
     {
-        public override void CreateRules(Model model)
+        public override void CreateValidations(Model model)
         {
             Field(model.Value)
                 .Must(_ => true);
@@ -78,7 +78,7 @@ public class ValidateBenchmarks
     
     private record ModelValidatorFail : ModelValidator<Model>
     {
-        public override void CreateRules(Model model)
+        public override void CreateValidations(Model model)
         {
             Field(model.Value)
                 .Must(_ => false);
@@ -87,7 +87,7 @@ public class ValidateBenchmarks
     
     private record ModelValidatorErrorAccumulationSuccess : ModelValidator<Model>
     {
-        public override void CreateRules(Model model)
+        public override void CreateValidations(Model model)
         {
             Field(model.Value)
                 .Must(_ => true)
@@ -98,7 +98,7 @@ public class ValidateBenchmarks
     
     private record ModelValidatorErrorAccumulationFail : ModelValidator<Model>
     {
-        public override void CreateRules(Model model)
+        public override void CreateValidations(Model model)
         {
             Field(model.Value)
                 .Must(_ => false)

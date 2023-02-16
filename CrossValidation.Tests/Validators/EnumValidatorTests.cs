@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Linq;
 using CrossValidation.Exceptions;
-using CrossValidation.Rules;
 using CrossValidation.ShouldlyAssertions;
 using CrossValidation.Tests.Models;
+using CrossValidation.Validations;
 using Shouldly;
 using Xunit;
 

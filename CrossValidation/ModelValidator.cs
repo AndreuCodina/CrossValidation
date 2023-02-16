@@ -1,8 +1,8 @@
 ﻿using System.Diagnostics.Contracts;
 using System.Runtime.CompilerServices;
 using CrossValidation.Exceptions;
-using CrossValidation.Rules;
 using CrossValidation.ValidationContexts;
+using CrossValidation.Validations;
 
 namespace CrossValidation;
 
@@ -28,21 +28,21 @@ public abstract record ModelValidator<TModel>
     }
 
     [Pure]
-    public IRule<TField> Field<TField>(
+    public IValidation<TField> Field<TField>(
         TField field,
         [CallerArgumentExpression(nameof(field))]
         string fieldName = "")
     {
-        return IValidRule<TField>.CreateFromFieldName(field, fieldName, Context);
+        return IValidValidation<TField>.CreateFromFieldName(field, fieldName, Context);
     }
 
     [Pure]
-    public IRule<TField> That<TField>(TField fieldValue)
+    public IValidation<TField> That<TField>(TField fieldValue)
     {
-        return IValidRule<TField>.CreateFromField(fieldValue, context: Context);
+        return IValidValidation<TField>.CreateFromField(fieldValue, context: Context);
     }
 
-    public abstract void CreateRules(TModel model);
+    public abstract void CreateValidations(TModel model);
 
     public void Validate(TModel model)
     {
@@ -53,7 +53,7 @@ public abstract record ModelValidator<TModel>
         }
 
         Model = model;
-        CreateRules(model);
+        CreateValidations(model);
 
         if (!Context.IsChildContext && Context.ErrorsCollected is not null)
         {

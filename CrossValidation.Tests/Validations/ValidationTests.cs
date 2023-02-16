@@ -3,22 +3,22 @@ using System.Net;
 using CrossValidation.Errors;
 using CrossValidation.Exceptions;
 using CrossValidation.Resources;
-using CrossValidation.Rules;
 using CrossValidation.ShouldlyAssertions;
 using CrossValidation.Tests.Builders;
 using CrossValidation.Tests.Fixtures;
 using CrossValidation.Tests.Models;
+using CrossValidation.Validations;
 using Shouldly;
 using Xunit;
 
-namespace CrossValidation.Tests.Rules;
+namespace CrossValidation.Tests.Validations;
 
-public class RuleTests : IClassFixture<CommonFixture>
+public class ValidationTests : IClassFixture<CommonFixture>
 {
     private readonly CommonFixture _commonFixture;
     private ParentModel _model;
 
-    public RuleTests(CommonFixture commonFixture)
+    public ValidationTests(CommonFixture commonFixture)
     {
         _commonFixture = commonFixture;
         _model = new ParentModelBuilder().Build();
@@ -122,11 +122,11 @@ public class RuleTests : IClassFixture<CommonFixture>
     }
     
     [Fact]
-    public void Call_Instance_from_invalid_rule_fails()
+    public void Call_Instance_from_invalid_validation_fails()
     {
         var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
         {
-            validator.ValidationMode = ValidationMode.AccumulateFirstErrorEachRule;
+            validator.ValidationMode = ValidationMode.AccumulateFirstErrorEachValidation;
 
             validator.Field(_model.NullableInt)
                 .NotNull()
@@ -142,11 +142,11 @@ public class RuleTests : IClassFixture<CommonFixture>
     }
     
     [Fact]
-    public void Call_Instance_with_function_from_invalid_rule_fails()
+    public void Call_Instance_with_function_from_invalid_validation_fails()
     {
         var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
         {
-            validator.ValidationMode = ValidationMode.AccumulateFirstErrorEachRule;
+            validator.ValidationMode = ValidationMode.AccumulateFirstErrorEachValidation;
 
             validator.Field(_model.NullableInt)
                 .NotNull()

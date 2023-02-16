@@ -1,14 +1,14 @@
 ﻿using CrossValidation.Errors;
 using CrossValidation.Resources;
-using CrossValidation.Rules;
 using CrossValidation.ShouldlyAssertions;
 using CrossValidation.Tests.Builders;
 using CrossValidation.Tests.Fixtures;
 using CrossValidation.Tests.Models;
+using CrossValidation.Validations;
 using Shouldly;
 using Xunit;
 
-namespace CrossValidation.Tests.Rules.RuleExtensions;
+namespace CrossValidation.Tests.Validations.ValidationExtensions;
 
 public class NullTests : IClassFixture<CommonFixture>
 {
