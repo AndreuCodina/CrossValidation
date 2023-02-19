@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using CrossValidation.Errors;
+using CrossValidation.Exceptions;
 using CrossValidation.ShouldlyAssertions;
 using CrossValidation.Tests.Builders;
 using CrossValidation.Tests.Fixtures;
@@ -247,6 +248,89 @@ public class ForEachTests : IClassFixture<CommonFixture>
 
         var error = action.ShouldThrowValidationError();
         error.Details.ShouldBeNull();
+    }
+    
+    [Theory]
+    [InlineData(
+        ValidationMode.StopValidationOnFirstError,
+        new[] {"1"})]
+    [InlineData(
+        ValidationMode.AccumulateFirstErrorEachValidation,
+        new[] {"1", "3"})]
+    [InlineData(
+        ValidationMode.AccumulateFirstErrorEachValidationAndAllFirstErrorsCollectionIteration,
+        new[] {"1", "2", "3"})]
+    public void Throw_errors_with_model_validator(
+        ValidationMode validationMode,
+        string[] expectedErrorCodes)
+    {
+        var intList = new List<int> {100, 20, 30, 100};
+        _model = new ParentModelBuilder()
+            .WithNullableIntList(intList)
+            .Build();
+        var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
+        {
+            validator.ValidationMode = validationMode;
+            
+            validator.Field(_model.NullableIntList)
+                .NotNull()
+                .ForEach(x => x
+                    .GreaterThan(0)
+                    .WithCode("1")
+                    .GreaterThan(intList[1])
+                    .WithCode("2")
+                    .GreaterThan(intList[2]))
+                .Must(_commonFixture.NotBeValid);
+
+            validator.That(_model)
+                .WithCode("3")
+                .Must(_commonFixture.NotBeValid);
+        });
+        
+        var action = () => parentModelValidator.Validate(_model);
+
+        var exception = action.ShouldThrow<Exception>();
+
+        if (exception is ValidationListException validationListException)
+        {
+            validationListException.Errors
+                .Select(x => x.Code)
+                .SequenceEqual(expectedErrorCodes);
+        }
+        else if (exception is CrossException crossException)
+        {
+            crossException.Error
+                .Code
+                .ShouldBe(expectedErrorCodes[0]);
+        }
+        else
+        {
+            throw new Exception("Unexpected exception type");
+        }
+    }
+    
+    [Fact]
+    public void Throw_errors_with_inline_validation()
+    {
+        var expectedErrorCode = "1";
+        var intList = new List<int> {100, 20, 30, 100};
+        _model = new ParentModelBuilder()
+            .WithNullableIntList(intList)
+            .Build();
+
+        var action = () => Validate.Field(_model.IntList)
+            .NotNull()
+            .ForEach(x => x
+                .GreaterThan(0)
+                .WithCode(expectedErrorCode)
+                .GreaterThan(intList[1])
+                .WithCode("2")
+                .GreaterThan(intList[2]))
+            .Must(_commonFixture.NotBeValid);
+
+
+        var error = action.ShouldThrowValidationError();
+        error.Code.ShouldBe(expectedErrorCode);
     }
 
     private record ErrorTest : CrossError;

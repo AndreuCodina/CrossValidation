@@ -267,6 +267,7 @@ public static class ValidationExtensions
                 else if (validValidation.Context.ValidationMode is ValidationMode.AccumulateFirstErrorEachValidationAndAllFirstErrorsCollectionIteration)
                 {
                     areErrors = true;
+                    index++;
                     continue;
                 }
                 else
