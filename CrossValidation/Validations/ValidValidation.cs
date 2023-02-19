@@ -72,7 +72,6 @@ file class ValidValidation<TField> :
     {
         FieldValue = fieldValue;
         Context = context ?? new ValidationContext();
-        Context.FieldValue = fieldValue;
         FieldDisplayName = null;
         FieldFullPath = fieldFullPath;
 
