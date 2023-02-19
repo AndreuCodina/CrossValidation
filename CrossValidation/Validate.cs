@@ -52,34 +52,34 @@ public static class Validate
     {
         if (!condition)
         {
-            var rule = IValidValidation<bool>.CreateFromField(condition);
+            var validation = IValidValidation<bool>.CreateFromField(condition);
 
             if (error is not null)
             {
-                rule = rule.WithError(error);
+                validation = validation.WithError(error);
             }
             
             if (message is not null)
             {
-                rule = rule.WithMessage(message);
+                validation = validation.WithMessage(message);
             }
             
             if (code is not null)
             {
-                rule = rule.WithCode(code);
+                validation = validation.WithCode(code);
             }
 
             if (details is not null)
             {
-                rule = rule.WithDetails(details);
+                validation = validation.WithDetails(details);
             }
             
             if (httpStatusCode is not null)
             {
-                rule = rule.WithHttpStatusCode(httpStatusCode.Value);
+                validation = validation.WithHttpStatusCode(httpStatusCode.Value);
             }
 
-            rule.Must(_ => false);
+            validation.Must(_ => false);
         }
     }
 

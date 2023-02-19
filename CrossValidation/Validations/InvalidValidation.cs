@@ -15,12 +15,12 @@ file class InvalidValidation<TField> :
     public override TField Instance()
     {
         throw new InvalidOperationException(
-            $"Accumulate errors and call {nameof(Instance)} with an invalid rule is not allowed");
+            $"Accumulate errors and call {nameof(Instance)} with an invalid validation is not allowed");
     }
     
     public override TInstance Instance<TInstance>(Func<TField, TInstance> fieldToInstance)
     {
         throw new InvalidOperationException(
-            $"Accumulate errors and call {nameof(Instance)} with an invalid rule is not allowed");
+            $"Accumulate errors and call {nameof(Instance)} with an invalid validation is not allowed");
     }
 }
