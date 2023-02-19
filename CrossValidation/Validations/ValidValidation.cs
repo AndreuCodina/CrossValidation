@@ -56,7 +56,7 @@ file class ValidValidation<TField> :
     public ICrossError? Error { get; set; }
     public string? FieldDisplayName { get; set; }
     public HttpStatusCode? HttpStatusCode { get; set; }
-    public bool ExecuteNextValidator { get; set; } = true;
+    public bool ExecuteValidator { get; set; } = true;
 
     public ValidValidation(
         TField fieldValue,
@@ -169,7 +169,7 @@ file class ValidValidation<TField> :
         Message = null;
         Details = null;
         Error = null;
-        ExecuteNextValidator = true;
+        ExecuteValidator = true;
         HttpStatusCode = null;
     }
     

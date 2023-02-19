@@ -11,5 +11,5 @@ public interface IValidationCustomizations
     public ICrossError? Error { get; set; }
     public string? FieldDisplayName { get; set; }
     public HttpStatusCode? HttpStatusCode { get; set; }
-    public bool ExecuteNextValidator { get; set; }
+    public bool ExecuteValidator { get; set; }
 }
