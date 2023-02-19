@@ -41,8 +41,8 @@ public interface IValidValidation<out TField> : IValidation<TField>
             throw new ArgumentException("Use Field without a model is not allowed");
         }
 
-        var selectionFullPath = fieldName.Substring(fieldName.IndexOf('.') + 1);
-        return new ValidValidation<TField>(fieldValue, selectionFullPath, context);
+        var fieldFullPath = fieldName.Substring(fieldName.IndexOf('.') + 1);
+        return new ValidValidation<TField>(fieldValue, fieldFullPath, context);
     }
 
     void Clean();
