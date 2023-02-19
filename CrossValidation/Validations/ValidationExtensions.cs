@@ -254,8 +254,7 @@ public static class ValidationExtensions
                 fieldFullPath,
                 validValidation.Context,
                 index,
-                validValidation.Context.ParentPath,
-                validValidation);
+                validValidation.Context.ParentPath);
             var validationReturned = action(newValidation);
 
             if (validationReturned is IInvalidValidation<TReturnedField>)
@@ -298,8 +297,7 @@ public static class ValidationExtensions
                     fieldFullPath,
                     validValidation.Context,
                     index,
-                    validValidation.Context.ParentPath,
-                    validValidation);
+                    validValidation.Context.ParentPath);
         }
     }
 }

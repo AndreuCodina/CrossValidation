@@ -6,10 +6,14 @@ using CrossValidation.Resources;
 
 namespace CrossValidation.Validations;
 
-public interface IValidValidation<out TField> :
-    IValidation<TField>,
-    IValidationCustomizations
+public interface IValidValidation<out TField> : IValidation<TField>
 {
+    public string? Code { get; set; }
+    public string? Message { get; set; }
+    public string? Details { get; set; }
+    public ICrossError? Error { get; set; }
+    public string? FieldDisplayName { get; set; }
+    public HttpStatusCode? HttpStatusCode { get; set; }
     bool ExecuteNextValidator { get; set; }
     public TField GetFieldValue();
     public ValidationContext Context { get; set; }
@@ -22,10 +26,9 @@ public interface IValidValidation<out TField> :
         string? fieldFullPath = null,
         ValidationContext? context = null,
         int? index = null,
-        string? parentPath = null,
-        IValidationCustomizations? customizations = null)
+        string? parentPath = null)
     {
-        return new ValidValidation<TField>(fieldValue, fieldFullPath, context, index, parentPath, customizations);
+        return new ValidValidation<TField>(fieldValue, fieldFullPath, context, index, parentPath);
     }
 
     public static IValidation<TField> CreateFromFieldName(
@@ -65,28 +68,15 @@ file class ValidValidation<TField> :
         string? fieldFullPath = null,
         ValidationContext? context = null,
         int? index = null,
-        string? parentPath = null,
-        IValidationCustomizations? customizations = null)
+        string? parentPath = null)
     {
         FieldValue = fieldValue;
         Context = context ?? new ValidationContext();
         FieldDisplayName = null;
         FieldFullPath = fieldFullPath;
-        
-        if (customizations is not null)
-        {
-            Code = customizations.Code;
-            Message = customizations.Message;
-            Details = customizations.Details;
-            Error = customizations.Error;
-            FieldDisplayName = customizations.FieldDisplayName;
-            HttpStatusCode = customizations.HttpStatusCode;
-        }
-
         var indexRepresentation = Context.FieldName is not null && index is not null
             ? $"[{index}]"
             : null;
-
         string? parentPathValue = null;
 
         if (parentPath is not null)

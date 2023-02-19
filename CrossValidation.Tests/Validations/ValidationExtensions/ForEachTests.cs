@@ -155,15 +155,15 @@ public class ForEachTests : IClassFixture<CommonFixture>
             validator.ValidationMode = validationMode;
             
             validator.Field(_model.IntList)
-                .WithFieldDisplayName("Not expected field display name")
-                .Must(_commonFixture.BeValid)
-                .WithFieldDisplayName(expectedFieldDisplayName)
-                .WithCode(expectedCode)
-                .WithMessage(expectedMessage)
-                .WithError(new ErrorTest())
-                .WithHttpStatusCode(HttpStatusCode.Created)
-                .WithDetails(expectedDetails)
                 .ForEach(x => x
+                    .WithFieldDisplayName("Not expected field display name")
+                    .Must(_commonFixture.BeValid)
+                    .WithFieldDisplayName(expectedFieldDisplayName)
+                    .WithCode(expectedCode)
+                    .WithMessage(expectedMessage)
+                    .WithError(new ErrorTest())
+                    .WithHttpStatusCode(HttpStatusCode.Created)
+                    .WithDetails(expectedDetails)
                     .GreaterThan(intList[2]));
         });
         
@@ -200,13 +200,13 @@ public class ForEachTests : IClassFixture<CommonFixture>
             validator.ValidationMode = validationMode;
             
             validator.That(_model.IntList)
-                .WithFieldDisplayName(expectedFieldDisplayName)
-                .WithCode(expectedCode)
-                .WithMessage(expectedMessage)
-                .WithError(new ErrorTest())
-                .WithHttpStatusCode(HttpStatusCode.Created)
-                .WithDetails(expectedDetails)
                 .ForEach(x => x
+                    .WithFieldDisplayName(expectedFieldDisplayName)
+                    .WithCode(expectedCode)
+                    .WithMessage(expectedMessage)
+                    .WithError(new ErrorTest())
+                    .WithHttpStatusCode(HttpStatusCode.Created)
+                    .WithDetails(expectedDetails)
                     .GreaterThan(intList[2]));
         });
         
@@ -221,6 +221,32 @@ public class ForEachTests : IClassFixture<CommonFixture>
         error.Details.ShouldBe(expectedDetails);
         error.PlaceholderValues.ShouldNotBeEmpty();
         error.HttpStatusCode.ShouldBe(expectedHttpStatusCode);
+    }
+    
+    [Theory]
+    [InlineData(ValidationMode.StopValidationOnFirstError)]
+    [InlineData(ValidationMode.AccumulateFirstErrorEachValidation)]
+    [InlineData(ValidationMode.AccumulateFirstErrorEachValidationAndAllFirstErrorsCollectionIteration)]
+    public void Do_not_take_previous_customizations(ValidationMode validationMode)
+    {
+        var intList = new List<int> {1};
+        _model = new ParentModelBuilder()
+            .WithIntList(intList)
+            .Build();
+        var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
+        {
+            validator.ValidationMode = validationMode;
+            
+            validator.That(_model.IntList)
+                .WithDetails("Unexpected details")
+                .ForEach(x => x
+                    .GreaterThan(intList[0]));
+        });
+        
+        var action = () => parentModelValidator.Validate(_model);
+
+        var error = action.ShouldThrowValidationError();
+        error.Details.ShouldBeNull();
     }
 
     private record ErrorTest : CrossError;
