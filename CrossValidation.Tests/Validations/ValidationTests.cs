@@ -119,6 +119,8 @@ public class ValidationTests : IClassFixture<CommonFixture>
         error.Code.ShouldBe(nameof(ErrorResource.GreaterThan));
         error.Message.ShouldBe("Expected message");
         error.Details.ShouldBe("Expected details");
+        error.HttpStatusCode.ShouldBe(HttpStatusCode.Accepted);
+        error.FieldDisplayName.ShouldBe("Expected field display name");
     }
     
     [Fact]
@@ -341,6 +343,8 @@ public class ValidationTests : IClassFixture<CommonFixture>
             Validate.That(value)
                 .WithMessage("Expected message")
                 .WithDetails("Expected details")
+                .WithHttpStatusCode(HttpStatusCode.Accepted)
+                .WithFieldDisplayName("Expected field display name")
                 .GreaterThan(value + 1);
             return new(value);
         }

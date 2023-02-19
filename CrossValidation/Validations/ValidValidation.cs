@@ -6,16 +6,21 @@ using CrossValidation.Resources;
 
 namespace CrossValidation.Validations;
 
-public interface IValidValidation<out TField> :
-    IValidation<TField>,
-    IValidationCustomizations
+public interface IValidValidation<out TField> : IValidation<TField>
 {
+    bool ExecuteNextValidator { get; set; }
     public TField GetFieldValue();
     public ValidationContext Context { get; set; }
     public string FieldFullPath { get; set; }
+    public string? Code { get; set; }
+    public string? Message { get; set; }
+    public string? Details { get; set; }
+    public ICrossError? Error { get; set; }
+    public HttpStatusCode? HttpStatusCode { get; set; }
+    public string? FieldDisplayName { get; set; }
     void HandleError(ICrossError error);
-    void TakeErrorCustomizations(ICrossError error, bool overrideContextCustomizations);
-    
+    void TakeErrorCustomizations(ICrossError error, bool overrideCustomizations);
+
     public static IValidation<TField> CreateFromField(
         TField fieldValue,
         string? fieldFullPath = null,
@@ -56,7 +61,7 @@ file class ValidValidation<TField> :
     public ICrossError? Error { get; set; }
     public string? FieldDisplayName { get; set; }
     public HttpStatusCode? HttpStatusCode { get; set; }
-    public bool ExecuteValidator { get; set; } = true;
+    public bool ExecuteNextValidator { get; set; } = true;
 
     public ValidValidation(
         TField fieldValue,
@@ -98,31 +103,19 @@ file class ValidValidation<TField> :
     {
         return FieldValue;
     }
-    
-    public void TakeErrorCustomizations(ICrossError error, bool overrideContextCustomizations)
-    {
-        if (overrideContextCustomizations)
-        {
-            if (error.Code is not null)
-            {
-                Code = error.Code;
-            }
 
-            if (error.Message is not null)
-            {
-                Message = error.Message;
-            }
-        
-            if (error.Details is not null)
-            {
-                Details = error.Details;
-            }
-            
-            if (error.HttpStatusCode is not null)
-            {
-                HttpStatusCode = error.HttpStatusCode;
-            }
+    public void TakeErrorCustomizations(ICrossError error, bool overrideCustomizations)
+    {
+        if (!overrideCustomizations)
+        {
+            return;
         }
+        
+        Code = error.Code ?? Code;
+        Message = error.Message ?? Message;
+        Details = error.Details ?? Details;
+        HttpStatusCode = error.HttpStatusCode ?? HttpStatusCode;
+        FieldDisplayName = error.FieldDisplayName ?? FieldDisplayName;
     }
 
     public void HandleError(ICrossError error)
@@ -138,7 +131,7 @@ file class ValidValidation<TField> :
             }
         }
     }
-    
+
     public override TField Instance()
     {
         return FieldValue;
@@ -153,26 +146,25 @@ file class ValidValidation<TField> :
         catch (CrossException e)
         {
             e.Error.FieldName = null;
-            e.Error.FieldDisplayName = null;
             e.Error.FieldValue = null;
-            e.Error.HttpStatusCode = null;
             e.Error.PlaceholderValues = null;
-            TakeErrorCustomizations(e.Error, overrideContextCustomizations: false);
+            TakeErrorCustomizations(e.Error, overrideCustomizations: false);
             HandleError(e.Error);
             throw new UnreachableException();
         }
     }
-    
+
     public void Clean()
     {
         Code = null;
         Message = null;
         Details = null;
         Error = null;
-        ExecuteValidator = true;
         HttpStatusCode = null;
+        FieldDisplayName = null;
+        ExecuteNextValidator = true;
     }
-    
+
     public void AddError(ICrossError error)
     {
         AddCustomizationsToError(error);
@@ -186,37 +178,24 @@ file class ValidValidation<TField> :
         error.FieldName = Context.FieldName;
         error.FieldDisplayName = GetFieldDisplayNameToFill(error);
         error.FieldValue = FieldValue;
-
-        if (Code is not null)
-        {
-            error.Code = Code;
-        }
-        
+        error.Code = Code ?? error.Code;
         error.Message = GetMessageToFill(error);
-
-        if (Details is not null)
-        {
-            error.Details = Details;
-        }
-        
-        if (HttpStatusCode is not null)
-        {
-            error.HttpStatusCode = HttpStatusCode;
-        }
+        error.Details = Details ?? error.Details;
+        error.HttpStatusCode = HttpStatusCode ?? error.HttpStatusCode;
     }
-    
+
     private string? GetMessageToFill(ICrossError error)
     {
         if (Message is not null)
         {
             return Message;
         }
-        
+
         if (Code is not null)
         {
             return ErrorResource.ResourceManager.GetString(Code);
         }
-        
+
         if (error.Message is not null)
         {
             return error.Message;
@@ -235,6 +214,11 @@ file class ValidValidation<TField> :
         if (FieldDisplayName is not null)
         {
             return FieldDisplayName;
+        }
+        
+        if (error.FieldDisplayName is not null)
+        {
+            return error.FieldDisplayName;
         }
 
         return error.FieldName!;
