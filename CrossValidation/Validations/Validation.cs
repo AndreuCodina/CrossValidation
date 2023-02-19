@@ -60,19 +60,19 @@ internal abstract class Validation<TField> : IValidation<TField>
     {
         if (this is IValidValidation<TField> validRule)
         {
-            if (validRule.Context.ExecuteNextValidator)
+            if (validRule.ExecuteNextValidator)
             {
                 var error = validator.GetError();
 
                 if (error is not null)
                 {
                     validRule.HandleError(error);
-                    validRule.Context.Clean();
+                    validRule.Clean();
                     return IInvalidValidation<TField>.Create();
                 }
             }
 
-            validRule.Context.Clean();
+            validRule.Clean();
         }
 
         return this;
@@ -80,9 +80,9 @@ internal abstract class Validation<TField> : IValidation<TField>
 
     public IValidation<TField> WithCode(string code)
     {
-        if (this is IValidValidation<TField> validRule && validRule.Context.ExecuteNextValidator)
+        if (this is IValidValidation<TField> validRule && validRule.ExecuteNextValidator)
         {
-            validRule.Context.Code = code;
+            validRule.Code = code;
         }
 
         return this;
@@ -90,9 +90,9 @@ internal abstract class Validation<TField> : IValidation<TField>
     
     public IValidation<TField> WithMessage(string message)
     {
-        if (this is IValidValidation<TField> validRule && validRule.Context.ExecuteNextValidator)
+        if (this is IValidValidation<TField> validRule && validRule.ExecuteNextValidator)
         {
-            validRule.Context.Message = message;
+            validRule.Message = message;
         }
 
         return this;
@@ -100,9 +100,9 @@ internal abstract class Validation<TField> : IValidation<TField>
     
     public IValidation<TField> WithDetails(string details)
     {
-        if (this is IValidValidation<TField> validRule && validRule.Context.ExecuteNextValidator)
+        if (this is IValidValidation<TField> validRule && validRule.ExecuteNextValidator)
         {
-            validRule.Context.Details = details;
+            validRule.Details = details;
         }
 
         return this;
@@ -110,10 +110,10 @@ internal abstract class Validation<TField> : IValidation<TField>
 
     public IValidation<TField> WithError(ICrossError error)
     {
-        if (this is IValidValidation<TField> validRule && validRule.Context.ExecuteNextValidator)
+        if (this is IValidValidation<TField> validRule && validRule.ExecuteNextValidator)
         {
             validRule.TakeErrorCustomizations(error, overrideContextCustomizations: true);
-            validRule.Context.Error = error;
+            validRule.Error = error;
         }
 
         return this;
@@ -121,9 +121,9 @@ internal abstract class Validation<TField> : IValidation<TField>
 
     public IValidation<TField> WithFieldDisplayName(string fieldDisplayName)
     {
-        if (this is IValidValidation<TField> validRule && validRule.Context.ExecuteNextValidator)
+        if (this is IValidValidation<TField> validRule && validRule.ExecuteNextValidator)
         {
-            validRule.Context.FieldDisplayName = fieldDisplayName;
+            validRule.FieldDisplayName = fieldDisplayName;
         }
 
         return this;
@@ -131,9 +131,9 @@ internal abstract class Validation<TField> : IValidation<TField>
 
     public IValidation<TField> WithHttpStatusCode(HttpStatusCode code)
     {
-        if (this is IValidValidation<TField> validRule && validRule.Context.ExecuteNextValidator)
+        if (this is IValidValidation<TField> validRule && validRule.ExecuteNextValidator)
         {
-            validRule.Context.HttpStatusCode = code;
+            validRule.HttpStatusCode = code;
         }
 
         return this;
@@ -141,9 +141,9 @@ internal abstract class Validation<TField> : IValidation<TField>
 
     public IValidation<TField> When(bool condition)
     {
-        if (this is IValidValidation<TField> validRule && validRule.Context.ExecuteNextValidator)
+        if (this is IValidValidation<TField> validRule && validRule.ExecuteNextValidator)
         {
-            validRule.Context.ExecuteNextValidator = condition;
+            validRule.ExecuteNextValidator = condition;
         }
 
         return this;
@@ -151,9 +151,9 @@ internal abstract class Validation<TField> : IValidation<TField>
 
     public IValidation<TField> When(Func<TField, bool> condition)
     {
-        if (this is IValidValidation<TField> validRule && validRule.Context.ExecuteNextValidator)
+        if (this is IValidValidation<TField> validRule && validRule.ExecuteNextValidator)
         {
-            validRule.Context.ExecuteNextValidator = condition(validRule.GetFieldValue());
+            validRule.ExecuteNextValidator = condition(validRule.GetFieldValue());
         }
 
         return this;
@@ -161,9 +161,9 @@ internal abstract class Validation<TField> : IValidation<TField>
 
     public IValidation<TField> WhenAsync(Func<TField, Task<bool>> condition)
     {
-        if (this is IValidValidation<TField> validRule && validRule.Context.ExecuteNextValidator)
+        if (this is IValidValidation<TField> validRule && validRule.ExecuteNextValidator)
         {
-            validRule.Context.ExecuteNextValidator = condition(validRule.GetFieldValue())
+            validRule.ExecuteNextValidator = condition(validRule.GetFieldValue())
                 .GetAwaiter()
                 .GetResult();
         }
@@ -201,7 +201,7 @@ internal abstract class Validation<TField> : IValidation<TField>
     public IValidation<TFieldTransformed> Transform<TFieldTransformed>(
         Func<TField, TFieldTransformed> transformer)
     {
-        if (this is IValidValidation<TField> validRule && validRule.Context.ExecuteNextValidator)
+        if (this is IValidValidation<TField> validRule && validRule.ExecuteNextValidator)
         {
             var fieldValueTransformed = transformer(validRule.GetFieldValue());
             return IValidValidation<TFieldTransformed>.CreateFromField(
@@ -217,9 +217,9 @@ internal abstract class Validation<TField> : IValidation<TField>
     {
         if (this is IValidValidation<TField> validRule)
         {
-            validRule.Context.Clean(); // Ignore customizations for model validators
+            validRule.Clean(); // Ignore customizations for model validators
 
-            if (validRule.Context.ExecuteNextValidator)
+            if (validRule.ExecuteNextValidator)
             {
                 var oldContext = validRule.Context;
                 var childContext = validRule.Context.CloneForChildModelValidator(validRule.FieldFullPath);

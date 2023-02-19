@@ -1,11 +1,14 @@
 ﻿using System.Diagnostics;
+using System.Net;
 using CrossValidation.Errors;
 using CrossValidation.Exceptions;
-using CrossValidation.ValidationContexts;
+using CrossValidation.Resources;
 
 namespace CrossValidation.Validations;
 
-public interface IValidValidation<out TField> : IValidation<TField>
+public interface IValidValidation<out TField> :
+    IValidation<TField>,
+    IValidationCustomizations
 {
     public TField GetFieldValue();
     public ValidationContext Context { get; set; }
@@ -36,6 +39,8 @@ public interface IValidValidation<out TField> : IValidation<TField>
         var selectionFullPath = fieldName.Substring(fieldName.IndexOf('.') + 1);
         return new ValidValidation<TField>(fieldValue, selectionFullPath, context);
     }
+
+    void Clean();
 }
 
 file class ValidValidation<TField> :
@@ -45,6 +50,13 @@ file class ValidValidation<TField> :
     public TField FieldValue { get; set; }
     public ValidationContext Context { get; set; }
     public string FieldFullPath { get; set; }
+    public string? Code { get; set; }
+    public string? Message { get; set; }
+    public string? Details { get; set; }
+    public ICrossError? Error { get; set; }
+    public string? FieldDisplayName { get; set; }
+    public HttpStatusCode? HttpStatusCode { get; set; }
+    public bool ExecuteNextValidator { get; set; } = true;
 
     public ValidValidation(
         TField fieldValue,
@@ -56,7 +68,7 @@ file class ValidValidation<TField> :
         FieldValue = fieldValue;
         Context = context ?? new ValidationContext();
         Context.FieldValue = fieldValue;
-        Context.FieldDisplayName = null;
+        FieldDisplayName = null;
         FieldFullPath = fieldFullPath ?? "";
 
         var indexRepresentation = index is not null
@@ -93,30 +105,30 @@ file class ValidValidation<TField> :
         {
             if (error.Code is not null)
             {
-                Context.Code = error.Code;
+                Code = error.Code;
             }
 
             if (error.Message is not null)
             {
-                Context.Message = error.Message;
+                Message = error.Message;
             }
         
             if (error.Details is not null)
             {
-                Context.Details = error.Details;
+                Details = error.Details;
             }
             
             if (error.HttpStatusCode is not null)
             {
-                Context.HttpStatusCode = error.HttpStatusCode;
+                HttpStatusCode = error.HttpStatusCode;
             }
         }
     }
 
     public void HandleError(ICrossError error)
     {
-        var errorToAdd = Context.Error ?? error;
-        Context.AddError(errorToAdd);
+        var errorToAdd = Error ?? error;
+        AddError(errorToAdd);
 
         if (Context is {ValidationMode: ValidationMode.StopValidationOnFirstError})
         {
@@ -149,5 +161,82 @@ file class ValidValidation<TField> :
             HandleError(e.Error);
             throw new UnreachableException();
         }
+    }
+    
+    public void Clean()
+    {
+        Code = null;
+        Message = null;
+        Details = null;
+        Error = null;
+        ExecuteNextValidator = true;
+        HttpStatusCode = null;
+    }
+    
+    public void AddError(ICrossError error)
+    {
+        AddCustomizationsToError(error);
+        Context.ErrorsCollected ??= new List<ICrossError>();
+        error.AddPlaceholderValues();
+        Context.ErrorsCollected.Add(error);
+    }
+
+    private void AddCustomizationsToError(ICrossError error)
+    {
+        error.FieldName = Context.FieldName;
+        error.FieldDisplayName = GetFieldDisplayNameToFill(error);
+        error.FieldValue = FieldValue;
+
+        if (Code is not null)
+        {
+            error.Code = Code;
+        }
+        
+        error.Message = GetMessageToFill(error);
+
+        if (Details is not null)
+        {
+            error.Details = Details;
+        }
+        
+        if (HttpStatusCode is not null)
+        {
+            error.HttpStatusCode = HttpStatusCode;
+        }
+    }
+    
+    private string? GetMessageToFill(ICrossError error)
+    {
+        if (Message is not null)
+        {
+            return Message;
+        }
+        
+        if (Code is not null)
+        {
+            return ErrorResource.ResourceManager.GetString(Code);
+        }
+        
+        if (error.Message is not null)
+        {
+            return error.Message;
+        }
+
+        if (error.Code is not null)
+        {
+            return ErrorResource.ResourceManager.GetString(error.Code);
+        }
+
+        return null;
+    }
+
+    private string GetFieldDisplayNameToFill(ICrossError error)
+    {
+        if (FieldDisplayName is not null)
+        {
+            return FieldDisplayName;
+        }
+
+        return error.FieldName!;
     }
 }
