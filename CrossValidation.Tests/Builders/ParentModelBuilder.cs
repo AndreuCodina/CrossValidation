@@ -8,6 +8,7 @@ public class ParentModelBuilder
 {
     private string? _nullableString;
     private NestedModel _nestedModel = new NestedModelBuilder().Build();
+    private List<int> _intList = new List<int> {1, 2, 3};
     private List<int>? _nullableIntList;
     private int? _nullableInt;
 
@@ -20,7 +21,7 @@ public class ParentModelBuilder
             NullableDateTime = DateTime.UtcNow,
             NestedModel = _nestedModel,
             NullableNestedModel = null,
-            IntList = new List<int> {1, 2, 3},
+            IntList = _intList,
             NullableIntList = _nullableIntList,
             StringList = new List<string> {"1", "2", "3"},
             NullableStringList = null,
@@ -43,6 +44,12 @@ public class ParentModelBuilder
     public ParentModelBuilder WithNullableString(string? nullableString)
     {
         _nullableString = nullableString;
+        return this;
+    }
+    
+    public ParentModelBuilder WithIntList(List<int> intList)
+    {
+        _intList = intList;
         return this;
     }
     

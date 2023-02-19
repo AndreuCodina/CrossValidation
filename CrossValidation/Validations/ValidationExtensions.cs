@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using System.Diagnostics;
+using System.Numerics;
 using CrossValidation.Validators;
 using CrossValidation.Validators.LengthValidators;
 
@@ -231,35 +232,90 @@ public static class ValidationExtensions
         return validation;
     }
 
-    public static IValidation<IEnumerable<TInnerType>> ForEach<TInnerType, TReturnedField>(
+    public static IValidation<IEnumerable<TReturnedField>> ForEach<TInnerType, TReturnedField>(
         this IValidation<IEnumerable<TInnerType>> validation,
         Func<IValidation<TInnerType>, IValidation<TReturnedField>> action)
     {
-        if (validation is IValidValidation<IEnumerable<TInnerType>> validRule)
+        if (validation is not IValidValidation<IEnumerable<TInnerType>> validValidation)
         {
-            var fieldCollection = validRule.GetFieldValue();
-            var fieldFullPath = validRule.Context.FieldName;
-            var index = 0;
-
-            foreach (var innerField in fieldCollection)
-            {
-                var newRule = IValidValidation<TInnerType>.CreateFromField(
-                    innerField,
-                    fieldFullPath,
-                    validRule.Context,
-                    index,
-                    validRule.Context.ParentPath);
-                var ruleReturned = action(newRule);
-
-                if (ruleReturned is IInvalidValidation<TReturnedField>)
-                {
-                    return IInvalidValidation<IEnumerable<TInnerType>>.Create();
-                }
-
-                index++;
-            }
+            return IInvalidValidation<IEnumerable<TReturnedField>>.Create();
         }
 
-        return validation;
+        var fieldCollection = validValidation.GetFieldValue();
+        var fieldFullPath = validValidation.Context.FieldName;
+        var index = 0;
+        var areErrors = false;
+        var returnedFieldValues = new List<TReturnedField>();
+        // var oldContext = new ValidationContext
+        // {
+        //     Details = validRule.Context.Details,
+        //     Error = validRule.Context.Error,
+        //     Message = validRule.Context.Message,
+        //     Code = validRule.Context.Code,
+        //     ExecuteNextValidator = validRule.Context.ExecuteNextValidator,
+        //     HttpStatusCode = validRule.Context.HttpStatusCode,
+        //     FieldDisplayName = validRule.Context.FieldDisplayName,
+        //     ErrorsCollected = validRule.Context.ErrorsCollected,
+        //     ValidationMode = validRule.Context.ValidationMode,
+        //     ParentPath = validRule.Context.ParentPath,
+        //     FieldName = validRule.Context.FieldName,
+        //     IsChildContext = validRule.Context.IsChildContext,
+        //     FieldValue = validRule.Context.FieldValue
+        // };
+
+        foreach (var innerField in fieldCollection)
+        {
+            var newRule = IValidValidation<TInnerType>.CreateFromField(
+                innerField,
+                fieldFullPath,
+                validValidation.Context,
+                index,
+                validValidation.Context.ParentPath,
+                validValidation);
+            var ruleReturned = action(newRule);
+
+            if (ruleReturned is IInvalidValidation<TReturnedField>)
+            {
+                if (validValidation.Context.ValidationMode is ValidationMode.StopValidationOnFirstError
+                    || validValidation.Context.ValidationMode is ValidationMode.AccumulateFirstErrorEachValidation)
+                {
+                    return IInvalidValidation<IEnumerable<TReturnedField>>.Create();
+                }
+                else if (validValidation.Context.ValidationMode is ValidationMode.AccumulateFirstErrorEachValidationAndAllFirstErrorsCollectionIteration)
+                {
+                    areErrors = true;
+                    continue;
+                }
+                else
+                {
+                    throw new UnreachableException();
+                }
+            }
+            else if (ruleReturned is IValidValidation<TReturnedField> validRuleReturned)
+            {
+                returnedFieldValues.Add(validRuleReturned.GetFieldValue());
+            }
+            else
+            {
+                throw new UnreachableException();
+            }
+
+            index++;
+        }
+
+        if (areErrors)
+        {
+            return IInvalidValidation<IEnumerable<TReturnedField>>.Create();
+        }
+        else
+        {
+            return IValidValidation<IEnumerable<TReturnedField>>.CreateFromField(
+                    returnedFieldValues,
+                    fieldFullPath,
+                    validValidation.Context,
+                    index,
+                    validValidation.Context.ParentPath,
+                    validValidation);
+        }
     }
 }

@@ -6,18 +6,14 @@ using CrossValidation.Resources;
 
 namespace CrossValidation.Validations;
 
-public interface IValidValidation<out TField> : IValidation<TField>
+public interface IValidValidation<out TField> :
+    IValidation<TField>,
+    IValidationCustomizations
 {
     bool ExecuteNextValidator { get; set; }
     public TField GetFieldValue();
     public ValidationContext Context { get; set; }
     public string? FieldFullPath { get; set; }
-    public string? Code { get; set; }
-    public string? Message { get; set; }
-    public string? Details { get; set; }
-    public ICrossError? Error { get; set; }
-    public HttpStatusCode? HttpStatusCode { get; set; }
-    public string? FieldDisplayName { get; set; }
     void HandleError(ICrossError error);
     void TakeErrorCustomizations(ICrossError error, bool overrideCustomizations);
 
@@ -26,9 +22,10 @@ public interface IValidValidation<out TField> : IValidation<TField>
         string? fieldFullPath = null,
         ValidationContext? context = null,
         int? index = null,
-        string? parentPath = null)
+        string? parentPath = null,
+        IValidationCustomizations? customizations = null)
     {
-        return new ValidValidation<TField>(fieldValue, fieldFullPath, context, index, parentPath);
+        return new ValidValidation<TField>(fieldValue, fieldFullPath, context, index, parentPath, customizations);
     }
 
     public static IValidation<TField> CreateFromFieldName(
@@ -68,14 +65,25 @@ file class ValidValidation<TField> :
         string? fieldFullPath = null,
         ValidationContext? context = null,
         int? index = null,
-        string? parentPath = null)
+        string? parentPath = null,
+        IValidationCustomizations? customizations = null)
     {
         FieldValue = fieldValue;
         Context = context ?? new ValidationContext();
         FieldDisplayName = null;
         FieldFullPath = fieldFullPath;
+        
+        if (customizations is not null)
+        {
+            Code = customizations.Code;
+            Message = customizations.Message;
+            Details = customizations.Details;
+            Error = customizations.Error;
+            FieldDisplayName = customizations.FieldDisplayName;
+            HttpStatusCode = customizations.HttpStatusCode;
+        }
 
-        var indexRepresentation = index is not null
+        var indexRepresentation = Context.FieldName is not null && index is not null
             ? $"[{index}]"
             : null;
 
@@ -97,9 +105,9 @@ file class ValidValidation<TField> :
         
         Context.FieldName = parentPathValue + fieldFullPath + indexRepresentation;
         
-        if (Context.ParentPath is "")
+        if (Context.FieldName is "")
         {
-            Context.ParentPath = null;
+            Context.FieldName = null;
         }
     }
 

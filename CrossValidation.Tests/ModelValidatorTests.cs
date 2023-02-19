@@ -307,7 +307,7 @@ public class ModelValidatorTests : IClassFixture<CommonFixture>
         var action = () => parentModelValidator.Validate(_model);
     
         var error = action.ShouldThrowValidationError();
-        error.FieldName.ShouldBe("");
+        error.FieldName.ShouldBeNull();
         error.FieldValue.ShouldBe(expectedTransformation);
     }
     
@@ -683,7 +683,7 @@ public class ModelValidatorTests : IClassFixture<CommonFixture>
     }
     
     [Fact]
-    public void ValidateThat_returns_empty_field_name()
+    public void ValidateThat_returns_null_as_field_name()
     {
         var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
         {
@@ -694,7 +694,7 @@ public class ModelValidatorTests : IClassFixture<CommonFixture>
         var action = () => parentModelValidator.Validate(_model);
 
         var error = action.ShouldThrowValidationError();
-        error.FieldName.ShouldBeEmpty();
+        error.FieldName.ShouldBeNull();
     }
 
     private record CustomErrorWithCode(string Code) : CrossError(Code: Code);
