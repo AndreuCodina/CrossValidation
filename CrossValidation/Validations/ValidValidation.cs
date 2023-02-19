@@ -26,15 +26,38 @@ public interface IValidValidation<out TField> : IValidation<TField>
         string? fieldFullPath = null,
         ValidationContext? context = null,
         int? index = null,
-        string? parentPath = null)
+        string? parentPath = null,
+        ICrossError? error = null,
+        string? message = null,
+        string? code = null,
+        string? details = null,
+        HttpStatusCode? httpStatusCode = null,
+        string? fieldDisplayName = null)
     {
-        return new ValidValidation<TField>(fieldValue, fieldFullPath, context, index, parentPath);
+        return new ValidValidation<TField>(
+            fieldValue,
+            fieldFullPath,
+            context,
+            index,
+            parentPath,
+            error: error,
+            message: message,
+            code: code,
+            details: details,
+            httpStatusCode: httpStatusCode,
+            fieldDisplayName: fieldDisplayName);
     }
 
     public static IValidation<TField> CreateFromFieldName(
         TField fieldValue,
         string fieldName,
-        ValidationContext? context = null)
+        ValidationContext? context = null,
+        ICrossError? error = null,
+        string? message = null,
+        string? code = null,
+        string? details = null,
+        HttpStatusCode? httpStatusCode = null,
+        string? fieldDisplayName = null)
     {
         if (!fieldName.Contains("."))
         {
@@ -42,7 +65,16 @@ public interface IValidValidation<out TField> : IValidation<TField>
         }
 
         var fieldFullPath = fieldName.Substring(fieldName.IndexOf('.') + 1);
-        return new ValidValidation<TField>(fieldValue, fieldFullPath, context);
+        return new ValidValidation<TField>(
+            fieldValue,
+            fieldFullPath,
+            context,
+            error: error,
+            message: message,
+            code: code,
+            details: details,
+            httpStatusCode: httpStatusCode,
+            fieldDisplayName: fieldDisplayName);
     }
 
     void Clean();
@@ -52,15 +84,141 @@ file class ValidValidation<TField> :
     Validation<TField>,
     IValidValidation<TField>
 {
+    private string? _code;
+    private string? _message;
+    private string? _details;
+    private ICrossError? _error;
+    private string? _fieldDisplayName;
+    private HttpStatusCode? _httpStatusCode;
+    
     public TField FieldValue { get; set; }
     public ValidationContext Context { get; set; }
     public string? FieldFullPath { get; set; }
-    public string? Code { get; set; }
-    public string? Message { get; set; }
-    public string? Details { get; set; }
-    public ICrossError? Error { get; set; }
-    public string? FieldDisplayName { get; set; }
-    public HttpStatusCode? HttpStatusCode { get; set; }
+    public string? Code
+    {
+        get
+        {
+            if (Context.Code is not null)
+            {
+                return Context.Code;
+            }
+
+            return _code;
+        }
+        set
+        {
+            if (Context.Code is not null)
+            {
+                return;
+            }
+
+            _code = value;
+        }
+    }
+    public string? Message
+    {
+        get
+        {
+            if (Context.Message is not null)
+            {
+                return Context.Message;
+            }
+
+            return _message;
+        }
+        set
+        {
+            if (Context.Message is not null)
+            {
+                return;
+            }
+
+            _message = value;
+        }
+    }
+    public string? Details
+    {
+        get
+        {
+            if (Context.Details is not null)
+            {
+                return Context.Details;
+            }
+
+            return _details;
+        }
+        set
+        {
+            if (Context.Details is not null)
+            {
+                return;
+            }
+
+            _details = value;
+        }
+    }
+    public ICrossError? Error    {
+        get
+        {
+            if (Context.Error is not null)
+            {
+                return Context.Error;
+            }
+
+            return _error;
+        }
+        set
+        {
+            if (Context.Error is not null)
+            {
+                return;
+            }
+
+            _error = value;
+        }
+    }
+    public string? FieldDisplayName
+    {
+        get
+        {
+            if (Context.FieldDisplayName is not null)
+            {
+                return Context.FieldDisplayName;
+            }
+
+            return _fieldDisplayName;
+        }
+        set
+        {
+            if (Context.FieldDisplayName is not null)
+            {
+                return;
+            }
+
+            _fieldDisplayName = value;
+        }
+    }
+    public HttpStatusCode? HttpStatusCode
+    {
+        get
+        {
+            if (Context.HttpStatusCode is not null)
+            {
+                return Context.HttpStatusCode;
+            }
+
+            return _httpStatusCode;
+        }
+        set
+        {
+            if (Context.HttpStatusCode is not null)
+            {
+                return;
+            }
+
+            _httpStatusCode = value;
+        }
+    }
     public bool ExecuteNextValidator { get; set; } = true;
 
     public ValidValidation(
@@ -68,7 +226,13 @@ file class ValidValidation<TField> :
         string? fieldFullPath = null,
         ValidationContext? context = null,
         int? index = null,
-        string? parentPath = null)
+        string? parentPath = null,
+        ICrossError? error = null,
+        string? message = null,
+        string? code = null,
+        string? details = null,
+        HttpStatusCode? httpStatusCode = null,
+        string? fieldDisplayName = null)
     {
         FieldValue = fieldValue;
         Context = context ?? new ValidationContext();
@@ -99,6 +263,13 @@ file class ValidValidation<TField> :
         {
             Context.FieldName = null;
         }
+
+        Context.Error = error;
+        Context.Message = message;
+        Context.Code = code;
+        Context.Details = details;
+        Context.HttpStatusCode = httpStatusCode;
+        Context.FieldDisplayName = fieldDisplayName;
     }
 
     public TField GetFieldValue()
@@ -167,7 +338,7 @@ file class ValidValidation<TField> :
         ExecuteNextValidator = true;
     }
 
-    public void AddError(ICrossError error)
+    private void AddError(ICrossError error)
     {
         AddCustomizationsToError(error);
         Context.ErrorsCollected ??= new List<ICrossError>();

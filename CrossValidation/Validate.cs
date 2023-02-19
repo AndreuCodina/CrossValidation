@@ -10,17 +10,45 @@ namespace CrossValidation;
 public static class Validate
 {
     [Pure]
-    public static IValidation<TField> That<TField>(TField fieldValue)
+    public static IValidation<TField> That<TField>(
+        TField fieldValue,
+        ICrossError? error = null,
+        string? message = null,
+        string? code = null,
+        string? details = null,
+        HttpStatusCode? httpStatusCode = null,
+        string? fieldDisplayName = null)
     {
-        return IValidValidation<TField>.CreateFromField(fieldValue);
+        return IValidValidation<TField>.CreateFromField(
+            fieldValue,
+            error: error,
+            message: message,
+            code: code,
+            details: details,
+            httpStatusCode: httpStatusCode,
+            fieldDisplayName: fieldDisplayName);
     }
     
     [Pure]
     public static IValidation<TField> Field<TField>(
         TField field,
+        ICrossError? error = null,
+        string? message = null,
+        string? code = null,
+        string? details = null,
+        HttpStatusCode? httpStatusCode = null,
+        string? fieldDisplayName = null,
         [CallerArgumentExpression(nameof(field))] string fieldName = "")
     {
-        return IValidValidation<TField>.CreateFromFieldName(field, fieldName);
+        return IValidValidation<TField>.CreateFromFieldName(
+            field,
+            fieldName,
+            error: error,
+            message: message,
+            code: code,
+            details: details,
+            httpStatusCode: httpStatusCode,
+            fieldDisplayName: fieldDisplayName);
     }
 
     public static void Must(bool condition, CrossError error)

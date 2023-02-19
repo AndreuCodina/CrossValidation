@@ -1,5 +1,7 @@
 ﻿using System.Diagnostics.Contracts;
+using System.Net;
 using System.Runtime.CompilerServices;
+using CrossValidation.Errors;
 using CrossValidation.Exceptions;
 using CrossValidation.Validations;
 
@@ -29,16 +31,45 @@ public abstract record ModelValidator<TModel>
     [Pure]
     public IValidation<TField> Field<TField>(
         TField field,
-        [CallerArgumentExpression(nameof(field))]
-        string fieldName = "")
+        ICrossError? error = null,
+        string? message = null,
+        string? code = null,
+        string? details = null,
+        HttpStatusCode? httpStatusCode = null,
+        string? fieldDisplayName = null,
+        [CallerArgumentExpression(nameof(field))] string fieldName = "")
     {
-        return IValidValidation<TField>.CreateFromFieldName(field, fieldName, Context);
+        return IValidValidation<TField>.CreateFromFieldName(
+            field,
+            fieldName,
+            Context,
+            error: error,
+            message: message,
+            code: code,
+            details: details,
+            httpStatusCode: httpStatusCode,
+            fieldDisplayName: fieldDisplayName);
     }
 
     [Pure]
-    public IValidation<TField> That<TField>(TField fieldValue)
+    public IValidation<TField> That<TField>(
+        TField fieldValue,
+        ICrossError? error = null,
+        string? message = null,
+        string? code = null,
+        string? details = null,
+        HttpStatusCode? httpStatusCode = null,
+        string? fieldDisplayName = null)
     {
-        return IValidValidation<TField>.CreateFromField(fieldValue, context: Context);
+        return IValidValidation<TField>.CreateFromField(
+            fieldValue,
+            context: Context,
+            error: error,
+            message: message,
+            code: code,
+            details: details,
+            httpStatusCode: httpStatusCode,
+            fieldDisplayName: fieldDisplayName);
     }
 
     public abstract void CreateValidations(TModel model);
