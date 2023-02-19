@@ -11,7 +11,7 @@ public interface IValidValidation<out TField> : IValidation<TField>
     bool ExecuteNextValidator { get; set; }
     public TField GetFieldValue();
     public ValidationContext Context { get; set; }
-    public string FieldFullPath { get; set; }
+    public string? FieldFullPath { get; set; }
     public string? Code { get; set; }
     public string? Message { get; set; }
     public string? Details { get; set; }
@@ -54,7 +54,7 @@ file class ValidValidation<TField> :
 {
     public TField FieldValue { get; set; }
     public ValidationContext Context { get; set; }
-    public string FieldFullPath { get; set; }
+    public string? FieldFullPath { get; set; }
     public string? Code { get; set; }
     public string? Message { get; set; }
     public string? Details { get; set; }
@@ -74,13 +74,13 @@ file class ValidValidation<TField> :
         Context = context ?? new ValidationContext();
         Context.FieldValue = fieldValue;
         FieldDisplayName = null;
-        FieldFullPath = fieldFullPath ?? "";
+        FieldFullPath = fieldFullPath;
 
         var indexRepresentation = index is not null
             ? $"[{index}]"
-            : "";
+            : null;
 
-        var parentPathValue = "";
+        string? parentPathValue = null;
 
         if (parentPath is not null)
         {
@@ -91,12 +91,17 @@ file class ValidValidation<TField> :
             parentPathValue = Context.ParentPath;
         }
 
-        if (parentPathValue is not "")
+        if (parentPathValue is not null)
         {
             parentPathValue += ".";
         }
-
+        
         Context.FieldName = parentPathValue + fieldFullPath + indexRepresentation;
+        
+        if (Context.ParentPath is "")
+        {
+            Context.ParentPath = null;
+        }
     }
 
     public TField GetFieldValue()
