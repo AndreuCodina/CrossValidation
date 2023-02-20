@@ -175,18 +175,21 @@ You can add conditional rules.
 ```csharp
 public record ModelValidator : ModelValidator<Model>
 {
-    public override void CreateRules(Model model)
+    public override void CreateValidations(Model model)
     {
         if (model.CustomerIsPreferred)
         {
             Field(model.CustomerDiscount)
                 .NotNull()
                 .GreaterThan(0);
+            
             Field(model.CreditCardNumber)
                 .NotNull();
+            
             Field(model.CustomerDiscount)
                 .NotNull()
                 .GreaterThan(0);
+            
             Field(model.CreditCardNumber)
                 .NotNull();
         }
