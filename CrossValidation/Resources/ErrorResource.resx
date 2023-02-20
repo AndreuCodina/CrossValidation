@@ -39,4 +39,7 @@
     <data name="MinimumLength" xml:space="preserve">
         <value>Must have at least {Minimum} characters</value>
     </data>
+    <data name="RegularExpression" xml:space="preserve">
+        <value>The format is not valid</value>
+    </data>
 </root>

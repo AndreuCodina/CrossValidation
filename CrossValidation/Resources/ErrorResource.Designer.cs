@@ -121,5 +121,14 @@ namespace CrossValidation.Resources {
                 return ResourceManager.GetString("Predicate", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The format is not valid.
+        /// </summary>
+        public static string RegularExpression {
+            get {
+                return ResourceManager.GetString("RegularExpression", resourceCulture);
+            }
+        }
     }
 }
