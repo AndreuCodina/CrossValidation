@@ -251,6 +251,7 @@ public static class ValidationExtensions
         {
             var newValidation = IValidValidation<TInnerType>.CreateFromField(
                 innerField,
+                validValidation.CrossErrorToException,
                 fieldFullPath,
                 validValidation.Context,
                 index,
@@ -295,6 +296,7 @@ public static class ValidationExtensions
         {
             return IValidValidation<IEnumerable<TReturnedField>>.CreateFromField(
                     returnedFieldValues,
+                    validValidation.CrossErrorToException,
                     fieldFullPath,
                     validValidation.Context,
                     index,

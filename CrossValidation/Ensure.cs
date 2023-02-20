@@ -2,12 +2,11 @@
 using System.Runtime.CompilerServices;
 using CrossValidation.Errors;
 using CrossValidation.Exceptions;
-using CrossValidation.Utils;
 using CrossValidation.Validations;
 
 namespace CrossValidation;
 
-public abstract class Validate<TException> : IValidate<TException>
+public abstract class Ensure<TException> : IValidate<TException>
     where TException : Exception, ICrossErrorToException
 {
     public static IValidation<TField> That<TField>(
@@ -19,15 +18,14 @@ public abstract class Validate<TException> : IValidate<TException>
         HttpStatusCode? httpStatusCode = null,
         string? fieldDisplayName = null)
     {
-        return IValidValidation<TField>.CreateFromField(
+        return Validate<TException>.That(
             fieldValue,
-            typeof(TException),
-            error: error,
-            message: message,
-            code: code,
-            details: details,
-            httpStatusCode: httpStatusCode,
-            fieldDisplayName: fieldDisplayName);
+            error,
+            message,
+            code,
+            details,
+            httpStatusCode,
+            fieldDisplayName);
     }
     
     public static IValidation<TField> Field<TField>(
@@ -44,7 +42,7 @@ public abstract class Validate<TException> : IValidate<TException>
             field,
             typeof(TException),
             fieldName,
-            allowFieldNameWithoutModel: false,
+            allowFieldNameWithoutModel: true,
             error: error,
             message: message,
             code: code,
@@ -55,30 +53,19 @@ public abstract class Validate<TException> : IValidate<TException>
 
     public static void Must(bool condition, ICrossError error)
     {
-        IValidate<TException>.InternalMust(condition, error: error);
+        Validate<TException>.Must(condition, error);
     }
-    
-    public static void Must(
-        bool condition,
+
+    public static void Must(bool condition,
         string? message = null,
         string? code = null,
         string? details = null,
         HttpStatusCode? httpStatusCode = null)
     {
-        IValidate<TException>.InternalMust(
-            condition,
-            message: message,
-            code: code,
-            details: details,
-            httpStatusCode: httpStatusCode);
-    }
-    
-    public static void ModelNullability<TModel>(TModel model)
-    {
-        ModelNullabilityValidator.Validate(model);
+        Validate<TException>.Must(condition, message, code, details, httpStatusCode);
     }
 }
 
-public abstract class Validate : Validate<CrossException>
+public abstract class Ensure : Ensure<CrossArgumentException>
 {
 }

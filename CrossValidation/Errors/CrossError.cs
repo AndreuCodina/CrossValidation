@@ -15,9 +15,10 @@ public interface ICrossError
     string? Details { get; set; }
     HttpStatusCode? HttpStatusCode { get; set; }
     Dictionary<string, object>? PlaceholderValues { get; set; }
+    public Type CrossErrorToException { get; set; }
     void AddPlaceholderValues();
     IEnumerable<string> GetFieldNames();
-    CrossException ToException();
+    Exception ToException();
 }
 
 public record CrossError : ICrossError
@@ -33,6 +34,7 @@ public record CrossError : ICrossError
     public string? Details { get; set; }
     public HttpStatusCode? HttpStatusCode { get; set; }
     public Dictionary<string, object>? PlaceholderValues { get; set; }
+    public Type CrossErrorToException { get; set; }
 
     public CrossError(
         string? FieldName = null,
@@ -41,7 +43,8 @@ public record CrossError : ICrossError
         string? Code = null,
         string? Message = null,
         string? Details = null,
-        HttpStatusCode? HttpStatusCode = null)
+        HttpStatusCode? HttpStatusCode = null,
+        Type? CrossErrorToException = null)
     {
         this.FieldName = FieldName;
         this.FieldDisplayName = FieldDisplayName;
@@ -50,11 +53,12 @@ public record CrossError : ICrossError
         this.Message = Message;
         this.Details = Details;
         this.HttpStatusCode = HttpStatusCode;
+        this.CrossErrorToException = CrossErrorToException ?? typeof(CrossException);
     }
 
     protected void AddPlaceholderValue(
         object? value,
-        [CallerArgumentExpression(nameof(value))] string name = "")
+        [CallerArgumentExpression(nameof(value))] string name = default!)
     {
         PlaceholderValues ??= new();
 
@@ -85,9 +89,14 @@ public record CrossError : ICrossError
             .Select(x => x.Name!);
     }
 
-    public CrossException ToException()
+    public Exception ToException()
     {
-        throw new CrossException(this);
+        var fromCrossErrorMethod = CrossErrorToException.GetMethod(
+            nameof(ICrossErrorToException.FromCrossError),
+            new[] {typeof(ICrossError)})!;
+        var parameters = new object[] {this};
+        var exception = fromCrossErrorMethod.Invoke(null, parameters);
+        return (Exception)exception!;
     }
 
     private void AddCommonPlaceholderValues()

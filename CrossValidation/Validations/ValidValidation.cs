@@ -18,11 +18,13 @@ public interface IValidValidation<out TField> : IValidation<TField>
     public TField GetFieldValue();
     public ValidationContext Context { get; set; }
     public string? FieldFullPath { get; set; }
+    public Type CrossErrorToException { get; set; }
     void HandleError(ICrossError error);
     void TakeErrorCustomizations(ICrossError error, bool overrideCustomizations);
 
     public static IValidation<TField> CreateFromField(
         TField fieldValue,
+        Type crossErrorToException,
         string? fieldFullPath = null,
         ValidationContext? context = null,
         int? index = null,
@@ -36,6 +38,7 @@ public interface IValidValidation<out TField> : IValidation<TField>
     {
         return new ValidValidation<TField>(
             fieldValue,
+            crossErrorToException,
             fieldFullPath,
             context,
             index,
@@ -50,7 +53,9 @@ public interface IValidValidation<out TField> : IValidation<TField>
 
     public static IValidation<TField> CreateFromFieldName(
         TField fieldValue,
+        Type crossErrorToException,
         string fieldName,
+        bool allowFieldNameWithoutModel,
         ValidationContext? context = null,
         ICrossError? error = null,
         string? message = null,
@@ -59,14 +64,20 @@ public interface IValidValidation<out TField> : IValidation<TField>
         HttpStatusCode? httpStatusCode = null,
         string? fieldDisplayName = null)
     {
-        if (!fieldName.Contains("."))
+        if (!allowFieldNameWithoutModel)
         {
-            throw new ArgumentException("Use Field without a model is not allowed");
+            if (!fieldName.Contains("."))
+            {
+                throw new ArgumentException("Use Field without a model is not allowed");
+            }
         }
 
-        var fieldFullPath = fieldName.Substring(fieldName.IndexOf('.') + 1);
+        var fieldFullPath = allowFieldNameWithoutModel
+            ? fieldName
+            : fieldName.Substring(fieldName.IndexOf('.') + 1);
         return new ValidValidation<TField>(
             fieldValue,
+            crossErrorToException,
             fieldFullPath,
             context,
             error: error,
@@ -94,6 +105,8 @@ file class ValidValidation<TField> :
     public TField FieldValue { get; set; }
     public ValidationContext Context { get; set; }
     public string? FieldFullPath { get; set; }
+    public Type CrossErrorToException { get; set; }
+
     public string? Code
     {
         get
@@ -223,6 +236,7 @@ file class ValidValidation<TField> :
 
     public ValidValidation(
         TField fieldValue,
+        Type crossErrorToException,
         string? fieldFullPath = null,
         ValidationContext? context = null,
         int? index = null,
@@ -235,6 +249,7 @@ file class ValidValidation<TField> :
         string? fieldDisplayName = null)
     {
         FieldValue = fieldValue;
+        CrossErrorToException = crossErrorToException;
         Context = context ?? new ValidationContext();
         FieldDisplayName = null;
         FieldFullPath = fieldFullPath;
@@ -321,6 +336,7 @@ file class ValidValidation<TField> :
             e.Error.FieldName = null;
             e.Error.FieldValue = null;
             e.Error.PlaceholderValues = null;
+            e.Error.CrossErrorToException = CrossErrorToException;
             TakeErrorCustomizations(e.Error, overrideCustomizations: false);
             HandleError(e.Error);
             throw new UnreachableException();

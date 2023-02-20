@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using CrossValidation.Errors;
+using CrossValidation.Exceptions;
 
 namespace CrossValidation;
 
@@ -16,6 +17,7 @@ public class ValidationContext
     public string? Details { get; set; }
     public HttpStatusCode? HttpStatusCode { get; set; }
     public string? FieldDisplayName { get; set; }
+    public ICrossErrorToException? CrossErrorToException { get; set; }
 
     public ValidationContext CloneForChildModelValidator(string? parentPath)
     {
@@ -24,7 +26,8 @@ public class ValidationContext
             IsChildContext = true,
             ParentPath = parentPath,
             ErrorsCollected = ErrorsCollected,
-            ValidationMode = ValidationMode
+            ValidationMode = ValidationMode,
+            CrossErrorToException = CrossErrorToException
         };
         return newContext;
     }

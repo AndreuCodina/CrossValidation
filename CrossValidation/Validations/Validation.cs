@@ -66,6 +66,7 @@ internal abstract class Validation<TField> : IValidation<TField>
 
                 if (error is not null)
                 {
+                    error.CrossErrorToException = validValidation.CrossErrorToException;
                     validValidation.HandleError(error);
                     validValidation.Clean();
                     return IInvalidValidation<TField>.Create();
@@ -112,6 +113,7 @@ internal abstract class Validation<TField> : IValidation<TField>
     {
         if (this is IValidValidation<TField> validValidation && validValidation.ExecuteNextValidator)
         {
+            error.CrossErrorToException = validValidation.CrossErrorToException;
             validValidation.TakeErrorCustomizations(error, overrideCustomizations: true);
             validValidation.Error = error;
         }
@@ -206,6 +208,7 @@ internal abstract class Validation<TField> : IValidation<TField>
             var fieldValueTransformed = transformer(validValidation.GetFieldValue());
             return IValidValidation<TFieldTransformed>.CreateFromField(
                 fieldValueTransformed,
+                validValidation.CrossErrorToException,
                 validValidation.Context.FieldName,
                 validValidation.Context);
         }
