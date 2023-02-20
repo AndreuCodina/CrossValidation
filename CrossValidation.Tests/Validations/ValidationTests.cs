@@ -34,7 +34,7 @@ public class ValidationTests : IClassFixture<CommonFixture>
             .WithError(new CustomErrorWithPlaceholderValue(_model.NestedModel.Int))
             .GreaterThan(_model.NestedModel.Int);
 
-        var error = action.ShouldThrowValidationError();
+        var error = action.ShouldThrowCrossError();
         error.PlaceholderValues!
             .ShouldContain(x =>
                 x.Key == nameof(CustomErrorWithPlaceholderValue.Value)
@@ -49,7 +49,7 @@ public class ValidationTests : IClassFixture<CommonFixture>
         var action = () => Validate.That(_model.NestedModel)
             .Must(_commonFixture.NotBeValid);
 
-        action.ShouldThrowValidationError<CommonCrossError.Predicate>();
+        action.ShouldThrowCrossError<CommonCrossError.Predicate>();
     }
     
     [Fact]
@@ -63,7 +63,7 @@ public class ValidationTests : IClassFixture<CommonFixture>
             .WithError(new CustomErrorWithPlaceholderValue(10))
             .Instance(ValueObjectWithoutCustomization.Create);
 
-        var error = getAge.ShouldThrowValidationError<CustomErrorWithPlaceholderValue>();
+        var error = getAge.ShouldThrowCrossError<CustomErrorWithPlaceholderValue>();
         error.FieldName.ShouldBe("NestedModel.Int");
         error.Message.ShouldBe(expectedMessage);
     }
@@ -75,7 +75,7 @@ public class ValidationTests : IClassFixture<CommonFixture>
             .WithCode(nameof(ErrorResource.NotNull))
             .Instance(ValueObjectWithoutCustomization.Create);
 
-        var error = getAge.ShouldThrowValidationError<CommonCrossError.GreaterThan<int>>();
+        var error = getAge.ShouldThrowCrossError<CommonCrossError.GreaterThan<int>>();
         error.Code.ShouldBe(nameof(ErrorResource.NotNull));
         error.Message.ShouldBe(ErrorResource.NotNull);
     }
@@ -87,7 +87,7 @@ public class ValidationTests : IClassFixture<CommonFixture>
             .WithMessage(ErrorResource.NotNull)
             .Instance(ValueObjectWithoutCustomization.Create);
 
-        var error = getAge.ShouldThrowValidationError<CommonCrossError.GreaterThan<int>>();
+        var error = getAge.ShouldThrowCrossError<CommonCrossError.GreaterThan<int>>();
         error.Message.ShouldBe(ErrorResource.NotNull);
     }
     
@@ -105,7 +105,7 @@ public class ValidationTests : IClassFixture<CommonFixture>
                 return x;
             });
         
-        var error = action.ShouldThrowValidationError<CommonCrossError.Predicate>();
+        var error = action.ShouldThrowCrossError<CommonCrossError.Predicate>();
         error.Message.ShouldBe(expectedMessage);
     }
     
@@ -115,7 +115,7 @@ public class ValidationTests : IClassFixture<CommonFixture>
         var getAge = () => Validate.That(_model.Int)
             .Instance(ValueObjectWithCustomization.Create);
 
-        var error = getAge.ShouldThrowValidationError<CommonCrossError.GreaterThan<int>>();
+        var error = getAge.ShouldThrowCrossError<CommonCrossError.GreaterThan<int>>();
         error.Code.ShouldBe(nameof(ErrorResource.GreaterThan));
         error.Message.ShouldBe("Expected message");
         error.Details.ShouldBe("Expected details");
@@ -210,7 +210,7 @@ public class ValidationTests : IClassFixture<CommonFixture>
             .WithMessage(expectedMessage)
             .GreaterThan(_model.NestedModel.Int);
 
-        var error = action.ShouldThrowValidationError();
+        var error = action.ShouldThrowCrossError();
         error.Message.ShouldBe(expectedMessage);
     }
     
@@ -225,7 +225,7 @@ public class ValidationTests : IClassFixture<CommonFixture>
             .WithMessage(expectedMessage)
             .GreaterThan(_model.NestedModel.Int);
 
-        var error = action.ShouldThrowValidationError();
+        var error = action.ShouldThrowCrossError();
         error.Message.ShouldBe(expectedMessage);
     }
 
@@ -275,7 +275,7 @@ public class ValidationTests : IClassFixture<CommonFixture>
             .WithMessage(expectedMessage)
             .NotNull();
 
-        var error = action.ShouldThrowValidationError();
+        var error = action.ShouldThrowCrossError();
         error.Message.ShouldBe(expectedMessage);
     }
     
@@ -287,7 +287,7 @@ public class ValidationTests : IClassFixture<CommonFixture>
             .WithError(new CommonCrossError.Enum())
             .Must(_commonFixture.NotBeValid);
 
-        var error = action.ShouldThrowValidationError<CommonCrossError.Enum>();
+        var error = action.ShouldThrowCrossError<CommonCrossError.Enum>();
         error.Code.ShouldBe(nameof(ErrorResource.Enum));
         error.Message.ShouldBe(ErrorResource.Enum);
     }
@@ -303,7 +303,7 @@ public class ValidationTests : IClassFixture<CommonFixture>
             .WithHttpStatusCode(HttpStatusCode.Created)
             .GreaterThan(_model.Int);
 
-        var error = action.ShouldThrowValidationError<CommonCrossError.GreaterThan<int>>();
+        var error = action.ShouldThrowCrossError<CommonCrossError.GreaterThan<int>>();
         error.Code.ShouldBe(nameof(ErrorResource.NotNull));
         error.Message.ShouldBe(ErrorResource.NotNull);
         error.Details.ShouldBe(expectedDetails);
@@ -318,7 +318,7 @@ public class ValidationTests : IClassFixture<CommonFixture>
             .WithError(new ErrorWithCustomization())
             .GreaterThan(_model.Int);
 
-        var error = action.ShouldThrowValidationError<ErrorWithCustomization>();
+        var error = action.ShouldThrowCrossError<ErrorWithCustomization>();
         error.Code.ShouldBe(nameof(ErrorResource.NotNull));
         error.Message.ShouldBe(ErrorResource.NotNull);
         error.Details.ShouldBe(expectedDetails);

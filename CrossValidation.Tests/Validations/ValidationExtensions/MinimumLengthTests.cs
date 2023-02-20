@@ -17,7 +17,7 @@ public class MinimumLengthTests
         var action = () => Validate.That(value)
             .MinimumLength(value.Length + 1);
 
-        var error = action.ShouldThrowValidationError<CommonCrossError.MinimumLength>();
+        var error = action.ShouldThrowCrossError<CommonCrossError.MinimumLength>();
         error.Code.ShouldBe(nameof(ErrorResource.MinimumLength));
     }
 }

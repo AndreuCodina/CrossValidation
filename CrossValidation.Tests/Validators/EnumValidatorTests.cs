@@ -39,12 +39,12 @@ public class EnumValidatorTests
         var enumValue = (ParentModelEnum)nonExistentColorId;
         var enumAction = () => Validate.That(enumValue)
             .Enum();
-        enumAction.ShouldThrowValidationError();
+        enumAction.ShouldThrowCrossError();
          
         var intValue = nonExistentColorId;
         var intAction = () => Validate.That(intValue)
             .Enum<ParentModelEnum>();
-        intAction.ShouldThrowValidationError();
+        intAction.ShouldThrowCrossError();
          
         var stringValue = "Not valid enum value";
         var stringAction = () => Validate.That(stringValue)

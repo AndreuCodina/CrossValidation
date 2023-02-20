@@ -66,7 +66,7 @@ public class ForEachTests : IClassFixture<CommonFixture>
         
         var action = () => parentModelValidator.Validate(_model);
 
-        var error = action.ShouldThrowValidationError();
+        var error = action.ShouldThrowCrossError();
         error.FieldName.ShouldBe("NullableIntList[1]");
     }
     
@@ -92,7 +92,7 @@ public class ForEachTests : IClassFixture<CommonFixture>
         
         var action = () => parentModelValidator.Validate(_model);
 
-        var error = action.ShouldThrowValidationError();
+        var error = action.ShouldThrowCrossError();
         error.FieldName.ShouldBe("NullableIntList[0]");
     }
     
@@ -117,7 +117,7 @@ public class ForEachTests : IClassFixture<CommonFixture>
 
         var action = () => parentModelValidator.Validate(_model);
 
-        var error = action.ShouldThrowValidationError();
+        var error = action.ShouldThrowCrossError();
         error.FieldName.ShouldBe("NullableIntList[1]");
     }
     
@@ -170,7 +170,7 @@ public class ForEachTests : IClassFixture<CommonFixture>
         
         var action = () => parentModelValidator.Validate(_model);
 
-        var error = action.ShouldThrowValidationError();
+        var error = action.ShouldThrowCrossError();
         error.FieldName.ShouldBe("IntList[2]");
         error.FieldDisplayName.ShouldBe(expectedFieldDisplayName);
         error.ShouldBeOfType<ErrorTest>();
@@ -213,7 +213,7 @@ public class ForEachTests : IClassFixture<CommonFixture>
         
         var action = () => parentModelValidator.Validate(_model);
 
-        var error = action.ShouldThrowValidationError();
+        var error = action.ShouldThrowCrossError();
         error.FieldName.ShouldBeNull();
         error.FieldDisplayName.ShouldBe(expectedFieldDisplayName);
         error.ShouldBeOfType<ErrorTest>();
@@ -246,7 +246,7 @@ public class ForEachTests : IClassFixture<CommonFixture>
         
         var action = () => parentModelValidator.Validate(_model);
 
-        var error = action.ShouldThrowValidationError();
+        var error = action.ShouldThrowCrossError();
         error.Details.ShouldBeNull();
     }
     
@@ -329,7 +329,7 @@ public class ForEachTests : IClassFixture<CommonFixture>
             .Must(_commonFixture.NotBeValid);
 
 
-        var error = action.ShouldThrowValidationError();
+        var error = action.ShouldThrowCrossError();
         error.Code.ShouldBe(expectedErrorCode);
     }
 

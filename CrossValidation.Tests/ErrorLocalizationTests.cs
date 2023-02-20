@@ -23,7 +23,7 @@ public class ErrorLocalizationTests
         var action = () => Validate.That(_model.NullableString)
             .NotNull();
 
-        var error = action.ShouldThrowValidationError();
+        var error = action.ShouldThrowCrossError();
         error.Code.ShouldBe(nameof(ErrorResource.NotNull));
         error.Message.ShouldBe(ErrorResource.NotNull);
     }

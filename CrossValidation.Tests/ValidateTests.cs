@@ -26,7 +26,7 @@ public class ValidateTests : IClassFixture<CommonFixture>
     {
         var action = () => Validate.Must(false);
 
-        action.ShouldThrowValidationError();
+        action.ShouldThrowCrossError();
     }
 
     [Fact]
@@ -42,7 +42,7 @@ public class ValidateTests : IClassFixture<CommonFixture>
 
         var action = () => Validate.Must(false, errorForValidation);
 
-        var error = action.ShouldThrowValidationError();
+        var error = action.ShouldThrowCrossError();
         error.Code.ShouldBe(expectedCode);
         error.Message.ShouldBe(ErrorResource.NotNull);
         error.Details.ShouldBe(expectedDetails);
@@ -63,7 +63,7 @@ public class ValidateTests : IClassFixture<CommonFixture>
             details: expectedDetails,
             httpStatusCode: expectedHttpStatusCode);
 
-        var error = action.ShouldThrowValidationError();
+        var error = action.ShouldThrowCrossError();
         error.Code.ShouldBe(expectedCode);
         error.Message.ShouldBe(expectedMessage);
         error.Details.ShouldBe(expectedDetails);
@@ -95,7 +95,7 @@ public class ValidateTests : IClassFixture<CommonFixture>
             .WithFieldDisplayName("Unexpected field display name")
             .Must(_commonFixture.NotBeValid);
 
-        var error = action.ShouldThrowValidationError<TestError>();
+        var error = action.ShouldThrowCrossError<TestError>();
         error.Message.ShouldBe(expectedMessage);
         error.Code.ShouldBe(expectedCode);
         error.Details.ShouldBe(expectedDetails);

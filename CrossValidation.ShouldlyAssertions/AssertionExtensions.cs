@@ -7,39 +7,39 @@ namespace CrossValidation.ShouldlyAssertions;
 [ShouldlyMethods]
 public static class AssertionExtensions
 {
-    public static ICrossError ShouldThrowValidationError(this Action actual, string? customMessage = null)
+    public static ICrossError ShouldThrowCrossError(this Action actual, string? customMessage = null)
     {
         return actual.ShouldThrow<CrossException>().Error;
     }
     
-    public static ICrossError ShouldThrowValidationError(this Func<object?> actual, string? customMessage = null)
+    public static ICrossError ShouldThrowCrossError(this Func<object?> actual, string? customMessage = null)
     {
         return actual.ShouldThrow<CrossException>().Error;
     }
     
-    public static TValidationError ShouldThrowValidationError<TValidationError>(this Action actual, string? customMessage = null)
-        where TValidationError : ICrossError
+    public static TCrossError ShouldThrowCrossError<TCrossError>(this Action actual, string? customMessage = null)
+        where TCrossError : ICrossError
     {
         var error = actual.ShouldThrow<CrossException>().Error;
-        return error.ShouldBeOfType<TValidationError>(customMessage);
+        return error.ShouldBeOfType<TCrossError>(customMessage);
     }
     
-    public static TValidationError ShouldThrowValidationError<TValidationError>(this Func<object?> actual, string? customMessage = null)
-        where TValidationError : ICrossError
+    public static TCrossError ShouldThrowCrossError<TCrossError>(this Func<object?> actual, string? customMessage = null)
+        where TCrossError : ICrossError
     {
         var error = actual.ShouldThrow<CrossException>().Error;
-        return error.ShouldBeOfType<TValidationError>(customMessage);
+        return error.ShouldBeOfType<TCrossError>(customMessage);
     }
     
-    public static List<ICrossError> ShouldThrowValidationErrors(this Action actual, string? customMessage = null)
+    public static List<ICrossError> ShouldThrowCrossErrors(this Action actual, string? customMessage = null)
     {
-        var errors = actual.ShouldThrow<ValidationListException>().Errors;
+        var errors = actual.ShouldThrow<ValidationListException>(customMessage).Errors;
         return errors;
     }
     
-    public static List<ICrossError> ShouldThrowValidationErrors(this Func<object?> actual, string? customMessage = null)
+    public static List<ICrossError> ShouldThrowCrossErrors(this Func<object?> actual, string? customMessage = null)
     {
-        var errors = actual.ShouldThrow<ValidationListException>().Errors;
+        var errors = actual.ShouldThrow<ValidationListException>(customMessage).Errors;
         return errors;
     }
 }

@@ -28,7 +28,7 @@ public class ValidationErrorTests :
             .WithError(new ErrorWithAllFieldsAddedAsPlaceholders("Alex", 30))
             .Must(_commonFixture.NotBeValid);
 
-        var error = action.ShouldThrowValidationError<ErrorWithAllFieldsAddedAsPlaceholders>();
+        var error = action.ShouldThrowCrossError<ErrorWithAllFieldsAddedAsPlaceholders>();
 
         _validatorFixture.AllFieldsAreAddedAsPlaceholders(error).ShouldBeTrue();
     }
@@ -40,7 +40,7 @@ public class ValidationErrorTests :
             .WithError(new ErrorWithNotAllFieldsAddedAsPlaceholders("Alex", 30))
             .Must(_commonFixture.NotBeValid);
 
-        var error = action.ShouldThrowValidationError<ErrorWithNotAllFieldsAddedAsPlaceholders>();
+        var error = action.ShouldThrowCrossError<ErrorWithNotAllFieldsAddedAsPlaceholders>();
 
         _validatorFixture.AllFieldsAreAddedAsPlaceholders(error).ShouldBeFalse();
     }
@@ -52,7 +52,7 @@ public class ValidationErrorTests :
             .WithError(new ErrorWithNullFields(null, null))
             .Must(_commonFixture.NotBeValid);
 
-        var error = action.ShouldThrowValidationError<ErrorWithNullFields>();
+        var error = action.ShouldThrowCrossError<ErrorWithNullFields>();
 
         error.PlaceholderValues![nameof(CrossError.FieldName)].ShouldBe("");
         error.PlaceholderValues![nameof(ErrorWithNullFields.Name)].ShouldBe("");

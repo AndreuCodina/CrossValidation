@@ -39,17 +39,17 @@ public class EnumRangeValidatorTests
         var enumValue = (ParentModelEnum)nonExistentColorId;
         var enumAction = () => Validate.That(enumValue)
             .Enum(ParentModelEnum.Red);
-        enumAction.ShouldThrowValidationError();
+        enumAction.ShouldThrowCrossError();
         
         var validEnumValue = ParentModelEnum.Red;
         var validEnumAction = () => Validate.That(validEnumValue)
             .Enum(ParentModelEnum.Blue);
-        validEnumAction.ShouldThrowValidationError();
+        validEnumAction.ShouldThrowCrossError();
          
         var intValue = nonExistentColorId;
         var intAction = () => Validate.That(intValue)
             .Enum(ParentModelEnum.Red);
-        intAction.ShouldThrowValidationError();
+        intAction.ShouldThrowCrossError();
          
         var stringValue = "Not valid enum value";
         var stringAction = () => Validate.That(stringValue)

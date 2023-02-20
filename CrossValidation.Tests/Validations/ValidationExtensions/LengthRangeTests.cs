@@ -17,7 +17,7 @@ public class LengthRangeTests
         var action = () => Validate.That(value)
             .LengthRange(value.Length + 1, value.Length);
 
-        var error = action.ShouldThrowValidationError<CommonCrossError.LengthRange>();
+        var error = action.ShouldThrowCrossError<CommonCrossError.LengthRange>();
         error.Code.ShouldBe(nameof(ErrorResource.LengthRange));
     }
 }

@@ -45,14 +45,14 @@ public class WhenNotNullTests : IClassFixture<CommonFixture>
         var structValidationAction = () => Validate.That(_model.NullableInt)
             .WhenNotNull(x => x
                 .GreaterThan(_model.NullableInt!.Value));
-        var error = structValidationAction.ShouldThrowValidationError();
+        var error = structValidationAction.ShouldThrowCrossError();
         error.FieldValue.ShouldNotBeOfType<int?>();
         error.FieldValue.ShouldBeOfType<int>();
 
         var classValidationAction = () => Validate.That(_model.NullableString)
             .WhenNotNull(x => x
                 .Must(_commonFixture.NotBeValid));
-        error = classValidationAction.ShouldThrowValidationError();
+        error = classValidationAction.ShouldThrowCrossError();
         error.FieldValue.ShouldBeOfType<string>();
     }
     
@@ -80,7 +80,7 @@ public class WhenNotNullTests : IClassFixture<CommonFixture>
 
         var action = () => parentModelValidator.Validate(_model);
 
-        action.ShouldThrowValidationErrors();
+        action.ShouldThrowCrossErrors();
     }
 
     [Fact]
@@ -106,7 +106,7 @@ public class WhenNotNullTests : IClassFixture<CommonFixture>
                 .Must(_commonFixture.BeValid))
             .NotNull();
 
-        var error = action.ShouldThrowValidationError<CommonCrossError.NotNull>();
+        var error = action.ShouldThrowCrossError<CommonCrossError.NotNull>();
         error.FieldValue.ShouldNotBeOfType<int>();
         error.FieldValue.ShouldBeNull();
     }
