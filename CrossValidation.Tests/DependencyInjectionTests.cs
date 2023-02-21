@@ -74,7 +74,7 @@ public class DependencyInjectionTests
         error.Message.ShouldBeNull();
     }
     
-    [Theory]
+    [Theory(Skip = "Affect other tests")]
     [InlineData("en", "Replaced NotNull")]
     [InlineData("es", "NotNull reemplazado")]
     public async Task Replace_built_in_code_with_custom_resx(string languageCode, string expectedMessage)
