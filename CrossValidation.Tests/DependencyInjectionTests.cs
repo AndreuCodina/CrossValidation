@@ -115,4 +115,14 @@ public class DependencyInjectionTests
         var problemDetails = await response.Content.ReadFromJsonAsync<CrossProblemDetails>();
         problemDetails!.Errors.ShouldBeNull();
     }
+    
+    [Fact]
+    public async Task Handle_unknown_exception()
+    {
+        var response = await _client.GetAsync("/exception");
+        
+        response.StatusCode.ShouldBe(HttpStatusCode.InternalServerError);
+        var problemDetails = await response.Content.ReadFromJsonAsync<CrossProblemDetails>();
+        problemDetails.ShouldNotBeNull();
+    }
 }

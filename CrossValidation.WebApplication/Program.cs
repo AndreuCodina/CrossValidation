@@ -56,6 +56,11 @@ app.MapGet("/errorWithStatusCode", () =>
     throw new CrossError(HttpStatusCode: HttpStatusCode.Created).ToException();
 });
 
+app.MapGet("/exception", () =>
+{
+    throw new Exception();
+});
+
 app.Run();
 
 public record ErrorWithCodeFromCustomResx() : CodeCrossError(nameof(ErrorResource1.Hello));

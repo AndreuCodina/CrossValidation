@@ -85,7 +85,7 @@ public class CrossValidationMiddleware : IMiddleware
         }
         else
         {
-            if (CrossValidationOptions.HandleUnknownException)
+            if (!CrossValidationOptions.HandleUnknownException)
             {
                 await next(context);
                 return;
