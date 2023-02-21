@@ -13,4 +13,10 @@ public class AddCrossValidationOptionsBuilder
         CrossValidationOptions.AddResourceManager<TResourceFile>();
         return this;
     }
+    
+    public AddCrossValidationOptionsBuilder NotHandleUnknownException()
+    {
+        CrossValidationOptions.HandleUnknownException = false;
+        return this;
+    }
 }

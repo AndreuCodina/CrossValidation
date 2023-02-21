@@ -28,11 +28,14 @@ public class CrossValidationMiddleware : IMiddleware
         }
         catch (Exception e)
         {
-            await HandleException(e, context);
+            await HandleException(e, context, next);
         }
     }
 
-    private async Task HandleException(Exception exception, HttpContext context)
+    private async Task HandleException(
+        Exception exception,
+        HttpContext context,
+        RequestDelegate next)
     {
         var problemDetails = new CrossProblemDetails();
         var httpStatusCode = HttpStatusCode.InternalServerError;
@@ -82,6 +85,12 @@ public class CrossValidationMiddleware : IMiddleware
         }
         else
         {
+            if (CrossValidationOptions.HandleUnknownException)
+            {
+                await next(context);
+                return;
+            }
+            
             _logger.LogError(exception, exception.Message);
             title = "An error occurred";;
             problemDetails.Detail = _environment.IsDevelopment() ? exception.Message : null;

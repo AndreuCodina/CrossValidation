@@ -7,6 +7,7 @@ public static class CrossValidationOptions
 {
     public static bool GeneratePlaceholderValuesWhenTheyAreNotAdded = false;
     public static List<ResourceManager> ResourceManagers { get; private set; } = CreateDefaultResourceManager();
+    public static bool HandleUnknownException { get; set; } = false;
 
     public static void AddResourceManager<TResourceFile>()
     {
