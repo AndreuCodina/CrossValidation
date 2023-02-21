@@ -12,8 +12,8 @@ public static class CrossValidationOptions
     public static bool LocalizeErrorInClient = false;
     public static List<ResourceManager> ResourceManagers { get; private set; } = CreateDefaultResourceManager();
     public static bool HandleUnknownException { get; set; } = true;
-    public static string DefaultCulture { get; set; } = CultureInfo.CurrentCulture.Name;
-    public static List<CultureInfo> SupportedCultures { get; set; } = new() {CultureInfo.CurrentCulture};
+    public static string DefaultCulture { get; set; } = "en";
+    public static List<CultureInfo> SupportedCultures { get; set; } = new() {new CultureInfo("en")};
 
     public static void AddResourceManager<TResourceFile>()
     {
