@@ -121,7 +121,7 @@ public record CrossError : ICrossError
     {
         var arePlaceholderValuesAdded = GetType().GetMethod(nameof(AddPlaceholderValues))!.DeclaringType == GetType();
 
-        if (!arePlaceholderValuesAdded && CrossValidationOptions.GeneratePlaceholderValuesWhenTheyAreNotAdded)
+        if (!arePlaceholderValuesAdded && CrossValidationOptions.LocalizeErrorInClient)
         {
             var properties = GetType().GetProperties();
             var customPlaceholderNames = GetFieldNames();

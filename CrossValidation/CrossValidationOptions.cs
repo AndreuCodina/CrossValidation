@@ -6,7 +6,10 @@ namespace CrossValidation;
 
 public static class CrossValidationOptions
 {
-    public static bool GeneratePlaceholderValuesWhenTheyAreNotAdded = false;
+    /// <summary>
+    /// Generate placeholders when they are not added
+    /// </summary>
+    public static bool LocalizeErrorInClient = false;
     public static List<ResourceManager> ResourceManagers { get; private set; } = CreateDefaultResourceManager();
     public static bool HandleUnknownException { get; set; } = true;
     public static string DefaultCulture { get; set; } = CultureInfo.CurrentCulture.Name;

@@ -13,11 +13,11 @@ public class CrossValidationOptionsTests
     {
         var expectedName = "Value";
         var expectedDateTime = DateTime.UtcNow;
-        var originalValue = CrossValidationOptions.GeneratePlaceholderValuesWhenTheyAreNotAdded;
+        var originalValue = CrossValidationOptions.LocalizeErrorInClient;
         
         try
         {
-            CrossValidationOptions.GeneratePlaceholderValuesWhenTheyAreNotAdded = true;
+            CrossValidationOptions.LocalizeErrorInClient = true;
 
             try
             {
@@ -33,7 +33,7 @@ public class CrossValidationOptionsTests
         }
         finally
         {
-            CrossValidationOptions.GeneratePlaceholderValuesWhenTheyAreNotAdded = originalValue;
+            CrossValidationOptions.LocalizeErrorInClient = originalValue;
         }
     }
 

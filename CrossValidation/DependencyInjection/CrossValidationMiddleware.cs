@@ -116,7 +116,8 @@ public class CrossValidationMiddleware : IMiddleware
             Details = crossError.Details
         };
 
-        if (crossError.PlaceholderValues is not null)
+        if (CrossValidationOptions.LocalizeErrorInClient
+            && crossError.PlaceholderValues is not null)
         {
             var placeholders = new Dictionary<string, object>();
             

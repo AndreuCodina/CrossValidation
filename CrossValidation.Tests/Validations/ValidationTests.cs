@@ -27,8 +27,8 @@ public class ValidationTests : IClassFixture<CommonFixture>
     [Fact]
     public void Placeholder_values_are_added_automatically_when_they_are_not_added_and_it_is_enabled_in_configuration()
     {
-        var defaultConfiguration = CrossValidationOptions.GeneratePlaceholderValuesWhenTheyAreNotAdded;
-        CrossValidationOptions.GeneratePlaceholderValuesWhenTheyAreNotAdded = true;
+        var defaultConfiguration = CrossValidationOptions.LocalizeErrorInClient;
+        CrossValidationOptions.LocalizeErrorInClient = true;
         
         var action = () => Validate.That(_model.NestedModel.Int)
             .WithError(new CustomErrorWithPlaceholderValue(_model.NestedModel.Int))
@@ -40,7 +40,7 @@ public class ValidationTests : IClassFixture<CommonFixture>
                 x.Key == nameof(CustomErrorWithPlaceholderValue.Value)
                 && (int)x.Value == _model.NestedModel.Int);
         
-        CrossValidationOptions.GeneratePlaceholderValuesWhenTheyAreNotAdded = defaultConfiguration;
+        CrossValidationOptions.LocalizeErrorInClient = defaultConfiguration;
     }
     
     [Fact]

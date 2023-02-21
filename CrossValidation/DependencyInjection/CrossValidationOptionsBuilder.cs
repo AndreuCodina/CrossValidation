@@ -6,7 +6,7 @@ public class CrossValidationOptionsBuilder
 {
     public CrossValidationOptionsBuilder LocalizeErrorInClient()
     {
-        CrossValidationOptions.GeneratePlaceholderValuesWhenTheyAreNotAdded = true;
+        CrossValidationOptions.LocalizeErrorInClient = true;
         return this;
     }
     
