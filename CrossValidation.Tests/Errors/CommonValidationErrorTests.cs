@@ -16,7 +16,7 @@ public class CommonValidationErrorTests : IClassFixture<ValidatorFixture>
     }
 
     [Fact]
-    public void All_common_errors_add_their_placeholders()
+    public void Common_errors_add_their_placeholders()
     {
         var errors = new List<CommonCrossError>
         {
@@ -26,7 +26,7 @@ public class CommonValidationErrorTests : IClassFixture<ValidatorFixture>
             new CommonCrossError.Enum(),
             new CommonCrossError.LengthRange(1, 1, 1),
             new CommonCrossError.MinimumLength(1, 1),
-            new CommonCrossError.Predicate(),
+            new CommonCrossError.Predicate()
         };
         errors.ForEach(error =>
         {

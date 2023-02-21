@@ -51,11 +51,17 @@ public record CrossError : ICrossError
         this.FieldValue = FieldValue;
         this.Code = Code;
         this.Message = Message;
+        
+        if (Message is null && Code is not null)
+        {
+            this.Message = CrossValidationOptions.GetMessageFromCode(Code);
+        }
+        
         this.Details = Details;
         this.HttpStatusCode = HttpStatusCode;
         this.CrossErrorToException = CrossErrorToException ?? typeof(CrossException);
     }
-
+    
     protected void AddPlaceholderValue(
         object? value,
         [CallerArgumentExpression(nameof(value))] string name = default!)
@@ -91,6 +97,11 @@ public record CrossError : ICrossError
 
     public Exception ToException()
     {
+        if (PlaceholderValues is null)
+        {
+            AddCustomErrorPlaceholderValues();
+        }
+        
         var fromCrossErrorMethod = CrossErrorToException.GetMethod(
             nameof(ICrossErrorToException.FromCrossError),
             new[] {typeof(ICrossError)})!;
@@ -110,7 +121,7 @@ public record CrossError : ICrossError
     {
         var arePlaceholderValuesAdded = GetType().GetMethod(nameof(AddPlaceholderValues))!.DeclaringType == GetType();
 
-        if (!arePlaceholderValuesAdded && CrossValidationConfiguration.GeneratePlaceholderValuesWhenTheyAreNotAdded)
+        if (!arePlaceholderValuesAdded && CrossValidationOptions.GeneratePlaceholderValuesWhenTheyAreNotAdded)
         {
             var properties = GetType().GetProperties();
             var customPlaceholderNames = GetFieldNames();

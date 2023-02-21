@@ -8,5 +8,5 @@ public class CrossProblemDetails
     public int? Status { get; set; }
     public string? Detail { get; set; }
     public string? Instance { get; set; }
-    public IEnumerable<IDictionary<string, object>>? Errors { get; set; }
+    public IEnumerable<CrossProblemDetailsError>? Errors { get; set; }
 }

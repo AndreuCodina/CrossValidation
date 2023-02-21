@@ -14,5 +14,29 @@
     <ItemGroup>
       <ProjectReference Include="..\CrossValidation\CrossValidation.csproj" />
     </ItemGroup>
+    
+    <ItemGroup>
+      <EmbeddedResource Update="Resources\ErrorResource1.resx">
+        <Generator>ResXFileCodeGenerator</Generator>
+        <LastGenOutput>ErrorResource1.Designer.cs</LastGenOutput>
+      </EmbeddedResource>
+      <EmbeddedResource Update="Resources\ErrorResource1.es.resx">
+        <Generator>ResXFileCodeGenerator</Generator>
+        <LastGenOutput>ErrorResource1.es.Designer.cs</LastGenOutput>
+      </EmbeddedResource>
+    </ItemGroup>
+    
+    <ItemGroup>
+      <Compile Update="Resources\ErrorResource1.Designer.cs">
+        <DesignTime>True</DesignTime>
+        <AutoGen>True</AutoGen>
+        <DependentUpon>ErrorResource1.resx</DependentUpon>
+      </Compile>
+      <Compile Update="Resources\ErrorResource1.es.Designer.cs">
+        <DesignTime>True</DesignTime>
+        <AutoGen>True</AutoGen>
+        <DependentUpon>ErrorResource1.es.resx</DependentUpon>
+      </Compile>
+    </ItemGroup>
 
 </Project>

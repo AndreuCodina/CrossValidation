@@ -2,7 +2,6 @@
 using System.Net;
 using CrossValidation.Errors;
 using CrossValidation.Exceptions;
-using CrossValidation.Resources;
 
 namespace CrossValidation.Validations;
 
@@ -382,7 +381,7 @@ file class ValidValidation<TField> :
 
         if (Code is not null)
         {
-            return ErrorResource.ResourceManager.GetString(Code);
+            return CrossValidationOptions.GetMessageFromCode(Code);
         }
 
         if (error.Message is not null)
@@ -392,7 +391,7 @@ file class ValidValidation<TField> :
 
         if (error.Code is not null)
         {
-            return ErrorResource.ResourceManager.GetString(error.Code);
+            return CrossValidationOptions.GetMessageFromCode(error.Code);
         }
 
         return null;

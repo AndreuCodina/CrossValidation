@@ -38,14 +38,24 @@ public class CrossValidationMiddleware : IMiddleware
         var httpStatusCode = HttpStatusCode.InternalServerError;
         string? title = null;
         string? details = null;
-        List<Dictionary<string, object>> errors = new();
+        List<CrossProblemDetailsError> errors = new();
 
         if (exception is CrossException crossException)
         {
-            httpStatusCode = HttpStatusCode.UnprocessableEntity;
-            title = "One validation errors occurred";
+            httpStatusCode = crossException.Error.HttpStatusCode ?? HttpStatusCode.UnprocessableEntity;
+            title = "A validation error occurred";
             var error = CreateCrossProblemDetailsError(crossException.Error);
-            errors.Add(error);
+            
+            var allErrorCustomizationsAreNotSet =
+                error.Code is null
+                && error.Message is null
+                && error.Details is null
+                && error.Placeholders is null;
+
+            if (!allErrorCustomizationsAreNotSet)
+            {
+                errors.Add(error);
+            }
         }
         else if (exception is ValidationListException validationListException)
         {
@@ -88,34 +98,25 @@ public class CrossValidationMiddleware : IMiddleware
         await context.Response.WriteAsync(response);
     }
 
-    private Dictionary<string, object> CreateCrossProblemDetailsError(ICrossError crossError)
+    private CrossProblemDetailsError CreateCrossProblemDetailsError(ICrossError crossError)
     {
-        var error = new Dictionary<string, object>();
-        
-        if (crossError.Code is not null)
+        var error = new CrossProblemDetailsError
         {
-            error.Add(
-                nameof(crossError.Code),
-                crossError.Code);
-        }
-        
-        if (crossError.Message is not null)
-        {
-            error.Add(
-                nameof(crossError.Message),
-                crossError.Message);
-        }
-            
-        if (crossError.Details is not null)
-        {
-            error.Add(
-                nameof(crossError.Details),
-                crossError.Details);
-        }
+            Code = crossError.Code,
+            Message = crossError.Message,
+            Details = crossError.Details
+        };
 
-        foreach (var placeholder in crossError.PlaceholderValues!)
+        if (crossError.PlaceholderValues is not null)
         {
-            error.Add(placeholder.Key, placeholder.Value);
+            var placeholders = new Dictionary<string, object>();
+            
+            foreach (var placeholder in crossError.PlaceholderValues)
+            {
+                placeholders.Add(placeholder.Key, placeholder.Value);
+            }
+
+            error.Placeholders = placeholders;
         }
 
         return error;

@@ -6,12 +6,9 @@ public static class CrossValidationCollectionExtensions
 {
     public static IServiceCollection AddCrossValidation(
         this IServiceCollection services,
-        Action<CrossValidationOptions>? options = null)
+        Action<AddCrossValidationOptionsBuilder>? options = null)
     {
-        var defaultOptions = new CrossValidationOptions();
-        options?.Invoke(defaultOptions);
-        CrossValidationConfiguration.GeneratePlaceholderValuesWhenTheyAreNotAdded =
-            defaultOptions.SendCompleteErrorToClient;
+        options?.Invoke(new AddCrossValidationOptionsBuilder());
         services.AddTransient<CrossValidationMiddleware>();
         return services;
     }
