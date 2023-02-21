@@ -5,14 +5,10 @@ namespace CrossValidation.DependencyInjection;
 
 public static class CrossValidationBuilderExtensions
 {
-    public static IApplicationBuilder UseCrossValidation(
-        this IApplicationBuilder app,
-        Action<UseCrossValidationOptionsBuilder>? options = null)
+    public static IApplicationBuilder UseCrossValidation(this IApplicationBuilder app)
     {
-        var builder = new UseCrossValidationOptionsBuilder();
-        options?.Invoke(builder);
         return app.UseCustomMiddleware()
-            .UseCustomRequestLocalization(builder);
+            .UseCustomRequestLocalization();
     }
     
     private static IApplicationBuilder UseCustomMiddleware(this IApplicationBuilder app)
@@ -21,20 +17,18 @@ public static class CrossValidationBuilderExtensions
         return app;
     }
     
-    private static IApplicationBuilder UseCustomRequestLocalization(
-        this IApplicationBuilder app,
-        UseCrossValidationOptionsBuilder builder)
+    private static IApplicationBuilder UseCustomRequestLocalization(this IApplicationBuilder app)
     {
         var localizationOptions = new RequestLocalizationOptions
         {
-            DefaultRequestCulture = new RequestCulture(builder.DefaultCulture),
-            SupportedCultures = builder.SupportedCultures,
-            SupportedUICultures = builder.SupportedCultures,
+            DefaultRequestCulture = new RequestCulture(CrossValidationOptions.DefaultCulture),
+            SupportedCultures = CrossValidationOptions.SupportedCultures,
+            SupportedUICultures = CrossValidationOptions.SupportedCultures,
             FallBackToParentCultures = true,
             FallBackToParentUICultures = true,
             RequestCultureProviders = new List<IRequestCultureProvider>
             {
-                new AcceptLanguageHeaderRequestCultureProvider(),
+                new AcceptLanguageHeaderRequestCultureProvider()
             }
         };
         app.UseRequestLocalization(localizationOptions);

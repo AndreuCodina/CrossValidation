@@ -9,17 +9,15 @@ using CrossValidation.WebApplication.Resources;
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddCrossValidation(options =>
 {
+    options.SetDefaultCulture("en");
+    options.SetSupportedCultures("en", "es");
     options.AddResx<ErrorResource1>();
 });
 
 var app = builder.Build();
-app.UseCrossValidation(options =>
-{
-    options.SetDefaultCulture("en");
-    options.SetSupportedCultures("en", "es");
-});
+app.UseCrossValidation();
 
-app.MapGet("/crossException", () =>
+    app.MapGet("/crossException", () =>
 {
     throw new CrossException(new CrossError());
 });

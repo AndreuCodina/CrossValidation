@@ -1,4 +1,5 @@
-﻿using System.Resources;
+﻿using System.Globalization;
+using System.Resources;
 using CrossValidation.Resources;
 
 namespace CrossValidation;
@@ -8,6 +9,8 @@ public static class CrossValidationOptions
     public static bool GeneratePlaceholderValuesWhenTheyAreNotAdded = false;
     public static List<ResourceManager> ResourceManagers { get; private set; } = CreateDefaultResourceManager();
     public static bool HandleUnknownException { get; set; } = false;
+    public static string DefaultCulture { get; set; } = CultureInfo.CurrentCulture.Name;
+    public static List<CultureInfo> SupportedCultures { get; set; } = new() {CultureInfo.CurrentCulture};
 
     public static void AddResourceManager<TResourceFile>()
     {
