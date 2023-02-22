@@ -14,17 +14,17 @@ public class EnumValidatorTests
     [Fact]
     public void Validate_enumeration()
     {
-        var enumValue = ParentModelEnum.Red;
+        var enumValue = ParentModelEnum.Case1;
         var enumAction = () => Validate.That(enumValue)
             .Enum();
         enumAction.ShouldNotThrow();
          
-        var intValue = (int)ParentModelEnum.Red;
+        var intValue = (int)ParentModelEnum.Case1;
         var intAction = () => Validate.That(intValue)
             .Enum<ParentModelEnum>();
         intAction.ShouldNotThrow();
          
-        var stringValue = nameof(ParentModelEnum.Red);
+        var stringValue = nameof(ParentModelEnum.Case1);
         var stringAction = () => Validate.That(stringValue)
             .Enum<ParentModelEnum>();
         stringAction.ShouldNotThrow();

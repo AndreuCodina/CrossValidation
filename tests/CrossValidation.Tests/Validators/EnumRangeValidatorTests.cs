@@ -14,19 +14,19 @@ public class EnumRangeValidatorTests
     [Fact]
     public void Validate_enumeration_range()
     {
-        var enumValue = ParentModelEnum.Red;
+        var enumValue = ParentModelEnum.Case1;
         var enumAction = () => Validate.That(enumValue)
-            .Enum(ParentModelEnum.Blue, ParentModelEnum.Red);
+            .Enum(ParentModelEnum.Case2, ParentModelEnum.Case1);
         enumAction.ShouldNotThrow();
          
-        var intValue = (int)ParentModelEnum.Red;
+        var intValue = (int)ParentModelEnum.Case1;
         var intAction = () => Validate.That(intValue)
-            .Enum(ParentModelEnum.Blue, ParentModelEnum.Red);
+            .Enum(ParentModelEnum.Case2, ParentModelEnum.Case1);
         intAction.ShouldNotThrow();
          
-        var stringValue = nameof(ParentModelEnum.Red);
+        var stringValue = nameof(ParentModelEnum.Case1);
         var stringAction = () => Validate.That(stringValue)
-            .Enum(ParentModelEnum.Blue, ParentModelEnum.Red);
+            .Enum(ParentModelEnum.Case2, ParentModelEnum.Case1);
         stringAction.ShouldNotThrow();
     }
      
@@ -38,22 +38,22 @@ public class EnumRangeValidatorTests
          
         var enumValue = (ParentModelEnum)nonExistentColorId;
         var enumAction = () => Validate.That(enumValue)
-            .Enum(ParentModelEnum.Red);
+            .Enum(ParentModelEnum.Case1);
         enumAction.ShouldThrowCrossError();
         
-        var validEnumValue = ParentModelEnum.Red;
+        var validEnumValue = ParentModelEnum.Case1;
         var validEnumAction = () => Validate.That(validEnumValue)
-            .Enum(ParentModelEnum.Blue);
+            .Enum(ParentModelEnum.Case2);
         validEnumAction.ShouldThrowCrossError();
          
         var intValue = nonExistentColorId;
         var intAction = () => Validate.That(intValue)
-            .Enum(ParentModelEnum.Red);
+            .Enum(ParentModelEnum.Case1);
         intAction.ShouldThrowCrossError();
          
         var stringValue = "Not valid enum value";
         var stringAction = () => Validate.That(stringValue)
-            .Enum(ParentModelEnum.Red);
+            .Enum(ParentModelEnum.Case1);
         stringAction.ShouldThrow<CrossException>();
     }
 }

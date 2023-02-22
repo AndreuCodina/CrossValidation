@@ -7,13 +7,22 @@ namespace CrossValidation;
 public static class CrossValidationOptions
 {
     /// <summary>
-    /// Generate placeholders when they are not added
+    /// Generates placeholders when they are not added
     /// </summary>
-    public static bool LocalizeErrorInClient = false;
-    public static List<ResourceManager> ResourceManagers { get; private set; } = CreateDefaultResourceManager();
-    public static bool HandleUnknownException { get; set; } = true;
-    public static string DefaultCulture { get; set; } = "en";
-    public static List<CultureInfo> SupportedCultures { get; set; } = new() {new CultureInfo("en")};
+    public static bool LocalizeErrorInClient { get; set; } = SetDefaultLocalizeErrorInClient();
+    public static List<ResourceManager> ResourceManagers { get; set; } = SetDefaultResourceManager();
+    public static bool HandleUnknownException { get; set; } = SetDefaultHandleUnknownException();
+    public static string DefaultCulture { get; set; } = SetDefaultCulture();
+    public static List<CultureInfo> SupportedCultures { get; set; } = SetDefaultSupportedCultures();
+
+    public static void SetDefaultOptions()
+    {
+        LocalizeErrorInClient = SetDefaultLocalizeErrorInClient();
+        ResourceManagers = SetDefaultResourceManager();
+        HandleUnknownException = SetDefaultHandleUnknownException();
+        DefaultCulture = SetDefaultCulture();
+        SupportedCultures = SetDefaultSupportedCultures();
+    }
 
     public static void AddResourceManager<TResourceFile>()
     {
@@ -41,11 +50,31 @@ public static class CrossValidationOptions
         return message;
     }
     
-    private static List<ResourceManager> CreateDefaultResourceManager()
+    private static bool SetDefaultLocalizeErrorInClient()
+    {
+        return false;
+    }
+    
+    private static List<ResourceManager> SetDefaultResourceManager()
     {
         var resourceType = typeof(ErrorResource);
         var resourceBaseName = resourceType.FullName!;
         var resourceManager = new ResourceManager(resourceBaseName, resourceType.Assembly);
         return new List<ResourceManager> {resourceManager};
+    }
+    
+    private static bool SetDefaultHandleUnknownException()
+    {
+        return true;
+    }
+    
+    private static string SetDefaultCulture()
+    {
+        return "en";
+    }
+    
+    private static List<CultureInfo> SetDefaultSupportedCultures()
+    {
+        return new() {new CultureInfo("en")};
     }
 }

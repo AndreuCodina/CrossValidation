@@ -1,67 +1,21 @@
-using System.Net;
-using CrossValidation;
 using CrossValidation.DependencyInjection;
 using CrossValidation.Errors;
-using CrossValidation.Exceptions;
-using CrossValidation.Validations;
+using CrossValidation.WebApplication;
 using CrossValidation.WebApplication.Resources;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddCrossValidation(options =>
-{
-    options.SetDefaultCulture("en");
-    options.SetSupportedCultures("en", "es");
-    options.AddResx<ErrorResource1>();
-});
+builder.Services.AddCrossValidation();
 
 var app = builder.Build();
 app.UseCrossValidation();
 
-    app.MapGet("/crossException", () =>
-{
-    throw new CrossException(new CrossError());
-});
-
-app.MapGet("/validationListException", () =>
-{
-    throw new ValidationListException(new List<ICrossError>());
-});
-
-app.MapGet("/errorWithCodeFromCustomResx", () =>
-{
-    throw new ErrorWithCodeFromCustomResx().ToException();
-});
-
-app.MapGet("/errorWithCodeWithoutResxKey", () =>
-{
-    throw new ErrorWithCodeWithoutResxKey().ToException();
-});
-
-app.MapGet("/replaceBuiltInCodeWithCustomResx", () =>
-{
-    string? value = null;
-    Validate.That(value)
-        .NotNull();
-});
-
-app.MapGet("/defaultCultureMessage", () =>
-{
-    string? value = "";
-    Validate.That(value)
-        .Null();
-});
-
-app.MapGet("/errorWithStatusCode", () =>
-{
-    throw new CrossError(HttpStatusCode: HttpStatusCode.Created).ToException();
-});
-
-app.MapGet("/exception", () =>
-{
-    throw new Exception();
-});
+app.UseTestEndpoints();
 
 app.Run();
+
+public partial class Program
+{
+}
 
 public record ErrorWithCodeFromCustomResx() : CodeCrossError(nameof(ErrorResource1.Hello));
 

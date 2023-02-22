@@ -27,7 +27,7 @@ public class ParentModelBuilder
             NullableStringList = null,
             Int = 1,
             NullableInt = _nullableInt,
-            Enum = ParentModelEnum.Red
+            Enum = ParentModelEnum.Case1
         };
 
         return model;

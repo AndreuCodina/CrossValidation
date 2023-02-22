@@ -2,6 +2,6 @@
 
 public enum ParentModelEnum
 {
-    Red = 1,
-    Blue = 2
+    Case1 = 1,
+    Case2 = 2
 }
