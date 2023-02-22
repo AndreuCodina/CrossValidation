@@ -39,7 +39,7 @@ jobs:
             --verbosity normal \
             --collect:"XPlat Code Coverage" \
             --results-directory ${{ env.TEST_COVERAGE_FOLDER }} \
-            -p:Exclude=[*]*
+            -p:Exclude="[*]*"
 
       - name: Copy coverage to a predictable location
         run: cp ${{ env.TEST_COVERAGE_FOLDER }}/*/coverage.cobertura.xml ${{ env.TEST_COVERAGE_FOLDER }}/coverage.cobertura.xml
