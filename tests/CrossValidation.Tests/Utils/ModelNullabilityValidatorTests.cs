@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using CrossValidation.Tests.Builders;
-using CrossValidation.Tests.Fixtures;
-using CrossValidation.Tests.Models;
+using CrossValidation.Tests.TestUtils;
+using CrossValidation.Tests.TestUtils.Builders;
+using CrossValidation.Tests.TestUtils.Fixtures;
+using CrossValidation.Tests.TestUtils.Models;
 using CrossValidation.Utils;
 using Shouldly;
 using Xunit;

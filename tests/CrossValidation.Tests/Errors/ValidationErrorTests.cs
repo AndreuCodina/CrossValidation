@@ -1,8 +1,9 @@
 ﻿using System.Linq;
 using CrossValidation.Errors;
 using CrossValidation.ShouldlyAssertions;
-using CrossValidation.Tests.Fixtures;
-using CrossValidation.Tests.Fixtures.Validators;
+using CrossValidation.Tests.TestUtils;
+using CrossValidation.Tests.TestUtils.Fixtures;
+using CrossValidation.Tests.TestUtils.Fixtures.Validators;
 using Shouldly;
 using Xunit;
 

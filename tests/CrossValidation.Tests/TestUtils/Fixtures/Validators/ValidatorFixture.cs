@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 using CrossValidation.Errors;
 
-namespace CrossValidation.Tests.Fixtures.Validators;
+namespace CrossValidation.Tests.TestUtils.Fixtures.Validators;
 
 public class ValidatorFixture
 {

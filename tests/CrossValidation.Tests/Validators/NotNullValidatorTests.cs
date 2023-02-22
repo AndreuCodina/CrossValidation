@@ -1,4 +1,5 @@
-﻿using CrossValidation.Validators;
+﻿using CrossValidation.Tests.TestUtils;
+using CrossValidation.Validators;
 using Shouldly;
 using Xunit;
 

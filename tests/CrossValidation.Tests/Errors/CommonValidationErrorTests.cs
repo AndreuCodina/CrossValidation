@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using CrossValidation.Errors;
-using CrossValidation.Tests.Fixtures.Validators;
+using CrossValidation.Tests.TestUtils;
+using CrossValidation.Tests.TestUtils.Fixtures.Validators;
 using Shouldly;
 using Xunit;
 

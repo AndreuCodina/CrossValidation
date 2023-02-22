@@ -2,7 +2,8 @@
 using System.Linq;
 using CrossValidation.Exceptions;
 using CrossValidation.ShouldlyAssertions;
-using CrossValidation.Tests.Models;
+using CrossValidation.Tests.TestUtils;
+using CrossValidation.Tests.TestUtils.Models;
 using CrossValidation.Validations;
 using Shouldly;
 using Xunit;

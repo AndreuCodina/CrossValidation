@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace CrossValidation.Tests.Models;
+namespace CrossValidation.Tests.TestUtils.Models;
 
 public class ParentModel
 {

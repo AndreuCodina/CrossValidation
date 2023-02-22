@@ -6,6 +6,7 @@ using System.Net.Http.Json;
 using System.Threading.Tasks;
 using CrossValidation.DependencyInjection;
 using CrossValidation.Resources;
+using CrossValidation.Tests.TestUtils;
 using CrossValidation.WebApplication;
 using CrossValidation.WebApplication.Resources;
 using Shouldly;
@@ -220,31 +221,6 @@ public class DependencyInjectionTests :
         error.Code.ShouldBe(nameof(ErrorResource.Null));
         error.Message.ShouldBe("No debe tener un valor");
     }
-    
-    // [Fact]
-    // public async Task Get_message_in_requested_culture_when_a_built_in_language_is_requested_and_customized()
-    // {
-    //     _client = new TestApplicationFactory(services =>
-    //     {
-    //         services.AddCrossValidation(x =>
-    //         {
-    //             x.SetDefaultCulture("en");
-    //             x.SetSupportedCultures("en", "es");
-    //             x.AddResx<ErrorResource1>();
-    //         });
-    //     }).CreateClient();
-    //     
-    //     _client.DefaultRequestHeaders.Add("Accept-Language", "es");
-    //     
-    //     var response = await _client.GetAsync(ApiPath.Test.Prefix + ApiPath.Test.DefaultCultureMessage);
-    //     
-    //     response.StatusCode.ShouldBe(HttpStatusCode.UnprocessableEntity);
-    //     var problemDetails = await GetProblemDetailsFromResponse(response);
-    //     problemDetails.Errors!.Count().ShouldBe(1);
-    //     var error = problemDetails.Errors!.First();
-    //     error.Code.ShouldBe(nameof(ErrorResource.Null));
-    //     error.Message.ShouldBe("No debe tener un valor");
-    // }
 
     public void Dispose()
     {

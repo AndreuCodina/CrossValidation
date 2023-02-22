@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace CrossValidation.Tests;
+namespace CrossValidation.Tests.TestUtils;
 
 public class TestApplicationFactory : WebApplicationFactory<Program>
 {

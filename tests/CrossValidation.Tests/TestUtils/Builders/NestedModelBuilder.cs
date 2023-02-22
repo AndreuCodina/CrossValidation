@@ -1,6 +1,6 @@
-﻿using CrossValidation.Tests.Models;
+﻿using CrossValidation.Tests.TestUtils.Models;
 
-namespace CrossValidation.Tests.Builders;
+namespace CrossValidation.Tests.TestUtils.Builders;
 
 public class NestedModelBuilder
 {

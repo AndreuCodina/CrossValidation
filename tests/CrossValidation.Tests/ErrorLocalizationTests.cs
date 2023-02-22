@@ -1,7 +1,8 @@
 ﻿using CrossValidation.Resources;
 using CrossValidation.ShouldlyAssertions;
-using CrossValidation.Tests.Builders;
-using CrossValidation.Tests.Models;
+using CrossValidation.Tests.TestUtils;
+using CrossValidation.Tests.TestUtils.Builders;
+using CrossValidation.Tests.TestUtils.Models;
 using CrossValidation.Validations;
 using Shouldly;
 using Xunit;

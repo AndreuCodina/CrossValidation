@@ -1,6 +1,7 @@
 ﻿using System;
-using CrossValidation.Tests.Builders;
-using CrossValidation.Tests.Models;
+using CrossValidation.Tests.TestUtils;
+using CrossValidation.Tests.TestUtils.Builders;
+using CrossValidation.Tests.TestUtils.Models;
 using Shouldly;
 using Xunit;
 

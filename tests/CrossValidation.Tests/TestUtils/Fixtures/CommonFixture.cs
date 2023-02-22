@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Threading.Tasks;
-using CrossValidation.Tests.Fixtures.Validators;
-using CrossValidation.Tests.Models;
+using CrossValidation.Tests.TestUtils.Fixtures.Validators;
+using CrossValidation.Tests.TestUtils.Models;
 using Moq;
 
-namespace CrossValidation.Tests.Fixtures;
+namespace CrossValidation.Tests.TestUtils.Fixtures;
 
 public class CommonFixture
 {
