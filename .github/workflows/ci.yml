@@ -37,8 +37,8 @@ jobs:
             --configuration Release \
             --no-build \
             --verbosity normal \
-            --collect:"XPlat Code Coverage" \
             --results-directory ${{ env.TEST_COVERAGE_FOLDER }} \
+            /p:CollectCoverage=true
             /p:Exclude="[*]*"
 
       - name: Copy coverage to a predictable location
