@@ -9,7 +9,8 @@ on:
       - main
 
 env:
-  TEST_COVERAGE_OUTPUT_FOLDER: ${{ github.workspace }}/generated/coverage
+  TEST_COVERAGE_FOLDER: ${{ github.workspace }}/generated/coverage
+  TEST_COVERAGE_REPORT_FOLDER: ${{ github.workspace }}/generated/coverage_report
 
 jobs:
   build_and_test:
@@ -37,20 +38,27 @@ jobs:
             --no-build \
             --verbosity normal \
             --collect:"XPlat Code Coverage" \
-            --results-directory ${{ env.TEST_COVERAGE_OUTPUT_FOLDER }}
+            --results-directory ${{ env.TEST_COVERAGE_FOLDER }}
 
       - name: Copy Coverage to a predictable location
-        run: cp ${{ env.TEST_COVERAGE_OUTPUT_FOLDER }}/*/coverage.cobertura.xml ${{ env.TEST_COVERAGE_OUTPUT_FOLDER }}/coverage.cobertura.xml
+        run: cp ${{ env.TEST_COVERAGE_FOLDER }}/*/coverage.cobertura.xml ${{ env.TEST_COVERAGE_FOLDER }}/coverage.cobertura.xml
 
-      - name: ReportGenerator
+      - name: Generate test coverage report
         uses: danielpalme/ReportGenerator-GitHub-Action@5.1.17
         with:
-          reports: ${{ env.TEST_COVERAGE_OUTPUT_FOLDER }}/coverage.cobertura.xml
-          targetdir: ${{ env.TEST_COVERAGE_OUTPUT_FOLDER }}
-          reporttypes: HtmlInline;Cobertura;MarkdownSummary
+          reports: ${{ env.TEST_COVERAGE_FOLDER }}/coverage.cobertura.xml
+          targetdir: ${{ env.TEST_COVERAGE_REPORT_FOLDER }}
+          reporttypes: HTML;MarkdownSummary
+
+      - name: Add pull request comment with the code coverage summary
+        uses: marocchino/sticky-pull-request-comment@v2.5.0
+        if: github.event_name == 'pull_request'
+        with:
+          recreate: true
+          path: ${{ env.TEST_COVERAGE_REPORT_FOLDER }}/Summary.md
 
       - name: Upload coverage report artifact
         uses: actions/upload-artifact@v3.1.2
         with:
-          name: CoverageReport
-          path: ${{ env.TEST_COVERAGE_OUTPUT_FOLDER }}
+          name: TestCoverageReport
+          path: ${{ env.TEST_COVERAGE_REPORT_FOLDER }}
