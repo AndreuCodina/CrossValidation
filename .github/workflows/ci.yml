@@ -48,7 +48,7 @@ jobs:
         with:
           reports: ${{ env.TEST_COVERAGE_FOLDER }}/coverage.cobertura.xml
           targetdir: ${{ env.TEST_COVERAGE_REPORT_FOLDER }}
-          reporttypes: HTML;MarkdownSummary
+          reporttypes: HTML;MarkdownSummaryGithub;MarkdownDeltaSummary
 
       - name: Add pull request comment with the code coverage summary
         uses: marocchino/sticky-pull-request-comment@v2.5.0
