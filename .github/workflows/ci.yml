@@ -43,7 +43,7 @@ jobs:
         run: cp ${{ env.TEST_COVERAGE_OUTPUT_FOLDER }}/*/coverage.cobertura.xml ${{ env.TEST_COVERAGE_OUTPUT_FOLDER }}/coverage.cobertura.xml
 
       - name: ReportGenerator
-        uses: danielpalme/ReportGenerator-GitHub-Action@v5.1.17
+        uses: danielpalme/ReportGenerator-GitHub-Action@5.1.17
         with:
           reports: ${{ env.TEST_COVERAGE_OUTPUT_FOLDER }}/coverage.cobertura.xml
           targetdir: ${{ env.TEST_COVERAGE_OUTPUT_FOLDER }}
