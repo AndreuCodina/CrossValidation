@@ -78,7 +78,7 @@ public class DependencyInjectionTests :
     [Theory]
     [InlineData("en")]
     [InlineData("es")]
-    public async Task Do_not_return_message_from_custom_resx_or_built_in_resx_when_the_code_is_not_key_of_any_resx(
+    public async Task Do_not_get_message_from_custom_resx_or_built_in_resx_when_the_code_is_not_key_of_any_resx(
         string languageCode)
     {
         _client = new TestApplicationFactory(services =>
@@ -118,7 +118,7 @@ public class DependencyInjectionTests :
     [Theory]
     [InlineData("en", "Replaced NotNull")]
     [InlineData("es", "NotNull reemplazado")]
-    public async Task Return_replaced_message_when_built_in_code_is_replaced_with_custom_resx(string languageCode, string expectedMessage)
+    public async Task Get_replaced_message_when_built_in_code_is_replaced_with_custom_resx(string languageCode, string expectedMessage)
     {
         _client = new TestApplicationFactory(services =>
         {
@@ -220,6 +220,21 @@ public class DependencyInjectionTests :
         var error = problemDetails.Errors!.First();
         error.Code.ShouldBe(nameof(ErrorResource.Null));
         error.Message.ShouldBe("No debe tener un valor");
+    }
+    
+    [Fact]
+    public async Task Get_message_in_parent_culture_when_requested_culture_is_not_supported()
+    {
+        _client.DefaultRequestHeaders.Add("Accept-Language", "en-IE");
+        
+        var response = await _client.GetAsync(ApiPath.Test.Prefix + ApiPath.Test.DefaultCultureMessage);
+        
+        response.StatusCode.ShouldBe(HttpStatusCode.UnprocessableEntity);
+        var problemDetails = await GetProblemDetailsFromResponse(response);
+        problemDetails.Errors!.Count().ShouldBe(1);
+        var error = problemDetails.Errors!.First();
+        error.Code.ShouldBe(nameof(ErrorResource.Null));
+        error.Message.ShouldBe(ErrorResource.Null);
     }
 
     public void Dispose()
