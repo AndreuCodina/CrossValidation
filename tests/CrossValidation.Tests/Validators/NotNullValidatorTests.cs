@@ -4,7 +4,7 @@ using Xunit;
 
 namespace CrossValidation.Tests.Validators;
 
-public class NotNullValidatorTests
+public class NotNullValidatorTests : TestBase
 {
     [Fact]
     public void Validate_not_null()

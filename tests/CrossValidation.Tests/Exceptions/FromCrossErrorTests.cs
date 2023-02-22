@@ -10,7 +10,7 @@ using Xunit;
 
 namespace CrossValidation.Tests.Exceptions;
 
-public class FromCrossErrorTests
+public class FromCrossErrorTests : TestBase
 {
     private ParentModel _model;
 

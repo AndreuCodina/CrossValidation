@@ -9,7 +9,7 @@ using Xunit;
 
 namespace CrossValidation.Tests.Validators;
 
-public class EnumRangeValidatorTests
+public class EnumRangeValidatorTests : TestBase
 {
     [Fact]
     public void Validate_enumeration_range()

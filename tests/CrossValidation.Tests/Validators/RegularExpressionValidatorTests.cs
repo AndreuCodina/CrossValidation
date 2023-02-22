@@ -4,7 +4,7 @@ using Xunit;
 
 namespace CrossValidation.Tests.Validators;
 
-public class RegularExpressionValidatorTests
+public class RegularExpressionValidatorTests : TestBase
 {
     [Fact]
     public void Validate_regular_expression()

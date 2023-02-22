@@ -7,7 +7,7 @@ using Xunit;
 
 namespace CrossValidation.Tests.Validations.ValidationExtensions;
 
-public class LengthRangeTests
+public class LengthRangeTests : TestBase
 {
     [Fact]
     public void Return_error_when_the_validation_fails()

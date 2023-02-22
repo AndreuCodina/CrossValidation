@@ -11,7 +11,9 @@ using Xunit;
 namespace CrossValidation.Tests;
 
 [CollectionDefinition("CrossValidationOptionsTests", DisableParallelization = true)]
-public class CrossValidationOptionsTests : IDisposable
+public class CrossValidationOptionsTests :
+    TestBase,
+    IDisposable
 {
     private ParentModel _model;
 

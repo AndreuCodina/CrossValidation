@@ -9,7 +9,9 @@ using Xunit;
 
 namespace CrossValidation.Tests.Utils;
 
-public class ModelNullabilityValidatorTests : IClassFixture<CommonFixture>
+public class ModelNullabilityValidatorTests :
+    TestBase,
+    IClassFixture<CommonFixture>
 {
     private readonly CommonFixture _commonFixture;
     private ParentModel _model;

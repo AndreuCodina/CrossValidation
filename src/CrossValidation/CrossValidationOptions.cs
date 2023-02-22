@@ -6,6 +6,8 @@ namespace CrossValidation;
 
 public static class CrossValidationOptions
 {
+    private const string _defaultCulture = "en";
+    
     /// <summary>
     /// Generates placeholders when they are not added
     /// </summary>
@@ -70,11 +72,11 @@ public static class CrossValidationOptions
     
     private static string SetDefaultCulture()
     {
-        return "en";
+        return _defaultCulture;
     }
     
     private static List<CultureInfo> SetDefaultSupportedCultures()
     {
-        return new() {new CultureInfo("en")};
+        return new() {new CultureInfo(_defaultCulture)};
     }
 }

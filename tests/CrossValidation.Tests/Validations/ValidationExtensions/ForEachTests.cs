@@ -14,7 +14,9 @@ using Xunit;
 
 namespace CrossValidation.Tests.Validations.ValidationExtensions;
 
-public class ForEachTests : IClassFixture<CommonFixture>
+public class ForEachTests :
+    TestBase,
+    IClassFixture<CommonFixture>
 {
     private readonly CommonFixture _commonFixture;
     private ParentModel _model;

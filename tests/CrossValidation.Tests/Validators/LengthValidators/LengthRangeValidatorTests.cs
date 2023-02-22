@@ -4,7 +4,7 @@ using Xunit;
 
 namespace CrossValidation.Tests.Validators.LengthValidators;
 
-public class LengthRangeValidatorTests
+public class LengthRangeValidatorTests : TestBase
 {
     [Fact]
     public void Validate_length()

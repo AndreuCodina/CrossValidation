@@ -4,7 +4,7 @@ using Xunit;
 
 namespace CrossValidation.Tests.Validators;
 
-public class GreaterThanValidatorTests
+public class GreaterThanValidatorTests : TestBase
 {
     [Fact]
     public void Validate_greater_than()

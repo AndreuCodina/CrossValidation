@@ -6,7 +6,9 @@ using Xunit;
 
 namespace CrossValidation.Tests.Errors;
 
-public class CommonValidationErrorTests : IClassFixture<ValidatorFixture>
+public class CommonValidationErrorTests :
+    TestBase,
+    IClassFixture<ValidatorFixture>
 {
     private readonly ValidatorFixture _validatorFixture;
 

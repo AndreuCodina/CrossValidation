@@ -8,7 +8,7 @@ using Xunit;
 
 namespace CrossValidation.Tests;
 
-public class ErrorLocalizationTests
+public class ErrorLocalizationTests : TestBase
 {
     private ParentModel _model;
 

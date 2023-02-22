@@ -4,7 +4,7 @@ using Xunit;
 
 namespace CrossValidation.Tests.Validators;
 
-public class PredicateValidatorTests
+public class PredicateValidatorTests : TestBase
 {
     [Fact]
     public void Validate_predicate()

@@ -6,7 +6,7 @@ using Xunit;
 
 namespace CrossValidation.Tests;
 
-public class EdgeCaseTests
+public class EdgeCaseTests : TestBase
 {
     private ParentModel _model;
 

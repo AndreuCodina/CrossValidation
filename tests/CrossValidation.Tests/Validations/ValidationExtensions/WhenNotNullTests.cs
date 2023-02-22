@@ -9,7 +9,9 @@ using Xunit;
 
 namespace CrossValidation.Tests.Validations.ValidationExtensions;
 
-public class WhenNotNullTests : IClassFixture<CommonFixture>
+public class WhenNotNullTests :
+    TestBase,
+    IClassFixture<CommonFixture>
 {
     private readonly CommonFixture _commonFixture;
     private ParentModel _model;

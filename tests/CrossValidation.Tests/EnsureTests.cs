@@ -7,7 +7,7 @@ using Xunit;
 
 namespace CrossValidation.Tests;
 
-public class EnsureTests
+public class EnsureTests : TestBase
 {
     [Fact]
     public void Use_field_without_model()

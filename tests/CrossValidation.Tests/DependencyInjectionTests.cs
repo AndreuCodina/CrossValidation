@@ -14,7 +14,9 @@ using Xunit;
 namespace CrossValidation.Tests;
 
 [CollectionDefinition("DependencyInjectionTests", DisableParallelization = true)]
-public class DependencyInjectionTests : IDisposable
+public class DependencyInjectionTests :
+    TestBase,
+    IDisposable
 {
     private HttpClient _client;
 
@@ -49,7 +51,7 @@ public class DependencyInjectionTests : IDisposable
     [Theory]
     [InlineData("en", "Hello")]
     [InlineData("es", "Hola")]
-    public async Task Use_custom_resx(string languageCode, string expectedMessage)
+    public async Task Get_message_from_custom_resx(string languageCode, string expectedMessage)
     {
         _client = new TestApplicationFactory(services =>
         {
@@ -65,11 +67,38 @@ public class DependencyInjectionTests : IDisposable
         var response = await _client.GetAsync(ApiPath.Test.Prefix + ApiPath.Test.ErrorWithCodeFromCustomResx);
         
         response.StatusCode.ShouldBe(HttpStatusCode.UnprocessableEntity);
-        var problemDetails = await response.Content.ReadFromJsonAsync<CrossProblemDetails>();
-        problemDetails!.Errors!.Count().ShouldBe(1);
+        var problemDetails = await GetProblemDetailsFromResponse(response);
+        problemDetails.Errors!.Count().ShouldBe(1);
         var error = problemDetails.Errors!.First();
         error.Code.ShouldBe(nameof(ErrorResource1.Hello));
         error.Message.ShouldBe(expectedMessage);
+    }
+    
+    [Theory]
+    [InlineData("en")]
+    [InlineData("es")]
+    public async Task Do_not_return_message_from_custom_resx_or_built_in_resx_when_the_code_is_not_key_of_any_resx(
+        string languageCode)
+    {
+        _client = new TestApplicationFactory(services =>
+        {
+            services.AddCrossValidation(x =>
+            {
+                x.SetDefaultCulture("en");
+                x.SetSupportedCultures("en", "es");
+                x.AddResx<ErrorResource1>();
+            });
+        }).CreateClient();
+        _client.DefaultRequestHeaders.Add("Accept-Language", languageCode);
+        
+        var response = await _client.GetAsync(ApiPath.Test.Prefix + ApiPath.Test.ErrorWithCodeWithoutResxKey);
+        
+        response.StatusCode.ShouldBe(HttpStatusCode.UnprocessableEntity);
+        var problemDetails = await GetProblemDetailsFromResponse(response);
+        problemDetails.Errors!.Count().ShouldBe(1);
+        var error = problemDetails.Errors!.First();
+        error.Code.ShouldBe("RandomCode");
+        error.Message.ShouldBeNull();
     }
     
     [Fact]
@@ -78,17 +107,17 @@ public class DependencyInjectionTests : IDisposable
         var response = await _client.GetAsync(ApiPath.Test.Prefix + ApiPath.Test.ErrorWithCodeWithoutResxKey);
         
         response.StatusCode.ShouldBe(HttpStatusCode.UnprocessableEntity);
-        var problemDetails = await response.Content.ReadFromJsonAsync<CrossProblemDetails>();
-        problemDetails!.Errors!.Count().ShouldBe(1);
+        var problemDetails = await GetProblemDetailsFromResponse(response);
+        problemDetails.Errors!.Count().ShouldBe(1);
         var error = problemDetails.Errors!.First();
-        error.Code.ShouldBe("RandomKey");
+        error.Code.ShouldBe("RandomCode");
         error.Message.ShouldBeNull();
     }
     
     [Theory]
     [InlineData("en", "Replaced NotNull")]
     [InlineData("es", "NotNull reemplazado")]
-    public async Task Replace_built_in_code_with_custom_resx(string languageCode, string expectedMessage)
+    public async Task Return_replaced_message_when_built_in_code_is_replaced_with_custom_resx(string languageCode, string expectedMessage)
     {
         _client = new TestApplicationFactory(services =>
         {
@@ -105,8 +134,8 @@ public class DependencyInjectionTests : IDisposable
         var response = await _client.GetAsync(ApiPath.Test.Prefix + ApiPath.Test.ReplaceBuiltInCodeWithCustomResx);
         
         response.StatusCode.ShouldBe(HttpStatusCode.UnprocessableEntity);
-        var problemDetails = await response.Content.ReadFromJsonAsync<CrossProblemDetails>();
-        problemDetails!.Errors!.Count().ShouldBe(1);
+        var problemDetails = await GetProblemDetailsFromResponse(response);
+        problemDetails.Errors!.Count().ShouldBe(1);
         var error = problemDetails.Errors!.First();
         error.Code.ShouldBe(nameof(ErrorResource1.NotNull));
         error.Message.ShouldBe(expectedMessage);
@@ -125,8 +154,8 @@ public class DependencyInjectionTests : IDisposable
         var response = await _client.GetAsync(ApiPath.Test.Prefix + ApiPath.Test.DefaultCultureMessage);
         
         response.StatusCode.ShouldBe(HttpStatusCode.UnprocessableEntity);
-        var problemDetails = await response.Content.ReadFromJsonAsync<CrossProblemDetails>();
-        problemDetails!.Errors!.Count().ShouldBe(1);
+        var problemDetails = await GetProblemDetailsFromResponse(response);
+        problemDetails.Errors!.Count().ShouldBe(1);
         var error = problemDetails.Errors!.First();
         error.Code.ShouldBe(nameof(ErrorResource.Null));
         error.Message.ShouldBe(ErrorResource.Null);
@@ -138,8 +167,8 @@ public class DependencyInjectionTests : IDisposable
         var response = await _client.GetAsync(ApiPath.Test.Prefix + ApiPath.Test.ErrorWithStatusCode);
         
         response.StatusCode.ShouldBe(HttpStatusCode.Created);
-        var problemDetails = await response.Content.ReadFromJsonAsync<CrossProblemDetails>();
-        problemDetails!.Errors.ShouldBeNull();
+        var problemDetails = await GetProblemDetailsFromResponse(response);
+        problemDetails.Errors.ShouldBeNull();
     }
     
     [Fact]
@@ -148,13 +177,84 @@ public class DependencyInjectionTests : IDisposable
         var response = await _client.GetAsync(ApiPath.Test.Prefix + ApiPath.Test.Exception);
         
         response.StatusCode.ShouldBe(HttpStatusCode.InternalServerError);
-        var problemDetails = await response.Content.ReadFromJsonAsync<CrossProblemDetails>();
+        var problemDetails = await GetProblemDetailsFromResponse(response);
         problemDetails.ShouldNotBeNull();
     }
+    
+    [Fact]
+    public async Task Get_message_in_default_culture_when_a_built_in_language_is_requested_but_not_customized()
+    {
+        _client.DefaultRequestHeaders.Add("Accept-Language", "es");
+        
+        var response = await _client.GetAsync(ApiPath.Test.Prefix + ApiPath.Test.DefaultCultureMessage);
+        
+        response.StatusCode.ShouldBe(HttpStatusCode.UnprocessableEntity);
+        var problemDetails = await GetProblemDetailsFromResponse(response);
+        problemDetails.Errors!.Count().ShouldBe(1);
+        var error = problemDetails.Errors!.First();
+        error.Code.ShouldBe(nameof(ErrorResource.Null));
+        error.Message.ShouldBe(ErrorResource.Null);
+    }
+    
+    [Fact]
+    public async Task Get_message_in_requested_culture_when_a_built_in_language_is_requested_and_customized()
+    {
+        _client = new TestApplicationFactory(services =>
+        {
+            services.AddCrossValidation(x =>
+            {
+                x.SetDefaultCulture("en");
+                x.SetSupportedCultures("en", "es");
+                x.AddResx<ErrorResource1>();
+            });
+        }).CreateClient();
+        
+        _client.DefaultRequestHeaders.Add("Accept-Language", "es");
+        
+        var response = await _client.GetAsync(ApiPath.Test.Prefix + ApiPath.Test.DefaultCultureMessage);
+        
+        response.StatusCode.ShouldBe(HttpStatusCode.UnprocessableEntity);
+        var problemDetails = await GetProblemDetailsFromResponse(response);
+        problemDetails.Errors!.Count().ShouldBe(1);
+        var error = problemDetails.Errors!.First();
+        error.Code.ShouldBe(nameof(ErrorResource.Null));
+        error.Message.ShouldBe("No debe tener un valor");
+    }
+    
+    // [Fact]
+    // public async Task Get_message_in_requested_culture_when_a_built_in_language_is_requested_and_customized()
+    // {
+    //     _client = new TestApplicationFactory(services =>
+    //     {
+    //         services.AddCrossValidation(x =>
+    //         {
+    //             x.SetDefaultCulture("en");
+    //             x.SetSupportedCultures("en", "es");
+    //             x.AddResx<ErrorResource1>();
+    //         });
+    //     }).CreateClient();
+    //     
+    //     _client.DefaultRequestHeaders.Add("Accept-Language", "es");
+    //     
+    //     var response = await _client.GetAsync(ApiPath.Test.Prefix + ApiPath.Test.DefaultCultureMessage);
+    //     
+    //     response.StatusCode.ShouldBe(HttpStatusCode.UnprocessableEntity);
+    //     var problemDetails = await GetProblemDetailsFromResponse(response);
+    //     problemDetails.Errors!.Count().ShouldBe(1);
+    //     var error = problemDetails.Errors!.First();
+    //     error.Code.ShouldBe(nameof(ErrorResource.Null));
+    //     error.Message.ShouldBe("No debe tener un valor");
+    // }
 
     public void Dispose()
     {
         _client.Dispose();
         CrossValidationOptions.SetDefaultOptions();
+    }
+
+    private async Task<CrossProblemDetails> GetProblemDetailsFromResponse(HttpResponseMessage response)
+    {
+        var problemDetails = await response.Content.ReadFromJsonAsync<CrossProblemDetails>();
+        return problemDetails!;
     }
 }

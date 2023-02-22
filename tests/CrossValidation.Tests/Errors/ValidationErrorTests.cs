@@ -9,6 +9,7 @@ using Xunit;
 namespace CrossValidation.Tests.Errors;
 
 public class ValidationErrorTests :
+    TestBase,
     IClassFixture<CommonFixture>,
     IClassFixture<ValidatorFixture>
 {
