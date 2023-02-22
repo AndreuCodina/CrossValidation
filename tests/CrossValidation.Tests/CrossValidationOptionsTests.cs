@@ -2,16 +2,15 @@
 using CrossValidation.Errors;
 using CrossValidation.Exceptions;
 using CrossValidation.ShouldlyAssertions;
+using CrossValidation.Tests.Attributes;
 using CrossValidation.Tests.TestUtils;
 using CrossValidation.Tests.TestUtils.Builders;
 using CrossValidation.Tests.TestUtils.Models;
 using CrossValidation.Validations;
 using Shouldly;
-using Xunit;
 
 namespace CrossValidation.Tests;
 
-[CollectionDefinition("CrossValidationOptionsTests", DisableParallelization = true)]
 public class CrossValidationOptionsTests :
     TestBase,
     IDisposable
@@ -23,7 +22,7 @@ public class CrossValidationOptionsTests :
         _model = new ParentModelBuilder().Build();
     }
     
-    [Fact]
+    [FactRunnableInDebugOnly]
     public void Generate_placeholders_when_they_are_not_added()
     {
         var expectedName = "Value";
@@ -52,7 +51,7 @@ public class CrossValidationOptionsTests :
         }
     }
     
-    [Fact]
+    [FactRunnableInDebugOnly]
     public void Placeholder_values_are_added_automatically_when_they_are_not_added_and_it_is_enabled_in_configuration()
     {
         var defaultConfiguration = CrossValidationOptions.LocalizeErrorInClient;

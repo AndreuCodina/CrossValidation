@@ -6,6 +6,7 @@ using System.Net.Http.Json;
 using System.Threading.Tasks;
 using CrossValidation.DependencyInjection;
 using CrossValidation.Resources;
+using CrossValidation.Tests.Attributes;
 using CrossValidation.Tests.TestUtils;
 using CrossValidation.WebApplication;
 using CrossValidation.WebApplication.Resources;
@@ -14,7 +15,6 @@ using Xunit;
 
 namespace CrossValidation.Tests;
 
-[CollectionDefinition("DependencyInjectionTests", DisableParallelization = true)]
 public class DependencyInjectionTests :
     TestBase,
     IDisposable
@@ -27,7 +27,7 @@ public class DependencyInjectionTests :
         _client = factory.CreateClient();
     }
     
-    [Theory]
+    [TheoryRunnableInDebugOnly]
     [InlineData(ApiPath.Test.Prefix + ApiPath.Test.CrossException, HttpStatusCode.UnprocessableEntity)]
     [InlineData(ApiPath.Test.Prefix + ApiPath.Test.ValidationListException, HttpStatusCode.UnprocessableEntity)]
     public async Task Get_http_status_code(string endpoint, HttpStatusCode expectedStatusCode)
@@ -37,7 +37,7 @@ public class DependencyInjectionTests :
         response.StatusCode.ShouldBe(expectedStatusCode);
     }
 
-    [Fact]
+    [FactRunnableInDebugOnly]
     public async Task Get_trace_id_sent()
     {
         var expectedTraceId = "Trace1";
@@ -49,7 +49,7 @@ public class DependencyInjectionTests :
         headers!.First().ShouldBe(expectedTraceId);
     }
     
-    [Theory]
+    [TheoryRunnableInDebugOnly]
     [InlineData("en", "Hello")]
     [InlineData("es", "Hola")]
     public async Task Get_message_from_custom_resx(string languageCode, string expectedMessage)
@@ -75,7 +75,7 @@ public class DependencyInjectionTests :
         error.Message.ShouldBe(expectedMessage);
     }
     
-    [Theory]
+    [TheoryRunnableInDebugOnly]
     [InlineData("en")]
     [InlineData("es")]
     public async Task Do_not_get_message_from_custom_resx_or_built_in_resx_when_the_code_is_not_key_of_any_resx(
@@ -102,7 +102,7 @@ public class DependencyInjectionTests :
         error.Message.ShouldBeNull();
     }
     
-    [Fact]
+    [FactRunnableInDebugOnly]
     public async Task Error_with_code_without_a_resx_key_have_null_message()
     {
         var response = await _client.GetAsync(ApiPath.Test.Prefix + ApiPath.Test.ErrorWithCodeWithoutResxKey);
@@ -115,7 +115,7 @@ public class DependencyInjectionTests :
         error.Message.ShouldBeNull();
     }
     
-    [Theory]
+    [TheoryRunnableInDebugOnly]
     [InlineData("en", "Replaced NotNull")]
     [InlineData("es", "NotNull reemplazado")]
     public async Task Get_replaced_message_when_built_in_code_is_replaced_with_custom_resx(string languageCode, string expectedMessage)
@@ -142,7 +142,7 @@ public class DependencyInjectionTests :
         error.Message.ShouldBe(expectedMessage);
     }
     
-    [Fact]
+    [FactRunnableInDebugOnly]
     public async Task Get_default_culture_message_when_the_culture_provided_is_not_present()
     {
         _client = new TestApplicationFactory(services =>
@@ -162,7 +162,7 @@ public class DependencyInjectionTests :
         error.Message.ShouldBe(ErrorResource.Null);
     }
     
-    [Fact]
+    [FactRunnableInDebugOnly]
     public async Task Get_error_status_code()
     {
         var response = await _client.GetAsync(ApiPath.Test.Prefix + ApiPath.Test.ErrorWithStatusCode);
@@ -172,7 +172,7 @@ public class DependencyInjectionTests :
         problemDetails.Errors.ShouldBeNull();
     }
     
-    [Fact]
+    [FactRunnableInDebugOnly]
     public async Task Handle_unknown_exception()
     {
         var response = await _client.GetAsync(ApiPath.Test.Prefix + ApiPath.Test.Exception);
@@ -182,7 +182,7 @@ public class DependencyInjectionTests :
         problemDetails.ShouldNotBeNull();
     }
     
-    [Fact]
+    [FactRunnableInDebugOnly]
     public async Task Get_message_in_default_culture_when_a_built_in_language_is_requested_but_not_customized()
     {
         _client.DefaultRequestHeaders.Add("Accept-Language", "es");
@@ -197,7 +197,7 @@ public class DependencyInjectionTests :
         error.Message.ShouldBe(ErrorResource.Null);
     }
     
-    [Fact]
+    [FactRunnableInDebugOnly]
     public async Task Get_message_in_requested_culture_when_a_built_in_language_is_requested_and_customized()
     {
         _client = new TestApplicationFactory(services =>
@@ -222,7 +222,7 @@ public class DependencyInjectionTests :
         error.Message.ShouldBe("No debe tener un valor");
     }
     
-    [Fact]
+    [FactRunnableInDebugOnly]
     public async Task Get_message_in_parent_culture_when_requested_culture_is_not_supported()
     {
         _client.DefaultRequestHeaders.Add("Accept-Language", "en-IE");
