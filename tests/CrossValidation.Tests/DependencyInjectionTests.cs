@@ -118,9 +118,7 @@ public class DependencyInjectionTests : IDisposable
         _client = new TestApplicationFactory(services =>
         {
             services.AddCrossValidation(x =>
-            {
-                x.AddResx<ErrorResource1>();
-            });
+                x.AddResx<ErrorResource1>());
         }).CreateClient();
         _client.DefaultRequestHeaders.Add("Accept-Language", "fr");
         
