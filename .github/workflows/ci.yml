@@ -57,6 +57,9 @@ jobs:
           recreate: true
           path: ${{ env.TEST_COVERAGE_REPORT_FOLDER }}/Summary.md
 
+      - name: Add code coverage summary to the job summary
+        run: cat ${{ env.TEST_COVERAGE_REPORT_FOLDER }}/Summary.md >> $GITHUB_STEP_SUMMARY
+
       - name: Upload coverage report artifact
         uses: actions/upload-artifact@v3.1.2
         with:
