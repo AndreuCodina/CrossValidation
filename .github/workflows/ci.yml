@@ -40,7 +40,7 @@ jobs:
             --collect:"XPlat Code Coverage" \
             --results-directory ${{ env.TEST_COVERAGE_FOLDER }}
 
-      - name: Copy Coverage to a predictable location
+      - name: Copy coverage to a predictable location
         run: cp ${{ env.TEST_COVERAGE_FOLDER }}/*/coverage.cobertura.xml ${{ env.TEST_COVERAGE_FOLDER }}/coverage.cobertura.xml
 
       - name: Generate test coverage report
