@@ -27,9 +27,9 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\CrossValidation.ShouldlyAssertions\CrossValidation.ShouldlyAssertions.csproj" />
+      <ProjectReference Include="..\..\src\CrossValidation.ShouldlyAssertions\CrossValidation.ShouldlyAssertions.csproj" />
+      <ProjectReference Include="..\..\src\CrossValidation\CrossValidation.csproj" />
       <ProjectReference Include="..\CrossValidation.WebApplication\CrossValidation.WebApplication.csproj" />
-      <ProjectReference Include="..\CrossValidation\CrossValidation.csproj" />
     </ItemGroup>
 
 </Project>

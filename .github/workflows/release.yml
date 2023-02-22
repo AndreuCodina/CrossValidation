@@ -6,8 +6,8 @@ on:
       - published
 
 env:
-  CROSS_VALIDATION_PROJECT: CrossValidation/CrossValidation.csproj
-  CROSS_VALIDATION_SHOULDLY_ASSERTIONS_PROJECT: CrossValidation.ShouldlyAssertions/CrossValidation.ShouldlyAssertions.csproj
+  CROSS_VALIDATION_PROJECT: src/CrossValidation/CrossValidation.csproj
+  CROSS_VALIDATION_SHOULDLY_ASSERTIONS_PROJECT: src/CrossValidation.ShouldlyAssertions/CrossValidation.ShouldlyAssertions.csproj
   NUGET_OUTPUT_FOLDER: ${{ github.workspace }}/Nuget
 
 jobs:

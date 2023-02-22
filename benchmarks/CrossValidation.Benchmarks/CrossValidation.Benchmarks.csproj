@@ -12,7 +12,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\CrossValidation\CrossValidation.csproj" />
+      <ProjectReference Include="..\..\src\CrossValidation\CrossValidation.csproj" />
     </ItemGroup>
 
 </Project>

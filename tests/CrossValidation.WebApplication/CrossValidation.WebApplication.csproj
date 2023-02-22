@@ -10,11 +10,7 @@
     <ItemGroup>
         <InternalsVisibleTo Include="CrossValidation.Tests" />
     </ItemGroup>
-    
-    <ItemGroup>
-      <ProjectReference Include="..\CrossValidation\CrossValidation.csproj" />
-    </ItemGroup>
-    
+
     <ItemGroup>
       <EmbeddedResource Update="Resources\ErrorResource1.resx">
         <Generator>ResXFileCodeGenerator</Generator>
@@ -37,6 +33,10 @@
         <AutoGen>True</AutoGen>
         <DependentUpon>ErrorResource1.es.resx</DependentUpon>
       </Compile>
+    </ItemGroup>
+    
+    <ItemGroup>
+      <ProjectReference Include="..\..\src\CrossValidation\CrossValidation.csproj" />
     </ItemGroup>
 
 </Project>
