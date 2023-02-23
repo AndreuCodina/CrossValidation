@@ -16,6 +16,37 @@ public class CrossValidationOptionsBuilder
         return this;
     }
     
+    public CrossValidationOptionsBuilder AddResxAndAssociatedCultures<TResourceFile>()
+    {
+        AddResx<TResourceFile>();
+        var supportedCultureCodes = new HashSet<string>(CrossValidationOptions.SupportedCultureCodes);
+        var resourceType = typeof(TResourceFile);
+        var resourceBaseName = resourceType.FullName;
+        var allCultures = CultureInfo.GetCultures(CultureTypes.AllCultures);
+
+        foreach (var culture in allCultures)
+        {
+            var cultureCode = culture.Name;
+
+            if (cultureCode == "")
+            {
+                continue;
+            }
+            
+            var languageCodeResourceExtension = "_" + cultureCode.Replace('-', '_');
+            var typeFullName = resourceBaseName + languageCodeResourceExtension;
+            var newResourceType = resourceType.Assembly.GetType(typeFullName);
+            
+            if (newResourceType != null)
+            {
+                supportedCultureCodes.Add(cultureCode);
+            }
+        }
+        
+        CrossValidationOptions.SupportedCultureCodes = supportedCultureCodes.ToList();
+        return this;
+    }
+    
     public CrossValidationOptionsBuilder NotHandleUnknownException()
     {
         CrossValidationOptions.HandleUnknownException = false;
@@ -24,14 +55,13 @@ public class CrossValidationOptionsBuilder
     
     public CrossValidationOptionsBuilder SetDefaultCulture(string culture)
     {
-        CrossValidationOptions.DefaultCulture = culture;
+        CrossValidationOptions.DefaultCultureCode = culture;
         return this;
     }
     
-    public CrossValidationOptionsBuilder SetSupportedCultures(params string[] cultures)
+    public CrossValidationOptionsBuilder SetSupportedCultures(params string[] cultureCodes)
     {
-        CrossValidationOptions.SupportedCultures = cultures.Select(x => new CultureInfo(x))
-            .ToList();
+        CrossValidationOptions.SupportedCultureCodes = cultureCodes.ToList();
         return this;
     }
 }

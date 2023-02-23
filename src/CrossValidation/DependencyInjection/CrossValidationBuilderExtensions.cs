@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using System.Globalization;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Localization;
 
 namespace CrossValidation.DependencyInjection;
@@ -19,11 +20,14 @@ public static class CrossValidationBuilderExtensions
     
     private static IApplicationBuilder UseCustomRequestLocalization(this IApplicationBuilder app)
     {
+        var supportedCultures = CrossValidationOptions.SupportedCultureCodes
+            .Select(x => new CultureInfo(x))
+            .ToList();
         var localizationOptions = new RequestLocalizationOptions
         {
-            DefaultRequestCulture = new RequestCulture(CrossValidationOptions.DefaultCulture),
-            SupportedCultures = CrossValidationOptions.SupportedCultures,
-            SupportedUICultures = CrossValidationOptions.SupportedCultures,
+            DefaultRequestCulture = new RequestCulture(CrossValidationOptions.DefaultCultureCode),
+            SupportedCultures = supportedCultures,
+            SupportedUICultures = supportedCultures,
             FallBackToParentCultures = true,
             FallBackToParentUICultures = true,
             RequestCultureProviders = new List<IRequestCultureProvider>

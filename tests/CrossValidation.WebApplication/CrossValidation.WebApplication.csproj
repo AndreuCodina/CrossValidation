@@ -20,6 +20,14 @@
         <Generator>ResXFileCodeGenerator</Generator>
         <LastGenOutput>ErrorResource1.es.Designer.cs</LastGenOutput>
       </EmbeddedResource>
+      <EmbeddedResource Update="Resources\ErrorResource2.resx">
+        <Generator>ResXFileCodeGenerator</Generator>
+        <LastGenOutput>ErrorResource2.Designer.cs</LastGenOutput>
+      </EmbeddedResource>
+      <EmbeddedResource Update="Resources\ErrorResource2.es.resx">
+        <Generator>ResXFileCodeGenerator</Generator>
+        <LastGenOutput>ErrorResource2.es.Designer.cs</LastGenOutput>
+      </EmbeddedResource>
     </ItemGroup>
     
     <ItemGroup>
@@ -32,6 +40,16 @@
         <DesignTime>True</DesignTime>
         <AutoGen>True</AutoGen>
         <DependentUpon>ErrorResource1.es.resx</DependentUpon>
+      </Compile>
+      <Compile Update="Resources\ErrorResource2.Designer.cs">
+        <DesignTime>True</DesignTime>
+        <AutoGen>True</AutoGen>
+        <DependentUpon>ErrorResource2.resx</DependentUpon>
+      </Compile>
+      <Compile Update="Resources\ErrorResource2.es.Designer.cs">
+        <DesignTime>True</DesignTime>
+        <AutoGen>True</AutoGen>
+        <DependentUpon>ErrorResource2.es.resx</DependentUpon>
       </Compile>
     </ItemGroup>
     

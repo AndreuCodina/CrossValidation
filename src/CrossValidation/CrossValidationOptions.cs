@@ -1,12 +1,11 @@
-﻿using System.Globalization;
-using System.Resources;
+﻿using System.Resources;
 using CrossValidation.Resources;
 
 namespace CrossValidation;
 
 public static class CrossValidationOptions
 {
-    private const string _defaultCulture = "en";
+    private const string _defaultCultureCode = "en";
     
     /// <summary>
     /// Generates placeholders when they are not added
@@ -14,16 +13,16 @@ public static class CrossValidationOptions
     public static bool LocalizeErrorInClient { get; set; } = SetDefaultLocalizeErrorInClient();
     public static List<ResourceManager> ResourceManagers { get; set; } = SetDefaultResourceManager();
     public static bool HandleUnknownException { get; set; } = SetDefaultHandleUnknownException();
-    public static string DefaultCulture { get; set; } = SetDefaultCulture();
-    public static List<CultureInfo> SupportedCultures { get; set; } = SetDefaultSupportedCultures();
+    public static string DefaultCultureCode { get; set; } = SetDefaultCultureCode();
+    public static List<string> SupportedCultureCodes { get; set; } = SetDefaultSupportedCultureCodes();
 
     public static void SetDefaultOptions()
     {
         LocalizeErrorInClient = SetDefaultLocalizeErrorInClient();
         ResourceManagers = SetDefaultResourceManager();
         HandleUnknownException = SetDefaultHandleUnknownException();
-        DefaultCulture = SetDefaultCulture();
-        SupportedCultures = SetDefaultSupportedCultures();
+        DefaultCultureCode = SetDefaultCultureCode();
+        SupportedCultureCodes = SetDefaultSupportedCultureCodes();
     }
 
     public static void AddResourceManager<TResourceFile>()
@@ -70,13 +69,13 @@ public static class CrossValidationOptions
         return true;
     }
     
-    private static string SetDefaultCulture()
+    private static string SetDefaultCultureCode()
     {
-        return _defaultCulture;
+        return _defaultCultureCode;
     }
     
-    private static List<CultureInfo> SetDefaultSupportedCultures()
+    private static List<string> SetDefaultSupportedCultureCodes()
     {
-        return new() {new CultureInfo(_defaultCulture)};
+        return new() {_defaultCultureCode};
     }
 }

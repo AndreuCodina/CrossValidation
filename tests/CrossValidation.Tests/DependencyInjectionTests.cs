@@ -236,6 +236,53 @@ public class DependencyInjectionTests :
         error.Code.ShouldBe(nameof(ErrorResource.Null));
         error.Message.ShouldBe(ErrorResource.Null);
     }
+    
+    [TheoryRunnableInDebugOnly]
+    [InlineData("en", "Hello")]
+    [InlineData("es", "Hola")]
+    public async Task Get_message_from_resx_associated_culture(string languageCode, string expectedMessage)
+    {
+        _client = new TestApplicationFactory(services =>
+        {
+            services.AddCrossValidation(x =>
+                x.AddResxAndAssociatedCultures<ErrorResource1>());
+        }).CreateClient();
+        _client.DefaultRequestHeaders.Add("Accept-Language", languageCode);
+        
+        var response = await _client.GetAsync(ApiPath.Test.Prefix + ApiPath.Test.ErrorWithCodeFromCustomResx);
+        
+        response.StatusCode.ShouldBe(HttpStatusCode.UnprocessableEntity);
+        var problemDetails = await GetProblemDetailsFromResponse(response);
+        problemDetails.Errors!.Count().ShouldBe(1);
+        var error = problemDetails.Errors!.First();
+        error.Code.ShouldBe(nameof(ErrorResource1.Hello));
+        error.Message.ShouldBe(expectedMessage);
+    }
+    
+    [TheoryRunnableInDebugOnly]
+    [InlineData("en", "Hello")]
+    [InlineData("es", "Hola")]
+    public async Task Get_message_from_resx_when_several_resx_and_associated_cultures_are_added(string languageCode, string expectedMessage)
+    {
+        _client = new TestApplicationFactory(services =>
+        {
+            services.AddCrossValidation(x =>
+            {
+                x.AddResxAndAssociatedCultures<ErrorResource1>();
+                x.AddResxAndAssociatedCultures<ErrorResource2>();
+            });
+        }).CreateClient();
+        _client.DefaultRequestHeaders.Add("Accept-Language", languageCode);
+        
+        var response = await _client.GetAsync(ApiPath.Test.Prefix + ApiPath.Test.ErrorWithCodeFromCustomResx);
+        
+        response.StatusCode.ShouldBe(HttpStatusCode.UnprocessableEntity);
+        var problemDetails = await GetProblemDetailsFromResponse(response);
+        problemDetails.Errors!.Count().ShouldBe(1);
+        var error = problemDetails.Errors!.First();
+        error.Code.ShouldBe(nameof(ErrorResource1.Hello));
+        error.Message.ShouldBe(expectedMessage);
+    }
 
     public void Dispose()
     {

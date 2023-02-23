@@ -7,7 +7,7 @@ public class TestBase
 {
     protected TestBase()
     {
-        Thread.CurrentThread.CurrentUICulture = CultureInfo.GetCultureInfo(CrossValidationOptions.DefaultCulture);
-        Thread.CurrentThread.CurrentUICulture = CultureInfo.GetCultureInfo(CrossValidationOptions.DefaultCulture);
+        Thread.CurrentThread.CurrentUICulture = CultureInfo.GetCultureInfo(CrossValidationOptions.DefaultCultureCode);
+        Thread.CurrentThread.CurrentUICulture = CultureInfo.GetCultureInfo(CrossValidationOptions.DefaultCultureCode);
     }
 }
