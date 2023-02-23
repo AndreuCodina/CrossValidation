@@ -52,7 +52,7 @@ jobs:
 
       - name: Add pull request comment with the code coverage summary
         uses: marocchino/sticky-pull-request-comment@v2.5.0
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request' && github.event.pull_request.user.login != 'dependabot[bot]'
         with:
           recreate: true
           path: ${{ env.TEST_COVERAGE_REPORT_FOLDER }}/SummaryGithub.md
