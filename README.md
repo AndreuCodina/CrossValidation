@@ -1,7 +1,7 @@
 ![CrossValidation logo](https://user-images.githubusercontent.com/30506301/218343967-ba157171-c491-4a96-960c-73fb663467f0.png)
 
 [![CI workflow state](https://github.com/AndreuCodina/CrossValidation/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/AndreuCodina/CrossValidation/actions/workflows/ci.yml)
-![Nuget](https://img.shields.io/nuget/v/CrossValidation?color=blue&label=NuGet)
+[![CI workflow state](https://img.shields.io/nuget/v/CrossValidation?color=blue&label=NuGet)](https://www.nuget.org/packages/CrossValidation)
 
 State-of-the-art .NET library to handle errors and validate data.
 
