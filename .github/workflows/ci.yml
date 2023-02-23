@@ -37,8 +37,8 @@ jobs:
             --no-build \
             --verbosity normal \
             /p:CollectCoverage=true \
-            /p:CoverletOutput="../generated/coverage/lcov.info" |
-            /p:CoverletOutputFormat=\"lcov\" |
+            /p:CoverletOutput="../generated/coverage/lcov.info" \
+            /p:CoverletOutputFormat=\"lcov\" \
             /p:Exclude=\"[*]CrossValidation.WebApplication*\"
 
       - name: Coveralls
