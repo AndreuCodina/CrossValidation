@@ -10,7 +10,6 @@ on:
 
 env:
   TEST_COVERAGE_FOLDER: ${{ github.workspace }}/generated/coverage
-  TEST_COVERAGE_REPORT_FOLDER: ${{ github.workspace }}/generated/coverage_report
 
 jobs:
   build_and_test:
@@ -31,37 +30,22 @@ jobs:
       - name: Build
         run: dotnet build --configuration Release --no-restore
 
+      # https://github.com/coverlet-coverage/coverlet/blob/master/Documentation/VSTestIntegration.md#passing-runsettings-arguments-through-commandline
       - name: Test
         run: |
           dotnet test \
             --configuration Release \
             --no-build \
             --verbosity normal \
-            --collect:"XPlat Code Coverage" \
-            --results-directory ${{ env.TEST_COVERAGE_FOLDER }}
+            --collect:"XPlat Code Coverage;Format=lcov" \
+            --results-directory ./generated/coverage \
+            -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Exclude="[*]CrossValidation.WebApplication*"
 
       - name: Copy coverage to a predictable location
-        run: cp ${{ env.TEST_COVERAGE_FOLDER }}/*/coverage.cobertura.xml ${{ env.TEST_COVERAGE_FOLDER }}/coverage.cobertura.xml
+        run: cp ${{ env.TEST_COVERAGE_FOLDER }}/*/coverage.info ${{ env.TEST_COVERAGE_FOLDER }}/lcov.info
 
-      - name: Generate test coverage report
-        uses: danielpalme/ReportGenerator-GitHub-Action@5.1.17
+      - name: Coveralls
+        uses: coverallsapp/github-action@1.1.3
         with:
-          reports: ${{ env.TEST_COVERAGE_FOLDER }}/coverage.cobertura.xml
-          targetdir: ${{ env.TEST_COVERAGE_REPORT_FOLDER }}
-          reporttypes: HTML;MarkdownSummaryGithub
-
-      - name: Add pull request comment with the code coverage summary
-        uses: marocchino/sticky-pull-request-comment@v2.5.0
-        if: github.event_name == 'pull_request' && github.event.pull_request.user.login != 'dependabot[bot]'
-        with:
-          recreate: true
-          path: ${{ env.TEST_COVERAGE_REPORT_FOLDER }}/SummaryGithub.md
-
-      - name: Add code coverage summary to the job summary
-        run: cat ${{ env.TEST_COVERAGE_REPORT_FOLDER }}/SummaryGithub.md >> $GITHUB_STEP_SUMMARY
-
-      - name: Upload coverage report artifact
-        uses: actions/upload-artifact@v3.1.2
-        with:
-          name: TestCoverageReport
-          path: ${{ env.TEST_COVERAGE_REPORT_FOLDER }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path-to-lcov: ${{ env.TEST_COVERAGE_FOLDER }}/lcov.info
