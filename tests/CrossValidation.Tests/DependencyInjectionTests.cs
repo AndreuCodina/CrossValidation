@@ -268,6 +268,7 @@ public class DependencyInjectionTests :
             services.AddCrossValidation(x =>
             {
                 x.AddResxAndAssociatedCultures<ErrorResource1>();
+                ;
                 x.AddResxAndAssociatedCultures<ErrorResource2>();
             });
         }).CreateClient();
