@@ -39,7 +39,7 @@ jobs:
             --verbosity normal \
             --collect:"XPlat Code Coverage;Format=lcov" \
             --results-directory ./generated/coverage \
-            -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Exclude="[*]CrossValidation.WebApplication*"
+            -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Exclude="[*]CrossValidation.WebApplication*, [*]*.Designer.cs"
 
       - name: Copy coverage to a predictable location
         run: cp ${{ env.TEST_COVERAGE_FOLDER }}/*/coverage.info ${{ env.TEST_COVERAGE_FOLDER }}/lcov.info
