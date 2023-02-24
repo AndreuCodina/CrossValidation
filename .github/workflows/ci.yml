@@ -30,19 +30,22 @@ jobs:
       - name: Build
         run: dotnet build --configuration Release --no-restore
 
+      # https://github.com/coverlet-coverage/coverlet/blob/master/Documentation/VSTestIntegration.md#passing-runsettings-arguments-through-commandline
       - name: Test
         run: |
           dotnet test \
             --configuration Release \
             --no-build \
             --verbosity normal \
-            /p:CollectCoverage=true \
-            /p:CoverletOutput="../generated/coverage/lcov.info" \
-            /p:CoverletOutputFormat=\"lcov\" \
-            /p:Exclude=\"[*]CrossValidation.WebApplication*\"
+            --collect:"XPlat Code Coverage;Format=lcov" \
+            --results-directory ./generated/coverage \
+            -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Exclude="[*]CrossValidation.WebApplication*"
+
+      - name: Copy coverage to a predictable location
+        run: cp ${{ env.TEST_COVERAGE_FOLDER }}/*/coverage.info ${{ env.TEST_COVERAGE_FOLDER }}/lcov.info
 
       - name: Coveralls
-        uses: coverallsapp/github-action@master
+        uses: coverallsapp/github-action@1.1.3
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           path-to-lcov: ${{ env.TEST_COVERAGE_FOLDER }}/lcov.info

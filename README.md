@@ -1,13 +1,14 @@
 ![CrossValidation logo](https://user-images.githubusercontent.com/30506301/218343967-ba157171-c491-4a96-960c-73fb663467f0.png)
 
 [![CI workflow state](https://github.com/AndreuCodina/CrossValidation/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/AndreuCodina/CrossValidation/actions/workflows/ci.yml)
-[![CI workflow state](https://img.shields.io/nuget/v/CrossValidation?color=blue&label=NuGet)](https://www.nuget.org/packages/CrossValidation)
+[![Coverage Status](https://coveralls.io/repos/github/AndreuCodina/CrossValidation/badge.svg?branch=main)](https://coveralls.io/github/AndreuCodina/CrossValidation?branch=main)
+[![NuGet](https://img.shields.io/nuget/v/CrossValidation?color=blue&label=nuget)](https://www.nuget.org/packages/CrossValidation)
 
 State-of-the-art .NET library to handle errors and validate data.
 
 ## Impact of this library in your company:
 
-- Stop deliverying software without a proper error handling mechanism.
+- Stop delivering software without a proper error handling mechanism.
 - Stop using a different privative solution to validate data in every project of your company.
 - Start using modern C# instead of tricks or complex solutions.
 - Use typed errors.
@@ -89,7 +90,7 @@ Validate.That(age)
 ###### Typed errors
 C# can't treat with errors in a proper way. Developers tend to reuse the same runtime exceptions (ArgumentException, Exception, MyServiceException...) over and over again with hardcoded messages with parameters, or reuse a general exception (AppException) that won't be logged by the global exception middleware.
 
-Why AppException? Because it's a general exception that can be used in any layer of your application, and its main goal is to express we handled a **non-exceptional situation or expected situation**. For example, if we try to:
+Why AppException? Because it's a general exception that can be used in any layer of your application, and its main goal is to express we handled a **expected situation**. For example, if we try to:
   - Create an user with an age less or equal to zero
   - Activate an account and the link to do it has expired
   - Update an user and it doesn't exist in the database
@@ -97,7 +98,7 @@ Why AppException? Because it's a general exception that can be used in any layer
 
 Depending on the project you have worked, AppException will have a unique response such as inform the user, or do nothing, but it'll never log AppException because it's not an exceptional error to be solved by the developers.
 
-An **exceptional situation or unexpected situation** is, for example, when you:
+An **unexpected situation** is, for example, when you:
   - Execute a SQL query and the database is down, then you have a network error
   - Access to an array item out of bounds
   - A null reference exception.
