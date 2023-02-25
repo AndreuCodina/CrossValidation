@@ -90,7 +90,7 @@ Validate.That(age)
 ###### Typed errors
 C# can't treat with errors in a proper way. Developers tend to reuse the same runtime exceptions (ArgumentException, Exception, MyServiceException...) over and over again with hardcoded messages with parameters, or reuse a general exception (AppException) that won't be logged by the global exception middleware.
 
-Why AppException? Because it's a general exception that can be used in any layer of your application, and its main goal is to express we handled a **expected situation**. For example, if we try to:
+Why AppException? Because it's a general exception that can be used in any layer of your application, and its main goal is to express we handled an **expected situation**. For example, if we try to:
   - Create an user with an age less or equal to zero
   - Activate an account and the link to do it has expired
   - Update an user and it doesn't exist in the database

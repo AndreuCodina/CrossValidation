@@ -11,6 +11,7 @@ namespace CrossValidation.DependencyInjection;
 
 public class CrossValidationMiddleware : IMiddleware
 {
+    private bool _isExceptionHandled = false;
     private readonly ILogger<CrossValidationMiddleware> _logger;
     private readonly IHostingEnvironment _environment;
 
@@ -28,14 +29,16 @@ public class CrossValidationMiddleware : IMiddleware
         }
         catch (Exception e)
         {
-            await HandleException(e, context, next);
+            await HandleException(e, context);
+
+            if (!_isExceptionHandled)
+            {
+                throw;
+            }
         }
     }
 
-    private async Task HandleException(
-        Exception exception,
-        HttpContext context,
-        RequestDelegate next)
+    private async Task HandleException(Exception exception, HttpContext context)
     {
         var problemDetails = new CrossProblemDetails();
         var httpStatusCode = HttpStatusCode.InternalServerError;
@@ -45,6 +48,7 @@ public class CrossValidationMiddleware : IMiddleware
 
         if (exception is CrossException crossException)
         {
+            _isExceptionHandled = true;
             httpStatusCode = crossException.Error.HttpStatusCode ?? HttpStatusCode.UnprocessableEntity;
             title = "A validation error occurred";
             var error = CreateCrossProblemDetailsError(crossException.Error);
@@ -62,6 +66,7 @@ public class CrossValidationMiddleware : IMiddleware
         }
         else if (exception is ValidationListException validationListException)
         {
+            _isExceptionHandled = true;
             httpStatusCode = HttpStatusCode.UnprocessableEntity;
             title = "Several validation errors occurred";
 
@@ -72,6 +77,7 @@ public class CrossValidationMiddleware : IMiddleware
         }
         else if (exception is NonNullablePropertyIsNullException nonNullablePropertyIsNullException)
         {
+            _isExceptionHandled = true;
             httpStatusCode = HttpStatusCode.BadRequest;
             title = "Nullability error";
             details = $"Non nullable property is null: {nonNullablePropertyIsNullException.PropertyName}";
@@ -79,6 +85,7 @@ public class CrossValidationMiddleware : IMiddleware
         else if (exception is NonNullableItemCollectionWithNullItemException
                  nonNullableItemCollectionWithNullItemException)
         {
+            _isExceptionHandled = true;
             httpStatusCode = HttpStatusCode.BadRequest;
             title = "Nullability error";
             details = $"Non nullable item collection with null item: {nonNullableItemCollectionWithNullItemException.CollectionName}";
@@ -87,10 +94,10 @@ public class CrossValidationMiddleware : IMiddleware
         {
             if (!CrossValidationOptions.HandleUnknownException)
             {
-                await next(context);
                 return;
             }
             
+            _isExceptionHandled = true;
             _logger.LogError(exception, exception.Message);
             title = "An error occurred";;
             problemDetails.Detail = _environment.IsDevelopment() ? exception.Message : null;
