@@ -260,7 +260,13 @@ public static class ValidationExtensions
                 fieldFullPath,
                 validValidation.Context,
                 index,
-                validValidation.Context.ParentPath);
+                validValidation.Context.ParentPath,
+                error: validValidation.Context.Error,
+                message: validValidation.Context.Message,
+                code: validValidation.Context.Code,
+                details: validValidation.Context.Details,
+                httpStatusCode: validValidation.Context.HttpStatusCode,
+                fieldDisplayName: validValidation.Context.FieldDisplayName);
             var validationReturned = action(newValidation);
 
             if (validationReturned is IInvalidValidation<TReturnedField>)

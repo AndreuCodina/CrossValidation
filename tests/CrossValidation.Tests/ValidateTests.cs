@@ -6,6 +6,7 @@ using CrossValidation.Tests.TestUtils;
 using CrossValidation.Tests.TestUtils.Builders;
 using CrossValidation.Tests.TestUtils.Fixtures;
 using CrossValidation.Tests.TestUtils.Models;
+using CrossValidation.Validations;
 using Shouldly;
 using Xunit;
 
@@ -131,6 +132,40 @@ public class ValidateTests :
             .WithFieldDisplayName("Unexpected field display name")
             .Transform(x => x)
             .Must(_commonFixture.NotBeValid);
+
+        var error = action.ShouldThrowCrossError<TestError>();
+        error.Message.ShouldBe(expectedMessage);
+        error.Code.ShouldBe(expectedCode);
+        error.Details.ShouldBe(expectedDetails);
+        error.HttpStatusCode.ShouldBe(expectedHttpStatusCode);
+        error.FieldDisplayName.ShouldBe(expectedFieldDisplayName);
+    }
+    
+    [Fact]
+    public void Apply_fixed_customizations_with_collection_iteration()
+    {
+        var expectedError = new TestError();
+        var expectedMessage = "Expected message";
+        var expectedCode = "ExpectedCode";
+        var expectedDetails = "Expected details";
+        var expectedHttpStatusCode = HttpStatusCode.Created;
+        var expectedFieldDisplayName = "Expected field display name";
+        var action = () => Validate.That(
+                _model.IntList,
+                error: expectedError,
+                message: expectedMessage,
+                code: expectedCode,
+                details: expectedDetails,
+                httpStatusCode: expectedHttpStatusCode,
+                fieldDisplayName: expectedFieldDisplayName)
+            .WithError(new CrossError())
+            .WithMessage("Unexpected message")
+            .WithCode("UnexpectedCode")
+            .WithDetails("Unexpected details")
+            .WithHttpStatusCode(HttpStatusCode.Accepted)
+            .WithFieldDisplayName("Unexpected field display name")
+            .ForEach(x => x
+                .Must(_commonFixture.NotBeValid));
 
         var error = action.ShouldThrowCrossError<TestError>();
         error.Message.ShouldBe(expectedMessage);
