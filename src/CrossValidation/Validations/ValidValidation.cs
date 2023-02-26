@@ -264,7 +264,9 @@ file class ValidValidation<TField> :
         Context = context ?? new ValidationContext();
         FieldDisplayName = null;
         FieldFullPath = fieldFullPath;
-        Context.GeneralizeError = generalizeError;
+        Context.GeneralizeError = Context.IsChildContext && Context.GeneralizeError
+            ? true
+            : generalizeError;;
 
         var indexRepresentation = Context.FieldName is not null && index is not null
             ? $"[{index}]"

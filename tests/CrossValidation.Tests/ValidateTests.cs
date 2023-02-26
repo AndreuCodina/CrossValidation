@@ -175,18 +175,7 @@ public class ValidateTests :
         error.HttpStatusCode.ShouldBe(expectedHttpStatusCode);
         error.FieldDisplayName.ShouldBe(expectedFieldDisplayName);
     }
-    
-    // [Fact]
-    // public void ValidateThat_generalizes_error()
-    // {
-    //     var action = () => Validate.That(_model.Int)
-    //         .Must(_commonFixture.NotBeValid);
-    //
-    //     var error = action.ShouldThrowCrossError();
-    //     error.Code.ShouldBeNull();
-    //     error.Message.ShouldBeNull();
-    // }
-    
+
     [Theory]
     [InlineData(null, null, nameof(ErrorResource.General), "An error has occured")]
     [InlineData(null, "Expected message", nameof(ErrorResource.General), "Expected message")]
