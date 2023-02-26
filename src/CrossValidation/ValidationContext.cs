@@ -18,6 +18,7 @@ public class ValidationContext
     public HttpStatusCode? HttpStatusCode { get; set; }
     public string? FieldDisplayName { get; set; }
     public ICrossErrorToException? CrossErrorToException { get; set; }
+    public bool GeneralizeError { get; set; } = false;
 
     public ValidationContext CloneForChildModelValidator(string? parentPath)
     {
@@ -27,7 +28,8 @@ public class ValidationContext
             ParentPath = parentPath,
             ErrorsCollected = ErrorsCollected,
             ValidationMode = ValidationMode,
-            CrossErrorToException = CrossErrorToException
+            CrossErrorToException = CrossErrorToException,
+            GeneralizeError = GeneralizeError
         };
         return newContext;
     }

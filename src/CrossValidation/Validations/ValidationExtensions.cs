@@ -257,10 +257,11 @@ public static class ValidationExtensions
             var newValidation = IValidValidation<TInnerType>.CreateFromField(
                 innerField,
                 validValidation.CrossErrorToException,
-                fieldFullPath,
-                validValidation.Context,
-                index,
-                validValidation.Context.ParentPath,
+                generalizeError: validValidation.Context.GeneralizeError,
+                fieldFullPath: fieldFullPath,
+                context:validValidation.Context,
+                index: index,
+                parentPath: validValidation.Context.ParentPath,
                 error: validValidation.Context.Error,
                 message: validValidation.Context.Message,
                 code: validValidation.Context.Code,
@@ -309,10 +310,10 @@ public static class ValidationExtensions
             return IValidValidation<IEnumerable<TReturnedField>>.CreateFromField(
                 returnedFieldValues,
                 validValidation.CrossErrorToException,
-                fieldFullPath,
-                validValidation.Context,
-                index,
-                validValidation.Context.ParentPath);
+                fieldFullPath: fieldFullPath,
+                context: validValidation.Context,
+                index: index,
+                parentPath: validValidation.Context.ParentPath);
         }
     }
 

@@ -37,7 +37,8 @@ public class ValidateTests :
     public void ValidateMust_with_error()
     {
         var expectedCode = nameof(ErrorResource.NotNull);
-        var expectedDetails = "Details";
+        var expectedMessage = ErrorResource.NotNull;
+        var expectedDetails = "Expected details";
         var errorForValidation = new CrossError
         {
             Code = expectedCode,
@@ -48,7 +49,7 @@ public class ValidateTests :
 
         var error = action.ShouldThrowCrossError();
         error.Code.ShouldBe(expectedCode);
-        error.Message.ShouldBe(ErrorResource.NotNull);
+        error.Message.ShouldBe(expectedMessage);
         error.Details.ShouldBe(expectedDetails);
     }
 
@@ -173,6 +174,47 @@ public class ValidateTests :
         error.Details.ShouldBe(expectedDetails);
         error.HttpStatusCode.ShouldBe(expectedHttpStatusCode);
         error.FieldDisplayName.ShouldBe(expectedFieldDisplayName);
+    }
+    
+    // [Fact]
+    // public void ValidateThat_generalizes_error()
+    // {
+    //     var action = () => Validate.That(_model.Int)
+    //         .Must(_commonFixture.NotBeValid);
+    //
+    //     var error = action.ShouldThrowCrossError();
+    //     error.Code.ShouldBeNull();
+    //     error.Message.ShouldBeNull();
+    // }
+    
+    [Theory]
+    [InlineData(null, null, nameof(ErrorResource.General), "An error has occured")]
+    [InlineData(null, "Expected message", nameof(ErrorResource.General), "Expected message")]
+    [InlineData("RandomCode", null, "RandomCode", null)]
+    [InlineData(nameof(ErrorResource.NotNull), null, nameof(ErrorResource.NotNull), "Must have a value")]
+    public void ValidateThat_does_not_generalize_error_in_customized_code_or_message(
+        string? code,
+        string? message,
+        string? expectedCode,
+        string? expectedMessage)
+    {
+        var validation = Validate.That(_model.Int);
+
+        if (code != null)
+        {
+            validation = validation.WithCode(code);
+        }
+
+        if (message != null)
+        {
+            validation = validation.WithMessage(message);
+        }
+        
+        var action = () => validation.GreaterThan(_model.Int);
+
+        var error = action.ShouldThrowCrossError();
+        error.Code.ShouldBe(expectedCode);
+        error.Message.ShouldBe(expectedMessage);
     }
 
     private record TestError : CrossError;

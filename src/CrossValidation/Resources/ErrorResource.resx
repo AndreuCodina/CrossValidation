@@ -42,4 +42,7 @@
     <data name="RegularExpression" xml:space="preserve">
         <value>The format is not valid</value>
     </data>
+    <data name="General" xml:space="preserve">
+        <value>An error has occured</value>
+    </data>
 </root>

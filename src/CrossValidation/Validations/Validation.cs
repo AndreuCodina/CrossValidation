@@ -209,8 +209,9 @@ internal abstract class Validation<TField> : IValidation<TField>
             return IValidValidation<TFieldTransformed>.CreateFromField(
                 fieldValueTransformed,
                 validValidation.CrossErrorToException,
-                validValidation.Context.FieldName,
-                validValidation.Context,
+                generalizeError: validValidation.Context.GeneralizeError,
+                fieldFullPath: validValidation.Context.FieldName,
+                context: validValidation.Context,
                 error: validValidation.Error,
                 message: validValidation.Message,
                 code: validValidation.Code,

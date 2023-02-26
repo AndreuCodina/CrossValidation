@@ -492,12 +492,13 @@ public class ModelValidatorTests :
     [Fact]
     public void Successful_validator_cleans_customization()
     {
+        int? nullableInt = 1;
         _model = new ParentModelBuilder()
-            .WithNullableInt(1)
+            .WithNullableInt(nullableInt)
             .Build();
-        var expectedMessage = "Error message";
-        var expectedCode = nameof(CommonCrossError.Predicate);
-        var expectedDetails = "Details";
+        var expectedMessage = "Expected message";
+        var expectedCode = nameof(CommonCrossError.GreaterThan<int>);
+        var expectedDetails = "Expected details";
         var expectedHttpStatusCode = HttpStatusCode.Accepted;
         var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
         {
@@ -510,12 +511,12 @@ public class ModelValidatorTests :
                 .WithMessage(expectedMessage)
                 .WithDetails(expectedDetails)
                 .WithHttpStatusCode(expectedHttpStatusCode)
-                .Must(_commonFixture.NotBeValid);
+                .GreaterThan(nullableInt.Value);
         });
 
         var action = () => parentModelValidator.Validate(_model);
 
-        var error = action.ShouldThrowCrossError<CommonCrossError.Predicate>();
+        var error = action.ShouldThrowCrossError<CommonCrossError.GreaterThan<int>>();
         error.Message.ShouldBe(expectedMessage);
         error.Code.ShouldBe(expectedCode);
         error.Details.ShouldBe(expectedDetails);

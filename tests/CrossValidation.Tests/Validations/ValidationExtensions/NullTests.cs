@@ -47,9 +47,11 @@ public class NullTests :
     [Fact]
     public void Return_error_when_the_validation_fails()
     {
-        var value = "123";
-
-        var action = () => Validate.That(value)
+        _model = new ParentModelBuilder()
+            .WithNullableString("Nullable string")
+            .Build();
+        
+        var action = () => Validate.Field(_model.NullableString)
             .Null();
 
         var error = action.ShouldThrowCrossError<CommonCrossError.Null>();
