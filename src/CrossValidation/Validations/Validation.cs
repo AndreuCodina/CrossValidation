@@ -210,7 +210,13 @@ internal abstract class Validation<TField> : IValidation<TField>
                 fieldValueTransformed,
                 validValidation.CrossErrorToException,
                 validValidation.Context.FieldName,
-                validValidation.Context);
+                validValidation.Context,
+                error: validValidation.Error,
+                message: validValidation.Message,
+                code: validValidation.Code,
+                details: validValidation.Details,
+                httpStatusCode: validValidation.HttpStatusCode,
+                fieldDisplayName: validValidation.FieldDisplayName);
         }
 
         return IInvalidValidation<TFieldTransformed>.Create();
