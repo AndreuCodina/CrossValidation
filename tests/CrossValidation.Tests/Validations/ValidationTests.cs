@@ -93,7 +93,7 @@ public class ValidationTests :
         error.Message.ShouldBe(expectedMessage);
     }
     
-    [Fact(Skip = "Not implemented yet")]
+    [Fact(Skip = "Not implemented yet")] // TEST
     public void Keep_instance_customizations()
     {
         var getAge = () => Validate.That(_model.Int)
