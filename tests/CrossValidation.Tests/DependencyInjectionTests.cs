@@ -77,7 +77,7 @@ public class DependencyInjectionTests :
     [Theory]
     [InlineData("en")]
     [InlineData("es")]
-    public async Task Do_not_get_message_from_custom_resx_or_built_in_resx_when_the_code_is_not_key_of_any_resx(
+    public async Task Not_getting_message_from_custom_resx_or_built_in_resx_when_the_code_is_not_key_of_any_resx(
         string languageCode)
     {
         _client = new TestApplicationFactory(services =>

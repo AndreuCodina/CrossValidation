@@ -608,7 +608,7 @@ public class ModelValidatorTests :
     }
     
     [Fact]
-    public void Do_not_replace_placeholders_not_added()
+    public void Not_replacing_placeholders_not_added()
     {
         var template = "{PlaceholderNotReplaced} is {FieldValue}";
         var expectedMessage = $"{{PlaceholderNotReplaced}} is {_model.NestedModel.Int}";

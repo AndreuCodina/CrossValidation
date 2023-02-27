@@ -54,8 +54,9 @@ public class ValidationTests :
     
     [Theory]
     [InlineData(null, "Expected message", nameof(ErrorResource.General), "Expected message")]
-    [InlineData("Expected code", null, "Expected code", "An error has occured")]
-    [InlineData("Expected code", "Expected message", "Expected code", "Expected message")]
+    [InlineData("ExpectedCode", null, "ExpectedCode", null)]
+    [InlineData(nameof(ErrorResource.Enum), null, nameof(ErrorResource.Enum), "Must be a valid value")]
+    [InlineData("ExpectedCode", "Expected message", "ExpectedCode", "Expected message")]
     public void ValidateThat_keeps_customizations_before_create_instance(
         string? code,
         string? message,

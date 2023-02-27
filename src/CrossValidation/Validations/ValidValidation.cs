@@ -454,8 +454,19 @@ file class ValidValidation<TField> :
         {
             return;
         }
+
+        var codeToAdd = Code ?? error.Code;
+        var isInstanceCallerWithCodeAndWithoutMessage = Code is not null && Message is null;
         
-        Code ??= error.Code;
-        Message ??= error.Message;
+        if (isInstanceCallerWithCodeAndWithoutMessage && codeToAdd is not null)
+        {
+            Message = CrossValidationOptions.GetMessageFromCode(codeToAdd);
+        }
+        else
+        {
+            Message ??= error.Message;
+        }
+
+        Code = codeToAdd;
     }
 }

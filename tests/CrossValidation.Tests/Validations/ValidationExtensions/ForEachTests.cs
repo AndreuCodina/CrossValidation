@@ -147,7 +147,7 @@ public class ForEachTests :
     {
         var expectedFieldDisplayName = "Expected field display name";
         var expectedHttpStatusCode = HttpStatusCode.Created;
-        var expectedCode = "Expected code";
+        var expectedCode = "ExpectedCode";
         var expectedMessage = "Expected message";
         var expectedDetails = "Expected details";
         var intList = new List<int> {30, 20, 10};
@@ -192,7 +192,7 @@ public class ForEachTests :
     {
         var expectedFieldDisplayName = "Expected field display name";
         var expectedHttpStatusCode = HttpStatusCode.Created;
-        var expectedCode = "Expected code";
+        var expectedCode = "ExpectedCode";
         var expectedMessage = "Expected message";
         var expectedDetails = "Expected details";
         var intList = new List<int> {30, 20, 10};

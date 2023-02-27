@@ -108,7 +108,7 @@ public class ValidateTests :
     public void ValidateMust_with_raw_customizations()
     {
         var expectedMessage = "Expected message";
-        var expectedCode = "Expected code";
+        var expectedCode = "ExpectedCode";
         var expectedDetails = "Expected details";
         var expectedHttpStatusCode = HttpStatusCode.Created;
 
