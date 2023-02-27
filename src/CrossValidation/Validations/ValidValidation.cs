@@ -20,7 +20,7 @@ public interface IValidValidation<out TField> : IValidation<TField>
     public string? FieldFullPath { get; set; }
     public Type CrossErrorToException { get; set; }
     void HandleError(ICrossError error);
-    void TakeErrorCustomizations(ICrossError error, bool overrideCustomizations);
+    void TakeCustomizationsFromError(ICrossError error);
 
     public static IValidation<TField> CreateFromField(
         TField fieldValue,
@@ -307,13 +307,8 @@ file class ValidValidation<TField> :
         return FieldValue;
     }
 
-    public void TakeErrorCustomizations(ICrossError error, bool overrideCustomizations)
+    public void TakeCustomizationsFromError(ICrossError error)
     {
-        if (!overrideCustomizations)
-        {
-            return;
-        }
-
         Code = error.Code ?? Code;
         Message = error.Message ?? Message;
         Details = error.Details ?? Details;
@@ -352,7 +347,7 @@ file class ValidValidation<TField> :
             e.Error.FieldValue = null;
             e.Error.PlaceholderValues = null;
             e.Error.CrossErrorToException = CrossErrorToException;
-            TakeErrorCustomizations(e.Error, overrideCustomizations: false);
+            TakeCustomizationsFromInstanceError(e.Error);
             HandleError(e.Error);
             throw new UnreachableException();
         }
@@ -382,23 +377,25 @@ file class ValidValidation<TField> :
         error.FieldName = Context.FieldName;
         error.FieldDisplayName = GetFieldDisplayNameToFill(error);
         error.FieldValue = FieldValue;
-        
-        if (Code is not null)
-        {
-            error.Code = Code;
-        }
-        else if (Context.GeneralizeError)
-        {
-            error.Code = nameof(ErrorResource.General);
-        }
-        else
-        {
-            error.Code = error.Code;
-        }
-        
+        error.Code = GetCodeToFill(error);
         error.Message = GetMessageToFill(error);
         error.Details = Details ?? error.Details;
         error.HttpStatusCode = HttpStatusCode ?? error.HttpStatusCode;
+    }
+
+    private string? GetCodeToFill(ICrossError error)
+    {
+        if (Code is not null)
+        {
+            return Code;
+        }
+        
+        if (Context.GeneralizeError)
+        {
+            return nameof(ErrorResource.General);
+        }
+
+        return error.Code;
     }
 
     private string? GetMessageToFill(ICrossError error)
@@ -410,38 +407,28 @@ file class ValidValidation<TField> :
 
         if (Code is not null)
         {
-            // if (Context.GeneralizeError)
-            // {
-            //     return CrossValidationOptions.GetMessageFromCode(nameof(ErrorResource.General));
-            // }
-            
             return CrossValidationOptions.GetMessageFromCode(Code);
+        }
+        
+        if (Context.GeneralizeError)
+        {
+            return CrossValidationOptions.GetMessageFromCode(nameof(ErrorResource.General));
         }
 
         if (error.Message is not null)
         {
-            if (Context.GeneralizeError)
-            {
-                return CrossValidationOptions.GetMessageFromCode(nameof(ErrorResource.General));
-            }
-            
             return error.Message;
         }
 
         if (error.Code is not null)
         {
-            if (Context.GeneralizeError)
-            {
-                return CrossValidationOptions.GetMessageFromCode(nameof(ErrorResource.General));
-            }
-            
             return CrossValidationOptions.GetMessageFromCode(error.Code);
         }
 
         return null;
     }
 
-    private string GetFieldDisplayNameToFill(ICrossError error)
+    private string? GetFieldDisplayNameToFill(ICrossError error)
     {
         if (FieldDisplayName is not null)
         {
@@ -453,6 +440,22 @@ file class ValidValidation<TField> :
             return error.FieldDisplayName;
         }
 
-        return error.FieldName!;
+        if (error.FieldName is not null)
+        {
+            return error.FieldName;
+        }
+
+        return null;
+    }
+    
+    private void TakeCustomizationsFromInstanceError(ICrossError error)
+    {
+        if (!Context.GeneralizeError)
+        {
+            return;
+        }
+        
+        Code ??= error.Code;
+        Message ??= error.Message;
     }
 }

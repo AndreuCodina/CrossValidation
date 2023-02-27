@@ -181,7 +181,7 @@ public class ValidateTests :
     [InlineData(null, "Expected message", nameof(ErrorResource.General), "Expected message")]
     [InlineData("RandomCode", null, "RandomCode", null)]
     [InlineData(nameof(ErrorResource.NotNull), null, nameof(ErrorResource.NotNull), "Must have a value")]
-    public void ValidateThat_does_not_generalize_error_in_customized_code_or_message(
+    public void ValidateThat_does_not_generalize_customized_code_or_message(
         string? code,
         string? message,
         string? expectedCode,
@@ -204,6 +204,19 @@ public class ValidateTests :
         var error = action.ShouldThrowCrossError();
         error.Code.ShouldBe(expectedCode);
         error.Message.ShouldBe(expectedMessage);
+    }
+
+    [Fact]
+    public void ValidateThat_does_not_generalize_error_type()
+    {
+        _model = new ParentModelBuilder()
+            .WithNullableInt(1)
+            .Build();
+
+        var action = () => Validate.That(_model.NullableInt)
+            .Null();
+
+        action.ShouldThrowCrossError<CommonCrossError.Null>();
     }
 
     private record TestError : CrossError;
