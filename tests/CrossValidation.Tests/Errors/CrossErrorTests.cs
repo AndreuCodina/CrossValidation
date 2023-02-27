@@ -37,7 +37,7 @@ public class CrossErrorTests :
     }
     
     [Fact]
-    public void Not_adding_all_specific_error_fields_as_placeholders_fails()
+    public void Not_add_all_specific_error_fields_as_placeholders_fails()
     {
         var action = () => Validate.That(true)
             .WithError(new ErrorWithNotAllFieldsAddedAsPlaceholders("Alex", 30))

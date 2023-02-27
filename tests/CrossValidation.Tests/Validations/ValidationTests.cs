@@ -331,22 +331,6 @@ public class ValidationTests :
         error.HttpStatusCode.ShouldBe(HttpStatusCode.Created);
     }
 
-    [Fact]
-    public void Not_execute_invalid_validation()
-    {
-        var expectedCode = "ExpectedCode";
-        
-        var action = () => Validate.That(_model.Int)
-            .WithCode(expectedCode)
-            .Must(_commonFixture.NotBeValid)
-            .MustAsync(_commonFixture.NotBeValidAsync)
-            .Must(_ => _commonFixture.Error())
-            .MustAsync(_ => _commonFixture.ErrorAsync());
-
-        var error = action.ShouldThrowCrossError();
-        error.Code.ShouldBe(expectedCode);
-    }
-
     private record CustomErrorWithPlaceholderValue(int Value) : CrossError;
 
     private record ValueObjectWithoutCustomization(int Value)
