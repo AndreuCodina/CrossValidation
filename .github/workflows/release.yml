@@ -6,6 +6,7 @@ on:
       - published
 
 env:
+  DOTNET_CONFIGURATION: Release
   CROSS_VALIDATION_PROJECT: src/CrossValidation/CrossValidation.csproj
   CROSS_VALIDATION_SHOULDLY_ASSERTIONS_PROJECT: src/CrossValidation.ShouldlyAssertions/CrossValidation.ShouldlyAssertions.csproj
   NUGET_FOLDER: ${{ github.workspace }}/generated/nuget
@@ -30,22 +31,55 @@ jobs:
         run: dotnet restore ${{ env.CROSS_VALIDATION_PROJECT }}
 
       - name: Build CrossValidation
-        run: dotnet build ${{ env.CROSS_VALIDATION_PROJECT }} --configuration Release --no-restore
+        run: |
+          dotnet build ${{ env.CROSS_VALIDATION_PROJECT }} \
+            --configuration ${{ env.DOTNET_CONFIGURATION }} \
+            --no-restore
 
       - name: Create CrossValidation package
-        run: dotnet pack ${{ env.CROSS_VALIDATION_PROJECT }} --configuration Release --no-build --output ${{ env.NUGET_FOLDER }} -p:PackageVersion=${{ env.RELEASE_VERSION }}
+        run: |
+          dotnet pack ${{ env.CROSS_VALIDATION_PROJECT }} \
+            --configuration ${{ env.DOTNET_CONFIGURATION }} \
+            --no-build \
+            --output ${{ env.NUGET_FOLDER }} \
+            -p:PackageVersion=${{ env.RELEASE_VERSION }}
 
       - name: Push CrossValidation package
-        run: dotnet nuget push ${{ format('{0}/CrossValidation.{1}.nupkg', env.NUGET_FOLDER, env.RELEASE_VERSION) }} --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_API_KEY }}
+        run: |
+          dotnet nuget push ${{ format('{0}/CrossValidation.{1}.nupkg', env.NUGET_FOLDER, env.RELEASE_VERSION) }} \
+            --source https://api.nuget.org/v3/index.json \
+            --api-key ${{ secrets.NUGET_API_KEY }}
 
       - name: Restore CrossValidation.ShouldlyAssertions dependencies
         run: dotnet restore ${{ env.CROSS_VALIDATION_SHOULDLY_ASSERTIONS_PROJECT }}
 
       - name: Build CrossValidation.ShouldlyAssertions
-        run: dotnet build ${{ env.CROSS_VALIDATION_SHOULDLY_ASSERTIONS_PROJECT }} --configuration Release --no-restore
+        run: |
+          dotnet build ${{ env.CROSS_VALIDATION_SHOULDLY_ASSERTIONS_PROJECT }} \
+            --configuration ${{ env.DOTNET_CONFIGURATION }} \
+            --no-restore
 
       - name: Create CrossValidation.ShouldlyAssertions package
-        run: dotnet pack ${{ env.CROSS_VALIDATION_SHOULDLY_ASSERTIONS_PROJECT }} --configuration Release --no-build --output ${{ env.NUGET_FOLDER }} -p:PackageVersion=${{ env.RELEASE_VERSION }}
+        run: |
+          dotnet pack ${{ env.CROSS_VALIDATION_SHOULDLY_ASSERTIONS_PROJECT }} \
+            --configuration ${{ env.DOTNET_CONFIGURATION }} \
+            --no-build \
+            --output ${{ env.NUGET_FOLDER }} \
+            -p:PackageVersion=${{ env.RELEASE_VERSION }}
 
       - name: Push CrossValidation.ShouldlyAssertions package
-        run: dotnet nuget push ${{ format('{0}/CrossValidation.ShouldlyAssertions.{1}.nupkg', env.NUGET_FOLDER, env.RELEASE_VERSION) }} --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_API_KEY }}
+        run: |
+          dotnet nuget push ${{ format('{0}/CrossValidation.ShouldlyAssertions.{1}.nupkg', env.NUGET_FOLDER, env.RELEASE_VERSION) }} \
+            --source https://api.nuget.org/v3/index.json \
+            --api-key ${{ secrets.NUGET_API_KEY }}
+
+  execute_benchmarks:
+    name: Execute benchmarks
+    steps:
+      # It's not possible disable the artifact creation
+      - name: Execute benchmarks
+        run: |
+          dotnet run \
+            --project .\benchmarks\CrossValidation.Benchmarks\CrossValidation.Benchmarks.csproj \
+            --configuration ${{ env.DOTNET_CONFIGURATION }} \
+            -- --artifacts ./generated/benchmarks
