@@ -123,15 +123,6 @@ namespace CrossValidation.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to La entrada no es válida.
-        /// </summary>
-        internal static string Predicate {
-            get {
-                return ResourceManager.GetString("Predicate", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to El formato no es válido.
         /// </summary>
         internal static string RegularExpression {

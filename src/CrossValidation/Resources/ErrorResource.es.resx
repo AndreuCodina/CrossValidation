@@ -33,9 +33,6 @@
     <data name="Null" xml:space="preserve">
         <value>No debe tener un valor</value>
     </data>
-    <data name="Predicate" xml:space="preserve">
-        <value>La entrada no es válida</value>
-    </data>
     <data name="MinimumLength" xml:space="preserve">
         <value>Debe tener al menos {Minimum} caracteres</value>
     </data>
