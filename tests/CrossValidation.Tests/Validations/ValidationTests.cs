@@ -66,12 +66,12 @@ public class ValidationTests :
         
         if (code != null)
         {
-            validation = validation.WithCode(code);
+            validation.WithCode(code);
         }
         
         if (message != null)
         {
-            validation = validation.WithMessage(message);
+            validation.WithMessage(message);
         }
 
         var action = () => validation
@@ -349,12 +349,12 @@ public class ValidationTests :
 
             if (code is not null)
             {
-                validation = validation.WithCode(code);
+                validation.WithCode(code);
             }
 
             if (message is not null)
             {
-                validation = validation.WithMessage(message);
+                validation.WithMessage(message);
             }
                 
             validation

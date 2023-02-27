@@ -45,6 +45,10 @@ public interface IValidation<out TField>
     
     IValidation<TField> MustAsync(Func<TField, Task<bool>> condition);
 
+    IValidation<TField> Must(Func<TField, ICrossError?> condition);
+
+    IValidation<TField> MustAsync(Func<TField, Task<ICrossError?>> condition);
+
     [Pure]
     TField Instance();
     
@@ -177,12 +181,13 @@ internal abstract class Validation<TField> : IValidation<TField>
     {
         if (this is IValidValidation<TField> validValidation)
         {
-            return SetValidator(new PredicateValidator(condition(validValidation.GetFieldValue())));
+            var conditionResult = condition(validValidation.GetFieldValue());
+            return SetValidator(new PredicateValidator(conditionResult));
         }
 
         return this;
     }
-
+    
     public IValidation<TField> MustAsync(Func<TField, Task<bool>> condition)
     {
         if (this is IValidValidation<TField> validValidation)
@@ -191,6 +196,44 @@ internal abstract class Validation<TField> : IValidation<TField>
                 condition(validValidation.GetFieldValue())
                     .GetAwaiter()
                     .GetResult()));
+        }
+
+        return this;
+    }
+    
+    public IValidation<TField> Must(Func<TField, ICrossError?> condition)
+    {
+        if (this is IValidValidation<TField> validValidation)
+        {
+            var error = condition(validValidation.GetFieldValue());
+
+            if (error is not null)
+            {
+                validValidation.WithError(error);
+                return SetValidator(new PredicateValidator(false));
+            }
+            
+            return this;
+        }
+
+        return this;
+    }
+
+    public IValidation<TField> MustAsync(Func<TField, Task<ICrossError?>> condition)
+    {
+        if (this is IValidValidation<TField> validValidation)
+        {
+            var error = condition(validValidation.GetFieldValue())
+                .GetAwaiter()
+                .GetResult();
+
+            if (error is not null)
+            {
+                validValidation.WithError(error);
+                return SetValidator(new PredicateValidator(false));
+            }
+            
+            return this;
         }
 
         return this;

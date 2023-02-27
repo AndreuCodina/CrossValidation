@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using CrossValidation.Errors;
 using CrossValidation.Tests.TestUtils.Fixtures.Validators;
 using CrossValidation.Tests.TestUtils.Models;
 using Moq;
@@ -51,8 +52,23 @@ public class CommonFixture
         return await ReturnBoolTask(false);
     }
     
+    public async Task<ICrossError?> ValidErrorAsync(ICrossError? error)
+    {
+        return await ReturnErrorTask(error);
+    }
+    
     private Task<bool> ReturnBoolTask(bool value)
     {
         return Task.FromResult(value);
+    }
+    
+    private Task<ICrossError?> ReturnErrorTask(ICrossError? error)
+    {
+        if (error is null)
+        {
+            return Task.FromResult(error);
+        }
+        
+        return Task.FromResult((ICrossError?)error);
     }
 }
