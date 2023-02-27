@@ -78,7 +78,7 @@ public class ValidateTests :
         var expectedDetails = "Expected details";
         var errorForValidation = new TestError(Code: expectedCode, Details: expectedDetails);
         var action = () => Validate.That(_model.NullableInt)
-            .MustAsync(_ => _commonFixture.ValidErrorAsync(errorForValidation));
+            .MustAsync(_ => _commonFixture.ErrorAsync(errorForValidation));
 
         var error = action.ShouldThrowCrossError<TestError>();
         error.Code.ShouldBe(expectedCode);
@@ -89,10 +89,8 @@ public class ValidateTests :
     [Fact]
     public void ValidateMust_with_null_returned_error_not_fails()
     {
-        TestError? testError = null;
-
         var action = () => Validate.That(_model.NullableInt)
-            .Must(_ => testError);
+            .Must(_ => _commonFixture.NullableError());
 
         action.ShouldNotThrow();
     }
@@ -100,10 +98,8 @@ public class ValidateTests :
     [Fact]
     public void ValidateMustAsync_with_null_returned_error_not_fails()
     {
-        TestError? testError = null;
-
         var action = () => Validate.That(_model.NullableInt)
-            .MustAsync(_ => _commonFixture.ValidErrorAsync(testError));
+            .MustAsync(_ => _commonFixture.NullErrorAsync());
 
         action.ShouldNotThrow();
     }

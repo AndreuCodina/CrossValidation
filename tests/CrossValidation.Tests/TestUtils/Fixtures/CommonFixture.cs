@@ -52,8 +52,32 @@ public class CommonFixture
         return await ReturnBoolTask(false);
     }
     
-    public async Task<ICrossError?> ValidErrorAsync(ICrossError? error)
+    public ICrossError? Error()
     {
+        ICrossError? error = new CrossError();
+        return error;
+    }
+
+    public async Task<ICrossError?> ErrorAsync(ICrossError? error = null)
+    {
+        if (error is null)
+        {
+            ICrossError? nullableError = new CrossError();
+            return await ReturnErrorTask(nullableError);
+        }
+        
+        return await ReturnErrorTask(error);
+    }
+    
+    public ICrossError? NullableError()
+    {
+        ICrossError? error = null;
+        return error;
+    }
+    
+    public async Task<ICrossError?> NullErrorAsync()
+    {
+        ICrossError? error = null;
         return await ReturnErrorTask(error);
     }
     
@@ -64,11 +88,6 @@ public class CommonFixture
     
     private Task<ICrossError?> ReturnErrorTask(ICrossError? error)
     {
-        if (error is null)
-        {
-            return Task.FromResult(error);
-        }
-        
-        return Task.FromResult((ICrossError?)error);
+        return Task.FromResult(error);
     }
 }
