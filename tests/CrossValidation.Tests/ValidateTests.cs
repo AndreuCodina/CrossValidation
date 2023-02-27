@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using CrossValidation.Errors;
 using CrossValidation.Exceptions;
@@ -280,7 +281,7 @@ public class ValidateTests :
         var action = () => Validate.Argument(field)
             .NotNull();
         
-        action.ShouldThrow<CrossArgumentException>();
+        action.ShouldThrow<ArgumentException>();
     }
     
     [Fact]
@@ -292,7 +293,61 @@ public class ValidateTests :
             .ForEach(x => x
                 .NotNull());
 
-        var exception = action.ShouldThrow<CrossArgumentException>();
+        var exception = action.ShouldThrow<ArgumentException>();
         exception.Message.ShouldBe($"list[1]: {ErrorResource.NotNull}");
+    }
+    
+    [Fact]
+    public void Throw_parametrized_exception()
+    {
+        var action = () => Validate<ArgumentException>.Argument(_model.NullableInt)
+            .NotNull();
+        action.ShouldThrow<ArgumentException>();
+        
+        action = () => Validate<FormatException>.Argument(_model.NullableInt)
+            .NotNull();
+        action.ShouldThrow<FormatException>();
+        
+        action = () => Validate<FormatException>.That(_model.NullableInt)
+            .NotNull();
+        action.ShouldThrow<FormatException>();
+        
+        action = () => Validate<FormatException>.Field(_model.NullableInt)
+            .NotNull();
+        action.ShouldThrow<FormatException>();
+    }
+    
+    [Fact]
+    public void ValidateArgument_requires_exception_implementing_ICrossErrorToException_or_having_constructor_with_message()
+    {
+        int? field = null;
+        
+        var action = () => Validate<ExceptionFromError>.Argument(field)
+            .NotNull();
+        action.ShouldThrow<ExceptionFromError>();
+        
+        action = () => Validate<ExceptionWithoutConstructor>.Argument(field)
+            .NotNull();
+        action.ShouldThrow<MissingMethodException>();
+        
+        action = () => Validate<ArgumentException>.Argument(field)
+            .NotNull();
+        action.ShouldThrow<ArgumentException>();
+    }
+
+    private class ExceptionFromError : Exception, ICrossErrorToException
+    {
+        private ExceptionFromError(string message) : base(message)
+        {
+        }
+        
+        public static Exception FromCrossError(ICrossError error)
+        {
+            return new ExceptionFromError("Expected message");
+        }
+    }
+
+    private class ExceptionWithoutConstructor : Exception
+    {
     }
 }

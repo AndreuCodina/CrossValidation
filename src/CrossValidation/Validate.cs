@@ -125,7 +125,9 @@ public abstract class Validate<TException>
     {
         return IValidValidation<TField>.CreateFromFieldName(
             field,
-            typeof(CrossArgumentException),
+            typeof(TException) == typeof(CrossException)
+                ? typeof(ArgumentException)
+                : typeof(TException),
             fieldName,
             allowFieldNameWithoutModel: true,
             error: error,
@@ -135,7 +137,7 @@ public abstract class Validate<TException>
             httpStatusCode: httpStatusCode,
             fieldDisplayName: fieldDisplayName);
     }
-    
+
     public static void ModelNullability<TModel>(TModel model)
     {
         ModelNullabilityValidator.Validate(model);

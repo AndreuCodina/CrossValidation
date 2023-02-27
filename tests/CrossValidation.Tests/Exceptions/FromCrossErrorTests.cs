@@ -21,26 +21,26 @@ public class FromCrossErrorTests : TestBase
     }
     
     [Fact]
-    public void Validate_throws_customized_exception()
+    public void Throw_exception_implementing_ICrossErrorToException()
     {
-        var parametrizedExceptionAction = () => Validate<CrossArgumentException>.Field(_model.NullableInt)
+        var parametrizedExceptionAction = () => Validate<ExceptionFromError>.Field(_model.NullableInt)
             .NotNull();
-        var crossArgumentException = parametrizedExceptionAction.ShouldThrow<CrossArgumentException>();
-        crossArgumentException.Message.ShouldBe($"{nameof(_model.NullableInt)}: {ErrorResource.NotNull}");
+        var crossArgumentException = parametrizedExceptionAction.ShouldThrow<ExceptionFromError>();
+        crossArgumentException.Message.ShouldBe("Expected message");
         
         var defaultExceptionAction = () => Validate.Field(_model.NullableInt)
             .NotNull();
         var crossException = defaultExceptionAction.ShouldThrow<CrossException>();
         crossException.Error.Message.ShouldBe(ErrorResource.NotNull);
         
-        var withErrorAction = () => Validate<CrossArgumentException>.That(_model.NullableInt)
+        var withErrorAction = () => Validate<ExceptionFromError>.That(_model.NullableInt)
             .WithError(new CrossError())
             .NotNull();
-        withErrorAction.ShouldThrow<CrossArgumentException>();
+        withErrorAction.ShouldThrow<ExceptionFromError>();
         
-        var valueObjectAction = () => Validate<CrossArgumentException>.That(_model.Int)
+        var valueObjectAction = () => Validate<ExceptionFromError>.That(_model.Int)
             .Instance(ValueObject.Create);
-        valueObjectAction.ShouldThrow<CrossArgumentException>();
+        valueObjectAction.ShouldThrow<ExceptionFromError>();
 
         Action exceptionAction = () => throw new CrossError().ToException();
         exceptionAction.ShouldThrow<CrossException>();
@@ -52,6 +52,18 @@ public class FromCrossErrorTests : TestBase
         {
             Validate.That(value).Must(_ => false);
             return new(value);
+        }
+    }
+    
+    private class ExceptionFromError : Exception, ICrossErrorToException
+    {
+        private ExceptionFromError(string message) : base(message)
+        {
+        }
+        
+        public static Exception FromCrossError(ICrossError error)
+        {
+            return new ExceptionFromError("Expected message");
         }
     }
 }

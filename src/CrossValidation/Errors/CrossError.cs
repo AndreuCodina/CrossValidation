@@ -102,12 +102,44 @@ public record CrossError : ICrossError
             AddCustomErrorPlaceholderValues();
         }
         
+        var canUseCrossValidationCustomizations = CrossErrorToException
+            .GetInterface(nameof(ICrossErrorToException)) is not null;
+
+        if (!canUseCrossValidationCustomizations)
+        {
+            throw (Exception)Activator.CreateInstance(CrossErrorToException, CreateExceptionMessage())!;
+        }
+        
         var fromCrossErrorMethod = CrossErrorToException.GetMethod(
             nameof(ICrossErrorToException.FromCrossError),
             new[] {typeof(ICrossError)})!;
         var parameters = new object[] {this};
         var exception = fromCrossErrorMethod.Invoke(null, parameters);
         return (Exception)exception!;
+    }
+
+    private string? CreateExceptionMessage()
+    {
+        string? message = null;
+            
+        if (FieldName is not null)
+        {
+            message = $"{FieldName}: ";
+        }
+
+        if (Message is not null)
+        {
+            if (message is not null)
+            {
+                message += Message;
+            }
+            else
+            {
+                message = Message;
+            }
+        }
+            
+        return message;
     }
 
     private void AddCommonPlaceholderValues()
