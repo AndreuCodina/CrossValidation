@@ -7,8 +7,8 @@ using CrossValidation.Validations;
 
 namespace CrossValidation;
 
-public abstract class Validate<TException> : IValidate<TException>
-    where TException : Exception, ICrossErrorToException
+public abstract class Validate<TException>
+    where TException : Exception
 {
     public static IValidation<TField> That<TField>(
         TField fieldValue,
@@ -55,7 +55,7 @@ public abstract class Validate<TException> : IValidate<TException>
 
     public static void Must(bool condition, ICrossError error)
     {
-        IValidate<TException>.InternalMust(condition, error: error);
+        InternalMust(condition, error: error);
     }
     
     public static void Must(
@@ -65,12 +65,75 @@ public abstract class Validate<TException> : IValidate<TException>
         string? details = null,
         HttpStatusCode? httpStatusCode = null)
     {
-        IValidate<TException>.InternalMust(
+        InternalMust(
             condition,
             message: message,
             code: code,
             details: details,
             httpStatusCode: httpStatusCode);
+    }
+    
+    private static void InternalMust(bool condition,
+        ICrossError? error = null,
+        string? message = null,
+        string? code = null,
+        string? details = null,
+        HttpStatusCode? httpStatusCode = null)
+    {
+        if (!condition)
+        {
+            var validation = IValidValidation<bool>.CreateFromField(condition, typeof(TException));
+
+            if (error is not null)
+            {
+                validation = validation.WithError(error);
+            }
+
+            if (message is not null)
+            {
+                validation = validation.WithMessage(message);
+            }
+
+            if (code is not null)
+            {
+                validation = validation.WithCode(code);
+            }
+
+            if (details is not null)
+            {
+                validation = validation.WithDetails(details);
+            }
+
+            if (httpStatusCode is not null)
+            {
+                validation = validation.WithHttpStatusCode(httpStatusCode.Value);
+            }
+
+            validation.Must(_ => false);
+        }
+    }
+    
+    public static IValidation<TField> Argument<TField>(
+        TField field,
+        ICrossError? error = null,
+        string? message = null,
+        string? code = null,
+        string? details = null,
+        HttpStatusCode? httpStatusCode = null,
+        string? fieldDisplayName = null,
+        [CallerArgumentExpression(nameof(field))] string fieldName = default!)
+    {
+        return IValidValidation<TField>.CreateFromFieldName(
+            field,
+            typeof(CrossArgumentException),
+            fieldName,
+            allowFieldNameWithoutModel: true,
+            error: error,
+            message: message,
+            code: code,
+            details: details,
+            httpStatusCode: httpStatusCode,
+            fieldDisplayName: fieldDisplayName);
     }
     
     public static void ModelNullability<TModel>(TModel model)

@@ -1,5 +1,7 @@
-﻿using System.Net;
+﻿using System.Collections.Generic;
+using System.Net;
 using CrossValidation.Errors;
+using CrossValidation.Exceptions;
 using CrossValidation.Resources;
 using CrossValidation.ShouldlyAssertions;
 using CrossValidation.Tests.TestUtils;
@@ -268,5 +270,29 @@ public class ValidateTests :
             .Null();
 
         action.ShouldThrowCrossError<CommonCrossError.Null>();
+    }
+    
+    [Fact]
+    public void ValidateArgument_can_use_field_without_model()
+    {
+        int? field = null;
+        
+        var action = () => Validate.Argument(field)
+            .NotNull();
+        
+        action.ShouldThrow<CrossArgumentException>();
+    }
+    
+    [Fact]
+    public void Use_index_in_field_name()
+    {
+        var list = new List<int?> {1, null, 2};
+
+        var action = () => Validate.Argument(list)
+            .ForEach(x => x
+                .NotNull());
+
+        var exception = action.ShouldThrow<CrossArgumentException>();
+        exception.Message.ShouldBe($"list[1]: {ErrorResource.NotNull}");
     }
 }
