@@ -33,15 +33,16 @@ public static class TestEndpoints
 
         group.MapGet(ApiPath.Test.ReplaceBuiltInCodeWithCustomResx, () =>
         {
-            string? value = null;
-            Validate.That(value)
+            var model = new Model();
+            Validate.Field(model.NullableString)
                 .NotNull();
         });
 
         group.MapGet(ApiPath.Test.DefaultCultureMessage, () =>
         {
-            string? value = "";
-            Validate.That(value)
+            var model = new Model();
+            model.NullableString = "";
+            Validate.Field(model.NullableString)
                 .Null();
         });
 

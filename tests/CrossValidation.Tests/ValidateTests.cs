@@ -6,6 +6,7 @@ using CrossValidation.Tests.TestUtils;
 using CrossValidation.Tests.TestUtils.Builders;
 using CrossValidation.Tests.TestUtils.Fixtures;
 using CrossValidation.Tests.TestUtils.Models;
+using CrossValidation.Validations;
 using Shouldly;
 using Xunit;
 
@@ -36,7 +37,8 @@ public class ValidateTests :
     public void ValidateMust_with_error()
     {
         var expectedCode = nameof(ErrorResource.NotNull);
-        var expectedDetails = "Details";
+        var expectedMessage = ErrorResource.NotNull;
+        var expectedDetails = "Expected details";
         var errorForValidation = new CrossError
         {
             Code = expectedCode,
@@ -47,7 +49,7 @@ public class ValidateTests :
 
         var error = action.ShouldThrowCrossError();
         error.Code.ShouldBe(expectedCode);
-        error.Message.ShouldBe(ErrorResource.NotNull);
+        error.Message.ShouldBe(expectedMessage);
         error.Details.ShouldBe(expectedDetails);
     }
 
@@ -138,6 +140,83 @@ public class ValidateTests :
         error.Details.ShouldBe(expectedDetails);
         error.HttpStatusCode.ShouldBe(expectedHttpStatusCode);
         error.FieldDisplayName.ShouldBe(expectedFieldDisplayName);
+    }
+    
+    [Fact]
+    public void Apply_fixed_customizations_with_collection_iteration()
+    {
+        var expectedError = new TestError();
+        var expectedMessage = "Expected message";
+        var expectedCode = "ExpectedCode";
+        var expectedDetails = "Expected details";
+        var expectedHttpStatusCode = HttpStatusCode.Created;
+        var expectedFieldDisplayName = "Expected field display name";
+        var action = () => Validate.That(
+                _model.IntList,
+                error: expectedError,
+                message: expectedMessage,
+                code: expectedCode,
+                details: expectedDetails,
+                httpStatusCode: expectedHttpStatusCode,
+                fieldDisplayName: expectedFieldDisplayName)
+            .WithError(new CrossError())
+            .WithMessage("Unexpected message")
+            .WithCode("UnexpectedCode")
+            .WithDetails("Unexpected details")
+            .WithHttpStatusCode(HttpStatusCode.Accepted)
+            .WithFieldDisplayName("Unexpected field display name")
+            .ForEach(x => x
+                .Must(_commonFixture.NotBeValid));
+
+        var error = action.ShouldThrowCrossError<TestError>();
+        error.Message.ShouldBe(expectedMessage);
+        error.Code.ShouldBe(expectedCode);
+        error.Details.ShouldBe(expectedDetails);
+        error.HttpStatusCode.ShouldBe(expectedHttpStatusCode);
+        error.FieldDisplayName.ShouldBe(expectedFieldDisplayName);
+    }
+
+    [Theory]
+    [InlineData(null, null, nameof(ErrorResource.General), "An error has occured")]
+    [InlineData(null, "Expected message", nameof(ErrorResource.General), "Expected message")]
+    [InlineData("RandomCode", null, "RandomCode", null)]
+    [InlineData(nameof(ErrorResource.NotNull), null, nameof(ErrorResource.NotNull), "Must have a value")]
+    public void ValidateThat_does_not_generalize_customized_code_or_message(
+        string? code,
+        string? message,
+        string? expectedCode,
+        string? expectedMessage)
+    {
+        var validation = Validate.That(_model.Int);
+
+        if (code != null)
+        {
+            validation = validation.WithCode(code);
+        }
+
+        if (message != null)
+        {
+            validation = validation.WithMessage(message);
+        }
+        
+        var action = () => validation.GreaterThan(_model.Int);
+
+        var error = action.ShouldThrowCrossError();
+        error.Code.ShouldBe(expectedCode);
+        error.Message.ShouldBe(expectedMessage);
+    }
+
+    [Fact]
+    public void ValidateThat_does_not_generalize_error_type()
+    {
+        _model = new ParentModelBuilder()
+            .WithNullableInt(1)
+            .Build();
+
+        var action = () => Validate.That(_model.NullableInt)
+            .Null();
+
+        action.ShouldThrowCrossError<CommonCrossError.Null>();
     }
 
     private record TestError : CrossError;

@@ -492,12 +492,13 @@ public class ModelValidatorTests :
     [Fact]
     public void Successful_validator_cleans_customization()
     {
+        int? nullableInt = 1;
         _model = new ParentModelBuilder()
-            .WithNullableInt(1)
+            .WithNullableInt(nullableInt)
             .Build();
-        var expectedMessage = "Error message";
-        var expectedCode = nameof(CommonCrossError.Predicate);
-        var expectedDetails = "Details";
+        var expectedMessage = "Expected message";
+        var expectedCode = nameof(CommonCrossError.GreaterThan<int>);
+        var expectedDetails = "Expected details";
         var expectedHttpStatusCode = HttpStatusCode.Accepted;
         var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
         {
@@ -510,12 +511,12 @@ public class ModelValidatorTests :
                 .WithMessage(expectedMessage)
                 .WithDetails(expectedDetails)
                 .WithHttpStatusCode(expectedHttpStatusCode)
-                .Must(_commonFixture.NotBeValid);
+                .GreaterThan(nullableInt.Value);
         });
 
         var action = () => parentModelValidator.Validate(_model);
 
-        var error = action.ShouldThrowCrossError<CommonCrossError.Predicate>();
+        var error = action.ShouldThrowCrossError<CommonCrossError.GreaterThan<int>>();
         error.Message.ShouldBe(expectedMessage);
         error.Code.ShouldBe(expectedCode);
         error.Details.ShouldBe(expectedDetails);
@@ -698,6 +699,57 @@ public class ModelValidatorTests :
 
         var error = action.ShouldThrowCrossError();
         error.FieldName.ShouldBeNull();
+    }
+    
+    [Fact]
+    public void General_error_customization_is_reset_between_validations()
+    {
+        _model = new ParentModelBuilder()
+            .WithNullableInt(1)
+            .Build();
+        
+        var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
+        {
+            validator.That(_model.NullableInt)
+                .NotNull();
+            
+            validator.Field(_model.NullableInt)
+                .Null();
+        });
+        
+        var action = () => parentModelValidator.Validate(_model);
+
+        var error = action.ShouldThrowCrossError<CommonCrossError.Null>();
+        error.Code.ShouldBe(nameof(ErrorResource.Null));
+        error.Message.ShouldBe(ErrorResource.Null);
+    }
+    
+    [Fact]
+    public void ValidateThat_with_child_model_validators_apply_generalization_when_they_use_ValidateField()
+    {
+        _model = new ParentModelBuilder()
+            .WithNullableInt(1)
+            .Build();
+        var nestedModel = _model.NestedModel;
+        
+        var nestedModelValidator = _commonFixture.CreateNestedModelValidator(validator =>
+        {
+            validator.Field(nestedModel.Int)
+                .GreaterThan(nestedModel.Int);
+        });
+        var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
+        {
+            validator.ValidationMode = ValidationMode.AccumulateFirstErrorEachValidation;
+
+            validator.That(_model.NestedModel)
+                .SetModelValidator(nestedModelValidator);
+        });
+
+        var action = () => parentModelValidator.Validate(_model);
+
+        var error = action.ShouldThrowCrossError<CommonCrossError.GreaterThan<int>>();
+        error.Code.ShouldBe(nameof(ErrorResource.General));
+        error.Message.ShouldBe(ErrorResource.General);
     }
 
     private record CustomErrorWithCode(string Code) : CrossError(Code: Code);

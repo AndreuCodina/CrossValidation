@@ -21,7 +21,7 @@ public class ErrorLocalizationTests : TestBase
     [Fact]
     public void Validator_error_is_localized()
     {
-        var action = () => Validate.That(_model.NullableString)
+        var action = () => Validate.Field(_model.NullableString)
             .NotNull();
 
         var error = action.ShouldThrowCrossError();

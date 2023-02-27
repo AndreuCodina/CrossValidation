@@ -37,29 +37,60 @@ public class ValidationTests :
     }
     
     [Fact]
-    public void Keep_customizations_before_create_instance()
+    public void ValidateField_keeps_customizations_before_create_instance()
     {
         var messageTemplate = "{FieldDisplayName}: Expected message";
         var expectedMessage = "NestedModel.Int: Expected message";
         
-        var getAge = () => Validate.Field(_model.NestedModel.Int)
+        var action = () => Validate.Field(_model.NestedModel.Int)
             .WithMessage(messageTemplate)
             .WithError(new CustomErrorWithPlaceholderValue(10))
             .Instance(ValueObjectWithoutCustomization.Create);
 
-        var error = getAge.ShouldThrowCrossError<CustomErrorWithPlaceholderValue>();
+        var error = action.ShouldThrowCrossError<CustomErrorWithPlaceholderValue>();
         error.FieldName.ShouldBe("NestedModel.Int");
+        error.Message.ShouldBe(expectedMessage);
+    }
+    
+    [Theory]
+    [InlineData(null, "Expected message", nameof(ErrorResource.General), "Expected message")]
+    [InlineData("Expected code", null, "Expected code", "An error has occured")]
+    [InlineData("Expected code", "Expected message", "Expected code", "Expected message")]
+    public void ValidateThat_keeps_customizations_before_create_instance(
+        string? code,
+        string? message,
+        string? expectedCode,
+        string? expectedMessage)
+    {
+        var validation = Validate.That(_model.NestedModel.Int);
+        
+        if (code != null)
+        {
+            validation = validation.WithCode(code);
+        }
+        
+        if (message != null)
+        {
+            validation = validation.WithMessage(message);
+        }
+
+        var action = () => validation
+            .WithError(new CustomErrorWithPlaceholderValue(10))
+            .Instance(x => ValueObjectWithCustomization.Create(x, code: null, message: null));
+
+        var error = action.ShouldThrowCrossError<CustomErrorWithPlaceholderValue>();
+        error.Code.ShouldBe(expectedCode);
         error.Message.ShouldBe(expectedMessage);
     }
     
     [Fact]
     public void Keep_localized_message_before_create_instance()
     {
-        var getAge = () => Validate.Field(_model.NestedModel.Int)
+        var action = () => Validate.Field(_model.NestedModel.Int)
             .WithCode(nameof(ErrorResource.NotNull))
             .Instance(ValueObjectWithoutCustomization.Create);
 
-        var error = getAge.ShouldThrowCrossError<CommonCrossError.GreaterThan<int>>();
+        var error = action.ShouldThrowCrossError<CommonCrossError.GreaterThan<int>>();
         error.Code.ShouldBe(nameof(ErrorResource.NotNull));
         error.Message.ShouldBe(ErrorResource.NotNull);
     }
@@ -67,41 +98,31 @@ public class ValidationTests :
     [Fact]
     public void Keep_message_before_create_instance()
     {
-        var getAge = () => Validate.Field(_model.NestedModel.Int)
+        var action = () => Validate.Field(_model.NestedModel.Int)
             .WithMessage(ErrorResource.NotNull)
             .Instance(ValueObjectWithoutCustomization.Create);
 
-        var error = getAge.ShouldThrowCrossError<CommonCrossError.GreaterThan<int>>();
+        var error = action.ShouldThrowCrossError<CommonCrossError.GreaterThan<int>>();
         error.Message.ShouldBe(ErrorResource.NotNull);
     }
-    
-    [Fact]
-    public void Keep_message_inside_create_instance()
-    {
-        var expectedMessage = "Expected message";
-        
-        var action = () => Validate.That(_model.String)
-            .Instance(x =>
-            {
-                Validate.That(x)
-                    .WithMessage(expectedMessage)
-                    .Must(_commonFixture.NotBeValid);
-                return x;
-            });
-        
-        var error = action.ShouldThrowCrossError<CommonCrossError.Predicate>();
-        error.Message.ShouldBe(expectedMessage);
-    }
-    
-    [Fact]
-    public void Keep_instance_customizations()
-    {
-        var getAge = () => Validate.That(_model.Int)
-            .Instance(ValueObjectWithCustomization.Create);
 
-        var error = getAge.ShouldThrowCrossError<CommonCrossError.GreaterThan<int>>();
-        error.Code.ShouldBe(nameof(ErrorResource.GreaterThan));
-        error.Message.ShouldBe("Expected message");
+    [Theory]
+    [InlineData(null, null, nameof(ErrorResource.General), "An error has occured")]
+    [InlineData(null, "Expected message", nameof(ErrorResource.General), "Expected message")]
+    [InlineData("RandomCode", null, "RandomCode", null)]
+    [InlineData(nameof(ErrorResource.NotNull), null, nameof(ErrorResource.NotNull), "Must have a value")]
+    public void Keep_instance_customizations(
+        string? code,
+        string? message,
+        string? expectedCode,
+        string? expectedMessage)
+    {
+        var action = () => Validate.That(_model.Int)
+            .Instance(x => ValueObjectWithCustomization.Create(x, code, message));
+
+        var error = action.ShouldThrowCrossError<CommonCrossError.GreaterThan<int>>();
+        error.Code.ShouldBe(expectedCode);
+        error.Message.ShouldBe(expectedMessage);
         error.Details.ShouldBe("Expected details");
         error.HttpStatusCode.ShouldBe(HttpStatusCode.Accepted);
         error.FieldDisplayName.ShouldBe("Expected field display name");
@@ -322,10 +343,21 @@ public class ValidationTests :
 
     private record ValueObjectWithCustomization(int Value)
     {
-        public static ValueObjectWithCustomization Create(int value)
+        public static ValueObjectWithCustomization Create(int value, string? code, string? message)
         {
-            Validate.That(value)
-                .WithMessage("Expected message")
+            var validation = Validate.That(value);
+
+            if (code is not null)
+            {
+                validation = validation.WithCode(code);
+            }
+
+            if (message is not null)
+            {
+                validation = validation.WithMessage(message);
+            }
+                
+            validation
                 .WithDetails("Expected details")
                 .WithHttpStatusCode(HttpStatusCode.Accepted)
                 .WithFieldDisplayName("Expected field display name")

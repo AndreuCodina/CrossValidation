@@ -69,6 +69,15 @@ namespace CrossValidation.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Ha ocurrido un error.
+        /// </summary>
+        internal static string General {
+            get {
+                return ResourceManager.GetString("General", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Debe ser mayor que {FieldValue}.
         /// </summary>
         internal static string GreaterThan {
@@ -110,15 +119,6 @@ namespace CrossValidation.Resources {
         internal static string Null {
             get {
                 return ResourceManager.GetString("Null", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to La entrada no es válida.
-        /// </summary>
-        internal static string Predicate {
-            get {
-                return ResourceManager.GetString("Predicate", resourceCulture);
             }
         }
         

@@ -1,5 +1,6 @@
-﻿using System.Linq;
+﻿using System;
 using CrossValidation.Errors;
+using CrossValidation.Resources;
 using CrossValidation.ShouldlyAssertions;
 using CrossValidation.Tests.TestUtils;
 using CrossValidation.Tests.TestUtils.Fixtures;
@@ -9,7 +10,7 @@ using Xunit;
 
 namespace CrossValidation.Tests.Errors;
 
-public class ValidationErrorTests :
+public class CrossErrorTests :
     TestBase,
     IClassFixture<CommonFixture>,
     IClassFixture<ValidatorFixture>
@@ -17,7 +18,7 @@ public class ValidationErrorTests :
     private readonly CommonFixture _commonFixture;
     private readonly ValidatorFixture _validatorFixture;
 
-    public ValidationErrorTests(CommonFixture commonFixture, ValidatorFixture validatorFixture)
+    public CrossErrorTests(CommonFixture commonFixture, ValidatorFixture validatorFixture)
     {
         _commonFixture = commonFixture;
         _validatorFixture = validatorFixture;
@@ -60,12 +61,15 @@ public class ValidationErrorTests :
         error.PlaceholderValues![nameof(ErrorWithNullFields.Name)].ShouldBe("");
         error.PlaceholderValues![nameof(ErrorWithNullFields.Age)].ShouldBe("");
     }
-
-    private bool ErrorContainsPlaceholder(ICrossError error, string placeholderName)
+    
+    [Fact]
+    public void Throw_cross_exception_with_code_customizes_message()
     {
-        return error.PlaceholderValues!
-            .Select(x => x.Key)
-            .Contains(placeholderName);
+        Action action = () => throw new CustomNotNull().ToException();
+
+        var error = action.ShouldThrowCrossError<CustomNotNull>();
+        error.Code.ShouldBe(nameof(ErrorResource.NotNull));
+        error.Message.ShouldBe(ErrorResource.NotNull);
     }
 
     private record ErrorWithAllFieldsAddedAsPlaceholders(string Name, int Age) : CrossError
@@ -96,4 +100,6 @@ public class ValidationErrorTests :
             base.AddPlaceholderValues();
         }
     }
+    
+    private record CustomNotNull() : CodeCrossError(nameof(ErrorResource.NotNull));
 }

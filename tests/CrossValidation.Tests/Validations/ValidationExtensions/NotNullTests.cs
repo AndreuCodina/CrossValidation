@@ -85,9 +85,7 @@ public class NotNullTests :
     [Fact]
     public void Return_error_when_the_validation_fails()
     {
-        string? value = null;
-
-        var action = () => Validate.That(value)
+        var action = () => Validate.Field(_model.NullableString)
             .NotNull();
 
         var error = action.ShouldThrowCrossError<CommonCrossError.NotNull>();

@@ -47,7 +47,7 @@ public record CommonCrossError(string Code) : CodeCrossError(Code)
         }
     }
     
-    public record Predicate() : CommonCrossError(nameof(ErrorResource.Predicate));
+    public record Predicate() : CommonCrossError(nameof(ErrorResource.General));
     
     public record RegularExpression() : CommonCrossError(nameof(ErrorResource.RegularExpression));
 }
