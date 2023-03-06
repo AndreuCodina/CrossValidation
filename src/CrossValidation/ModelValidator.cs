@@ -40,7 +40,7 @@ public abstract record ModelValidator<TModel>
         [CallerArgumentExpression(nameof(field))] string fieldName = default!)
     {
         return IValidValidation<TField>.CreateFromFieldName(
-            field,
+            () => field,
             typeof(CrossException),
             fieldName,
             allowFieldNameWithoutModel: false,
@@ -64,7 +64,7 @@ public abstract record ModelValidator<TModel>
         string? fieldDisplayName = null)
     {
         return IValidValidation<TField>.CreateFromField(
-            fieldValue,
+            () => fieldValue,
             typeof(CrossException),
             context: Context,
             error: error,

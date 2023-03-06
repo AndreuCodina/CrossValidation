@@ -8,22 +8,15 @@ namespace CrossValidation.Validations;
 
 public interface IValidValidation<out TField> : IValidation<TField>
 {
-    public string? Code { get; set; }
-    public string? Message { get; set; }
-    public string? Details { get; set; }
-    public ICrossError? Error { get; set; }
-    public string? FieldDisplayName { get; set; }
-    public HttpStatusCode? HttpStatusCode { get; set; }
-    bool ExecuteNextValidator { get; set; }
+    // public List<ValidationOperation> ValidationOperationsCollected { get; set; }
+    // public ValidationOperation ValidationOperation { get; set; }
     public TField GetFieldValue();
     public ValidationContext Context { get; set; }
     public string? FieldFullPath { get; set; }
     public Type CrossErrorToException { get; set; }
-    void HandleError(ICrossError error);
-    void TakeCustomizationsFromError(ICrossError error);
 
     public static IValidation<TField> CreateFromField(
-        TField fieldValue,
+        Func<TField> getFieldValue,
         Type crossErrorToException,
         bool generalizeError = true,
         string? fieldFullPath = null,
@@ -38,7 +31,7 @@ public interface IValidValidation<out TField> : IValidation<TField>
         string? fieldDisplayName = null)
     {
         return new ValidValidation<TField>(
-            fieldValue: fieldValue,
+            getFieldValue: getFieldValue,
             crossErrorToException: crossErrorToException,
             generalizeError: generalizeError,
             fieldFullPath: fieldFullPath,
@@ -54,7 +47,7 @@ public interface IValidValidation<out TField> : IValidation<TField>
     }
 
     public static IValidation<TField> CreateFromFieldName(
-        TField fieldValue,
+        Func<TField> fieldValue,
         Type crossErrorToException,
         string fieldName,
         bool allowFieldNameWithoutModel,
@@ -78,7 +71,7 @@ public interface IValidValidation<out TField> : IValidation<TField>
             ? fieldName
             : fieldName.Substring(fieldName.IndexOf('.') + 1);
         return new ValidValidation<TField>(
-            fieldValue: fieldValue,
+            getFieldValue: fieldValue,
             crossErrorToException: crossErrorToException,
             generalizeError: false,
             fieldFullPath: fieldFullPath,
@@ -90,162 +83,22 @@ public interface IValidValidation<out TField> : IValidation<TField>
             httpStatusCode: httpStatusCode,
             fieldDisplayName: fieldDisplayName);
     }
-
-    void Clean();
 }
 
 file class ValidValidation<TField> :
     Validation<TField>,
     IValidValidation<TField>
 {
-    private string? _code;
-    private string? _message;
-    private string? _details;
-    private ICrossError? _error;
-    private string? _fieldDisplayName;
-    private HttpStatusCode? _httpStatusCode;
-
-    public TField FieldValue { get; set; }
+    // public TField FieldValue { get; set; }
+    public Func<TField> GetFieldValueTransformed { get; set; }
+    // public List<ValidationOperation> ValidationOperationsCollected { get; set; } = new();
+    // public ValidationOperation ValidationOperation { get; set; } = new();
     public ValidationContext Context { get; set; }
     public string? FieldFullPath { get; set; }
     public Type CrossErrorToException { get; set; }
 
-    public string? Code
-    {
-        get
-        {
-            if (Context.Code is not null)
-            {
-                return Context.Code;
-            }
-
-            return _code;
-        }
-        set
-        {
-            if (Context.Code is not null)
-            {
-                return;
-            }
-
-            _code = value;
-        }
-    }
-
-    public string? Message
-    {
-        get
-        {
-            if (Context.Message is not null)
-            {
-                return Context.Message;
-            }
-
-            return _message;
-        }
-        set
-        {
-            if (Context.Message is not null)
-            {
-                return;
-            }
-
-            _message = value;
-        }
-    }
-
-    public string? Details
-    {
-        get
-        {
-            if (Context.Details is not null)
-            {
-                return Context.Details;
-            }
-
-            return _details;
-        }
-        set
-        {
-            if (Context.Details is not null)
-            {
-                return;
-            }
-
-            _details = value;
-        }
-    }
-
-    public ICrossError? Error
-    {
-        get
-        {
-            if (Context.Error is not null)
-            {
-                return Context.Error;
-            }
-
-            return _error;
-        }
-        set
-        {
-            if (Context.Error is not null)
-            {
-                return;
-            }
-
-            _error = value;
-        }
-    }
-
-    public string? FieldDisplayName
-    {
-        get
-        {
-            if (Context.FieldDisplayName is not null)
-            {
-                return Context.FieldDisplayName;
-            }
-
-            return _fieldDisplayName;
-        }
-        set
-        {
-            if (Context.FieldDisplayName is not null)
-            {
-                return;
-            }
-
-            _fieldDisplayName = value;
-        }
-    }
-
-    public HttpStatusCode? HttpStatusCode
-    {
-        get
-        {
-            if (Context.HttpStatusCode is not null)
-            {
-                return Context.HttpStatusCode;
-            }
-
-            return _httpStatusCode;
-        }
-        set
-        {
-            if (Context.HttpStatusCode is not null)
-            {
-                return;
-            }
-
-            _httpStatusCode = value;
-        }
-    }
-
-    public bool ExecuteNextValidator { get; set; } = true;
-
     public ValidValidation(
-        TField fieldValue,
+        Func<TField> getFieldValue,
         Type crossErrorToException,
         bool generalizeError,
         string? fieldFullPath = null,
@@ -259,14 +112,20 @@ file class ValidValidation<TField> :
         HttpStatusCode? httpStatusCode = null,
         string? fieldDisplayName = null)
     {
-        FieldValue = fieldValue;
-        CrossErrorToException = crossErrorToException;
+        if (context != null)
+        {
+            context.ValidationOperation = new();
+        }
+
         Context = context ?? new ValidationContext();
-        FieldDisplayName = null;
+        GetFieldValueTransformed = getFieldValue;
+        Context.ValidationOperation.FieldValue = getFieldValue;
+        CrossErrorToException = crossErrorToException;
+        Context.ValidationOperation.FieldDisplayName = null;
         FieldFullPath = fieldFullPath;
         Context.GeneralizeError = Context.IsChildContext && Context.GeneralizeError
             ? true
-            : generalizeError;;
+            : generalizeError;
 
         var indexRepresentation = Context.FieldName is not null && index is not null
             ? $"[{index}]"
@@ -304,42 +163,19 @@ file class ValidValidation<TField> :
 
     public TField GetFieldValue()
     {
-        return FieldValue;
-    }
-
-    public void TakeCustomizationsFromError(ICrossError error)
-    {
-        Code = error.Code ?? Code;
-        Message = error.Message ?? Message;
-        Details = error.Details ?? Details;
-        HttpStatusCode = error.HttpStatusCode ?? HttpStatusCode;
-        FieldDisplayName = error.FieldDisplayName ?? FieldDisplayName;
-    }
-
-    public void HandleError(ICrossError error)
-    {
-        var errorToAdd = Error ?? error;
-        AddError(errorToAdd);
-
-        if (Context is {ValidationMode: ValidationMode.StopValidationOnFirstError})
-        {
-            if (Context.ErrorsCollected!.Count == 1)
-            {
-                throw Context.ErrorsCollected[0].ToException();
-            }
-        }
+        return GetFieldValueTransformed();
     }
 
     public override TField Instance()
     {
-        return FieldValue;
+        return GetFieldValueTransformed();
     }
 
     public override TInstance Instance<TInstance>(Func<TField, TInstance> fieldToInstance)
     {
         try
         {
-            return fieldToInstance(FieldValue);
+            return fieldToInstance(GetFieldValueTransformed());
         }
         catch (CrossException e)
         {
@@ -347,126 +183,9 @@ file class ValidValidation<TField> :
             e.Error.FieldValue = null;
             e.Error.PlaceholderValues = null;
             e.Error.CrossErrorToException = CrossErrorToException;
-            TakeCustomizationsFromInstanceError(e.Error);
-            HandleError(e.Error);
+            Context.ValidationOperation.TakeCustomizationsFromInstanceError(e.Error, Context);
+            Context.ValidationOperation.HandleError(e.Error, Context);
             throw new UnreachableException();
         }
-    }
-
-    public void Clean()
-    {
-        Code = null;
-        Message = null;
-        Details = null;
-        Error = null;
-        HttpStatusCode = null;
-        FieldDisplayName = null;
-        ExecuteNextValidator = true;
-    }
-
-    private void AddError(ICrossError error)
-    {
-        AddCustomizationsToError(error);
-        Context.ErrorsCollected ??= new List<ICrossError>();
-        error.AddPlaceholderValues();
-        Context.ErrorsCollected.Add(error);
-    }
-
-    private void AddCustomizationsToError(ICrossError error)
-    {
-        error.FieldName = Context.FieldName;
-        error.FieldDisplayName = GetFieldDisplayNameToFill(error);
-        error.FieldValue = FieldValue;
-        error.Code = GetCodeToFill(error);
-        error.Message = GetMessageToFill(error);
-        error.Details = Details ?? error.Details;
-        error.HttpStatusCode = HttpStatusCode ?? error.HttpStatusCode;
-    }
-
-    private string? GetCodeToFill(ICrossError error)
-    {
-        if (Code is not null)
-        {
-            return Code;
-        }
-        
-        if (Context.GeneralizeError)
-        {
-            return nameof(ErrorResource.General);
-        }
-
-        return error.Code;
-    }
-
-    private string? GetMessageToFill(ICrossError error)
-    {
-        if (Message is not null)
-        {
-            return Message;
-        }
-
-        if (Code is not null)
-        {
-            return CrossValidationOptions.GetMessageFromCode(Code);
-        }
-        
-        if (Context.GeneralizeError)
-        {
-            return CrossValidationOptions.GetMessageFromCode(nameof(ErrorResource.General));
-        }
-
-        if (error.Message is not null)
-        {
-            return error.Message;
-        }
-
-        if (error.Code is not null)
-        {
-            return CrossValidationOptions.GetMessageFromCode(error.Code);
-        }
-
-        return null;
-    }
-
-    private string? GetFieldDisplayNameToFill(ICrossError error)
-    {
-        if (FieldDisplayName is not null)
-        {
-            return FieldDisplayName;
-        }
-
-        if (error.FieldDisplayName is not null)
-        {
-            return error.FieldDisplayName;
-        }
-
-        if (error.FieldName is not null)
-        {
-            return error.FieldName;
-        }
-
-        return null;
-    }
-    
-    private void TakeCustomizationsFromInstanceError(ICrossError error)
-    {
-        if (!Context.GeneralizeError)
-        {
-            return;
-        }
-
-        var codeToAdd = Code ?? error.Code;
-        var isInstanceCallerWithCodeAndWithoutMessage = Code is not null && Message is null;
-        
-        if (isInstanceCallerWithCodeAndWithoutMessage && codeToAdd is not null)
-        {
-            Message = CrossValidationOptions.GetMessageFromCode(codeToAdd);
-        }
-        else
-        {
-            Message ??= error.Message;
-        }
-
-        Code = codeToAdd;
     }
 }

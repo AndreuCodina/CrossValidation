@@ -12,14 +12,16 @@ public static class ValidationExtensions
         this IValidation<TField?> validation)
         where TField : class
     {
+        // return validation.SetValidator(context => new NotNullValidator<TField?>(context));
+        
         var validationToReturn = validation;
-
+        
         if (validation is IValidValidation<TField?> validValidation)
         {
             validationToReturn =
-                validValidation.SetValidator(new NotNullValidator<TField?>(validValidation.GetFieldValue()));
+                validValidation.SetValidator(() => new NotNullValidator<TField?>(validValidation.GetFieldValue()));
         }
-
+        
         return validationToReturn.Transform(x => x!);
     }
 
@@ -32,7 +34,7 @@ public static class ValidationExtensions
         if (validation is IValidValidation<TField?> validValidation)
         {
             validationToReturn =
-                validValidation.SetValidator(new NotNullValidator<TField?>(validValidation.GetFieldValue()));
+                validValidation.SetValidator(() => new NotNullValidator<TField?>(validValidation.GetFieldValue()));
         }
 
         return validationToReturn.Transform(x => x!.Value);
@@ -90,7 +92,7 @@ public static class ValidationExtensions
     {
         if (validation is IValidValidation<TField?> validValidation)
         {
-            return validation.SetValidator(new NullValidator<TField?>(validValidation.GetFieldValue()));
+            return validation.SetValidator(() => new NullValidator<TField?>(validValidation.GetFieldValue()));
         }
 
         return validation;
@@ -102,7 +104,7 @@ public static class ValidationExtensions
     {
         if (validation is IValidValidation<TField?> validValidation)
         {
-            return validation.SetValidator(new NullValidator<TField?>(validValidation.GetFieldValue()));
+            return validation.SetValidator(() => new NullValidator<TField?>(validValidation.GetFieldValue()));
         }
 
         return validation;
@@ -115,7 +117,7 @@ public static class ValidationExtensions
     {
         if (validation is IValidValidation<TField> validValidation)
         {
-            return validation.SetValidator(new GreaterThanValidator<TField>(validValidation.GetFieldValue(),
+            return validation.SetValidator(() => new GreaterThanValidator<TField>(validValidation.GetFieldValue(),
                 valueToCompare));
         }
 
@@ -128,7 +130,7 @@ public static class ValidationExtensions
     {
         if (validation is IValidValidation<TField> validValidation)
         {
-            return validation.SetValidator(new EnumValidator<TField>(validValidation.GetFieldValue(), typeof(TField)));
+            return validation.SetValidator(() => new EnumValidator<TField>(validValidation.GetFieldValue(), typeof(TField)));
         }
 
         return validation;
@@ -143,7 +145,7 @@ public static class ValidationExtensions
         if (validation is IValidValidation<int> validValidation)
         {
             validationToReturn =
-                validValidation.SetValidator(new EnumValidator<int>(validValidation.GetFieldValue(), typeof(TEnum)));
+                validValidation.SetValidator(() => new EnumValidator<int>(validValidation.GetFieldValue(), typeof(TEnum)));
         }
 
         return validationToReturn.Transform(x => (TEnum)(object)x);
@@ -158,7 +160,7 @@ public static class ValidationExtensions
         if (validation is IValidValidation<string> validValidation)
         {
             validationToReturn = validValidation.SetValidator(
-                new EnumValidator<string>(validValidation.GetFieldValue(), typeof(TEnum)));
+                () => new EnumValidator<string>(validValidation.GetFieldValue(), typeof(TEnum)));
         }
 
         return validationToReturn.Transform(x =>
@@ -173,7 +175,7 @@ public static class ValidationExtensions
         if (validation is IValidValidation<TField> validValidation)
         {
             return validation.SetValidator(
-                new EnumRangeValidator<TField, TField>(validValidation.GetFieldValue(), allowedValues));
+                () => new EnumRangeValidator<TField, TField>(validValidation.GetFieldValue(), allowedValues));
         }
 
         return validation;
@@ -189,7 +191,7 @@ public static class ValidationExtensions
         if (validation is IValidValidation<int> validValidation)
         {
             validationToReturn = validValidation.SetValidator(
-                new EnumRangeValidator<int, TEnum>(validValidation.GetFieldValue(), allowedValues));
+                () => new EnumRangeValidator<int, TEnum>(validValidation.GetFieldValue(), allowedValues));
         }
 
         return validationToReturn.Transform(x => (TEnum)(object)x);
@@ -205,7 +207,7 @@ public static class ValidationExtensions
         if (validation is IValidValidation<string> validValidation)
         {
             validationToReturn = validValidation.SetValidator(
-                new EnumRangeValidator<string, TEnum>(validValidation.GetFieldValue(), allowedValues));
+                () => new EnumRangeValidator<string, TEnum>(validValidation.GetFieldValue(), allowedValues));
         }
 
         return validationToReturn.Transform(x =>
@@ -219,7 +221,7 @@ public static class ValidationExtensions
     {
         if (validation is IValidValidation<string> validValidation)
         {
-            return validation.SetValidator(new LengthRangeValidator(validValidation.GetFieldValue(), minimum, maximum));
+            return validation.SetValidator(() => new LengthRangeValidator(validValidation.GetFieldValue(), minimum, maximum));
         }
 
         return validation;
@@ -231,7 +233,7 @@ public static class ValidationExtensions
     {
         if (validation is IValidValidation<string> validValidation)
         {
-            return validation.SetValidator(new MinimumLengthValidator(validValidation.GetFieldValue(), minimum));
+            return validation.SetValidator(() => new MinimumLengthValidator(validValidation.GetFieldValue(), minimum));
         }
 
         return validation;
@@ -255,11 +257,11 @@ public static class ValidationExtensions
         foreach (var innerField in fieldCollection)
         {
             var newValidation = IValidValidation<TInnerType>.CreateFromField(
-                innerField,
+                () => innerField,
                 validValidation.CrossErrorToException,
                 generalizeError: validValidation.Context.GeneralizeError,
                 fieldFullPath: fieldFullPath,
-                context:validValidation.Context,
+                context: validValidation.Context,
                 index: index,
                 parentPath: validValidation.Context.ParentPath,
                 error: validValidation.Context.Error,
@@ -308,7 +310,7 @@ public static class ValidationExtensions
         else
         {
             return IValidValidation<IEnumerable<TReturnedField>>.CreateFromField(
-                returnedFieldValues,
+                () => returnedFieldValues,
                 validValidation.CrossErrorToException,
                 fieldFullPath: fieldFullPath,
                 context: validValidation.Context,
@@ -325,7 +327,7 @@ public static class ValidationExtensions
         if (validation is IValidValidation<string> validValidation)
         {
             return validation.SetValidator(
-                new RegularExpressionValidator(validValidation.GetFieldValue(), pattern));
+                () => new RegularExpressionValidator(validValidation.GetFieldValue(), pattern));
         }
 
         return validation;

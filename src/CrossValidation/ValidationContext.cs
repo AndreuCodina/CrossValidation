@@ -4,8 +4,13 @@ using CrossValidation.Exceptions;
 
 namespace CrossValidation;
 
+/// <summary>
+/// Settings to share between ValidationOperations and even Validations
+/// </summary>
 public class ValidationContext
 {
+    public List<ValidationOperation> ValidationOperationsCollected { get; set; } = new();
+    public ValidationOperation ValidationOperation { get; set; } = new();
     public List<ICrossError>? ErrorsCollected { get; set; }
     public string? FieldName { get; set; }
     public string? ParentPath { get; set; }

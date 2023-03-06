@@ -2,11 +2,12 @@
 
 namespace CrossValidation.Validators;
 
-public record PredicateValidator(bool Condition) : Validator
+// TODO: Pass 2 lambdas: success and failure ??
+public record PredicateValidator(Func<bool> Predicate) : Validator
 {
     public override bool IsValid()
     {
-        return Condition;
+        return Predicate();
     }
 
     public override CrossError CreateError()
