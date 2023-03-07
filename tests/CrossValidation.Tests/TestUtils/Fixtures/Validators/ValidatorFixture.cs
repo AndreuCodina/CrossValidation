@@ -15,7 +15,7 @@ public class ValidatorFixture
         var errorContainsCommonPlaceholders =
             ErrorContainsPlaceholder(error, nameof(CrossError.FieldName))
             && ErrorContainsPlaceholder(error, nameof(CrossError.FieldDisplayName))
-            && ErrorContainsPlaceholder(error, nameof(CrossError.FieldValue));
+            && ErrorContainsPlaceholder(error, "FieldValue");
         return areSpecificErrorFieldsAddedAsPlaceholders && errorContainsCommonPlaceholders;
     }
 

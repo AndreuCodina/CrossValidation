@@ -54,7 +54,7 @@ public class CommonFixture
     
     public ICrossError? Error()
     {
-        ICrossError? error = new CrossError();
+        ICrossError? error = new TestError();
         return error;
     }
 
@@ -62,7 +62,7 @@ public class CommonFixture
     {
         if (error is null)
         {
-            ICrossError? nullableError = new CrossError();
+            ICrossError? nullableError = new TestError();
             return await ReturnErrorTask(nullableError);
         }
         

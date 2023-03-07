@@ -449,7 +449,7 @@ public class ModelValidatorTests :
      }
      
      [Fact]
-     public void CombineCustomizationWithCustomError()
+     public void Combine_customization_with_custom_error()
      {
          var expectedMessage = "Expected message";
          var expectedError = new CustomErrorWithCode("COD123");
@@ -754,21 +754,22 @@ public class ModelValidatorTests :
      [Fact]
      public void Execute_all_validators_in_a_validation_with_error_accumulation()
      {
+         var testError = new TestError();
+         
          var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
          {
              validator.ValidationMode = ValidationMode.AccumulateFirstErrorEachValidation;
-             
+
              validator.Field(_model.Int)
-                 .Must(_commonFixture.NotBeValid)
-                 .MustAsync(_commonFixture.NotBeValidAsync)
-                 .Must(_ => _commonFixture.Error())
-                 .MustAsync(_ => _commonFixture.ErrorAsync())
-                 .Instance();
+                 .Must(_commonFixture.BeValid)
+                 .MustAsync(_commonFixture.BeValidAsync)
+                 .Must(_ => _commonFixture.NullableError())
+                 .MustAsync(_ => _commonFixture.ErrorAsync(testError));
          });
 
          var action = () => parentModelValidator.Validate(_model);
 
-         action.ShouldThrow<InvalidOperationException>();
+         action.ShouldThrowCrossError<TestError>();
      }
 
      private record CustomErrorWithCode(string Code) : CrossError(Code: Code);

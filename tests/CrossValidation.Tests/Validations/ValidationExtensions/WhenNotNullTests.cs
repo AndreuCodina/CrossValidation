@@ -1,4 +1,5 @@
-﻿using CrossValidation.Errors;
+﻿using System;
+using CrossValidation.Errors;
 using CrossValidation.ShouldlyAssertions;
 using CrossValidation.Tests.TestUtils;
 using CrossValidation.Tests.TestUtils.Builders;
@@ -112,5 +113,68 @@ public class WhenNotNullTests :
         var error = action.ShouldThrowCrossError<CommonCrossError.NotNull>();
         error.FieldValue.ShouldNotBeOfType<int>();
         error.FieldValue.ShouldBeNull();
+    }
+    
+    [Fact]
+    public void Accumulate_errors_with_error_accumulation()
+    {
+        _model = new ParentModelBuilder()
+            .WithNullableInt(1)
+            .Build();
+         
+        var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
+        {
+            validator.ValidationMode = ValidationMode.AccumulateFirstErrorEachValidation;
+
+            validator.Field(_model.NullableInt)
+                .WhenNotNull(x => x
+                    .Must(_commonFixture.NotBeValid));
+            
+            validator.Field(_model.Int)
+                .Must(_commonFixture.NotBeValid);
+        });
+
+        var action = () => parentModelValidator.Validate(_model);
+
+        var errors = action.ShouldThrowCrossErrors();
+        errors.Count.ShouldBe(2);
+    }
+    
+    [Fact]
+    public void Accumulate_errors_with_operation_accumulation()
+    {
+        var expectedMessage = "Expected message";
+        _model = new ParentModelBuilder()
+            .WithNullableInt(1)
+            .Build();
+
+        IValidation<int> WhenNotNullFunc()
+        {
+            throw new Exception();
+        };
+
+        var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
+        {
+            validator.ValidationMode = ValidationMode.AccumulateFirstErrorEachValidation;
+
+            validator.Field(_model.NullableInt)
+                .WithMessage(expectedMessage)
+                .MustAsync(_commonFixture.NotBeValidAsync)
+                .WhenNotNull(_ => WhenNotNullFunc())
+                .Transform(x => (int?)null)
+                .Must(x => x is null)
+                .Run();
+
+            validator.Field(_model.Int)
+                .Must(_commonFixture.NotBeValid)
+                .Run();
+        });
+
+        var action = () => parentModelValidator.Validate(_model);
+
+        var errors = action.ShouldThrowCrossErrors();
+        errors.Count.ShouldBe(2);
+        errors[0].ShouldBeOfType<CommonCrossError.Predicate>();
+        errors[0].Message.ShouldBe(expectedMessage);
     }
 }

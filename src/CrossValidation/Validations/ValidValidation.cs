@@ -119,7 +119,7 @@ file class ValidValidation<TField> :
 
         Context = context ?? new ValidationContext();
         GetFieldValueTransformed = getFieldValue;
-        Context.ValidationOperation.FieldValue = getFieldValue;
+        Context.ValidationOperation.GetFieldValue = () => getFieldValue;
         CrossErrorToException = crossErrorToException;
         Context.ValidationOperation.FieldDisplayName = null;
         FieldFullPath = fieldFullPath;
@@ -180,7 +180,6 @@ file class ValidValidation<TField> :
         catch (CrossException e)
         {
             e.Error.FieldName = null;
-            e.Error.FieldValue = null;
             e.Error.PlaceholderValues = null;
             e.Error.CrossErrorToException = CrossErrorToException;
             Context.ValidationOperation.TakeCustomizationsFromInstanceError(e.Error, Context);

@@ -24,6 +24,23 @@ public class RealAsyncTests :
     }
     
     [Fact]
+    public void Return_last_known_validation_type_before_accumulate_operations()
+    {
+        var expectedMessage = "Expected message";
+
+        var validation = Validate.That(_model.NullableInt)
+            .MustAsync(_commonFixture.BeValidAsync)
+            .WithMessage(expectedMessage)
+            .NotNull();
+
+        (validation is IValidValidation<int>).ShouldBeTrue();
+
+        var action = () => validation.Run();
+        var error = action.ShouldThrowCrossError<CommonCrossError.NotNull>();
+        error.Message.ShouldBe(expectedMessage);
+    }
+    
+    [Fact]
     public void Execute_async_validation_node()
     {
         var expectedMessage = "Expected message";
@@ -75,16 +92,81 @@ public class RealAsyncTests :
     {
         var expectedMessage = "Expected message";
 
-        var action = () => Validate.That(_model.NullableString)
+        var action = () => Validate.That(_model.NullableInt)
             .MustAsync(_commonFixture.BeValidAsync)
             .WithMessage(expectedMessage)
-            .NotNull() // Returns a ValidValidation because we couldn't execute the validation due to we have accumulated operations
-            .Must(x => x.StartsWith("Random start"))
+            .NotNull()
+            .Must(x => x == int.MaxValue)
             .Run();
 
         var error = action.ShouldThrowCrossError<CommonCrossError.NotNull>();
         error.Message.ShouldBe(expectedMessage);
     }
+    
+    [Fact]
+    public void Not_execute_predicate_returning_error_customization()
+    {
+        var expectedMessage = "Expected message";
+
+        var action = () => Validate.That(_model.NullableString)
+            .WithMessage(expectedMessage)
+            .MustAsync(_commonFixture.NotBeValidAsync)
+            .NotNull()
+            .Must(x => new CrossError(Message: x.Substring(0)))
+            .Run();
+
+        var error = action.ShouldThrowCrossError<CommonCrossError.Predicate>();
+        error.Message.ShouldBe(expectedMessage);
+    }
+    
+    [Fact]
+    public void Get_transformed_instance_after_accumulation()
+    {
+        var instance = Validate.That(3)
+            .MustAsync(_commonFixture.BeValidAsync)
+            .Transform(x => x.ToString())
+            .Transform(x => x + "0")
+            .Transform(int.Parse)
+            .Instance();
+
+        instance.ShouldBe(30);
+    }
+
+    [Fact]
+    public void WhenNotNull_does_not_fails_with_transformed_field_value()
+    {
+        _model = new ParentModelBuilder()
+            .WithNullableInt(1)
+            .Build();
+        
+        var action = () => Validate.That(_model.NullableInt)
+            .WhenAsync(_commonFixture.BeValidAsync)
+            .WhenNotNull(x => x
+                .Must(x => x == 1))
+            .Transform(x => (int?)null)
+            .Must(x => x is null)
+            .Run();
+
+        action.ShouldNotThrow();
+    }
+    
+    // [Fact]
+    // public void Accumulate_operations_after_async_validator()
+    // {
+    //     var expectedMessage = "Expected message";
+    //
+    //     var action = () => Validate.That(_model.IntList)
+    //         .MustAsync(_commonFixture.BeValidAsync)
+    //         .ForEach(x =>
+    //             x.Must(x => x == int.MaxValue));
+    //         .WithMessage(expectedMessage)
+    //         .NotNull() // Returns a ValidValidation because we couldn't execute the validation due to we have accumulated operations
+    //         .Must(x => x == int.MaxValue)
+    //         .Run();
+    //
+    //     var error = action.ShouldThrowCrossError<CommonCrossError.NotNull>();
+    //     error.Message.ShouldBe(expectedMessage);
+    // }
     
     // TODO: Use a ModelValidator
     // A ModelValidator doesn't call .RunAsync in each validation, so

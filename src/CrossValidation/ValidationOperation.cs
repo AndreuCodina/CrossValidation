@@ -29,7 +29,7 @@ namespace CrossValidation;
 // public class ValidationOperation<TField> : IValidationOperation
 public class ValidationOperation
 {
-    public object? FieldValue { get; set; }
+    public Func<object?>? GetFieldValue { get; set; }
     public Func<IValidator<ICrossError>>? Validator { get; set; }
     public Func<Task<IValidator<ICrossError>>>? AsyncValidator { get; set; }
     public string? Code { get; set; }
@@ -83,7 +83,6 @@ public class ValidationOperation
     {
         error.FieldName = context.FieldName;
         error.FieldDisplayName = GetFieldDisplayNameToFill(error);
-        error.FieldValue = FieldValue;
         error.Code = GetCodeToFill(error, context);
         error.Message = GetMessageToFill(error, context);
         error.Details = Details ?? error.Details;

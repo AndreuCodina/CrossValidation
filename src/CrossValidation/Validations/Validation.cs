@@ -239,20 +239,20 @@ internal abstract class Validation<TField> : IValidation<TField>
     {
         if (this is IValidValidation<TField> validValidation)
         {
-            var error = condition(validValidation.GetFieldValue());
-
-            if (error is not null)
+            var predicateValidator = () =>
             {
-                validValidation.WithError(error);
-                return SetValidator(() => new PredicateValidator(() => false));
-            }
-            
-            return this;
-            
-            // Can be rewritten as
-            // var conditionResult = error is null;
-            //WithError
-            // return SetValidator(new PredicateValidator(conditionResult));
+                var error = condition(validValidation.GetFieldValue());
+
+                if (error is not null)
+                {
+                    validValidation.WithError(error);
+                    return new PredicateValidator(() => false);
+                }
+
+                return new PredicateValidator(() => true);
+            };
+
+            return SetValidator(predicateValidator);
         }
 
         return this;
@@ -262,17 +262,22 @@ internal abstract class Validation<TField> : IValidation<TField>
     {
         if (this is IValidValidation<TField> validValidation)
         {
-            var error = condition(validValidation.GetFieldValue())
-                .GetAwaiter()
-                .GetResult();
-
-            if (error is not null)
+            var predicateValidator = () =>
             {
-                validValidation.WithError(error);
-                return SetValidator(() => new PredicateValidator(() => false));
-            }
-            
-            return this;
+                var error = condition(validValidation.GetFieldValue())
+                    .GetAwaiter()
+                    .GetResult();
+
+                if (error is not null)
+                {
+                    validValidation.WithError(error);
+                    return new PredicateValidator(() => false);
+                }
+
+                return new PredicateValidator(() => true);
+            };
+
+            return SetValidator(predicateValidator);
         }
 
         return this;
@@ -338,8 +343,16 @@ internal abstract class Validation<TField> : IValidation<TField>
         
         foreach (var operation in validValidation.Context.ValidationOperationsCollected)
         {
-            operation.Execute(validValidation.Context);
+            var isValid = operation.Execute(validValidation.Context);
+
+            if (!isValid)
+            {
+                break;
+            }
         }
+
+        validValidation.Context.ValidationOperationsCollected.Clear();
+        validValidation.Context.ValidationOperation = new();
     }
 
 #pragma warning disable CS1998

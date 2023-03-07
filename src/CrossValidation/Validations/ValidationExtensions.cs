@@ -50,9 +50,27 @@ public static class ValidationExtensions
             return validation;
         }
 
+        // Requirements
+        //
+        // Code execution
+        
+        // if (validValidation.Context.ValidationOperationsCollected.Any())
+        // {
+        //     // TODO: Set CodeBlockValidation
+        //     validValidation.Context
+        //         .ValidationOperationsCollected
+        //         .Add(validValidation.Context.ValidationOperation);
+        //     validValidation.Context.ValidationOperation = new();
+        //     return validation;
+        // }
+        
+        //
+        //
+        //
+
         if (validValidation.GetFieldValue() is not null)
         {
-            var validationReturned = notNullValidation(validation.Transform(x => x!.Value));
+            var validationReturned = notNullValidation(validValidation.Transform(x => x!.Value));
 
             if (validationReturned is IInvalidValidation<TReturnedField>)
             {
