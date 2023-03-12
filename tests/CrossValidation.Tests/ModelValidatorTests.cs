@@ -262,6 +262,25 @@ public class ModelValidatorTests :
      }
      
      [Fact]
+     public void Validations_after_NotNull_with_null_value_and_error_accumulation_are_not_executed()
+     {
+         var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
+         {
+             validator.ValidationMode = ValidationMode.AccumulateFirstErrorEachValidation;
+
+             validator.Field(_model.NullableString)
+                 .NotNull()
+                 .Transform<int>(x => throw new Exception())
+                 .GreaterThan(int.MaxValue);
+         });
+     
+         var action = () => parentModelValidator.Validate(_model);
+     
+         var error = action.ShouldThrowCrossError<CommonCrossError.NotNull>();
+         error.FieldValue.ShouldBe(null);
+     }
+     
+     [Fact]
      public void Transform_field()
      {
          IEnumerable<string>? TransformValues(IEnumerable<int>? values)
