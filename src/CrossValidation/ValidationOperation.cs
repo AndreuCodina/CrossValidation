@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Net;
 using CrossValidation.Errors;
 using CrossValidation.Resources;
@@ -16,6 +17,28 @@ namespace CrossValidation;
 //     // public Type FieldValueType { get; set; }
 // }
 
+public interface IValidationOperation
+{
+    public Func<object?>? GetFieldValue { get; set; }
+    public Func<IValidator<ICrossError>>? Validator { get; set; }
+    public Func<Task<IValidator<ICrossError>>>? AsyncValidator { get; set; }
+    // public Action<IValidValidation<TField>>? ValidationScope { get; set; }
+    public Func<bool>? ValidationScope { get; set; }
+    public string? Code { get; set; }
+    public string? Message { get; set; }
+    public string? Details { get; set; }
+    public ICrossError? Error { get; set; }
+    public string? FieldDisplayName { get; set; }
+    public HttpStatusCode? HttpStatusCode { get; set; }
+    // public Type CrossErrorToException { get; set; }
+    public bool ExecuteNextValidator { get; set; }
+    // void SetValidationScope(Action setScope);
+    bool Execute(ValidationContext context);
+    void HandleError(ICrossError error, ValidationContext context);
+    void TakeCustomizationsFromInstanceError(ICrossError error, ValidationContext context);
+    void TakeCustomizationsFromError(ICrossError error);
+}
+
 /// <summary>
 /// A node of a validation, defined by its validator and customizations.
 ///
@@ -27,11 +50,13 @@ namespace CrossValidation;
 ///     .Transform(age => age + 1) // ValidationNode
 /// </summary>
 // public class ValidationOperation<TField> : IValidationOperation
-public class ValidationOperation
+public class ValidationOperation<TField> : IValidationOperation
 {
     public Func<object?>? GetFieldValue { get; set; }
     public Func<IValidator<ICrossError>>? Validator { get; set; }
     public Func<Task<IValidator<ICrossError>>>? AsyncValidator { get; set; }
+    // public Action<IValidValidation<TField>>? ValidationScope { get; set; }
+    public Func<bool>? ValidationScope { get; set; }
     public string? Code { get; set; }
     public string? Message { get; set; }
     public string? Details { get; set; }
@@ -41,20 +66,36 @@ public class ValidationOperation
     // public Type CrossErrorToException { get; set; }
     public bool ExecuteNextValidator { get; set; } = true;
 
+    // public void SetValidationScope(Action setScope);
+    // {
+    //     ValidationScope = validationScope;
+    // }
+
     public bool Execute(ValidationContext context)
     {
-        var error = Validator!().GetError();
-
-        if (error is not null)
+        if (Validator is not null)
         {
-            // TODO
-            // error.CrossErrorToException = CrossErrorToException;
-            HandleError(error, context);
-            // validValidation.Clean();
-            return false;
-        }
+            var error = Validator!().GetError();
 
-        return true;
+            if (error is not null)
+            {
+                // TODO
+                // error.CrossErrorToException = CrossErrorToException;
+                HandleError(error, context);
+                // validValidation.Clean();
+                return false;
+            }
+
+            return true;
+        }
+        else if (ValidationScope is not null)
+        {
+            return ValidationScope();
+        }
+        else
+        {
+            throw new UnreachableException();
+        }
     }
     
     public void HandleError(ICrossError error, ValidationContext context)

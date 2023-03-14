@@ -49,36 +49,52 @@ public static class ValidationExtensions
         {
             return validation;
         }
-
-        // Requirements
-        //
-        // Code execution
         
-        // if (validValidation.Context.ValidationOperationsCollected.Any())
-        // {
-        //     // TODO: Set CodeBlockValidation
-        //     validValidation.Context
-        //         .ValidationOperationsCollected
-        //         .Add(validValidation.Context.ValidationOperation);
-        //     validValidation.Context.ValidationOperation = new();
-        //     return validation;
-        // }
-        
-        //
-        //
-        //
-
-        if (validValidation.GetFieldValue() is not null)
+        return validValidation.SetValidationScope(() =>
         {
-            var validationReturned = notNullValidation(validValidation.Transform(x => x!.Value));
-
-            if (validationReturned is IInvalidValidation<TReturnedField>)
+            if (validValidation.GetFieldValue() is not null)
             {
-                return IInvalidValidation<TField?>.Create();
+                // Accumulate validation operations in runtime, but add them at the start of the accumulated operation list
+                // When this scope is executed, the scope is the first item in the list due to all previous
+                // accumulated operations have been executed
+                var currentOperationCollected = validValidation.Context
+                    .ValidationOperationsCollected
+                    .Take(1)
+                    .ToList();
+                var oldOperationsCollected = validValidation.Context
+                    .ValidationOperationsCollected
+                    .Skip(1)
+                    .ToList(); // Skip this scope
+                var validationReturned = notNullValidation(validValidation.Transform(x => x!.Value));
+                var newOperationsCollected = validValidation.Context
+                    .ValidationOperationsCollected
+                    .Skip(currentOperationCollected.Count + oldOperationsCollected.Count)
+                    .ToList();
+                validValidation.Context.ValidationOperationsCollected = new List<IValidationOperation>();
+                validValidation.Context.ValidationOperationsCollected.AddRange(currentOperationCollected);
+                validValidation.Context.ValidationOperationsCollected.AddRange(newOperationsCollected);
+                validValidation.Context.ValidationOperationsCollected.AddRange(oldOperationsCollected);
+                
+                if (validationReturned is IInvalidValidation<TReturnedField>)
+                {
+                    return false;
+                }
             }
-        }
 
-        return validation;
+            return true;
+        });
+
+        // if (validValidation.GetFieldValue() is not null)
+        // {
+        //     var validationReturned = notNullValidation(validValidation.Transform(x => x!.Value));
+        //
+        //     if (validationReturned is IInvalidValidation<TReturnedField>)
+        //     {
+        //         return IInvalidValidation<TField?>.Create();
+        //     }
+        // }
+
+        // return validation;
     }
 
     public static IValidation<TField?> WhenNotNull<TField, TReturnedField>(
@@ -135,8 +151,8 @@ public static class ValidationExtensions
     {
         if (validation is IValidValidation<TField> validValidation)
         {
-            return validation.SetValidator(() => new GreaterThanValidator<TField>(validValidation.GetFieldValue(),
-                valueToCompare));
+            return validation.SetValidator(() =>
+                new GreaterThanValidator<TField>(validValidation.GetFieldValue(), valueToCompare));
         }
 
         return validation;

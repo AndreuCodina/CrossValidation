@@ -1,3 +1,4 @@
+using System;
 using CrossValidation.Errors;
 using CrossValidation.ShouldlyAssertions;
 using CrossValidation.Tests.TestUtils;
@@ -148,6 +149,106 @@ public class RealAsyncTests :
             .Run();
 
         action.ShouldNotThrow();
+    }
+
+    [Fact]
+    public void WhenNotNull_should_not_execute_scope_if_the_nullable_condition_is_not_met()
+    {
+        var expectedMessage = "Expected message";
+        
+        var action = () => Validate.That(_model.NullableInt)
+            .MustAsync(_commonFixture.BeValidAsync)
+            .WhenNotNull<int, int>(_ => throw new Exception())
+            .WithMessage(expectedMessage)
+            .Must(_commonFixture.NotBeValid)
+            .Run();
+
+        var error = action.ShouldThrowCrossError<CommonCrossError.Predicate>();
+        error.Message.ShouldBe(expectedMessage);
+    }
+    
+    [Fact]
+    public void WhenNotNull_does_not_continue_the_validation_when_scope_fails()
+    {
+        _model = new ParentModelBuilder()
+            .WithNullableInt(1)
+            .Build();
+        
+        var expectedMessage = "Expected message";
+
+        bool ThrowException()
+        {
+            throw new Exception();
+        }
+
+        var action = () => Validate.That(_model.NullableInt)
+            .MustAsync(_commonFixture.BeValidAsync)
+            .WhenNotNull(x => x
+                .WithMessage("Expected message")
+                .Must(_commonFixture.NotBeValid))
+            .Must(_ => ThrowException())
+            .Run();
+
+        var error = action.ShouldThrowCrossError<CommonCrossError.Predicate>();
+        error.Message.ShouldBe(expectedMessage);
+    }
+    
+    [Fact]
+    public void WhenNotNull_with_nested_WhenNotNull()
+    {
+        _model = new ParentModelBuilder()
+            .WithNullableInt(1)
+            .Build();
+        
+        var expectedMessage = "Expected message";
+
+        bool ThrowException()
+        {
+            throw new Exception();
+        }
+
+        var action = () => Validate.That(_model.NullableInt)
+            .MustAsync(_commonFixture.BeValidAsync)
+            .WhenNotNull(x => x
+                .Transform(x => (int?)x)
+                .WhenNotNull(x => x
+                    .WithMessage("Expected message")
+                    .Must(_commonFixture.NotBeValid))
+                .Must(_ => ThrowException()))
+            .Must(_ => ThrowException())
+            .Run();
+
+        var error = action.ShouldThrowCrossError<CommonCrossError.Predicate>();
+        error.Message.ShouldBe(expectedMessage);
+    }
+    
+    [Fact]
+    public void WhenNotNull_with_nested_WhenNotNull_can_accumulate_operations()
+    {
+        _model = new ParentModelBuilder()
+            .WithNullableInt(1)
+            .Build();
+        
+        var expectedMessage = "Expected message";
+
+        bool ThrowException()
+        {
+            throw new Exception();
+        }
+
+        var action = () => Validate.That(_model.NullableInt)
+            .MustAsync(_commonFixture.BeValidAsync)
+            .WhenNotNull(x => x
+                .Transform(x => (int?)x)
+                .WhenNotNull(x => x
+                    .WithMessage("Expected message")
+                    .MustAsync(_commonFixture.NotBeValidAsync))
+                .Must(_ => ThrowException()))
+            .Must(_ => ThrowException())
+            .Run();
+
+        var error = action.ShouldThrowCrossError<CommonCrossError.Predicate>();
+        error.Message.ShouldBe(expectedMessage);
     }
     
     // [Fact]

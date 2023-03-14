@@ -85,6 +85,11 @@ public interface IValidValidation<out TField> : IValidation<TField>
     }
 }
 
+// public interface IValidationScope
+// {
+//     
+// }
+
 file class ValidValidation<TField> :
     Validation<TField>,
     IValidValidation<TField>
@@ -114,12 +119,16 @@ file class ValidValidation<TField> :
     {
         if (context != null)
         {
-            context.ValidationOperation = new();
+            Context = context;
         }
-
-        Context = context ?? new ValidationContext();
+        else
+        {
+            Context = new ValidationContext();
+        }
+        
+        Context.ValidationOperation = new ValidationOperation<TField>();
         GetFieldValueTransformed = getFieldValue;
-        Context.ValidationOperation.GetFieldValue = () => getFieldValue;
+        Context.ValidationOperation!.GetFieldValue = () => getFieldValue;
         CrossErrorToException = crossErrorToException;
         Context.ValidationOperation.FieldDisplayName = null;
         FieldFullPath = fieldFullPath;
@@ -182,7 +191,7 @@ file class ValidValidation<TField> :
             e.Error.FieldName = null;
             e.Error.PlaceholderValues = null;
             e.Error.CrossErrorToException = CrossErrorToException;
-            Context.ValidationOperation.TakeCustomizationsFromInstanceError(e.Error, Context);
+            Context.ValidationOperation!.TakeCustomizationsFromInstanceError(e.Error, Context);
             Context.ValidationOperation.HandleError(e.Error, Context);
             throw new UnreachableException();
         }

@@ -783,7 +783,9 @@ public class ModelValidatorTests :
                  .Must(_commonFixture.BeValid)
                  .MustAsync(_commonFixture.BeValidAsync)
                  .Must(_ => _commonFixture.NullableError())
+                 .WithMessage("Blabla")
                  .MustAsync(_ => _commonFixture.ErrorAsync(testError));
+             // .Run();
          });
 
          var action = () => parentModelValidator.Validate(_model);

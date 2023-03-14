@@ -55,6 +55,8 @@ public interface IValidation<out TField>
     // IValidation<TField> SetValidator(Func<ValidationContext, IValidator<ICrossError>> success, bool async = false);
     IValidation<TField> SetValidator(Func<IValidator<ICrossError>> success, bool async = false);
     
+    IValidation<TField> SetValidationScope(Func<bool> scope);
+    
     IValidation<TField> SetAsyncValidator(IValidator<ICrossError> validator);
     
     IValidation<TField> SetModelValidator<TChildModel>(ModelValidator<TChildModel> validator);
@@ -67,12 +69,11 @@ public interface IValidation<out TField>
 internal abstract class Validation<TField> : IValidation<TField>
 {
     // public IValidation<TField> SetValidator(Func<ValidationContext, IValidator<ICrossError>> success,
-    public IValidation<TField> SetValidator(Func<IValidator<ICrossError>> success,
-        bool async = false)
+    public IValidation<TField> SetValidator(Func<IValidator<ICrossError>> success, bool async = false)
     {
         if (this is IValidValidation<TField> validValidation)
         {
-            if (validValidation.Context.ValidationOperation.ExecuteNextValidator)
+            if (validValidation.Context.ValidationOperation!.ExecuteNextValidator)
             {
                 validValidation.Context.ValidationOperation.Validator = success;
                 
@@ -92,7 +93,37 @@ internal abstract class Validation<TField> : IValidation<TField>
                 }
             }
 
-            validValidation.Context.ValidationOperation = new();
+            validValidation.Context.ValidationOperation = new ValidationOperation<TField>();
+        }
+
+        return this;
+    }
+
+    public IValidation<TField> SetValidationScope(Func<bool> scope)
+    {
+        if (this is IValidValidation<TField> validValidation)
+        {
+            if (validValidation.Context.ValidationOperation!.ExecuteNextValidator)
+            {
+                validValidation.Context.ValidationOperation.ValidationScope = scope;
+                
+                if (validValidation.Context.ValidationOperationsCollected.Any())
+                {
+                    validValidation.Context.ValidationOperationsCollected
+                        .Add(validValidation.Context.ValidationOperation);
+                }
+                else
+                {
+                    var isExecutionValid = validValidation.Context.ValidationOperation.Execute(validValidation.Context);
+                    
+                    if (!isExecutionValid)
+                    {
+                        return IInvalidValidation<TField>.Create();
+                    }
+                }
+            }
+
+            validValidation.Context.ValidationOperation = new ValidationOperation<TField>();
         }
 
         return this;
@@ -118,7 +149,7 @@ internal abstract class Validation<TField> : IValidation<TField>
 
     public IValidation<TField> WithCode(string code)
     {
-        if (this is IValidValidation<TField> validValidation && validValidation.Context.ValidationOperation.ExecuteNextValidator)
+        if (this is IValidValidation<TField> validValidation && validValidation.Context.ValidationOperation!.ExecuteNextValidator)
         {
             validValidation.Context.ValidationOperation.Code = code;
         }
@@ -128,7 +159,7 @@ internal abstract class Validation<TField> : IValidation<TField>
     
     public IValidation<TField> WithMessage(string message)
     {
-        if (this is IValidValidation<TField> validValidation && validValidation.Context.ValidationOperation.ExecuteNextValidator)
+        if (this is IValidValidation<TField> validValidation && validValidation.Context.ValidationOperation!.ExecuteNextValidator)
         {
             validValidation.Context.ValidationOperation.Message = message;
         }
@@ -138,7 +169,7 @@ internal abstract class Validation<TField> : IValidation<TField>
     
     public IValidation<TField> WithDetails(string details)
     {
-        if (this is IValidValidation<TField> validValidation && validValidation.Context.ValidationOperation.ExecuteNextValidator)
+        if (this is IValidValidation<TField> validValidation && validValidation.Context.ValidationOperation!.ExecuteNextValidator)
         {
             validValidation.Context.ValidationOperation.Details = details;
         }
@@ -148,7 +179,7 @@ internal abstract class Validation<TField> : IValidation<TField>
 
     public IValidation<TField> WithError(ICrossError error)
     {
-        if (this is IValidValidation<TField> validValidation && validValidation.Context.ValidationOperation.ExecuteNextValidator)
+        if (this is IValidValidation<TField> validValidation && validValidation.Context.ValidationOperation!.ExecuteNextValidator)
         {
             error.CrossErrorToException = validValidation.CrossErrorToException;
             validValidation.Context.ValidationOperation.TakeCustomizationsFromError(error);
@@ -160,7 +191,7 @@ internal abstract class Validation<TField> : IValidation<TField>
 
     public IValidation<TField> WithFieldDisplayName(string fieldDisplayName)
     {
-        if (this is IValidValidation<TField> validValidation && validValidation.Context.ValidationOperation.ExecuteNextValidator)
+        if (this is IValidValidation<TField> validValidation && validValidation.Context.ValidationOperation!.ExecuteNextValidator)
         {
             validValidation.Context.ValidationOperation.FieldDisplayName = fieldDisplayName;
         }
@@ -170,7 +201,7 @@ internal abstract class Validation<TField> : IValidation<TField>
 
     public IValidation<TField> WithHttpStatusCode(HttpStatusCode code)
     {
-        if (this is IValidValidation<TField> validValidation && validValidation.Context.ValidationOperation.ExecuteNextValidator)
+        if (this is IValidValidation<TField> validValidation && validValidation.Context.ValidationOperation!.ExecuteNextValidator)
         {
             validValidation.Context.ValidationOperation.HttpStatusCode = code;
         }
@@ -180,7 +211,7 @@ internal abstract class Validation<TField> : IValidation<TField>
 
     public IValidation<TField> When(bool condition)
     {
-        if (this is IValidValidation<TField> validValidation && validValidation.Context.ValidationOperation.ExecuteNextValidator)
+        if (this is IValidValidation<TField> validValidation && validValidation.Context.ValidationOperation!.ExecuteNextValidator)
         {
             validValidation.Context.ValidationOperation.ExecuteNextValidator = condition;
         }
@@ -190,7 +221,7 @@ internal abstract class Validation<TField> : IValidation<TField>
 
     public IValidation<TField> When(Func<TField, bool> condition)
     {
-        if (this is IValidValidation<TField> validValidation && validValidation.Context.ValidationOperation.ExecuteNextValidator)
+        if (this is IValidValidation<TField> validValidation && validValidation.Context.ValidationOperation!.ExecuteNextValidator)
         {
             validValidation.Context.ValidationOperation.ExecuteNextValidator = condition(validValidation.GetFieldValue());
         }
@@ -200,7 +231,7 @@ internal abstract class Validation<TField> : IValidation<TField>
 
     public IValidation<TField> WhenAsync(Func<TField, Task<bool>> condition)
     {
-        if (this is IValidValidation<TField> validValidation && validValidation.Context.ValidationOperation.ExecuteNextValidator)
+        if (this is IValidValidation<TField> validValidation && validValidation.Context.ValidationOperation!.ExecuteNextValidator)
         {
             validValidation.Context.ValidationOperation.ExecuteNextValidator = condition(validValidation.GetFieldValue())
                 .GetAwaiter()
@@ -290,7 +321,7 @@ internal abstract class Validation<TField> : IValidation<TField>
     public IValidation<TFieldTransformed> Transform<TFieldTransformed>(
         Func<TField, TFieldTransformed> transformer)
     {
-        if (this is IValidValidation<TField> validValidation && validValidation.Context.ValidationOperation.ExecuteNextValidator)
+        if (this is IValidValidation<TField> validValidation && validValidation.Context.ValidationOperation!.ExecuteNextValidator)
         {
             var getFieldValueTransformed = () => transformer(validValidation.GetFieldValue());
             return IValidValidation<TFieldTransformed>.CreateFromField(
@@ -316,7 +347,7 @@ internal abstract class Validation<TField> : IValidation<TField>
         {
             // TODO: validValidation.Clean(); // Ignore customizations for model validators
 
-            if (validValidation.Context.ValidationOperation.ExecuteNextValidator)
+            if (validValidation.Context.ValidationOperation!.ExecuteNextValidator)
             {
                 // validValidation.Clean(); // Ignore customizations for model validators
                 
@@ -340,19 +371,22 @@ internal abstract class Validation<TField> : IValidation<TField>
         {
             return;
         }
-        
-        foreach (var operation in validValidation.Context.ValidationOperationsCollected)
+
+        for (var index = 0; index < validValidation.Context.ValidationOperationsCollected.Count;)
         {
+            var operation = validValidation.Context.ValidationOperationsCollected[index];
             var isValid = operation.Execute(validValidation.Context);
 
             if (!isValid)
             {
                 break;
             }
+            
+            validValidation.Context.ValidationOperationsCollected.RemoveAt(0);
         }
 
         validValidation.Context.ValidationOperationsCollected.Clear();
-        validValidation.Context.ValidationOperation = new();
+        validValidation.Context.ValidationOperation = new ValidationOperation<TField>();
     }
 
 #pragma warning disable CS1998
