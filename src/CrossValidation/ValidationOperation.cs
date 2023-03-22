@@ -90,6 +90,11 @@ public class ValidationOperation<TField> : IValidationOperation
         }
         else if (AsyncValidator is not null)
         {
+            if (!useAsync)
+            {
+                throw new InvalidOperationException("An asynchronous validator cannot be used in synchronous mode");
+            }
+            
             var error = (await AsyncValidator!()).GetError();
 
             if (error is null)
