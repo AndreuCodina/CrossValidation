@@ -334,15 +334,3 @@ var email = request.Email.Map(UserEmail.Create);
 
 var emails = request.Emails?.Select(UserEmail.Create);
 ```
-
-With context switching
-
-```csharp
-var email = Validate.Field(request.Email)
-  .NotNull()
-  .Instance(UserEmail.Create);
-
-var emails = Validate.Field(request.Emails)
-  .NotNull()
-  .InstanceMap(UserEmail.Create);
-```
