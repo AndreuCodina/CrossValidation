@@ -38,4 +38,25 @@ public class ValidationContext
         };
         return newContext;
     }
+
+    public void ExecuteAccumulatedOperations<TField>()
+    {
+        var firstItemIndex = 0;
+        
+        while (ValidationOperationsCollected.Any())
+        {
+            var operation = ValidationOperationsCollected[firstItemIndex];
+            var isValid = operation.Execute(this);
+
+            if (!isValid)
+            {
+                break;
+            }
+            
+            ValidationOperationsCollected.RemoveAt(firstItemIndex);
+        }
+
+        ValidationOperationsCollected.Clear();
+        ValidationOperation = new ValidationOperation<TField>();
+    }
 }

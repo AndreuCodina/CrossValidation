@@ -39,6 +39,7 @@ public abstract record ModelValidator<TModel>
         string? fieldDisplayName = null,
         [CallerArgumentExpression(nameof(field))] string fieldName = default!)
     {
+        Context!.ExecuteAccumulatedOperations<TField>();
         return IValidValidation<TField>.CreateFromFieldName(
             () => field,
             typeof(CrossException),
@@ -63,6 +64,7 @@ public abstract record ModelValidator<TModel>
         HttpStatusCode? httpStatusCode = null,
         string? fieldDisplayName = null)
     {
+        Context!.ExecuteAccumulatedOperations<TField>();
         return IValidValidation<TField>.CreateFromField(
             () => fieldValue,
             typeof(CrossException),
@@ -87,6 +89,9 @@ public abstract record ModelValidator<TModel>
 
         Model = model;
         CreateValidations(model);
+
+        // TODO: Create an overload without a generic
+        Context.ExecuteAccumulatedOperations<object>(); // Pass any type because we aren't going to return a validation
 
         if (!Context.IsChildContext && Context.ErrorsCollected is not null)
         {

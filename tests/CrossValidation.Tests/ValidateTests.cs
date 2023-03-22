@@ -80,9 +80,10 @@ public class ValidateTests :
         var expectedCode = nameof(ErrorResource.NotNull);
         var expectedMessage = ErrorResource.NotNull;
         var expectedDetails = "Expected details";
-        var errorForValidation = new TestError(Code: expectedCode, Details: expectedDetails);
+        var testError = new TestError(Code: expectedCode, Details: expectedDetails);
         var action = () => Validate.That(_model.NullableInt)
-            .MustAsync(_ => _commonFixture.ErrorAsync(errorForValidation));
+            .MustAsync(_ => _commonFixture.ErrorAsync(testError))
+            .Run();
 
         var error = action.ShouldThrowCrossError<TestError>();
         error.Code.ShouldBe(expectedCode);

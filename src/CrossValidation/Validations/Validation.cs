@@ -276,11 +276,17 @@ internal abstract class Validation<TField> : IValidation<TField>
 
                 if (error is not null)
                 {
+                    if (validValidation.Context.ValidationOperationsCollected.Any())
+                    {
+                        validValidation.Context.ValidationOperation =
+                            validValidation.Context.ValidationOperationsCollected[0];
+                    }
+
                     validValidation.WithError(error);
-                    return new PredicateValidator(() => false);
+                    validValidation.Context.ValidationOperation = new ValidationOperation<TField>();
                 }
 
-                return new PredicateValidator(() => true);
+                return new ErrorPredicateValidator(() => error);
             };
 
             return SetValidator(predicateValidator);
@@ -301,14 +307,18 @@ internal abstract class Validation<TField> : IValidation<TField>
 
                 if (error is not null)
                 {
+                    validValidation.Context.ValidationOperation =
+                        validValidation.Context.ValidationOperationsCollected[0];
+                    // validValidation.Context.ValidationOperationsCollected[0] =
+                    //     validValidation.Context.ValidationOperation;
                     validValidation.WithError(error);
-                    return new PredicateValidator(() => false);
+                    validValidation.Context.ValidationOperation = new ValidationOperation<TField>();
                 }
 
-                return new PredicateValidator(() => true);
+                return new ErrorPredicateValidator(() => error);
             };
 
-            return SetValidator(predicateValidator);
+            return SetValidator(predicateValidator, async: true);
         }
 
         return this;
@@ -371,21 +381,23 @@ internal abstract class Validation<TField> : IValidation<TField>
         {
             return;
         }
+        
+        validValidation.Context.ExecuteAccumulatedOperations<TField>();
 
-        for (var index = 0; index < validValidation.Context.ValidationOperationsCollected.Count;)
-        {
-            var operation = validValidation.Context.ValidationOperationsCollected[index];
-            var isValid = operation.Execute(validValidation.Context);
-
-            if (!isValid)
-            {
-                break;
-            }
-            
-            validValidation.Context.ValidationOperationsCollected.RemoveAt(0);
-        }
-
-        validValidation.Context.ValidationOperationsCollected.Clear();
+        // for (var index = 0; index < validValidation.Context.ValidationOperationsCollected.Count;)
+        // {
+        //     var operation = validValidation.Context.ValidationOperationsCollected[index];
+        //     var isValid = operation.Execute(validValidation.Context);
+        //
+        //     if (!isValid)
+        //     {
+        //         break;
+        //     }
+        //     
+        //     validValidation.Context.ValidationOperationsCollected.RemoveAt(0);
+        // }
+        //
+        // validValidation.Context.ValidationOperationsCollected.Clear();
         validValidation.Context.ValidationOperation = new ValidationOperation<TField>();
     }
 

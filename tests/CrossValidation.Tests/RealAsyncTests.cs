@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using CrossValidation.Errors;
 using CrossValidation.ShouldlyAssertions;
 using CrossValidation.Tests.TestUtils;
@@ -176,17 +178,12 @@ public class RealAsyncTests :
         
         var expectedMessage = "Expected message";
 
-        bool ThrowException()
-        {
-            throw new Exception();
-        }
-
         var action = () => Validate.That(_model.NullableInt)
             .MustAsync(_commonFixture.BeValidAsync)
             .WhenNotNull(x => x
                 .WithMessage("Expected message")
                 .Must(_commonFixture.NotBeValid))
-            .Must(_ => ThrowException())
+            .Must(_commonFixture.ThrowException)
             .Run();
 
         var error = action.ShouldThrowCrossError<CommonCrossError.Predicate>();
@@ -202,11 +199,6 @@ public class RealAsyncTests :
         
         var expectedMessage = "Expected message";
 
-        bool ThrowException()
-        {
-            throw new Exception();
-        }
-
         var action = () => Validate.That(_model.NullableInt)
             .MustAsync(_commonFixture.BeValidAsync)
             .WhenNotNull(x => x
@@ -214,8 +206,30 @@ public class RealAsyncTests :
                 .WhenNotNull(x => x
                     .WithMessage("Expected message")
                     .Must(_commonFixture.NotBeValid))
-                .Must(_ => ThrowException()))
-            .Must(_ => ThrowException())
+                .Must(_commonFixture.ThrowException))
+            .Must(_commonFixture.ThrowException)
+            .Run();
+
+        var error = action.ShouldThrowCrossError<CommonCrossError.Predicate>();
+        error.Message.ShouldBe(expectedMessage);
+    }
+    
+    [Fact]
+    public void WhenNotNull_can_accumulate_operations()
+    {
+        _model = new ParentModelBuilder()
+            .WithNullableInt(1)
+            .Build();
+        
+        var expectedMessage = "Expected message";
+
+        var action = () => Validate.That(_model.NullableInt)
+            // .MustAsync(_commonFixture.BeValidAsync)
+            .WhenNotNull(x => x
+                .WithMessage("Expected message")
+                .MustAsync(_commonFixture.NotBeValidAsync)
+                .Must(_commonFixture.ThrowException))
+            .Must(_commonFixture.ThrowException)
             .Run();
 
         var error = action.ShouldThrowCrossError<CommonCrossError.Predicate>();
@@ -231,11 +245,6 @@ public class RealAsyncTests :
         
         var expectedMessage = "Expected message";
 
-        bool ThrowException()
-        {
-            throw new Exception();
-        }
-
         var action = () => Validate.That(_model.NullableInt)
             .MustAsync(_commonFixture.BeValidAsync)
             .WhenNotNull(x => x
@@ -243,13 +252,149 @@ public class RealAsyncTests :
                 .WhenNotNull(x => x
                     .WithMessage("Expected message")
                     .MustAsync(_commonFixture.NotBeValidAsync))
-                .Must(_ => ThrowException()))
-            .Must(_ => ThrowException())
+                .Must(_commonFixture.ThrowException))
+            .Must(_commonFixture.ThrowException)
             .Run();
 
         var error = action.ShouldThrowCrossError<CommonCrossError.Predicate>();
         error.Message.ShouldBe(expectedMessage);
     }
+
+    [Fact]
+    public void ForEach_can_accumulate_operations()
+    {
+        var expectedIntList = new List<int> { 1, 2, 3 };
+        var expectedMessage = "Expected message";
+        _model = new ParentModelBuilder()
+            .WithIntList(expectedIntList)
+            .Build();
+
+        var action = () => Validate.That(_model.IntList)
+            .ForEach(x => x
+                .MustAsync(_commonFixture.BeValidAsync)
+                .Must(_commonFixture.BeValid)
+                .WithMessage(expectedMessage)
+                .MustAsync(_commonFixture.NotBeValidAsync)
+                .Must(_commonFixture.ThrowException))
+            .Must(_commonFixture.ThrowException)
+            .Run();
+
+        var error = action.ShouldThrowCrossError<CommonCrossError.Predicate>();
+        error.Message.ShouldBe(expectedMessage);
+    }
+
+    // TODO: Fix
+    [Fact]
+    public void ForEach_does_not_get_field_value_when_there_are_accumulated_operations()
+    {
+        var expectedMessage = "Expected message";
+
+        var action = () => Validate.That(_model.NullableIntList)
+            .MustAsync(_commonFixture.BeValidAsync)
+            .NotNull()
+            .ForEach(x => x
+                .WithMessage(expectedMessage)
+                .MustAsync(_commonFixture.NotBeValidAsync))
+            .Run();
+
+        var error = action.ShouldThrowCrossError<CommonCrossError.Predicate>();
+        error.Message.ShouldBe(expectedMessage);
+    }
+    
+    [Fact]
+    public void ForEach_with_accumulations_returns_field_value()
+    {
+        var expectedIntList = new List<int> { 1, 2, 3 };
+        var expectedStringList = new List<string> { "2", "4", "6" };
+        var expectedMessage = "Expected message";
+        _model = new ParentModelBuilder()
+            .WithIntList(expectedIntList)
+            .Build();
+
+        var action = () => Validate.That(_model.IntList)
+            .MustAsync(_commonFixture.BeValidAsync)
+            .ForEach(x => x
+                .MustAsync(_commonFixture.BeValidAsync)
+                
+                .Transform(x => x * 2)
+                .Transform(x => (int?)x)
+                .NotNull()
+                .MustAsync(_commonFixture.BeValidAsync)
+                .Transform(x => x.ToString())
+                .MustAsync(_commonFixture.BeValidAsync))
+            .Must(x => x.SequenceEqual(expectedStringList))
+            .WithMessage(expectedMessage)
+            .Must(_commonFixture.NotBeValid)
+            .Run();
+
+        var error = action.ShouldThrowCrossError<CommonCrossError.Predicate>();
+        error.Message.ShouldBe(expectedMessage);
+    }
+    
+    [Fact]
+    public void Stop_validation_after_failed_WhenNotNull_scope()
+    {
+        var expectedCodes = new List<string> { "Code1", "Code2" };
+        _model = new ParentModelBuilder()
+            .WithNullableInt(1)
+            .Build();
+        
+        var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
+        {
+            validator.ValidationMode = ValidationMode.AccumulateFirstErrorEachValidation;
+            
+            validator.Field(_model.NullableInt)
+                .WhenNotNull(x => x
+                    .WithCode(expectedCodes[0])
+                    .Must(_commonFixture.NotBeValid))
+                .Must(_commonFixture.ThrowException);
+
+            validator.Field(_model.Int)
+                .WithCode(expectedCodes[1])
+                .Must(_commonFixture.NotBeValid);
+        });
+
+        var action = () => parentModelValidator.Validate(_model);
+
+        var errors = action.ShouldThrowCrossErrors();
+        errors.Select(x => x.Code)
+            .SequenceEqual(expectedCodes)
+            .ShouldBeTrue();
+    }
+    
+    [Fact]
+    public void ModelValidator_automatically_execute_accumulated_operations()
+    {
+        var expectedCodes = new List<string> { "Code1", "Code2" };
+        _model = new ParentModelBuilder()
+            .WithNullableInt(1)
+            .Build();
+        
+        var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
+        {
+            validator.ValidationMode = ValidationMode.AccumulateFirstErrorEachValidation;
+
+            validator.Field(_model.NullableInt)
+                .WhenNotNull(x => x
+                    .WithCode(expectedCodes[0])
+                    .MustAsync(_commonFixture.NotBeValidAsync))
+                .Must(_commonFixture.ThrowException);
+
+            validator.Field(_model.Int)
+                .WithCode(expectedCodes[1])
+                .MustAsync(_commonFixture.NotBeValidAsync);
+        });
+
+        var action = () => parentModelValidator.Validate(_model);
+        
+        var errors = action.ShouldThrowCrossErrors();
+        errors.Select(x => x.Code)
+            .SequenceEqual(expectedCodes)
+            .ShouldBeTrue();
+    }
+    
+    // TODO: MustAsync, ForEach and a Must to check the value of GetFieldValue
+    // Maybe GetFieldValue() should be saved in the Context ??? No
     
     // [Fact]
     // public void Accumulate_operations_after_async_validator()

@@ -282,6 +282,13 @@ public static class ValidationExtensions
             return IInvalidValidation<IEnumerable<TReturnedField>>.Create();
         }
 
+        // validValidation.SetValidationScope(() =>
+        // {
+        //     
+        // });
+        
+        // throw new NotImplementedException();
+        
         var fieldCollection = validValidation.GetFieldValue();
         var fieldFullPath = validValidation.Context.FieldName;
         var index = 0;
@@ -333,10 +340,10 @@ public static class ValidationExtensions
             {
                 throw new UnreachableException();
             }
-
+        
             index++;
         }
-
+        
         if (areErrors)
         {
             return IInvalidValidation<IEnumerable<TReturnedField>>.Create();

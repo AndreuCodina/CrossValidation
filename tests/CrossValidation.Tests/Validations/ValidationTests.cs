@@ -52,6 +52,18 @@ public class ValidationTests :
         error.Message.ShouldBe(expectedMessage);
     }
     
+    [Fact]
+    public void ValidateField_keeps_customizations_after_create_instance_using_ValidateField()
+    {
+        var action = () => Validate.Field(_model.NestedModel.Int)
+            .Instance(ValueObjectFieldWithoutCustomization.Create);
+
+        var error = action.ShouldThrowCrossError<CommonCrossError.GreaterThan<int>>();
+        error.FieldName.ShouldBe("NestedModel.Int");
+        error.Code.ShouldBe(nameof(ErrorResource.GreaterThan));
+        error.Message.ShouldBe("Must be greater than 1");
+    }
+    
     [Theory]
     [InlineData(null, "Expected message", nameof(ErrorResource.General), "Expected message")]
     [InlineData("ExpectedCode", null, "ExpectedCode", null)]
@@ -339,6 +351,15 @@ public class ValidationTests :
         public static ValueObjectWithoutCustomization Create(int value)
         {
             Validate.That(value).GreaterThan(value + 1);
+            return new(value);
+        }
+    }
+    
+    private record ValueObjectFieldWithoutCustomization(int Value)
+    {
+        public static ValueObjectWithoutCustomization Create(int value)
+        {
+            Validate.Field(value).GreaterThan(value + 1);
             return new(value);
         }
     }

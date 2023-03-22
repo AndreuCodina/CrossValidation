@@ -77,16 +77,16 @@ public class ValidationOperation<TField> : IValidationOperation
         {
             var error = Validator!().GetError();
 
-            if (error is not null)
+            if (error is null)
             {
-                // TODO
-                // error.CrossErrorToException = CrossErrorToException;
-                HandleError(error, context);
-                // validValidation.Clean();
-                return false;
+                return true;
             }
 
-            return true;
+            // TODO
+            // error.CrossErrorToException = CrossErrorToException;
+            HandleError(error, context);
+            // validValidation.Clean();
+            return false;
         }
         else if (ValidationScope is not null)
         {

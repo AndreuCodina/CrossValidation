@@ -71,14 +71,18 @@ public class CommonFixture
     
     public ICrossError? NullableError()
     {
-        ICrossError? error = null;
-        return error;
+        return default;
     }
     
     public async Task<ICrossError?> NullErrorAsync()
     {
         ICrossError? error = null;
         return await ReturnErrorTask(error);
+    }
+    
+    public bool ThrowException<T>(T parameter)
+    {
+        throw new Exception();
     }
     
     private Task<bool> ReturnBoolTask(bool value)

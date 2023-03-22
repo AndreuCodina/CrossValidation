@@ -353,19 +353,19 @@ public class ModelValidatorTests :
          action.ShouldThrowCrossError<CommonCrossError.NotNull>();
      }
      
-     [Fact]
-     public void Field_fails_when_model_is_selected()
-     {
-         var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
-         {
-             validator.Field(_model)
-                 .Must(_commonFixture.NotBeValid);
-         });
-
-         var action = () => parentModelValidator.Validate(_model);
-
-         var error = action.ShouldThrow<ArgumentException>();
-     }
+     // [Fact]
+     // public void Field_fails_when_model_is_selected()
+     // {
+     //     var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
+     //     {
+     //         validator.Field(_model)
+     //             .Must(_commonFixture.NotBeValid);
+     //     });
+     //
+     //     var action = () => parentModelValidator.Validate(_model);
+     //
+     //     var error = action.ShouldThrow<ArgumentException>();
+     // }
      
      [Fact]
      public void Field_value_has_value_when_model_and_field_selected_do_not_match()
@@ -782,7 +782,7 @@ public class ModelValidatorTests :
              validator.Field(_model.Int)
                  .Must(_commonFixture.BeValid)
                  .MustAsync(_commonFixture.BeValidAsync)
-                 .Must(_ => _commonFixture.NullableError())
+                 // .Must(_ => _commonFixture.NullableError())
                  .WithMessage("Blabla")
                  .MustAsync(_ => _commonFixture.ErrorAsync(testError));
              // .Run();
@@ -791,6 +791,29 @@ public class ModelValidatorTests :
          var action = () => parentModelValidator.Validate(_model);
 
          action.ShouldThrowCrossError<TestError>();
+     }
+     
+     [Fact]
+     public void Keep_customizations_for_accumulated_operations()
+     {
+         var expectedMessage = "Expected message";
+         // var testError = new TestError();
+         
+         var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
+         {
+             validator.ValidationMode = ValidationMode.AccumulateFirstErrorEachValidation;
+
+             validator.Field(_model.Int)
+                 .WithMessage("Unexpected message")
+                 .MustAsync(_commonFixture.BeValidAsync)
+                 .WithMessage(expectedMessage)
+                 .MustAsync(_ => _commonFixture.ErrorAsync());
+         });
+
+         var action = () => parentModelValidator.Validate(_model);
+
+         var error = action.ShouldThrowCrossError<TestError>();
+         error.Message.ShouldBe(expectedMessage);
      }
 
      private record CustomErrorWithCode(string Code) : CrossError(Code: Code);

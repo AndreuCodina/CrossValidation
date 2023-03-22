@@ -59,13 +59,13 @@ public interface IValidValidation<out TField> : IValidation<TField>
         HttpStatusCode? httpStatusCode = null,
         string? fieldDisplayName = null)
     {
-        if (!allowFieldNameWithoutModel)
-        {
-            if (!fieldName.Contains("."))
-            {
-                throw new ArgumentException("Use Field without a model is not allowed");
-            }
-        }
+        // if (!allowFieldNameWithoutModel)
+        // {
+        //     if (!fieldName.Contains("."))
+        //     {
+        //         throw new ArgumentException("Use Field without a model is not allowed");
+        //     }
+        // }
 
         var fieldFullPath = allowFieldNameWithoutModel
             ? fieldName

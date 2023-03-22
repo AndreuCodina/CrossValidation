@@ -162,12 +162,10 @@ public class WhenNotNullTests :
                 .MustAsync(_commonFixture.NotBeValidAsync)
                 .WhenNotNull(_ => WhenNotNullFunc())
                 .Transform(x => (int?)null)
-                .Must(x => x is null)
-                .Run();
+                .Must(x => x is null);
 
             validator.Field(_model.Int)
-                .Must(_commonFixture.NotBeValid)
-                .Run();
+                .Must(_commonFixture.NotBeValid);
         });
 
         var action = () => parentModelValidator.Validate(_model);

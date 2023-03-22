@@ -298,7 +298,8 @@ public class ForEachTests :
         {
             validationListException.Errors
                 .Select(x => x.Code)
-                .SequenceEqual(expectedErrorCodes);
+                .SequenceEqual(expectedErrorCodes)
+                .ShouldBeTrue();
         }
         else if (exception is CrossException crossException)
         {
