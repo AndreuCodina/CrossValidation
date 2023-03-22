@@ -246,7 +246,7 @@ internal abstract class Validation<TField> : IValidation<TField>
         if (this is IValidValidation<TField> validValidation)
         {
             var conditionResult = () => condition(validValidation.GetFieldValue());
-            return SetValidator(() => new PredicateValidator(conditionResult));
+            return SetValidator(() => new BooleanPredicateValidator(conditionResult));
         }
 
         return this;
@@ -257,7 +257,7 @@ internal abstract class Validation<TField> : IValidation<TField>
         if (this is IValidValidation<TField> validValidation)
         {
             // validValidation.ValidationOperation.
-            return SetValidator(() => new PredicateValidator(
+            return SetValidator(() => new BooleanPredicateValidator(
                 () => condition(validValidation.GetFieldValue())
                     .GetAwaiter()
                     .GetResult()), async: true);

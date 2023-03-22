@@ -185,7 +185,7 @@ public class ModelValidatorTests :
          });
          var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
          {
-             validator.ValidationMode = ValidationMode.AccumulateFirstErrorEachValidation;
+             validator.ValidationMode = ValidationMode.AccumulateFirstError;
              
              validator.Field(_model.NullableString)
                  .WithCode(expectedCodes[0])
@@ -214,7 +214,7 @@ public class ModelValidatorTests :
      {
          var nestedModelValidator = _commonFixture.CreateNestedModelValidator(validator =>
          {
-             validator.ValidationMode = ValidationMode.AccumulateFirstErrorEachValidation;
+             validator.ValidationMode = ValidationMode.AccumulateFirstError;
              validator.Field(_nestedModel.Int)
                  .GreaterThan(10);
              validator.Field(_nestedModel.Int)
@@ -247,7 +247,7 @@ public class ModelValidatorTests :
              .Build();
          var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
          {
-             validator.ValidationMode = ValidationMode.AccumulateFirstErrorEachValidation;
+             validator.ValidationMode = ValidationMode.AccumulateFirstError;
 
              validator.Field(_model.NullableString)
                  .NotNull()
@@ -266,7 +266,7 @@ public class ModelValidatorTests :
      {
          var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
          {
-             validator.ValidationMode = ValidationMode.AccumulateFirstErrorEachValidation;
+             validator.ValidationMode = ValidationMode.AccumulateFirstError;
 
              validator.Field(_model.NullableString)
                  .NotNull()
@@ -295,7 +295,7 @@ public class ModelValidatorTests :
              .Build();
          var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
          {
-             validator.ValidationMode = ValidationMode.AccumulateFirstErrorEachValidation;
+             validator.ValidationMode = ValidationMode.AccumulateFirstError;
 
              validator.Field(_model.NullableIntList)
                  .Transform(x => TransformValues(x!))
@@ -337,7 +337,7 @@ public class ModelValidatorTests :
      {
          var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
          {
-             validator.ValidationMode = ValidationMode.AccumulateFirstErrorEachValidation;
+             validator.ValidationMode = ValidationMode.AccumulateFirstError;
 
              validator.Field(_model.NullableInt)
                  .NotNull()
@@ -686,7 +686,7 @@ public class ModelValidatorTests :
          });
          var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
          {
-             validator.ValidationMode = ValidationMode.AccumulateFirstErrorEachValidation;
+             validator.ValidationMode = ValidationMode.AccumulateFirstError;
 
              validator.Field(_model.Int)
                  .Must(_commonFixture.NotBeValid);
@@ -757,7 +757,7 @@ public class ModelValidatorTests :
          });
          var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
          {
-             validator.ValidationMode = ValidationMode.AccumulateFirstErrorEachValidation;
+             validator.ValidationMode = ValidationMode.AccumulateFirstError;
 
              validator.That(_model.NestedModel)
                  .SetModelValidator(nestedModelValidator);
@@ -777,15 +777,13 @@ public class ModelValidatorTests :
          
          var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
          {
-             validator.ValidationMode = ValidationMode.AccumulateFirstErrorEachValidation;
+             validator.ValidationMode = ValidationMode.AccumulateFirstError;
 
              validator.Field(_model.Int)
                  .Must(_commonFixture.BeValid)
                  .MustAsync(_commonFixture.BeValidAsync)
-                 // .Must(_ => _commonFixture.NullableError())
-                 .WithMessage("Blabla")
+                 .Must(_ => _commonFixture.NullableError())
                  .MustAsync(_ => _commonFixture.ErrorAsync(testError));
-             // .Run();
          });
 
          var action = () => parentModelValidator.Validate(_model);
@@ -801,7 +799,7 @@ public class ModelValidatorTests :
          
          var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
          {
-             validator.ValidationMode = ValidationMode.AccumulateFirstErrorEachValidation;
+             validator.ValidationMode = ValidationMode.AccumulateFirstError;
 
              validator.Field(_model.Int)
                  .WithMessage("Unexpected message")

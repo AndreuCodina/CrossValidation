@@ -9,7 +9,7 @@ namespace CrossValidation;
 
 public abstract record ModelValidator<TModel>
 {
-    private ValidationMode _validationMode = ValidationMode.StopValidationOnFirstError;
+    private ValidationMode _validationMode = ValidationMode.StopOnFirstError;
     public ValidationContext? Context { get; set; }
     public TModel? Model { get; set; }
 
@@ -89,8 +89,6 @@ public abstract record ModelValidator<TModel>
 
         Model = model;
         CreateValidations(model);
-
-        // TODO: Create an overload without a generic
         Context.ExecuteAccumulatedOperations<object>(); // Pass any type because we aren't going to return a validation
 
         if (!Context.IsChildContext && Context.ErrorsCollected is not null)

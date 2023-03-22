@@ -14,7 +14,7 @@ public class ValidationContext
     public List<ICrossError>? ErrorsCollected { get; set; }
     public string? FieldName { get; set; }
     public string? ParentPath { get; set; }
-    public ValidationMode ValidationMode { get; set; } = ValidationMode.StopValidationOnFirstError;
+    public ValidationMode ValidationMode { get; set; } = ValidationMode.StopOnFirstError;
     public bool IsChildContext { get; set; }
     public ICrossError? Error { get; set; }
     public string? Message { get; set; }

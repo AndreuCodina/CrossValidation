@@ -103,7 +103,7 @@ public class ValidationOperation<TField> : IValidationOperation
         var errorToAdd = Error ?? error;
         AddError(errorToAdd, context);
 
-        if (context is {ValidationMode: ValidationMode.StopValidationOnFirstError})
+        if (context is {ValidationMode: ValidationMode.StopOnFirstError})
         {
             if (context.ErrorsCollected!.Count == 1)
             {

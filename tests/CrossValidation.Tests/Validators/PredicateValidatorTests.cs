@@ -10,7 +10,7 @@ public class PredicateValidatorTests : TestBase
     [Fact]
     public void Validate_predicate()
     {
-        var validator = new PredicateValidator(() => true);
+        var validator = new BooleanPredicateValidator(() => true);
 
         var isValid = validator.IsValid();
 
@@ -20,7 +20,7 @@ public class PredicateValidatorTests : TestBase
     [Fact]
     public void Validate_predicate_fails()
     {
-        var validator = new PredicateValidator(() => false);
+        var validator = new BooleanPredicateValidator(() => false);
 
         var isValid = validator.IsValid();
 

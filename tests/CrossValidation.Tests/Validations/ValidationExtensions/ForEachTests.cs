@@ -49,8 +49,8 @@ public class ForEachTests :
     }
     
     [Theory]
-    [InlineData(ValidationMode.StopValidationOnFirstError)]
-    [InlineData(ValidationMode.AccumulateFirstErrorEachValidation)]
+    [InlineData(ValidationMode.StopOnFirstError)]
+    [InlineData(ValidationMode.AccumulateFirstError)]
     public void Execute_validators_for_all_item_collection_fails(ValidationMode validationMode)
     {
         _model = new ParentModelBuilder()
@@ -74,9 +74,9 @@ public class ForEachTests :
     }
     
     [Theory]
-    [InlineData(ValidationMode.StopValidationOnFirstError)]
-    [InlineData(ValidationMode.AccumulateFirstErrorEachValidation)]
-    [InlineData(ValidationMode.AccumulateFirstErrorEachValidationAndAllFirstErrorsCollectionIteration)]
+    [InlineData(ValidationMode.StopOnFirstError)]
+    [InlineData(ValidationMode.AccumulateFirstError)]
+    [InlineData(ValidationMode.AccumulateFirstErrorAndAllFirstErrorsCollectionIteration)]
     public void Keep_field_name_when_the_field_is_transformed_in_a_collection(ValidationMode validationMode)
     {
         _model = new ParentModelBuilder()
@@ -100,9 +100,9 @@ public class ForEachTests :
     }
     
     [Theory]
-    [InlineData(ValidationMode.StopValidationOnFirstError)]
-    [InlineData(ValidationMode.AccumulateFirstErrorEachValidation)]
-    [InlineData(ValidationMode.AccumulateFirstErrorEachValidationAndAllFirstErrorsCollectionIteration)]
+    [InlineData(ValidationMode.StopOnFirstError)]
+    [InlineData(ValidationMode.AccumulateFirstError)]
+    [InlineData(ValidationMode.AccumulateFirstErrorAndAllFirstErrorsCollectionIteration)]
     public void Index_is_represented_in_field_name_when_iterate_collection(ValidationMode validationMode)
     {
         _model = new ParentModelBuilder()
@@ -140,9 +140,9 @@ public class ForEachTests :
     }
     
     [Theory]
-    [InlineData(ValidationMode.StopValidationOnFirstError)]
-    [InlineData(ValidationMode.AccumulateFirstErrorEachValidation)]
-    [InlineData(ValidationMode.AccumulateFirstErrorEachValidationAndAllFirstErrorsCollectionIteration)]
+    [InlineData(ValidationMode.StopOnFirstError)]
+    [InlineData(ValidationMode.AccumulateFirstError)]
+    [InlineData(ValidationMode.AccumulateFirstErrorAndAllFirstErrorsCollectionIteration)]
     public void Field_keep_settings_with_error_accumulation(ValidationMode validationMode)
     {
         var expectedFieldDisplayName = "Expected field display name";
@@ -185,9 +185,9 @@ public class ForEachTests :
     }
     
     [Theory]
-    [InlineData(ValidationMode.StopValidationOnFirstError)]
-    [InlineData(ValidationMode.AccumulateFirstErrorEachValidation)]
-    [InlineData(ValidationMode.AccumulateFirstErrorEachValidationAndAllFirstErrorsCollectionIteration)]
+    [InlineData(ValidationMode.StopOnFirstError)]
+    [InlineData(ValidationMode.AccumulateFirstError)]
+    [InlineData(ValidationMode.AccumulateFirstErrorAndAllFirstErrorsCollectionIteration)]
     public void That_keeps_settings_with_error_accumulation(ValidationMode validationMode)
     {
         var expectedFieldDisplayName = "Expected field display name";
@@ -228,9 +228,9 @@ public class ForEachTests :
     }
     
     [Theory]
-    [InlineData(ValidationMode.StopValidationOnFirstError)]
-    [InlineData(ValidationMode.AccumulateFirstErrorEachValidation)]
-    [InlineData(ValidationMode.AccumulateFirstErrorEachValidationAndAllFirstErrorsCollectionIteration)]
+    [InlineData(ValidationMode.StopOnFirstError)]
+    [InlineData(ValidationMode.AccumulateFirstError)]
+    [InlineData(ValidationMode.AccumulateFirstErrorAndAllFirstErrorsCollectionIteration)]
     public void Do_not_take_previous_customizations(ValidationMode validationMode)
     {
         var intList = new List<int> {1};
@@ -255,13 +255,13 @@ public class ForEachTests :
     
     [Theory]
     [InlineData(
-        ValidationMode.StopValidationOnFirstError,
+        ValidationMode.StopOnFirstError,
         new[] {"1"})]
     [InlineData(
-        ValidationMode.AccumulateFirstErrorEachValidation,
+        ValidationMode.AccumulateFirstError,
         new[] {"1", "3"})]
     [InlineData(
-        ValidationMode.AccumulateFirstErrorEachValidationAndAllFirstErrorsCollectionIteration,
+        ValidationMode.AccumulateFirstErrorAndAllFirstErrorsCollectionIteration,
         new[] {"1", "2", "3"})]
     public void Throw_errors_with_model_validator(
         ValidationMode validationMode,

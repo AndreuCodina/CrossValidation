@@ -315,13 +315,13 @@ public static class ValidationExtensions
 
             if (validationReturned is IInvalidValidation<TReturnedField>)
             {
-                if (validValidation.Context.ValidationMode is ValidationMode.StopValidationOnFirstError
-                    || validValidation.Context.ValidationMode is ValidationMode.AccumulateFirstErrorEachValidation)
+                if (validValidation.Context.ValidationMode is ValidationMode.StopOnFirstError
+                    || validValidation.Context.ValidationMode is ValidationMode.AccumulateFirstError)
                 {
                     return IInvalidValidation<IEnumerable<TReturnedField>>.Create();
                 }
                 else if (validValidation.Context.ValidationMode is ValidationMode
-                             .AccumulateFirstErrorEachValidationAndAllFirstErrorsCollectionIteration)
+                             .AccumulateFirstErrorAndAllFirstErrorsCollectionIteration)
                 {
                     areErrors = true;
                     index++;
