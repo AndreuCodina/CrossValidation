@@ -33,7 +33,7 @@ public interface IValidationOperation
     // public Type CrossErrorToException { get; set; }
     public bool ExecuteNextValidator { get; set; }
     // void SetValidationScope(Action setScope);
-    bool Execute(ValidationContext context);
+    ValueTask<bool> ExecuteAsync(ValidationContext context, bool useAsync);
     void HandleError(ICrossError error, ValidationContext context);
     void TakeCustomizationsFromInstanceError(ICrossError error, ValidationContext context);
     void TakeCustomizationsFromError(ICrossError error);
@@ -71,11 +71,26 @@ public class ValidationOperation<TField> : IValidationOperation
     //     ValidationScope = validationScope;
     // }
 
-    public bool Execute(ValidationContext context)
+    public async ValueTask<bool> ExecuteAsync(ValidationContext context, bool useAsync)
     {
         if (Validator is not null)
         {
             var error = Validator!().GetError();
+
+            if (error is null)
+            {
+                return true;
+            }
+
+            // TODO
+            // error.CrossErrorToException = CrossErrorToException;
+            HandleError(error, context);
+            // validValidation.Clean();
+            return false;
+        }
+        else if (AsyncValidator is not null)
+        {
+            var error = (await AsyncValidator!()).GetError();
 
             if (error is null)
             {
@@ -122,7 +137,7 @@ public class ValidationOperation<TField> : IValidationOperation
 
     private void AddCustomizationsToError(ICrossError error, ValidationContext context)
     {
-        error.FieldName = context.FieldName;
+        error.FieldName = context.FieldName; // TODO: Save it in ValidationOperation
         error.FieldDisplayName = GetFieldDisplayNameToFill(error);
         error.Code = GetCodeToFill(error, context);
         error.Message = GetMessageToFill(error, context);
@@ -137,7 +152,7 @@ public class ValidationOperation<TField> : IValidationOperation
             return Code;
         }
         
-        if (context.GeneralizeError)
+        if (context.GeneralizeError) // TODO: Save it in ValidationOperation
         {
             return nameof(ErrorResource.General);
         }
@@ -157,7 +172,7 @@ public class ValidationOperation<TField> : IValidationOperation
             return CrossValidationOptions.GetMessageFromCode(Code);
         }
         
-        if (context.GeneralizeError)
+        if (context.GeneralizeError) // TODO: Save it in ValidationOperation
         {
             return CrossValidationOptions.GetMessageFromCode(nameof(ErrorResource.General));
         }

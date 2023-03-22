@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net;
+using System.Threading.Tasks;
 using CrossValidation.Errors;
 using CrossValidation.Exceptions;
 using CrossValidation.Resources;
@@ -275,13 +276,13 @@ public class ValidationTests :
     }
     
     [Fact]
-    public void MustAsync_fails()
+    public async Task MustAsync_fails()
     {
         var action = () => Validate.That(1)
             .MustAsync(_commonFixture.NotBeValidAsync)
-            .Run();
+            .RunAsync();
 
-        action.ShouldThrow<CrossException>();
+        await action.ShouldThrowAsync<CrossException>();
     }
     
     [Fact]

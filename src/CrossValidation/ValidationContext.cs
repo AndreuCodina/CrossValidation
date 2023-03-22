@@ -39,14 +39,14 @@ public class ValidationContext
         return newContext;
     }
 
-    public void ExecuteAccumulatedOperations<TField>()
+    public async ValueTask ExecuteOperationsCollectedAsync<TField>(bool useAsync)
     {
         var firstItemIndex = 0;
         
         while (ValidationOperationsCollected.Any())
         {
             var operation = ValidationOperationsCollected[firstItemIndex];
-            var isValid = operation.Execute(this);
+            var isValid = await operation.ExecuteAsync(this, useAsync);
 
             if (!isValid)
             {

@@ -75,7 +75,7 @@ public class ValidateTests :
     }
     
     [Fact]
-    public void ValidateMustAsync_with_returned_error_fails()
+    public async Task ValidateMustAsync_with_returned_error_fails()
     {
         var expectedCode = nameof(ErrorResource.NotNull);
         var expectedMessage = ErrorResource.NotNull;
@@ -83,9 +83,9 @@ public class ValidateTests :
         var testError = new TestError(Code: expectedCode, Details: expectedDetails);
         var action = () => Validate.That(_model.NullableInt)
             .MustAsync(_ => _commonFixture.ErrorAsync(testError))
-            .Run();
+            .RunAsync();
 
-        var error = action.ShouldThrowCrossError<TestError>();
+        var error = await action.ShouldThrowCrossErrorAsync<TestError>();
         error.Code.ShouldBe(expectedCode);
         error.Message.ShouldBe(expectedMessage);
         error.Details.ShouldBe(expectedDetails);
