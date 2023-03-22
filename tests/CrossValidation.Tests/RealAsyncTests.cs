@@ -191,6 +191,28 @@ public class RealAsyncTests :
     }
     
     [Fact]
+    public void WhenNotNull_with_error_accumulation_does_not_continue_the_validation_when_scope_with_operation_accumulated_fails()
+    {
+        _model = new ParentModelBuilder()
+            .WithNullableInt(1)
+            .Build();
+        
+        var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
+        {
+            validator.ValidationMode = ValidationMode.AccumulateFirstError;
+
+            validator.Field(_model.NullableInt)
+                .WhenNotNull(x => x
+                    .MustAsync(_commonFixture.NotBeValidAsync))
+                .Must(_commonFixture.ThrowException);
+        });
+
+        var action = () => parentModelValidator.Validate(_model);
+        
+        action.ShouldThrowCrossError();
+    }
+    
+    [Fact]
     public void WhenNotNull_with_nested_WhenNotNull()
     {
         _model = new ParentModelBuilder()
