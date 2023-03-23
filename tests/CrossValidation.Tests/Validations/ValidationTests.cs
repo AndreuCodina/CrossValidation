@@ -221,11 +221,12 @@ public class ValidationTests :
     [Fact]
     public void Validator_with_conditional_execution()
     {
-        var expectedMessage = "TrueCase";
+        var expectedMessage = "Expected message";
+        
         var action = () => Validate.That(_model.NestedModel.Int)
             .When(_commonFixture.NotBeValid)
             .GreaterThan(_model.NestedModel.Int + 1)
-            .When(true)
+            .When(() => true)
             .WithMessage(expectedMessage)
             .GreaterThan(_model.NestedModel.Int);
 

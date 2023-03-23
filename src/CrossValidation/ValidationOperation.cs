@@ -31,7 +31,8 @@ public interface IValidationOperation
     public string? FieldDisplayName { get; set; }
     public HttpStatusCode? HttpStatusCode { get; set; }
     // public Type CrossErrorToException { get; set; }
-    public bool ExecuteNextValidator { get; set; }
+    public Func<bool>? Condition { get; set; }
+    public Func<Task<bool>>? AsyncCondition { get; set; }
     // void SetValidationScope(Action setScope);
     ValueTask<bool> ExecuteAsync(ValidationContext context, bool useAsync);
     void HandleError(ICrossError error, ValidationContext context);
@@ -64,7 +65,8 @@ public class ValidationOperation<TField> : IValidationOperation
     public string? FieldDisplayName { get; set; }
     public HttpStatusCode? HttpStatusCode { get; set; }
     // public Type CrossErrorToException { get; set; }
-    public bool ExecuteNextValidator { get; set; } = true;
+    public Func<bool>? Condition { get; set; }
+    public Func<Task<bool>>? AsyncCondition { get; set; }
 
     // public void SetValidationScope(Action setScope);
     // {
@@ -73,6 +75,26 @@ public class ValidationOperation<TField> : IValidationOperation
 
     public async ValueTask<bool> ExecuteAsync(ValidationContext context, bool useAsync)
     {
+        if (Condition is not null)
+        {
+            if (!Condition())
+            {
+                return true;
+            }
+        }
+        else if (AsyncCondition is not null)
+        {
+            if (!useAsync)
+            {
+                throw new InvalidOperationException("An asynchronous condition cannot be used in synchronous mode");
+            }
+            
+            if (!await AsyncCondition())
+            {
+                return true;
+            }
+        }
+        
         if (Validator is not null)
         {
             var error = Validator!().GetError();
