@@ -235,7 +235,7 @@ public class ValidationTests :
     }
     
     [Fact]
-    public void Validator_with_async_conditional_execution()
+    public async Task Validator_with_async_conditional_execution()
     {
         var expectedMessage = "TrueCase";
         var action = () => Validate.That(_model.NestedModel.Int)
@@ -243,9 +243,10 @@ public class ValidationTests :
             .GreaterThan(_model.NestedModel.Int + 1)
             .WhenAsync(_commonFixture.BeValidAsync)
             .WithMessage(expectedMessage)
-            .GreaterThan(_model.NestedModel.Int);
+            .GreaterThan(_model.NestedModel.Int)
+            .ValidateAsync();
 
-        var error = action.ShouldThrowCrossError();
+        var error = await action.ShouldThrowCrossErrorAsync();
         error.Message.ShouldBe(expectedMessage);
     }
 

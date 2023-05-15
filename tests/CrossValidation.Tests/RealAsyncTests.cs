@@ -46,7 +46,6 @@ public class RealAsyncTests :
     public async Task Not_execute_accumulated_operations_when_any_not_accumulated_already_failed()
     {
         var expectedMessage = "Expected message";
-
         var action = () => Validate.That(_model.NullableString)
             .WithMessage(expectedMessage)
             .NotNull()
@@ -62,7 +61,6 @@ public class RealAsyncTests :
     public async Task Execute_validation_after_async_validation_node()
     {
         var expectedMessage = "Expected message";
-
         var action = () => Validate.That(_model.Int)
             .Must(_commonFixture.BeValid)
             .MustAsync(_commonFixture.BeValidAsync)
@@ -79,7 +77,6 @@ public class RealAsyncTests :
     public async Task Stop_execution_after_first_failed_validation_operation_accumulated()
     {
         var expectedMessage = "Expected message";
-
         var action = () => Validate.That(_model.NullableInt)
             .MustAsync(_commonFixture.BeValidAsync)
             .WithMessage(expectedMessage)
@@ -96,7 +93,6 @@ public class RealAsyncTests :
     public async Task Not_execute_predicate_returning_error_customization()
     {
         var expectedMessage = "Expected message";
-
         var action = () => Validate.That(_model.NullableString)
             .WithMessage(expectedMessage)
             .MustAsync(_commonFixture.NotBeValidAsync)
@@ -105,6 +101,7 @@ public class RealAsyncTests :
             .ValidateAsync();
 
         var error = await action.ShouldThrowCrossErrorAsync<CommonCrossError.Predicate>();
+        
         error.Message.ShouldBe(expectedMessage);
     }
     
@@ -127,7 +124,6 @@ public class RealAsyncTests :
         _model = new ParentModelBuilder()
             .WithNullableInt(1)
             .Build();
-        
         var action = () => Validate.That(_model.NullableInt)
             .WhenAsync(_commonFixture.BeValidAsync)
             .WhenNotNull(x => x
@@ -143,7 +139,6 @@ public class RealAsyncTests :
     public async Task WhenNotNull_should_not_execute_scope_if_the_nullable_condition_is_not_met()
     {
         var expectedMessage = "Expected message";
-        
         var action = () => Validate.That(_model.NullableInt)
             .MustAsync(_commonFixture.BeValidAsync)
             .WhenNotNull<int, int>(_ => throw new Exception())
@@ -152,6 +147,7 @@ public class RealAsyncTests :
             .ValidateAsync();
 
         var error = await action.ShouldThrowCrossErrorAsync<CommonCrossError.Predicate>();
+        
         error.Message.ShouldBe(expectedMessage);
     }
     
@@ -204,9 +200,7 @@ public class RealAsyncTests :
         _model = new ParentModelBuilder()
             .WithNullableInt(1)
             .Build();
-        
         var expectedMessage = "Expected message";
-
         var action = () => Validate.That(_model.NullableInt)
             .MustAsync(_commonFixture.BeValidAsync)
             .WhenNotNull(x => x
@@ -230,7 +224,6 @@ public class RealAsyncTests :
             .Build();
         
         var expectedMessage = "Expected message";
-
         var action = () => Validate.That(_model.NullableInt)
             // .MustAsync(_commonFixture.BeValidAsync)
             .WhenNotNull(x => x
@@ -241,6 +234,7 @@ public class RealAsyncTests :
             .ValidateAsync();
 
         var error = await action.ShouldThrowCrossErrorAsync<CommonCrossError.Predicate>();
+        
         error.Message.ShouldBe(expectedMessage);
     }
     
@@ -252,7 +246,6 @@ public class RealAsyncTests :
             .Build();
         
         var expectedMessage = "Expected message";
-
         var action = () => Validate.That(_model.NullableInt)
             .MustAsync(_commonFixture.BeValidAsync)
             .WhenNotNull(x => x
@@ -265,6 +258,7 @@ public class RealAsyncTests :
             .ValidateAsync();
 
         var error = await action.ShouldThrowCrossErrorAsync<CommonCrossError.Predicate>();
+        
         error.Message.ShouldBe(expectedMessage);
     }
 
@@ -276,7 +270,6 @@ public class RealAsyncTests :
         _model = new ParentModelBuilder()
             .WithIntList(expectedIntList)
             .Build();
-
         var action = () => Validate.That(_model.IntList)
             .ForEach(x => x
                 .MustAsync(_commonFixture.BeValidAsync)
@@ -288,6 +281,7 @@ public class RealAsyncTests :
             .ValidateAsync();
 
         var error = await action.ShouldThrowCrossErrorAsync<CommonCrossError.Predicate>();
+        
         error.Message.ShouldBe(expectedMessage);
     }
 
@@ -296,7 +290,6 @@ public class RealAsyncTests :
     public async Task ForEach_does_not_get_field_value_when_there_are_accumulated_operations()
     {
         var expectedMessage = "Expected message";
-
         var action = () => Validate.That(_model.NullableIntList)
             .MustAsync(_commonFixture.BeValidAsync)
             .NotNull()
@@ -306,6 +299,7 @@ public class RealAsyncTests :
             .ValidateAsync();
 
         var error = await action.ShouldThrowCrossErrorAsync<CommonCrossError.Predicate>();
+        
         error.Message.ShouldBe(expectedMessage);
     }
     
@@ -318,12 +312,10 @@ public class RealAsyncTests :
         _model = new ParentModelBuilder()
             .WithIntList(expectedIntList)
             .Build();
-
         var action = () => Validate.That(_model.IntList)
             .MustAsync(_commonFixture.BeValidAsync)
             .ForEach(x => x
                 .MustAsync(_commonFixture.BeValidAsync)
-                
                 .Transform(x => x * 2)
                 .Transform(x => (int?)x)
                 .NotNull()
@@ -336,6 +328,7 @@ public class RealAsyncTests :
             .ValidateAsync();
 
         var error = await action.ShouldThrowCrossErrorAsync<CommonCrossError.Predicate>();
+        
         error.Message.ShouldBe(expectedMessage);
     }
     

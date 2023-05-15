@@ -86,6 +86,7 @@ public class ValidateTests :
             .ValidateAsync();
 
         var error = await action.ShouldThrowCrossErrorAsync<TestError>();
+        
         error.Code.ShouldBe(expectedCode);
         error.Message.ShouldBe(expectedMessage);
         error.Details.ShouldBe(expectedDetails);

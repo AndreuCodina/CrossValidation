@@ -295,16 +295,7 @@ internal class Validation<TField> :
     public IValidation<TField> WhenAsync(Func<TField, Task<bool>> condition)
     {
         HasPendingAsyncValidation = true;
-        // TODO: Assign AsyncCondition
-        
-        if (!HasFailed)
-        {
-            var predicate = () => condition(GetFieldValue())
-                .GetAwaiter()
-                .GetResult();
-            Condition = predicate;
-        }
-
+        AsyncCondition = async () => await condition(GetFieldValue());
         return this;
     }
 
