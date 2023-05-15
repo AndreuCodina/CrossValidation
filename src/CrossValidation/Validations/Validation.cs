@@ -384,26 +384,31 @@ internal class Validation<TField> :
     public IValidation<TFieldTransformed> Transform<TFieldTransformed>(
         Func<TField, TFieldTransformed> transformer)
     {
-        if (!HasFailed)
+        if (HasFailed)
         {
-            var getFieldValueTransformed = () => transformer(GetFieldValue());
-            return new Validation<TFieldTransformed>(
-                getFieldValueTransformed,
-                CrossErrorToException,
-                generalizeError: Context!.GeneralizeError,
-                parentValidation: null, // TODO
-                fieldFullPath: Context.FieldName,
-                context: Context,
-                // index: Index // Not required because the field name already contains the index
-                error: Context.Error,
-                message: Context.Message,
-                code: Context.Code,
-                details: Context.Details,
-                httpStatusCode: Context.HttpStatusCode,
-                fieldDisplayName: Context.FieldDisplayName);
+            return IValidation<TFieldTransformed>.CreateFailed();
         }
-
-        return IValidation<TFieldTransformed>.CreateFailed();
+        
+        var getFieldValueTransformed = () => transformer(GetFieldValue());
+        var nextValidation = new Validation<TFieldTransformed>(
+            getFieldValue: getFieldValueTransformed,
+            crossErrorToException: CrossErrorToException,
+            parentValidation: this,
+            generalizeError: false,
+            fieldFullPath: FieldFullPath,
+            context: Context,
+            index: Index,
+            parentPath: ParentPath,
+            error: null,
+            message: null,
+            code: null,
+            details: null,
+            httpStatusCode: null,
+            fieldDisplayName: null);
+        nextValidation.HasFailed = HasFailed;
+        nextValidation.HasPendingAsyncValidation = HasPendingAsyncValidation;
+        NextValidation = nextValidation;
+        return nextValidation;
     }
 
     public IValidation<TField> SetModelValidator<TChildModel>(ModelValidator<TChildModel> validator)

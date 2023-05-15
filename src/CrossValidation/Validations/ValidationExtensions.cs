@@ -12,31 +12,17 @@ public static class ValidationExtensions
         this IValidation<TField?> validation)
         where TField : class
     {
-        // return validation.SetValidator(context => new NotNullValidator<TField?>(context));
-        
-        var validationToReturn = validation;
-        
-        if (!validation.HasFailed)
-        {
-            validationToReturn = validation.SetValidator(() => new NotNullValidator<TField?>(validation.GetFieldValue()));
-        }
-        
-        return validationToReturn.Transform(x => x!);
+
+        return validation.SetValidator(() => new NotNullValidator<TField?>(validation.GetFieldValue()))
+            .Transform(x => x!);
     }
 
     public static IValidation<TField> NotNull<TField>(
         this IValidation<TField?> validation)
         where TField : struct
     {
-        var validationToReturn = validation;
-
-        if (!validation.HasFailed)
-        {
-            validationToReturn =
-                validation.SetValidator(() => new NotNullValidator<TField?>(validation.GetFieldValue()));
-        }
-
-        return validationToReturn.Transform(x => x!.Value);
+        return validation.SetValidator(() => new NotNullValidator<TField?>(validation.GetFieldValue()))
+            .Transform(x => x!.Value);
     }
 
     public static IValidation<TField?> WhenNotNull<TField, TReturnedField>(

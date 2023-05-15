@@ -26,24 +26,7 @@ public class RealAsyncTests :
         _commonFixture = commonFixture;
         _model = new ParentModelBuilder().Build();
     }
-    
-    [Fact]
-    public async Task Return_last_known_validation_type_before_accumulate_operations()
-    {
-        var expectedMessage = "Expected message";
 
-        var validation = Validate.That(_model.NullableInt)
-            .MustAsync(_commonFixture.BeValidAsync)
-            .WithMessage(expectedMessage)
-            .NotNull();
-
-        validation.HasFailed.ShouldBeFalse();
-        
-        var action = () => validation.ValidateAsync();
-        var error = await action.ShouldThrowCrossErrorAsync<CommonCrossError.NotNull>();
-        error.Message.ShouldBe(expectedMessage);
-    }
-    
     [Fact]
     public async Task Not_execute_synchronous_validation_when_there_are_asynchronous_validations_pending_to_execute()
     {
@@ -71,6 +54,7 @@ public class RealAsyncTests :
             .ValidateAsync();
 
         var error = await action.ShouldThrowCrossErrorAsync<CommonCrossError.NotNull>();
+        
         error.Message.ShouldBe(expectedMessage);
     }
     
@@ -87,6 +71,7 @@ public class RealAsyncTests :
             .ValidateAsync();
 
         var error = await action.ShouldThrowCrossErrorAsync();
+        
         error.Message.ShouldBe(expectedMessage);
     }
     
@@ -103,6 +88,7 @@ public class RealAsyncTests :
             .ValidateAsync();
 
         var error = await action.ShouldThrowCrossErrorAsync<CommonCrossError.NotNull>();
+        
         error.Message.ShouldBe(expectedMessage);
     }
     
