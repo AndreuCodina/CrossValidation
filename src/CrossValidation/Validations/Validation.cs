@@ -432,83 +432,14 @@ internal class Validation<TField> :
         await Context!.ValidationTree!.TraverseAsync(Context);
     }
 
-    // public async ValueTask<bool> ExecuteAsync(ValidationContext context, bool useAsync)
-    // {
-    //     if (Condition is not null)
-    //     {
-    //         if (!Condition())
-    //         {
-    //             return true;
-    //         }
-    //     }
-    //     else if (AsyncCondition is not null)
-    //     {
-    //         if (!useAsync)
-    //         {
-    //             throw new InvalidOperationException("An asynchronous condition cannot be used in synchronous mode");
-    //         }
-    //         
-    //         if (!await AsyncCondition())
-    //         {
-    //             return true;
-    //         }
-    //     }
-    //     
-    //     if (Validator is not null)
-    //     {
-    //         var error = Validator!().GetError();
-    //
-    //         if (error is null)
-    //         {
-    //             return true;
-    //         }
-    //
-    //         // TODO
-    //         // error.CrossErrorToException = CrossErrorToException;
-    //         HandleError(error, context);
-    //         // validValidation.Clean();
-    //         return false;
-    //     }
-    //     else if (AsyncValidator is not null)
-    //     {
-    //         if (!useAsync)
-    //         {
-    //             throw new InvalidOperationException("An asynchronous validator cannot be used in synchronous mode");
-    //         }
-    //         
-    //         var error = (await AsyncValidator!()).GetError();
-    //
-    //         if (error is null)
-    //         {
-    //             return true;
-    //         }
-    //
-    //         // TODO
-    //         // error.CrossErrorToException = CrossErrorToException;
-    //         HandleError(error, context);
-    //         // validValidation.Clean();
-    //         return false;
-    //     }
-    //     else if (ValidationScope is not null)
-    //     {
-    //         return ValidationScope();
-    //     }
-    //
-    //     HasBeenExecuted = true;
-    //     return true;
-    //     // return await ValueTask.FromResult(true);
-    // }
-    
-    public Func<TField>? GetFieldValueTransformed { get; set; }
-    // public List<ValidationOperation> ValidationOperationsCollected { get; set; } = new();
-    // public ValidationOperation ValidationOperation { get; set; } = new();
+    public Func<TField>? GetGenericFieldValue { get; set; }
     public ValidationContext? Context { get; set; }
     public string? FieldFullPath { get; set; }
     public Type? CrossErrorToException { get; set; }
 
     public TField GetFieldValue()
     {
-        return (TField)GetNonGenericFieldValue!();
+        return GetGenericFieldValue!();
     }
     // public ValidationOperation ParentValidation { get; set; }
 
@@ -554,7 +485,7 @@ internal class Validation<TField> :
             Context.ValidationTree = this;
         }
 
-        GetFieldValueTransformed = getFieldValue;
+        GetGenericFieldValue = getFieldValue;
         GetNonGenericFieldValue = () => getFieldValue!()!;
         CrossErrorToException = crossErrorToException;
         FieldFullPath = fieldFullPath;
@@ -600,14 +531,14 @@ internal class Validation<TField> :
 
     public TField Instance()
     {
-        return GetFieldValueTransformed!();
+        return GetGenericFieldValue!();
     }
 
     public TInstance Instance<TInstance>(Func<TField, TInstance> fieldToInstance)
     {
         try
         {
-            return fieldToInstance(GetFieldValueTransformed!());
+            return fieldToInstance(GetGenericFieldValue!());
         }
         catch (CrossException e)
         {
