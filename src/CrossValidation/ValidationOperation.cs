@@ -123,7 +123,7 @@ public class ValidationOperation
                 throw new InvalidOperationException("An asynchronous validator cannot be used in synchronous mode");
             }
             
-            var error = (await AsyncValidator!()).GetError();
+            var error = (await AsyncValidator()).GetError();
 
             if (error is null)
             {

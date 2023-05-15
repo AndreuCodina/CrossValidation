@@ -142,60 +142,39 @@ internal class Validation<TField> :
 {
     public IValidation<TField> SetValidator(Func<IValidator<ICrossError>> validator)
     {
-        if (!HasFailed)
+        if (HasFailed)
         {
-            Validator = validator;
+            return IValidation<TField>.CreateFailed();
+        }
+        
+        Validator = validator;
 
-            if (!(HasPendingAsyncValidation || AsyncCondition is not null))
+        if (!HasPendingAsyncValidation)
+        {
+            var isExecutionValid = ExecuteAsync(Context!, useAsync: false)
+                .GetAwaiter()
+                .GetResult();
+
+            if (!isExecutionValid)
             {
-                var isExecutionValid = ExecuteAsync(Context!, useAsync: false)
-                    .GetAwaiter()
-                    .GetResult();
-
-                if (!isExecutionValid)
-                {
-                    return IValidation<TField>.CreateFailed();
-                }
+                return IValidation<TField>.CreateFailed();
             }
         }
 
-        var nextValidation = new Validation<TField>(
-            getFieldValue: GetFieldValue,
-            crossErrorToException: CrossErrorToException,
-            parentValidation: this,
-            generalizeError: false,
-            fieldFullPath: FieldFullPath,
-            context: Context,
-            index: Index,
-            parentPath: ParentPath,
-            error: null,
-            message: null,
-            code: null,
-            details: null,
-            httpStatusCode: null,
-            fieldDisplayName: null);
-        NextValidation = nextValidation;
+        var nextValidation = CreateNextValidation();
         return nextValidation;
     }
-    
+
     public IValidation<TField> SetAsyncValidator(Func<Task<IValidator<ICrossError>>> validator)
     {
-        var nextValidation = new Validation<TField>(
-            getFieldValue: GetFieldValue,
-            crossErrorToException: CrossErrorToException,
-            parentValidation: this,
-            generalizeError: false,
-            fieldFullPath: FieldFullPath,
-            context: Context,
-            index: Index,
-            parentPath: ParentPath,
-            error: null,
-            message: null,
-            code: null,
-            details: null,
-            httpStatusCode: null,
-            fieldDisplayName: null);
-        NextValidation = nextValidation;
+        if (HasFailed)
+        {
+            return IValidation<TField>.CreateFailed();
+        }
+        
+        HasPendingAsyncValidation = true;
+        AsyncValidator = validator;
+        var nextValidation = CreateNextValidation();
         return nextValidation;
     }
 
@@ -315,6 +294,9 @@ internal class Validation<TField> :
 
     public IValidation<TField> WhenAsync(Func<TField, Task<bool>> condition)
     {
+        HasPendingAsyncValidation = true;
+        // TODO: Assign AsyncCondition
+        
         if (!HasFailed)
         {
             var predicate = () => condition(GetFieldValue())
@@ -328,27 +310,20 @@ internal class Validation<TField> :
 
     public IValidation<TField> Must(Func<TField, bool> condition)
     {
-        if (!HasFailed)
+        return SetValidator(() =>
         {
             var predicate = () => condition(GetFieldValue());
-            return SetValidator(() => new BooleanPredicateValidator(predicate));
-        }
-
-        return this;
+            return new BooleanPredicateValidator(predicate);
+        });
     }
     
     public IValidation<TField> MustAsync(Func<TField, Task<bool>> condition)
     {
-        if (!HasFailed)
+        return SetAsyncValidator(async () =>
         {
-            return SetAsyncValidator(async () =>
-            {
-                var predicate = await condition(GetFieldValue());
-                return new BooleanPredicateValidator(() => predicate);
-            });
-        }
-
-        return this;
+            var predicate = await condition(GetFieldValue());
+            return new BooleanPredicateValidator(() => predicate);
+        });
     }
     
     public IValidation<TField> Must(Func<TField, ICrossError?> condition)
@@ -458,7 +433,7 @@ internal class Validation<TField> :
 
     public async Task ValidateAsync()
     {
-        await Context!.MainValidationOperation.TraverseAsync(Context);
+        await Context!.ValidationTree!.TraverseAsync(Context);
     }
 
     // public async ValueTask<bool> ExecuteAsync(ValidationContext context, bool useAsync)
@@ -570,16 +545,21 @@ internal class Validation<TField> :
             Context = new ValidationContext();
         }
 
-        if (parentValidation is not null)
+        // if (parentValidation is not null)
+        // {
+        //     parentValidation.NextValidation = this;
+        // }
+        // else
+        // {
+        //     Context.ValidationTree.NextValidation = this;
+        // }
+        if (Context.ValidationTree is null)
         {
-            parentValidation.NextValidation = this;
-        }
-        else
-        {
-            Context.MainValidationOperation.NextValidation = this;
+            Context.ValidationTree = this;
         }
 
         GetFieldValueTransformed = getFieldValue;
+        GetNonGenericFieldValue = () => getFieldValue!()!;
         CrossErrorToException = crossErrorToException;
         FieldFullPath = fieldFullPath;
         Context.GeneralizeError = Context.IsChildContext && Context.GeneralizeError
@@ -642,5 +622,28 @@ internal class Validation<TField> :
             HandleError(e.Error, Context!);
             throw new UnreachableException();
         }
+    }
+    
+    private IValidation<TField> CreateNextValidation()
+    {
+        var nextValidation = new Validation<TField>(
+            getFieldValue: GetFieldValue,
+            crossErrorToException: CrossErrorToException,
+            parentValidation: this,
+            generalizeError: false,
+            fieldFullPath: FieldFullPath,
+            context: Context,
+            index: Index,
+            parentPath: ParentPath,
+            error: null,
+            message: null,
+            code: null,
+            details: null,
+            httpStatusCode: null,
+            fieldDisplayName: null);
+        nextValidation.HasFailed = HasFailed;
+        nextValidation.HasPendingAsyncValidation = HasPendingAsyncValidation;
+        NextValidation = nextValidation;
+        return nextValidation;
     }
 }

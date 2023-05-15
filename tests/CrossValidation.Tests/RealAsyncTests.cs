@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using CrossValidation.Errors;
-using CrossValidation.Exceptions;
 using CrossValidation.ShouldlyAssertions;
 using CrossValidation.Tests.TestUtils;
 using CrossValidation.Tests.TestUtils.Builders;
@@ -49,15 +48,14 @@ public class RealAsyncTests :
     public async Task Not_execute_synchronous_validation_when_there_are_asynchronous_validations_pending_to_execute()
     {
         var expectedMessage = "Expected message";
-
         var action = () => Validate.That(_model.Int)
-            // .Must(_commonFixture.BeValid)
             .WithMessage(expectedMessage)
             .MustAsync(_commonFixture.NotBeValidAsync)
             .Must(_commonFixture.NotBeValid)
             .ValidateAsync();
 
         var error = await action.ShouldThrowCrossErrorAsync();
+        
         error.Message.ShouldBe(expectedMessage);
     }
     
