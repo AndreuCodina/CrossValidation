@@ -39,7 +39,7 @@ public abstract record ModelValidator<TModel>
         string? fieldDisplayName = null,
         [CallerArgumentExpression(nameof(field))] string fieldName = default!)
     {
-        return IValidValidation<TField>.CreateFromFieldName(
+        return IValidation<TField>.CreateFromFieldName(
             () => field,
             typeof(CrossException),
             fieldName,
@@ -63,16 +63,17 @@ public abstract record ModelValidator<TModel>
         HttpStatusCode? httpStatusCode = null,
         string? fieldDisplayName = null)
     {
-        return IValidValidation<TField>.CreateFromField(
-            () => fieldValue,
-            typeof(CrossException),
-            context: Context,
-            error: error,
-            message: message,
-            code: code,
-            details: details,
-            httpStatusCode: httpStatusCode,
-            fieldDisplayName: fieldDisplayName);
+        throw new NotImplementedException();
+        // return IValidation<TField>.CreateFromField(
+        //     () => fieldValue,
+        //     typeof(CrossException),
+        //     context: Context,
+        //     error: error,
+        //     message: message,
+        //     code: code,
+        //     details: details,
+        //     httpStatusCode: httpStatusCode,
+        //     fieldDisplayName: fieldDisplayName);
     }
 
     public abstract void CreateValidations(TModel model);

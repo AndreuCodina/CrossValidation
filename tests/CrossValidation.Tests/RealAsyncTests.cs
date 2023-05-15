@@ -38,24 +38,24 @@ public class RealAsyncTests :
             .WithMessage(expectedMessage)
             .NotNull();
 
-        (validation is IValidValidation<int>).ShouldBeTrue();
+        validation.HasFailed.ShouldBeFalse();
         
-        var action = () => validation.RunAsync();
+        var action = () => validation.ValidateAsync();
         var error = await action.ShouldThrowCrossErrorAsync<CommonCrossError.NotNull>();
         error.Message.ShouldBe(expectedMessage);
     }
     
     [Fact]
-    public async Task Execute_async_validation_node()
+    public async Task Not_execute_synchronous_validation_when_there_are_asynchronous_validations_pending_to_execute()
     {
         var expectedMessage = "Expected message";
 
         var action = () => Validate.That(_model.Int)
-            .Must(_commonFixture.BeValid)
+            // .Must(_commonFixture.BeValid)
             .WithMessage(expectedMessage)
             .MustAsync(_commonFixture.NotBeValidAsync)
             .Must(_commonFixture.NotBeValid)
-            .RunAsync();
+            .ValidateAsync();
 
         var error = await action.ShouldThrowCrossErrorAsync();
         error.Message.ShouldBe(expectedMessage);
@@ -70,7 +70,7 @@ public class RealAsyncTests :
             .WithMessage(expectedMessage)
             .NotNull()
             .MustAsync(_commonFixture.BeValidAsync)
-            .RunAsync();
+            .ValidateAsync();
 
         var error = await action.ShouldThrowCrossErrorAsync<CommonCrossError.NotNull>();
         error.Message.ShouldBe(expectedMessage);
@@ -86,7 +86,7 @@ public class RealAsyncTests :
             .MustAsync(_commonFixture.BeValidAsync)
             .WithMessage(expectedMessage)
             .Must(_commonFixture.NotBeValid)
-            .RunAsync();
+            .ValidateAsync();
 
         var error = await action.ShouldThrowCrossErrorAsync();
         error.Message.ShouldBe(expectedMessage);
@@ -102,7 +102,7 @@ public class RealAsyncTests :
             .WithMessage(expectedMessage)
             .NotNull()
             .Must(x => x == int.MaxValue)
-            .RunAsync();
+            .ValidateAsync();
 
         var error = await action.ShouldThrowCrossErrorAsync<CommonCrossError.NotNull>();
         error.Message.ShouldBe(expectedMessage);
@@ -118,7 +118,7 @@ public class RealAsyncTests :
             .MustAsync(_commonFixture.NotBeValidAsync)
             .NotNull()
             .Must(x => new CrossError(Message: x.Substring(0)))
-            .RunAsync();
+            .ValidateAsync();
 
         var error = await action.ShouldThrowCrossErrorAsync<CommonCrossError.Predicate>();
         error.Message.ShouldBe(expectedMessage);
@@ -150,7 +150,7 @@ public class RealAsyncTests :
                 .Must(x => x == 1))
             .Transform(x => (int?)null)
             .Must(x => x is null)
-            .RunAsync();
+            .ValidateAsync();
 
         await action.ShouldNotThrowAsync();
     }
@@ -165,7 +165,7 @@ public class RealAsyncTests :
             .WhenNotNull<int, int>(_ => throw new Exception())
             .WithMessage(expectedMessage)
             .Must(_commonFixture.NotBeValid)
-            .RunAsync();
+            .ValidateAsync();
 
         var error = await action.ShouldThrowCrossErrorAsync<CommonCrossError.Predicate>();
         error.Message.ShouldBe(expectedMessage);
@@ -186,7 +186,7 @@ public class RealAsyncTests :
                 .WithMessage("Expected message")
                 .Must(_commonFixture.NotBeValid))
             .Must(_commonFixture.ThrowException)
-            .RunAsync();
+            .ValidateAsync();
 
         var error = await action.ShouldThrowCrossErrorAsync<CommonCrossError.Predicate>();
         error.Message.ShouldBe(expectedMessage);
@@ -232,7 +232,7 @@ public class RealAsyncTests :
                     .Must(_commonFixture.NotBeValid))
                 .Must(_commonFixture.ThrowException))
             .Must(_commonFixture.ThrowException)
-            .RunAsync();
+            .ValidateAsync();
 
         var error = await action.ShouldThrowCrossErrorAsync<CommonCrossError.Predicate>();
         error.Message.ShouldBe(expectedMessage);
@@ -254,7 +254,7 @@ public class RealAsyncTests :
                 .MustAsync(_commonFixture.NotBeValidAsync)
                 .Must(_commonFixture.ThrowException))
             .Must(_commonFixture.ThrowException)
-            .RunAsync();
+            .ValidateAsync();
 
         var error = await action.ShouldThrowCrossErrorAsync<CommonCrossError.Predicate>();
         error.Message.ShouldBe(expectedMessage);
@@ -278,7 +278,7 @@ public class RealAsyncTests :
                     .MustAsync(_commonFixture.NotBeValidAsync))
                 .Must(_commonFixture.ThrowException))
             .Must(_commonFixture.ThrowException)
-            .RunAsync();
+            .ValidateAsync();
 
         var error = await action.ShouldThrowCrossErrorAsync<CommonCrossError.Predicate>();
         error.Message.ShouldBe(expectedMessage);
@@ -301,7 +301,7 @@ public class RealAsyncTests :
                 .MustAsync(_commonFixture.NotBeValidAsync)
                 .Must(_commonFixture.ThrowException))
             .Must(_commonFixture.ThrowException)
-            .RunAsync();
+            .ValidateAsync();
 
         var error = await action.ShouldThrowCrossErrorAsync<CommonCrossError.Predicate>();
         error.Message.ShouldBe(expectedMessage);
@@ -319,7 +319,7 @@ public class RealAsyncTests :
             .ForEach(x => x
                 .WithMessage(expectedMessage)
                 .MustAsync(_commonFixture.NotBeValidAsync))
-            .RunAsync();
+            .ValidateAsync();
 
         var error = await action.ShouldThrowCrossErrorAsync<CommonCrossError.Predicate>();
         error.Message.ShouldBe(expectedMessage);
@@ -349,7 +349,7 @@ public class RealAsyncTests :
             .Must(x => x.SequenceEqual(expectedStringList))
             .WithMessage(expectedMessage)
             .Must(_commonFixture.NotBeValid)
-            .RunAsync();
+            .ValidateAsync();
 
         var error = await action.ShouldThrowCrossErrorAsync<CommonCrossError.Predicate>();
         error.Message.ShouldBe(expectedMessage);

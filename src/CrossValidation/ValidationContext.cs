@@ -9,8 +9,8 @@ namespace CrossValidation;
 /// </summary>
 public class ValidationContext
 {
-    public List<IValidationOperation> ValidationOperationsCollected { get; set; } = new();
-    public IValidationOperation? ValidationOperation { get; set; }
+    // public ValidationOperation ValidationTree { get; set; } = new ValidationOperation();
+    public ValidationOperation MainValidationOperation { get; set; } = new();
     public List<ICrossError>? ErrorsCollected { get; set; }
     public string? FieldName { get; set; }
     public string? ParentPath { get; set; }
@@ -24,6 +24,8 @@ public class ValidationContext
     public string? FieldDisplayName { get; set; }
     public ICrossErrorToException? CrossErrorToException { get; set; }
     public bool GeneralizeError { get; set; } = false;
+    public bool HasAsyncValidations { get; set; } = false;
+    public bool IsAsyncExecutionTriggered { get; set; } = false;
 
     public ValidationContext CloneForChildModelValidator(string? parentPath)
     {
@@ -39,24 +41,27 @@ public class ValidationContext
         return newContext;
     }
 
+#pragma warning disable CS1998
     public async ValueTask ExecuteOperationsCollectedAsync<TField>(bool useAsync)
+#pragma warning restore CS1998
     {
-        var firstItemIndex = 0;
-        
-        while (ValidationOperationsCollected.Any())
-        {
-            var operation = ValidationOperationsCollected[firstItemIndex];
-            var isValid = await operation.ExecuteAsync(this, useAsync);
-
-            if (!isValid)
-            {
-                break;
-            }
-            
-            ValidationOperationsCollected.RemoveAt(firstItemIndex);
-        }
-
-        ValidationOperationsCollected.Clear();
-        ValidationOperation = new ValidationOperation<TField>();
+        throw new NotImplementedException();
+        // var firstItemIndex = 0;
+        //
+        // while (ValidationOperationsCollected.Any())
+        // {
+        //     var operation = ValidationOperationsCollected[firstItemIndex];
+        //     var isValid = await operation.ExecuteAsync(this, useAsync);
+        //
+        //     if (!isValid)
+        //     {
+        //         break;
+        //     }
+        //     
+        //     ValidationOperationsCollected.RemoveAt(firstItemIndex);
+        // }
+        //
+        // ValidationOperationsCollected.Clear();
+        // CurrentOperation = new ValidationOperation();
     }
 }

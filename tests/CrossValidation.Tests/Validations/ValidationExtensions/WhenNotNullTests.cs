@@ -74,12 +74,12 @@ public class WhenNotNullTests :
             var structValidationAction = validator.Field(_model.NullableInt)
                 .WhenNotNull(x => x
                     .Must(_commonFixture.NotBeValid));
-            (structValidationAction is IInvalidValidation<int?>).ShouldBeTrue();
+            structValidationAction.HasFailed.ShouldBeTrue();
             
             var classValidationAction = validator.Field(_model.NullableString)
                 .WhenNotNull(x => x
                     .Must(_commonFixture.NotBeValid));
-            (classValidationAction is IInvalidValidation<string>).ShouldBeTrue();
+            classValidationAction.HasFailed.ShouldBeTrue();
         });
 
         var action = () => parentModelValidator.Validate(_model);

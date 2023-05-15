@@ -2,43 +2,9 @@ using System.Diagnostics;
 using System.Net;
 using CrossValidation.Errors;
 using CrossValidation.Resources;
-using CrossValidation.Validations;
 using CrossValidation.Validators;
 
 namespace CrossValidation;
-
-// public interface IValidationOperation
-// {
-//     public bool IsSync { get; set; }
-//     public string? Message { get; set; }
-//     bool RunAsync();
-//     
-//     // public object? FieldValue { get; set; }
-//     // public Type FieldValueType { get; set; }
-// }
-
-public interface IValidationOperation
-{
-    public Func<object?>? GetFieldValue { get; set; }
-    public Func<IValidator<ICrossError>>? Validator { get; set; }
-    public Func<Task<IValidator<ICrossError>>>? AsyncValidator { get; set; }
-    // public Action<IValidValidation<TField>>? ValidationScope { get; set; }
-    public Func<bool>? ValidationScope { get; set; }
-    public string? Code { get; set; }
-    public string? Message { get; set; }
-    public string? Details { get; set; }
-    public ICrossError? Error { get; set; }
-    public string? FieldDisplayName { get; set; }
-    public HttpStatusCode? HttpStatusCode { get; set; }
-    // public Type CrossErrorToException { get; set; }
-    public Func<bool>? Condition { get; set; }
-    public Func<Task<bool>>? AsyncCondition { get; set; }
-    // void SetValidationScope(Action setScope);
-    ValueTask<bool> ExecuteAsync(ValidationContext context, bool useAsync);
-    void HandleError(ICrossError error, ValidationContext context);
-    void TakeCustomizationsFromInstanceError(ICrossError error, ValidationContext context);
-    void TakeCustomizationsFromError(ICrossError error);
-}
 
 /// <summary>
 /// A node of a validation, defined by its validator and customizations.
@@ -48,12 +14,13 @@ public interface IValidationOperation
 /// Validate.That(request.Age)
 ///     .WithMessage("The age is required").NotNull() // ValidationNode
 ///     .WithMessage("The age must be greater than or equal to 18").GreaterThanOrEqual(18) // ValidationNode
-///     .Transform(age => age + 1) // ValidationNode
+///     .Transform(age => age + 1)
+///     .Must(() => true) // ValidationNode
 /// </summary>
 // public class ValidationOperation<TField> : IValidationOperation
-public class ValidationOperation<TField> : IValidationOperation
+public class ValidationOperation
 {
-    public Func<object?>? GetFieldValue { get; set; }
+    public Func<object>? GetNonGenericFieldValue { get; set; }
     public Func<IValidator<ICrossError>>? Validator { get; set; }
     public Func<Task<IValidator<ICrossError>>>? AsyncValidator { get; set; }
     // public Action<IValidValidation<TField>>? ValidationScope { get; set; }
@@ -67,12 +34,51 @@ public class ValidationOperation<TField> : IValidationOperation
     // public Type CrossErrorToException { get; set; }
     public Func<bool>? Condition { get; set; }
     public Func<Task<bool>>? AsyncCondition { get; set; }
+    public ValidationOperation? NextValidation { get; set; }
+    public bool HasFailed { get; set; } = false;
+    public bool HasBeenExecuted { get; set; } = false;
+    // public bool HasAsyncNextValidationsPendingToExecute { get; set; } = false;
+    public bool HasPendingAsyncValidation { get; set; }
+    public bool IsScopeCreator { get; set; }
+    public List<ValidationOperation>? DependentValidations { get; set; }
+    public int? Index { get; set; }
+    public string? ParentPath { get; set; }
 
     // public void SetValidationScope(Action setScope);
     // {
     //     ValidationScope = validationScope;
     // }
+    
+    public async ValueTask TraverseAsync(ValidationContext context)
+    {
+        if (HasFailed
+            && (!IsScopeCreator
+                || (IsScopeCreator && context.ValidationMode is not ValidationMode.AccumulateFirstErrorAndAllFirstErrorsCollectionIteration)))
+        {
+            return;
+        }
 
+        HasPendingAsyncValidation = false;
+        
+        if (!HasBeenExecuted)
+        {
+            await ExecuteAsync(context, useAsync: true);
+        }
+
+        while (IsScopeCreator && HasPendingAsyncValidation)
+        {
+            foreach (var dependentValidation in DependentValidations!)
+            {
+                await dependentValidation.TraverseAsync(context);
+            }
+        }
+        
+        if (NextValidation is not null)
+        {
+            await NextValidation.TraverseAsync(context);
+        }
+    }
+    
     public async ValueTask<bool> ExecuteAsync(ValidationContext context, bool useAsync)
     {
         if (Condition is not null)
@@ -134,12 +140,12 @@ public class ValidationOperation<TField> : IValidationOperation
         {
             return ValidationScope();
         }
-        else
-        {
-            throw new UnreachableException();
-        }
+
+        HasBeenExecuted = true;
+        return true;
+        // return await ValueTask.FromResult(true);
     }
-    
+
     public void HandleError(ICrossError error, ValidationContext context)
     {
         var errorToAdd = Error ?? error;

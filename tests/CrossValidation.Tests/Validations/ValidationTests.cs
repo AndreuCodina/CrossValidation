@@ -281,7 +281,7 @@ public class ValidationTests :
     {
         var action = () => Validate.That(1)
             .MustAsync(_commonFixture.NotBeValidAsync)
-            .RunAsync();
+            .ValidateAsync();
 
         await action.ShouldThrowAsync<CrossException>();
     }

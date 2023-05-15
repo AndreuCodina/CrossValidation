@@ -83,7 +83,7 @@ public class ValidateTests :
         var testError = new TestError(Code: expectedCode, Details: expectedDetails);
         var action = () => Validate.That(_model.NullableInt)
             .MustAsync(_ => _commonFixture.ErrorAsync(testError))
-            .RunAsync();
+            .ValidateAsync();
 
         var error = await action.ShouldThrowCrossErrorAsync<TestError>();
         error.Code.ShouldBe(expectedCode);

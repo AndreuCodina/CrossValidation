@@ -15,7 +15,7 @@ public interface ICrossError
     string? Details { get; set; }
     HttpStatusCode? HttpStatusCode { get; set; }
     Dictionary<string, object>? PlaceholderValues { get; set; }
-    public Type CrossErrorToException { get; set; }
+    public Type? CrossErrorToException { get; set; }
     void AddPlaceholderValues();
     IEnumerable<string> GetFieldNames();
     Exception ToException();
@@ -34,7 +34,7 @@ public record CrossError : ICrossError
     public string? Details { get; set; }
     public HttpStatusCode? HttpStatusCode { get; set; }
     public Dictionary<string, object>? PlaceholderValues { get; set; }
-    public Type CrossErrorToException { get; set; }
+    public Type? CrossErrorToException { get; set; }
 
     public CrossError(
         string? FieldName = null,
@@ -102,7 +102,7 @@ public record CrossError : ICrossError
             AddCustomErrorPlaceholderValues();
         }
         
-        var canUseCrossValidationCustomizations = CrossErrorToException
+        var canUseCrossValidationCustomizations = CrossErrorToException!
             .GetInterface(nameof(ICrossErrorToException)) is not null;
 
         if (!canUseCrossValidationCustomizations)

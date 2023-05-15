@@ -19,9 +19,11 @@ public abstract class Validate<TException>
         HttpStatusCode? httpStatusCode = null,
         string? fieldDisplayName = null)
     {
-        return IValidValidation<TField>.CreateFromField(
+        return new Validation<TField>(
             () => fieldValue,
             typeof(TException),
+            parentValidation: null,
+            generalizeError: true,
             error: error,
             message: message,
             code: code,
@@ -40,7 +42,7 @@ public abstract class Validate<TException>
         string? fieldDisplayName = null,
         [CallerArgumentExpression(nameof(field))] string fieldName = default!)
     {
-        return IValidValidation<TField>.CreateFromFieldName(
+        return IValidation<TField>.CreateFromFieldName(
             () => field,
             typeof(TException),
             fieldName,
@@ -81,37 +83,38 @@ public abstract class Validate<TException>
         string? details = null,
         HttpStatusCode? httpStatusCode = null)
     {
-        if (!condition)
-        {
-            var validation = IValidValidation<bool>.CreateFromField(() => condition, typeof(TException));
-
-            if (error is not null)
-            {
-                validation = validation.WithError(error);
-            }
-
-            if (message is not null)
-            {
-                validation = validation.WithMessage(message);
-            }
-
-            if (code is not null)
-            {
-                validation = validation.WithCode(code);
-            }
-
-            if (details is not null)
-            {
-                validation = validation.WithDetails(details);
-            }
-
-            if (httpStatusCode is not null)
-            {
-                validation = validation.WithHttpStatusCode(httpStatusCode.Value);
-            }
-
-            validation.Must(_ => false);
-        }
+        throw new NotImplementedException();
+        // if (!condition)
+        // {
+        //     var validation = IValidation<bool>.CreateFromField(() => condition, typeof(TException));
+        //
+        //     if (error is not null)
+        //     {
+        //         validation = validation.WithError(error);
+        //     }
+        //
+        //     if (message is not null)
+        //     {
+        //         validation = validation.WithMessage(message);
+        //     }
+        //
+        //     if (code is not null)
+        //     {
+        //         validation = validation.WithCode(code);
+        //     }
+        //
+        //     if (details is not null)
+        //     {
+        //         validation = validation.WithDetails(details);
+        //     }
+        //
+        //     if (httpStatusCode is not null)
+        //     {
+        //         validation = validation.WithHttpStatusCode(httpStatusCode.Value);
+        //     }
+        //
+        //     validation.Must(_ => false);
+        // }
     }
     
     public static IValidation<TField> Argument<TField>(
@@ -124,7 +127,7 @@ public abstract class Validate<TException>
         string? fieldDisplayName = null,
         [CallerArgumentExpression(nameof(field))] string fieldName = default!)
     {
-        return IValidValidation<TField>.CreateFromFieldName(
+        return IValidation<TField>.CreateFromFieldName(
             () => field,
             typeof(TException) == typeof(CrossException)
                 ? typeof(ArgumentException)
