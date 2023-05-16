@@ -200,7 +200,7 @@ public static class ValidationExtensions
             var areAllItemsIterated = (index + 1) == totalItems;
             var stopWithFailedScope =
                 validation.HasFailed
-                && validation.Context!.ValidationMode is ValidationMode.AccumulateFirstError;
+                && validation.Context!.ValidationMode is ValidationMode.AccumulateFirstErrors;
             
             if (areAllItemsIterated || stopWithFailedScope)
             {

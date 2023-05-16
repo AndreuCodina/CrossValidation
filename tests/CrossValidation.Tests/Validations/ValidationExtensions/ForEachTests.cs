@@ -50,7 +50,7 @@ public class ForEachTests :
     
     [Theory]
     [InlineData(ValidationMode.StopOnFirstError)]
-    [InlineData(ValidationMode.AccumulateFirstError)]
+    [InlineData(ValidationMode.AccumulateFirstErrors)]
     public void Execute_validators_for_all_item_collection_fails(ValidationMode validationMode)
     {
         _model = new ParentModelBuilder()
@@ -75,8 +75,8 @@ public class ForEachTests :
     
     [Theory]
     [InlineData(ValidationMode.StopOnFirstError)]
-    [InlineData(ValidationMode.AccumulateFirstError)]
-    [InlineData(ValidationMode.AccumulateFirstErrorAndAllFirstErrorsCollectionIteration)]
+    [InlineData(ValidationMode.AccumulateFirstErrors)]
+    [InlineData(ValidationMode.AccumulateFirstErrorsAndAllIterationFirstErrors)]
     public void Keep_field_name_when_the_field_is_transformed_in_a_collection(ValidationMode validationMode)
     {
         _model = new ParentModelBuilder()
@@ -101,8 +101,8 @@ public class ForEachTests :
     
     [Theory]
     [InlineData(ValidationMode.StopOnFirstError)]
-    [InlineData(ValidationMode.AccumulateFirstError)]
-    [InlineData(ValidationMode.AccumulateFirstErrorAndAllFirstErrorsCollectionIteration)]
+    [InlineData(ValidationMode.AccumulateFirstErrors)]
+    [InlineData(ValidationMode.AccumulateFirstErrorsAndAllIterationFirstErrors)]
     public void Index_is_represented_in_field_name_when_iterate_collection(ValidationMode validationMode)
     {
         _model = new ParentModelBuilder()
@@ -140,8 +140,8 @@ public class ForEachTests :
     
     [Theory]
     [InlineData(ValidationMode.StopOnFirstError)]
-    [InlineData(ValidationMode.AccumulateFirstError)]
-    [InlineData(ValidationMode.AccumulateFirstErrorAndAllFirstErrorsCollectionIteration)]
+    [InlineData(ValidationMode.AccumulateFirstErrors)]
+    [InlineData(ValidationMode.AccumulateFirstErrorsAndAllIterationFirstErrors)]
     public void Field_keep_settings_with_error_accumulation(ValidationMode validationMode)
     {
         var expectedFieldDisplayName = "Expected field display name";
@@ -185,8 +185,8 @@ public class ForEachTests :
     
     [Theory]
     [InlineData(ValidationMode.StopOnFirstError)]
-    [InlineData(ValidationMode.AccumulateFirstError)]
-    [InlineData(ValidationMode.AccumulateFirstErrorAndAllFirstErrorsCollectionIteration)]
+    [InlineData(ValidationMode.AccumulateFirstErrors)]
+    [InlineData(ValidationMode.AccumulateFirstErrorsAndAllIterationFirstErrors)]
     public void That_keeps_settings_with_error_accumulation(ValidationMode validationMode)
     {
         var expectedFieldDisplayName = "Expected field display name";
@@ -228,8 +228,8 @@ public class ForEachTests :
     
     [Theory]
     [InlineData(ValidationMode.StopOnFirstError)]
-    [InlineData(ValidationMode.AccumulateFirstError)]
-    [InlineData(ValidationMode.AccumulateFirstErrorAndAllFirstErrorsCollectionIteration)]
+    [InlineData(ValidationMode.AccumulateFirstErrors)]
+    [InlineData(ValidationMode.AccumulateFirstErrorsAndAllIterationFirstErrors)]
     public void Do_not_take_previous_customizations(ValidationMode validationMode)
     {
         var intList = new List<int> {1};
@@ -257,10 +257,10 @@ public class ForEachTests :
         ValidationMode.StopOnFirstError,
         new[] {"1"})]
     [InlineData(
-        ValidationMode.AccumulateFirstError,
+        ValidationMode.AccumulateFirstErrors,
         new[] {"1", "3"})]
     [InlineData(
-        ValidationMode.AccumulateFirstErrorAndAllFirstErrorsCollectionIteration,
+        ValidationMode.AccumulateFirstErrorsAndAllIterationFirstErrors,
         new[] {"1", "2", "3"})]
     public void Throw_errors_with_model_validator(
         ValidationMode validationMode,

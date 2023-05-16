@@ -69,7 +69,7 @@ public class WhenNotNullTests :
             .Build();
         var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
         {
-            validator.ValidationMode = ValidationMode.AccumulateFirstError;
+            validator.ValidationMode = ValidationMode.AccumulateFirstErrors;
             
             var structValidationAction = validator.Field(_model.NullableInt)
                 .WhenNotNull(x => x
@@ -124,7 +124,7 @@ public class WhenNotNullTests :
          
         var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
         {
-            validator.ValidationMode = ValidationMode.AccumulateFirstError;
+            validator.ValidationMode = ValidationMode.AccumulateFirstErrors;
 
             validator.Field(_model.NullableInt)
                 .WhenNotNull(x => x
@@ -155,7 +155,7 @@ public class WhenNotNullTests :
 
         var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
         {
-            validator.ValidationMode = ValidationMode.AccumulateFirstError;
+            validator.ValidationMode = ValidationMode.AccumulateFirstErrors;
 
             validator.Field(_model.NullableInt)
                 .WithMessage(expectedMessage)

@@ -87,7 +87,7 @@ internal class ValidationOperation
     {
         if (HasFailed
             && (!IsScopeCreator
-                || (IsScopeCreator && context.ValidationMode is not ValidationMode.AccumulateFirstErrorAndAllFirstErrorsCollectionIteration)))
+                || (IsScopeCreator && context.ValidationMode is not ValidationMode.AccumulateFirstErrorsAndAllIterationFirstErrors)))
         {
             return;
         }

@@ -165,7 +165,7 @@ public class RealAsyncTests :
         
         var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
         {
-            validator.ValidationMode = ValidationMode.AccumulateFirstError;
+            validator.ValidationMode = ValidationMode.AccumulateFirstErrors;
 
             validator.Field(_model.NullableInt)
                 .WhenNotNull(x => x
@@ -297,7 +297,7 @@ public class RealAsyncTests :
         
         var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
         {
-            validator.ValidationMode = ValidationMode.AccumulateFirstError;
+            validator.ValidationMode = ValidationMode.AccumulateFirstErrors;
             
             validator.Field(_model.NullableInt)
                 .WhenNotNull(x => x
@@ -328,7 +328,7 @@ public class RealAsyncTests :
         
         var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
         {
-            validator.ValidationMode = ValidationMode.AccumulateFirstError;
+            validator.ValidationMode = ValidationMode.AccumulateFirstErrors;
 
             validator.Field(_model.NullableInt)
                 .WhenNotNull(x => x
