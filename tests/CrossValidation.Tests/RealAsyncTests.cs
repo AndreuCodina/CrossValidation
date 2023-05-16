@@ -269,22 +269,17 @@ public class RealAsyncTests :
         error.Message.ShouldBe(expectedMessage);
     }
 
-    // TODO: Fix
     [Fact]
     public async Task ForEach_does_not_get_field_value_when_there_are_accumulated_operations()
     {
-        var expectedMessage = "Expected message";
         var action = () => Validate.That(_model.NullableIntList)
             .MustAsync(_commonFixture.BeValidAsync)
             .NotNull()
             .ForEach(x => x
-                .WithMessage(expectedMessage)
-                .MustAsync(_commonFixture.NotBeValidAsync))
+                .Must(_commonFixture.ThrowException))
             .ValidateAsync();
 
-        var error = await action.ShouldThrowCrossErrorAsync<CommonCrossError.Predicate>();
-        
-        error.Message.ShouldBe(expectedMessage);
+        await action.ShouldThrowCrossErrorAsync<CommonCrossError.NotNull>();
     }
 
     [Fact]
