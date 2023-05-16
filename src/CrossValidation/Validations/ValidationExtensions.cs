@@ -89,24 +89,14 @@ public static class ValidationExtensions
         this IValidation<TField?> validation)
         where TField : class
     {
-        if (!validation.HasFailed)
-        {
-            return validation.SetValidator(() => new NullValidator<TField?>(validation.GetFieldValue()));
-        }
-
-        return validation;
+        return validation.SetValidator(() => new NullValidator<TField?>(validation.GetFieldValue()));
     }
 
     public static IValidation<TField?> Null<TField>(
         this IValidation<TField?> validation)
         where TField : struct
     {
-        if (!validation.HasFailed)
-        {
-            return validation.SetValidator(() => new NullValidator<TField?>(validation.GetFieldValue()));
-        }
-
-        return validation;
+        return validation.SetValidator(() => new NullValidator<TField?>(validation.GetFieldValue()));
     }
 
     public static IValidation<TField> GreaterThan<TField>(
@@ -114,56 +104,31 @@ public static class ValidationExtensions
         TField valueToCompare)
         where TField : IComparisonOperators<TField, TField, bool>
     {
-        if (!validation.HasFailed)
-        {
-            return validation.SetValidator(() =>
-                new GreaterThanValidator<TField>(validation.GetFieldValue(), valueToCompare));
-        }
-
-        return validation;
+        return validation.SetValidator(() =>
+            new GreaterThanValidator<TField>(validation.GetFieldValue(), valueToCompare));
     }
 
     public static IValidation<TField> Enum<TField>(
         this IValidation<TField> validation)
         where TField : Enum
     {
-        if (!validation.HasFailed)
-        {
-            return validation.SetValidator(() => new EnumValidator<TField>(validation.GetFieldValue(), typeof(TField)));
-        }
-
-        return validation;
+        return validation.SetValidator(() => new EnumValidator<TField>(validation.GetFieldValue(), typeof(TField)));
     }
 
     public static IValidation<TEnum> Enum<TEnum>(
         this IValidation<int> validation)
         where TEnum : Enum
     {
-        var validationToReturn = validation;
-
-        if (!validation.HasFailed)
-        {
-            validationToReturn =
-                validation.SetValidator(() => new EnumValidator<int>(validation.GetFieldValue(), typeof(TEnum)));
-        }
-
-        return validationToReturn.Transform(x => (TEnum)(object)x);
+        return validation.SetValidator(() => new EnumValidator<int>(validation.GetFieldValue(), typeof(TEnum)))
+            .Transform(x => (TEnum)(object)x);
     }
 
     public static IValidation<TEnum> Enum<TEnum>(
         this IValidation<string> validation)
         where TEnum : Enum
     {
-        var validationToReturn = validation;
-
-        if (!validation.HasFailed)
-        {
-            validationToReturn = validation.SetValidator(
-                () => new EnumValidator<string>(validation.GetFieldValue(), typeof(TEnum)));
-        }
-
-        return validationToReturn.Transform(x =>
-            (TEnum)System.Enum.Parse(typeof(TEnum), x, ignoreCase: true));
+        return validation.SetValidator(() => new EnumValidator<string>(validation.GetFieldValue(), typeof(TEnum)))
+            .Transform(x => (TEnum)System.Enum.Parse(typeof(TEnum), x, ignoreCase: true));
     }
 
     public static IValidation<TField> Enum<TField>(
@@ -171,13 +136,8 @@ public static class ValidationExtensions
         params TField[] allowedValues)
         where TField : Enum
     {
-        if (!validation.HasFailed)
-        {
-            return validation.SetValidator(
-                () => new EnumRangeValidator<TField, TField>(validation.GetFieldValue(), allowedValues));
-        }
-
-        return validation;
+        return validation.SetValidator(() =>
+            new EnumRangeValidator<TField, TField>(validation.GetFieldValue(), allowedValues));
     }
 
     public static IValidation<TEnum> Enum<TEnum>(
@@ -185,15 +145,9 @@ public static class ValidationExtensions
         params TEnum[] allowedValues)
         where TEnum : Enum
     {
-        var validationToReturn = validation;
-
-        if (!validation.HasFailed)
-        {
-            validationToReturn = validation.SetValidator(
-                () => new EnumRangeValidator<int, TEnum>(validation.GetFieldValue(), allowedValues));
-        }
-
-        return validationToReturn.Transform(x => (TEnum)(object)x);
+        return validation
+            .SetValidator(() => new EnumRangeValidator<int, TEnum>(validation.GetFieldValue(), allowedValues))
+            .Transform(x => (TEnum)(object)x);
     }
 
     public static IValidation<TEnum> Enum<TEnum>(
@@ -201,16 +155,9 @@ public static class ValidationExtensions
         params TEnum[] allowedValues)
         where TEnum : Enum
     {
-        var validationToReturn = validation;
-
-        if (!validation.HasFailed)
-        {
-            validationToReturn = validation.SetValidator(
-                () => new EnumRangeValidator<string, TEnum>(validation.GetFieldValue(), allowedValues));
-        }
-
-        return validationToReturn.Transform(x =>
-            (TEnum)System.Enum.Parse(typeof(TEnum), x, ignoreCase: true));
+        return validation.SetValidator(
+                () => new EnumRangeValidator<string, TEnum>(validation.GetFieldValue(), allowedValues))
+            .Transform(x => (TEnum)System.Enum.Parse(typeof(TEnum), x, ignoreCase: true));
     }
 
     public static IValidation<string> LengthRange(
@@ -218,24 +165,14 @@ public static class ValidationExtensions
         int minimum,
         int maximum)
     {
-        if (!validation.HasFailed)
-        {
-            return validation.SetValidator(() => new LengthRangeValidator(validation.GetFieldValue(), minimum, maximum));
-        }
-
-        return validation;
+        return validation.SetValidator(() => new LengthRangeValidator(validation.GetFieldValue(), minimum, maximum));
     }
 
     public static IValidation<string> MinimumLength(
         this IValidation<string> validation,
         int minimum)
     {
-        if (!validation.HasFailed)
-        {
-            return validation.SetValidator(() => new MinimumLengthValidator(validation.GetFieldValue(), minimum));
-        }
-
-        return validation;
+        return validation.SetValidator(() => new MinimumLengthValidator(validation.GetFieldValue(), minimum));
     }
 
     public static IValidation<IEnumerable<TInnerType>> ForEach<TInnerType, TReturnedField>(
@@ -280,13 +217,7 @@ public static class ValidationExtensions
         [StringSyntax(StringSyntaxAttribute.Regex)]
         string pattern)
     {
-        if (!validation.HasFailed)
-        {
-            return validation.SetValidator(
-                () => new RegularExpressionValidator(validation.GetFieldValue(), pattern));
-        }
-
-        return validation;
+        return validation.SetValidator(() => new RegularExpressionValidator(validation.GetFieldValue(), pattern));
     }
     
     private static IValidation<TDependentField> CreateDependentValidation<TField, TDependentField>(

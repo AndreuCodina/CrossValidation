@@ -91,8 +91,6 @@ internal class ValidationOperation
         {
             return;
         }
-
-        HasPendingAsyncValidation = false;
         
         if (!HasBeenExecuted)
         {
@@ -101,6 +99,8 @@ internal class ValidationOperation
 
         while (IsScopeCreator && HasPendingAsyncValidation)
         {
+            HasPendingAsyncValidation = false;
+
             foreach (var dependentValidation in DependentValidations!)
             {
                 await dependentValidation.TraverseAsync(context);

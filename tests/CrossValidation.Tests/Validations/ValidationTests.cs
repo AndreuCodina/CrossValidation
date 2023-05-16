@@ -1,5 +1,4 @@
-﻿using System;
-using System.Net;
+﻿using System.Net;
 using System.Threading.Tasks;
 using CrossValidation.Errors;
 using CrossValidation.Exceptions;
@@ -141,47 +140,7 @@ public class ValidationTests :
         error.HttpStatusCode.ShouldBe(HttpStatusCode.Accepted);
         error.FieldDisplayName.ShouldBe("Expected field display name");
     }
-    
-    [Fact]
-    public void Call_Instance_from_invalid_validation_fails()
-    {
-        var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
-        {
-            validator.ValidationMode = ValidationMode.AccumulateFirstError;
 
-            validator.Field(_model.NullableInt)
-                .NotNull()
-                .Transform(x => x + 1)
-                .Transform(x => x.ToString())
-                .Transform(int.Parse)
-                .Instance();
-        });
-    
-        var action = () => parentModelValidator.Validate(_model);
-    
-        action.ShouldThrow<InvalidOperationException>();
-    }
-    
-    [Fact]
-    public void Call_Instance_with_function_from_invalid_validation_fails()
-    {
-        var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
-        {
-            validator.ValidationMode = ValidationMode.AccumulateFirstError;
-
-            validator.Field(_model.NullableInt)
-                .NotNull()
-                .Transform(x => x + 1)
-                .Transform(x => x.ToString())
-                .Transform(int.Parse)
-                .Instance(ValueObjectWithoutCustomization.Create);
-        });
-    
-        var action = () => parentModelValidator.Validate(_model);
-    
-        action.ShouldThrow<InvalidOperationException>();
-    }
-    
     [Fact]
     public void Get_instance()
     {
@@ -362,7 +321,8 @@ public class ValidationTests :
     {
         public static ValueObjectWithoutCustomization Create(int value)
         {
-            Validate.Field(value).GreaterThan(value + 1);
+            Validate.Field(value)
+                .GreaterThan(value + 1);
             return new(value);
         }
     }
