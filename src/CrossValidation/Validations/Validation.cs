@@ -95,7 +95,6 @@ public interface IValidation<out TField> : IValidationOperation
         return new Validation<TField>(
             getFieldValue: getFieldValue,
             crossErrorToException: crossErrorToException,
-            parentValidation: null,
             generalizeError: false,
             fieldFullPath: fieldFullPath,
             error: error,
@@ -364,7 +363,6 @@ internal class Validation<TField> :
         var nextValidation = new Validation<TFieldTransformed>(
             getFieldValue: getFieldValueTransformed,
             crossErrorToException: CrossErrorToException,
-            parentValidation: this,
             generalizeError: false,
             fieldFullPath: FieldFullPath,
             context: Context,
@@ -421,7 +419,6 @@ internal class Validation<TField> :
     {
         return GetGenericFieldValue!();
     }
-    // public ValidationOperation ParentValidation { get; set; }
 
     public Validation()
     {
@@ -430,7 +427,6 @@ internal class Validation<TField> :
     public Validation(
         Func<TField>? getFieldValue,
         Type? crossErrorToException,
-        ValidationOperation? parentValidation,
         bool generalizeError,
         string? fieldFullPath = null,
         ValidationContext? context = null,
@@ -451,15 +447,7 @@ internal class Validation<TField> :
         {
             Context = new ValidationContext();
         }
-
-        // if (parentValidation is not null)
-        // {
-        //     parentValidation.NextValidation = this;
-        // }
-        // else
-        // {
-        //     Context.ValidationTree.NextValidation = this;
-        // }
+        
         if (Context.ValidationTree is null)
         {
             Context.ValidationTree = this;
@@ -536,7 +524,6 @@ internal class Validation<TField> :
         var nextValidation = new Validation<TField>(
             getFieldValue: GetFieldValue,
             crossErrorToException: CrossErrorToException,
-            parentValidation: this,
             generalizeError: false,
             fieldFullPath: FieldFullPath,
             context: Context,

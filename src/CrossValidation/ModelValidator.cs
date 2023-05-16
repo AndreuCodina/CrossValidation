@@ -62,17 +62,17 @@ public abstract record ModelValidator<TModel>
         HttpStatusCode? httpStatusCode = null,
         string? fieldDisplayName = null)
     {
-        throw new NotImplementedException();
-        // return IValidation<TField>.CreateFromField(
-        //     () => fieldValue,
-        //     typeof(CrossException),
-        //     context: Context,
-        //     error: error,
-        //     message: message,
-        //     code: code,
-        //     details: details,
-        //     httpStatusCode: httpStatusCode,
-        //     fieldDisplayName: fieldDisplayName);
+        return new Validation<TField>(
+            getFieldValue: () => fieldValue,
+            crossErrorToException: typeof(CrossException),
+            generalizeError: true,
+            context: Context,
+            error: error,
+            message: message,
+            code: code,
+            details: details,
+            httpStatusCode: httpStatusCode,
+            fieldDisplayName: fieldDisplayName);
     }
 
     public abstract void CreateValidations(TModel model);

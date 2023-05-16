@@ -297,7 +297,6 @@ public static class ValidationExtensions
         var dependentValidation = new Validation<TDependentField>(
             getFieldValue: getFieldValue,
             crossErrorToException: validation.CrossErrorToException,
-            parentValidation: null, // validation
             generalizeError: false,
             fieldFullPath: validation.FieldFullPath,
             context: validation.Context,

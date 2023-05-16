@@ -22,7 +22,6 @@ public abstract class Validate<TException>
         return new Validation<TField>(
             getFieldValue: () => field,
             crossErrorToException: typeof(TException),
-            parentValidation: null,
             generalizeError: true,
             error: error,
             message: message,
