@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using System.Net;
 using CrossValidation.Errors;
 using CrossValidation.Resources;
@@ -7,23 +6,56 @@ using CrossValidation.Validators;
 namespace CrossValidation;
 
 /// <summary>
-/// A node of a validation, defined by its validator and customizations.
+/// Manages a validation operation
 ///
 /// In a validation such as:
 /// 
 /// Validate.That(request.Age)
-///     .WithMessage("The age is required").NotNull() // ValidationNode
-///     .WithMessage("The age must be greater than or equal to 18").GreaterThanOrEqual(18) // ValidationNode
-///     .Transform(age => age + 1)
-///     .Must(() => true) // ValidationNode
+///     .WithMessage("The age is required").NotNull() // Validation operation
+///     .WithMessage("The age must be greater than or equal to 18").GreaterThanOrEqual(18) // Validation operation
+///     .Transform(age => age + 1) // Validation operation
+///     .Must(() => true) // Validation operation
 /// </summary>
-// public class ValidationOperation<TField> : IValidationOperation
-public class ValidationOperation
+public interface IValidationOperation
+{
+    Func<object>? GetNonGenericFieldValue { get; set; }
+    Func<IValidator<ICrossError>>? Validator { get; set; }
+    Func<Task<IValidator<ICrossError>>>? AsyncValidator { get; set; }
+    Func<bool>? ValidationScope { get; set; }
+    string? Code { get; set; }
+    string? Message { get; set; }
+    string? Details { get; set; }
+    ICrossError? Error { get; set; }
+    string? FieldDisplayName { get; set; }
+    HttpStatusCode? HttpStatusCode { get; set; }
+    // Type CrossErrorToException { get; set; }
+    Func<bool>? Condition { get; set; }
+    Func<Task<bool>>? AsyncCondition { get; set; }
+    IValidationOperation? NextValidation { get; set; }
+    bool HasFailed { get; set; }
+    bool HasBeenExecuted { get; set; }
+    // bool HasAsyncNextValidationsPendingToExecute { get; set; } = false;
+    bool HasPendingAsyncValidation { get; set; }
+    bool IsScopeCreator { get; set; }
+    List<IValidationOperation>? DependentValidations { get; set; }
+    int? Index { get; set; }
+    string? ParentPath { get; set; } 
+    public bool IsInsideScope { get; set; }
+    public IValidationOperation? ScopeCreatorValidation { get; set; }
+    ValueTask TraverseAsync(ValidationContext context);
+    ValueTask<bool> ExecuteAsync(ValidationContext context, bool useAsync);
+    void HandleError(ICrossError error, ValidationContext context);
+    void TakeCustomizationsFromInstanceError(ICrossError error, ValidationContext context);
+    void TakeCustomizationsFromError(ICrossError error);
+    void MarkAsPendingAsyncValidation();
+    void MarkAsFailed();
+}
+
+internal class ValidationOperation
 {
     public Func<object>? GetNonGenericFieldValue { get; set; }
     public Func<IValidator<ICrossError>>? Validator { get; set; }
     public Func<Task<IValidator<ICrossError>>>? AsyncValidator { get; set; }
-    // public Action<IValidValidation<TField>>? ValidationScope { get; set; }
     public Func<bool>? ValidationScope { get; set; }
     public string? Code { get; set; }
     public string? Message { get; set; }
@@ -34,15 +66,17 @@ public class ValidationOperation
     // public Type CrossErrorToException { get; set; }
     public Func<bool>? Condition { get; set; }
     public Func<Task<bool>>? AsyncCondition { get; set; }
-    public ValidationOperation? NextValidation { get; set; }
-    public bool HasFailed { get; set; } = false;
-    public bool HasBeenExecuted { get; set; } = false;
+    public IValidationOperation? NextValidation { get; set; }
+    public bool HasFailed { get; set; }
+    public bool HasBeenExecuted { get; set; }
     // public bool HasAsyncNextValidationsPendingToExecute { get; set; } = false;
     public bool HasPendingAsyncValidation { get; set; }
     public bool IsScopeCreator { get; set; }
-    public List<ValidationOperation>? DependentValidations { get; set; }
+    public List<IValidationOperation>? DependentValidations { get; set; }
     public int? Index { get; set; }
     public string? ParentPath { get; set; }
+    public bool IsInsideScope { get; set; }
+    public IValidationOperation? ScopeCreatorValidation { get; set; }
 
     // public void SetValidationScope(Action setScope);
     // {
@@ -143,7 +177,6 @@ public class ValidationOperation
 
         HasBeenExecuted = true;
         return true;
-        // return await ValueTask.FromResult(true);
     }
 
     public void HandleError(ICrossError error, ValidationContext context)
@@ -157,6 +190,57 @@ public class ValidationOperation
             {
                 throw context.ErrorsCollected[0].ToException();
             }
+        }
+    }
+    
+    public void TakeCustomizationsFromInstanceError(ICrossError error, ValidationContext context)
+    {
+        if (!context.GeneralizeError)
+        {
+            return;
+        }
+
+        var codeToAdd = Code ?? error.Code;
+        var isInstanceCallerWithCodeAndWithoutMessage = Code is not null && Message is null;
+        
+        if (isInstanceCallerWithCodeAndWithoutMessage && codeToAdd is not null)
+        {
+            Message = CrossValidationOptions.GetMessageFromCode(codeToAdd);
+        }
+        else
+        {
+            Message ??= error.Message;
+        }
+
+        Code = codeToAdd;
+    }
+    
+    public void TakeCustomizationsFromError(ICrossError error)
+    {
+        Code = error.Code ?? Code;
+        Message = error.Message ?? Message;
+        Details = error.Details ?? Details;
+        HttpStatusCode = error.HttpStatusCode ?? HttpStatusCode;
+        FieldDisplayName = error.FieldDisplayName ?? FieldDisplayName;
+    }
+    
+    public void MarkAsPendingAsyncValidation()
+    {
+        HasPendingAsyncValidation = true;
+        
+        if (IsInsideScope)
+        {
+            ScopeCreatorValidation!.MarkAsPendingAsyncValidation();
+        }
+    }
+
+    public void MarkAsFailed()
+    {
+        HasFailed = true;
+        
+        if (IsInsideScope)
+        {
+            ScopeCreatorValidation!.MarkAsFailed();
         }
     }
     
@@ -241,36 +325,5 @@ public class ValidationOperation
         }
 
         return null;
-    }
-    
-    public void TakeCustomizationsFromInstanceError(ICrossError error, ValidationContext context)
-    {
-        if (!context.GeneralizeError)
-        {
-            return;
-        }
-
-        var codeToAdd = Code ?? error.Code;
-        var isInstanceCallerWithCodeAndWithoutMessage = Code is not null && Message is null;
-        
-        if (isInstanceCallerWithCodeAndWithoutMessage && codeToAdd is not null)
-        {
-            Message = CrossValidationOptions.GetMessageFromCode(codeToAdd);
-        }
-        else
-        {
-            Message ??= error.Message;
-        }
-
-        Code = codeToAdd;
-    }
-    
-    public void TakeCustomizationsFromError(ICrossError error)
-    {
-        Code = error.Code ?? Code;
-        Message = error.Message ?? Message;
-        Details = error.Details ?? Details;
-        HttpStatusCode = error.HttpStatusCode ?? HttpStatusCode;
-        FieldDisplayName = error.FieldDisplayName ?? FieldDisplayName;
     }
 }

@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 using CrossValidation.Validators;
 using CrossValidation.Validators.LengthValidators;
@@ -239,77 +238,41 @@ public static class ValidationExtensions
         return validation;
     }
 
-    public static IValidation<IEnumerable<TReturnedField>> ForEach<TInnerType, TReturnedField>(
+    public static IValidation<IEnumerable<TInnerType>> ForEach<TInnerType, TReturnedField>(
         this IValidation<IEnumerable<TInnerType>> validation,
         Func<IValidation<TInnerType>, IValidation<TReturnedField>> action)
     {
-        if (validation.HasFailed)
+        if (validation.HasFailed)  // SetValidationScope ???
         {
-            return IValidation<IEnumerable<TReturnedField>>.CreateFailed();
+            return IValidation<IEnumerable<TInnerType>>.CreateFailed();
         }
 
-        throw new NotImplementedException();
+        validation.IsScopeCreator = true;
+        
+        var fieldCollection = validation.GetFieldValue()
+            .ToList();
+        var index = 0;
+        var totalItems = fieldCollection.Count();
 
-        // var fieldCollection = validation.GetFieldValue();
-        // var fieldFullPath = validation.Context!.FieldName;
-        // var index = 0;
-        // var areErrors = false;
-        //
-        // foreach (var innerField in fieldCollection)
-        // {
-        //     var newValidation = IValidation<TInnerType>.CreateFromField(
-        //         () => innerField,
-        //         validation.CrossErrorToException,
-        //         generalizeError: validation.Context.GeneralizeError,
-        //         fieldFullPath: fieldFullPath,
-        //         context: validation.Context,
-        //         index: index,
-        //         parentPath: validation.Context.ParentPath,
-        //         error: validation.Context.Error,
-        //         message: validation.Context.Message,
-        //         code: validation.Context.Code,
-        //         details: validation.Context.Details,
-        //         httpStatusCode: validation.Context.HttpStatusCode,
-        //         fieldDisplayName: validation.Context.FieldDisplayName);
-        //     var validationReturned = action(newValidation);
-        //
-        //     if (validationReturned.HasFailed)
-        //     {
-        //         if (validation.Context.ValidationMode is ValidationMode.StopOnFirstError
-        //             || validation.Context.ValidationMode is ValidationMode.AccumulateFirstError)
-        //         {
-        //             return IValidation<IEnumerable<TReturnedField>>.CreateFailed();
-        //         }
-        //         else if (validation.Context.ValidationMode is ValidationMode
-        //                      .AccumulateFirstErrorAndAllFirstErrorsCollectionIteration)
-        //         {
-        //             areErrors = true;
-        //             index++;
-        //             continue;
-        //         }
-        //         else
-        //         {
-        //             throw new UnreachableException();
-        //         }
-        //     }
-        //
-        //     index++;
-        // }
-        //
-        // if (areErrors)
-        // {
-        //     return IValidation<IEnumerable<TReturnedField>>.CreateFailed();
-        // }
-        // else
-        // {
-        //     return IValidation<IEnumerable<TReturnedField>>.CreateFromField(
-        //         () => throw new InvalidOperationException("Cannot continue a validation after ForEah"),
-        //         validation.CrossErrorToException,
-        //         fieldFullPath: fieldFullPath,
-        //         context: validation.Context,
-        //         index: index,
-        //         parentPath: validation.Context.ParentPath);
-        // }
+        foreach (var innerField in fieldCollection)
+        {
+            var getFieldValue = () => innerField;
+            var dependentValidation = CreateDependentValidation(validation, getFieldValue, index);
+            action(dependentValidation);
+            index++;
+            var areAllItemsIterated = (index + 1) == totalItems;
+            var stopWithFailedScope =
+                validation.HasFailed
+                && validation.Context!.ValidationMode is ValidationMode.AccumulateFirstError;
+            
+            if (areAllItemsIterated || stopWithFailedScope)
+            {
+                validation.HasBeenExecuted = true;
+                break;
+            }
+        }
+
+        return validation.CreateNextValidation();
     }
 
     public static IValidation<string> Regex(
@@ -324,5 +287,34 @@ public static class ValidationExtensions
         }
 
         return validation;
+    }
+    
+    private static IValidation<TDependentField> CreateDependentValidation<TField, TDependentField>(
+        IValidation<TField> validation,
+        Func<TDependentField> getFieldValue,
+        int? index)
+    {
+        var dependentValidation = new Validation<TDependentField>(
+            getFieldValue: getFieldValue,
+            crossErrorToException: validation.CrossErrorToException,
+            parentValidation: null, // validation
+            generalizeError: false,
+            fieldFullPath: validation.FieldFullPath,
+            context: validation.Context,
+            index: index,
+            parentPath: validation.ParentPath,
+            error: null,
+            message: null,
+            code: null,
+            details: null,
+            httpStatusCode: null,
+            fieldDisplayName: null);
+        dependentValidation.HasFailed = validation.HasFailed;
+        dependentValidation.HasPendingAsyncValidation = validation.HasPendingAsyncValidation;
+        dependentValidation.IsInsideScope = true;
+        dependentValidation.ScopeCreatorValidation = validation;
+        validation.DependentValidations ??= new();
+        validation.DependentValidations.Add(dependentValidation);
+        return dependentValidation;
     }
 }

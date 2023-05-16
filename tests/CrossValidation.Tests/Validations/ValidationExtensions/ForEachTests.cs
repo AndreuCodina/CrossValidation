@@ -125,14 +125,13 @@ public class ForEachTests :
     }
     
     [Fact]
-    public void Collect_transformed_values()
+    public void Collect_transformed_instance()
     {
         string ApplyTransformation(int value) => value.ToString();
         int UnapplyTransformation(string value) => int.Parse(value);
         
         var stringList = Validate.That(_model.IntList)
-            .ForEach(x => x
-                .Transform(ApplyTransformation))
+            .Transform(x => x.Select(ApplyTransformation))
             .Instance();
         
         stringList.Select(UnapplyTransformation)

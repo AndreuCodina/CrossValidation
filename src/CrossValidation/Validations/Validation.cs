@@ -7,17 +7,10 @@ using CrossValidation.Validators;
 
 namespace CrossValidation.Validations;
 
-// public interface IValidation
-// public interface IValidation<out TField> : IValidation
-
-// internal class ValidationOperation2
-// {
-//     internal void Foo()
-//     {
-//     }
-// }
-
-public interface IValidation<out TField>
+/// <summary>
+/// To be used by the library users to validate data.
+/// </summary>
+public interface IValidation<out TField> : IValidationOperation
 {
     [Pure]
     IValidation<TFieldTransformed> Transform<TFieldTransformed>(
@@ -79,12 +72,10 @@ public interface IValidation<out TField>
     string? FieldFullPath { get; set; }
     
     Type? CrossErrorToException { get; set; }
-    
-    bool HasFailed { get; set; }
 
-    Func<object>? GetNonGenericFieldValue { get; set; }
-    
     TField GetFieldValue();
+
+    IValidation<TField> CreateNextValidation();
 
     static IValidation<TField> CreateFromFieldName(
         Func<TField>? fieldValue,
@@ -157,6 +148,7 @@ internal class Validation<TField> :
 
             if (!isExecutionValid)
             {
+                MarkAsFailed();
                 return IValidation<TField>.CreateFailed();
             }
         }
@@ -172,7 +164,7 @@ internal class Validation<TField> :
             return IValidation<TField>.CreateFailed();
         }
         
-        HasPendingAsyncValidation = true;
+        MarkAsPendingAsyncValidation();
         AsyncValidator = validator;
         var nextValidation = CreateNextValidation();
         return nextValidation;
@@ -551,7 +543,7 @@ internal class Validation<TField> :
         }
     }
     
-    private IValidation<TField> CreateNextValidation()
+    public IValidation<TField> CreateNextValidation()
     {
         var nextValidation = new Validation<TField>(
             getFieldValue: GetFieldValue,

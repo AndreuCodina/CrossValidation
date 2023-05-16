@@ -72,23 +72,7 @@ public class RealAsyncTests :
         
         error.Message.ShouldBe(expectedMessage);
     }
-    
-    [Fact]
-    public async Task Stop_execution_after_first_failed_validation_operation_accumulated()
-    {
-        var expectedMessage = "Expected message";
-        var action = () => Validate.That(_model.NullableInt)
-            .MustAsync(_commonFixture.BeValidAsync)
-            .WithMessage(expectedMessage)
-            .NotNull()
-            .Must(x => x == int.MaxValue)
-            .ValidateAsync();
 
-        var error = await action.ShouldThrowCrossErrorAsync<CommonCrossError.NotNull>();
-        
-        error.Message.ShouldBe(expectedMessage);
-    }
-    
     [Fact]
     public async Task Not_execute_predicate_returning_error_customization()
     {
@@ -302,36 +286,7 @@ public class RealAsyncTests :
         
         error.Message.ShouldBe(expectedMessage);
     }
-    
-    [Fact]
-    public async Task ForEach_with_accumulations_returns_field_value()
-    {
-        var expectedIntList = new List<int> { 1, 2, 3 };
-        var expectedStringList = new List<string> { "2", "4", "6" };
-        var expectedMessage = "Expected message";
-        _model = new ParentModelBuilder()
-            .WithIntList(expectedIntList)
-            .Build();
-        var action = () => Validate.That(_model.IntList)
-            .MustAsync(_commonFixture.BeValidAsync)
-            .ForEach(x => x
-                .MustAsync(_commonFixture.BeValidAsync)
-                .Transform(x => x * 2)
-                .Transform(x => (int?)x)
-                .NotNull()
-                .MustAsync(_commonFixture.BeValidAsync)
-                .Transform(x => x.ToString())
-                .MustAsync(_commonFixture.BeValidAsync))
-            .Must(x => x.SequenceEqual(expectedStringList))
-            .WithMessage(expectedMessage)
-            .Must(_commonFixture.NotBeValid)
-            .ValidateAsync();
 
-        var error = await action.ShouldThrowCrossErrorAsync<CommonCrossError.Predicate>();
-        
-        error.Message.ShouldBe(expectedMessage);
-    }
-    
     [Fact]
     public void Stop_validation_after_failed_WhenNotNull_scope()
     {

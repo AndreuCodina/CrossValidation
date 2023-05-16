@@ -9,7 +9,7 @@ namespace CrossValidation;
 /// </summary>
 public class ValidationContext
 {
-    public ValidationOperation? ValidationTree { get; set; }
+    public IValidationOperation? ValidationTree { get; set; }
     public List<ICrossError>? ErrorsCollected { get; set; }
     public string? FieldName { get; set; }
     public string? ParentPath { get; set; }
