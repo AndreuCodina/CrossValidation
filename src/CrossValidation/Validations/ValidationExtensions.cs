@@ -26,63 +26,40 @@ public static class ValidationExtensions
 
     public static IValidation<TField?> WhenNotNull<TField, TReturnedField>(
         this IValidation<TField?> validation,
-        Func<IValidation<TField>, IValidation<TReturnedField>> notNullValidation)
+        Func<IValidation<TField>, IValidation<TReturnedField>> action)
         where TField : struct
     {
-        if (validation.HasFailed)
-        {
-            return validation;
-        }
+        validation.Condition = () => validation.GetFieldValue() is not null;
         
-        return validation.SetValidationScope(() =>
+        return validation.SetScope(() =>
         {
-            if (validation.GetFieldValue() is not null)
-            {
- 
-                
-                // if (validationReturned.HasFailed)
-                // {
-                //     return false;
-                // }
-            }
-
-            return true;
+            validation.IsScopeCreator = true;
+            var getFieldValue = () => validation.GetFieldValue()!.Value;
+            var dependentValidation = CreateDependentValidation(
+                validation: validation,
+                getFieldValue: getFieldValue,
+                index: null);
+            action(dependentValidation);
         });
-
-        // if (validation.GetFieldValue() is not null)
-        // {
-        //     var validationReturned = notNullValidation(validation.Transform(x => x!.Value));
-        //
-        //     if (validationReturned is IInvalidation<TReturnedField>)
-        //     {
-        //         return IInvalidation<TField?>.Create();
-        //     }
-        // }
-
-        // return validation;
     }
 
     public static IValidation<TField?> WhenNotNull<TField, TReturnedField>(
         this IValidation<TField?> validation,
-        Func<IValidation<TField>, IValidation<TReturnedField>> notNullValidation)
+        Func<IValidation<TField>, IValidation<TReturnedField>> action)
         where TField : class
     {
-        if (!validation.HasFailed)
+        validation.Condition = () => validation.GetFieldValue() is not null;
+        
+        return validation.SetScope(() =>
         {
-            return validation;
-        }
-
-        if (validation.GetFieldValue() is not null)
-        {
-            var validationReturned = notNullValidation(validation.Transform(x => x!));
-
-            if (validationReturned.HasFailed)
-            {
-                return IValidation<TField?>.CreateFailed();
-            }
-        }
-
-        return validation;
+            validation.IsScopeCreator = true;
+            var getFieldValue = () => validation.GetFieldValue()!;
+            var dependentValidation = CreateDependentValidation(
+                validation: validation,
+                getFieldValue: getFieldValue,
+                index: null);
+            action(dependentValidation);
+        });
     }
 
     public static IValidation<TField?> Null<TField>(
@@ -179,37 +156,38 @@ public static class ValidationExtensions
         this IValidation<IEnumerable<TInnerType>> validation,
         Func<IValidation<TInnerType>, IValidation<TReturnedField>> action)
     {
-        if (validation.HasFailed)  // SetValidationScope ???
+        if (validation.HasFailed)
         {
             return IValidation<IEnumerable<TInnerType>>.CreateFailed();
         }
 
-        validation.IsScopeCreator = true;
-        
-        var fieldCollection = validation.GetFieldValue()
-            .ToList();
-        var index = 0;
-        var totalItems = fieldCollection.Count();
-
-        foreach (var innerField in fieldCollection)
+        return validation.SetScope(() =>
         {
-            var getFieldValue = () => innerField;
-            var dependentValidation = CreateDependentValidation(validation, getFieldValue, index);
-            action(dependentValidation);
-            index++;
-            var areAllItemsIterated = (index + 1) == totalItems;
-            var stopWithFailedScope =
-                validation.HasFailed
-                && validation.Context!.ValidationMode is ValidationMode.AccumulateFirstErrors;
-            
-            if (areAllItemsIterated || stopWithFailedScope)
-            {
-                validation.HasBeenExecuted = true;
-                break;
-            }
-        }
+            validation.IsScopeCreator = true;
+        
+            var fieldCollection = validation.GetFieldValue()
+                .ToList();
+            var index = 0;
+            var totalItems = fieldCollection.Count();
 
-        return validation.CreateNextValidation();
+            foreach (var innerField in fieldCollection)
+            {
+                var getFieldValue = () => innerField;
+                var dependentValidation = CreateDependentValidation(validation, getFieldValue, index);
+                action(dependentValidation);
+                index++;
+                var areAllItemsIterated = (index + 1) == totalItems;
+                var stopWithFailedScope =
+                    validation.HasFailed
+                    && validation.Context!.ValidationMode is ValidationMode.AccumulateFirstErrors;
+            
+                if (areAllItemsIterated || stopWithFailedScope)
+                {
+                    validation.HasBeenExecuted = true;
+                    break;
+                }
+            }
+        });
     }
 
     public static IValidation<string> Regex(

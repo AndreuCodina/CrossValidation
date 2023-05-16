@@ -21,7 +21,7 @@ public interface IValidationOperation
     Func<object>? GetNonGenericFieldValue { get; set; }
     Func<IValidator<ICrossError>>? Validator { get; set; }
     Func<Task<IValidator<ICrossError>>>? AsyncValidator { get; set; }
-    Func<bool>? ValidationScope { get; set; }
+    Action? Scope { get; set; }
     string? Code { get; set; }
     string? Message { get; set; }
     string? Details { get; set; }
@@ -42,12 +42,13 @@ public interface IValidationOperation
     public bool IsInsideScope { get; set; }
     public IValidationOperation? ScopeCreatorValidation { get; set; }
     ValueTask TraverseAsync(ValidationContext context);
-    ValueTask<bool> ExecuteAsync(ValidationContext context, bool useAsync);
+    ValueTask ExecuteAsync(ValidationContext context, bool useAsync);
     void HandleError(ICrossError error, ValidationContext context);
     void TakeCustomizationsFromInstanceError(ICrossError error, ValidationContext context);
     void TakeCustomizationsFromError(ICrossError error);
     void MarkAsPendingAsyncValidation();
     void MarkAsFailed();
+    
 }
 
 internal class ValidationOperation
@@ -55,7 +56,7 @@ internal class ValidationOperation
     public Func<object>? GetNonGenericFieldValue { get; set; }
     public Func<IValidator<ICrossError>>? Validator { get; set; }
     public Func<Task<IValidator<ICrossError>>>? AsyncValidator { get; set; }
-    public Func<bool>? ValidationScope { get; set; }
+    public Action? Scope { get; set; }
     public string? Code { get; set; }
     public string? Message { get; set; }
     public string? Details { get; set; }
@@ -77,11 +78,6 @@ internal class ValidationOperation
     public bool IsInsideScope { get; set; }
     public IValidationOperation? ScopeCreatorValidation { get; set; }
 
-    // public void SetValidationScope(Action setScope);
-    // {
-    //     ValidationScope = validationScope;
-    // }
-    
     public async ValueTask TraverseAsync(ValidationContext context)
     {
         if (HasFailed
@@ -94,6 +90,11 @@ internal class ValidationOperation
         if (!HasBeenExecuted)
         {
             await ExecuteAsync(context, useAsync: true);
+
+            if (HasFailed)
+            {
+                return;
+            }
         }
 
         while (IsScopeCreator && HasPendingAsyncValidation)
@@ -112,13 +113,13 @@ internal class ValidationOperation
         }
     }
     
-    public async ValueTask<bool> ExecuteAsync(ValidationContext context, bool useAsync)
+    public async ValueTask ExecuteAsync(ValidationContext context, bool useAsync)
     {
         if (Condition is not null)
         {
             if (!Condition())
             {
-                return true;
+                return;
             }
         }
         else if (AsyncCondition is not null)
@@ -130,7 +131,7 @@ internal class ValidationOperation
             
             if (!await AsyncCondition())
             {
-                return true;
+                return;
             }
         }
         
@@ -140,11 +141,11 @@ internal class ValidationOperation
 
             if (error is null)
             {
-                return true;
+                return;
             }
             
             HandleError(error, context);
-            return false;
+            MarkAsFailed();
         }
         else if (AsyncValidator is not null)
         {
@@ -157,19 +158,18 @@ internal class ValidationOperation
 
             if (error is null)
             {
-                return true;
+                return;
             }
             
             HandleError(error, context);
-            return false;
+            MarkAsFailed();
         }
-        else if (ValidationScope is not null)
+        else if (Scope is not null)
         {
-            return ValidationScope();
+            Scope();
         }
 
         HasBeenExecuted = true;
-        return true;
     }
 
     public void HandleError(ICrossError error, ValidationContext context)

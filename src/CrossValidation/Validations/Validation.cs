@@ -60,8 +60,8 @@ public interface IValidation<out TField> : IValidationOperation
     IValidation<TField> SetValidator(Func<IValidator<ICrossError>> validator);
 
     IValidation<TField> SetAsyncValidator(Func<Task<IValidator<ICrossError>>> validator);
-    
-    IValidation<TField> SetValidationScope(Func<bool> scope);
+
+    IValidation<TField> SetScope(Action scope);
     
     IValidation<TField> SetModelValidator<TChildModel>(ModelValidator<TChildModel> validator);
     
@@ -127,21 +127,14 @@ internal class Validation<TField> :
 
         if (!HasPendingAsyncValidation)
         {
-            var isExecutionValid = ExecuteAsync(Context!, useAsync: false)
+            ExecuteAsync(Context!, useAsync: false)
                 .GetAwaiter()
                 .GetResult();
-
-            if (!isExecutionValid)
-            {
-                MarkAsFailed();
-                return IValidation<TField>.CreateFailed();
-            }
         }
 
-        var nextValidation = CreateNextValidation();
-        return nextValidation;
+        return CreateNextValidation();
     }
-
+    
     public IValidation<TField> SetAsyncValidator(Func<Task<IValidator<ICrossError>>> validator)
     {
         if (HasFailed)
@@ -151,40 +144,26 @@ internal class Validation<TField> :
         
         MarkAsPendingAsyncValidation();
         AsyncValidator = validator;
-        var nextValidation = CreateNextValidation();
-        return nextValidation;
+        return CreateNextValidation();
     }
-
-    public IValidation<TField> SetValidationScope(Func<bool> scope)
+    
+    public IValidation<TField> SetScope(Action scope)
     {
-        throw new NotImplementedException();
-        // if (!HasFailed)
-        // {
-        //     ValidationScope = scope;
-        //
-        //     if (Context.ValidationOperationsCollected.Any())
-        //     {
-        //         Context.ValidationOperationsCollected
-        //             .Add(Context.CurrentOperation);
-        //     }
-        //     else
-        //     {
-        //         var isExecutionValid = Context
-        //             .CurrentOperation
-        //             .ExecuteAsync(Context, useAsync: false)
-        //             .GetAwaiter()
-        //             .GetResult();
-        //
-        //         if (!isExecutionValid)
-        //         {
-        //             return IValidation<TField>.CreateFailed();
-        //         }
-        //     }
-        //
-        //     Context.CurrentOperation = new ValidationOperation();
-        // }
-        //
-        // return this;
+        if (HasFailed)
+        {
+            return IValidation<TField>.CreateFailed();
+        }
+        
+        Scope = scope;
+    
+        if (!HasPendingAsyncValidation)
+        {
+            ExecuteAsync(Context!, useAsync: false)
+                .GetAwaiter()
+                .GetResult();
+        }
+    
+        return CreateNextValidation();
     }
 
     public IValidation<TField> WithCode(string code)
@@ -477,6 +456,11 @@ internal class Validation<TField> :
     
     public IValidation<TField> CreateNextValidation()
     {
+        if (HasFailed)
+        {
+            return IValidation<TField>.CreateFailed();
+        }
+        
         var nextValidation = new Validation<TField>(
             getFieldValue: GetFieldValue,
             crossErrorToException: CrossErrorToException,
