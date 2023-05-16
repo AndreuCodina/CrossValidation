@@ -41,7 +41,7 @@ public class FromCrossErrorTests : TestBase
         var valueObjectAction = () => Validate<ExceptionFromError>.That(_model.Int)
             .Instance(ValueObject.Create);
         valueObjectAction.ShouldThrow<ExceptionFromError>();
-
+        
         Action exceptionAction = () => throw new CrossError().ToException();
         exceptionAction.ShouldThrow<CrossException>();
     }

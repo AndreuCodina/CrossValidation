@@ -28,13 +28,12 @@ public interface IValidationOperation
     ICrossError? Error { get; set; }
     string? FieldDisplayName { get; set; }
     HttpStatusCode? HttpStatusCode { get; set; }
-    // Type CrossErrorToException { get; set; }
+    Type? CrossErrorToException { get; set; }
     Func<bool>? Condition { get; set; }
     Func<Task<bool>>? AsyncCondition { get; set; }
     IValidationOperation? NextValidation { get; set; }
     bool HasFailed { get; set; }
     bool HasBeenExecuted { get; set; }
-    // bool HasAsyncNextValidationsPendingToExecute { get; set; } = false;
     bool HasPendingAsyncValidation { get; set; }
     bool IsScopeCreator { get; set; }
     List<IValidationOperation>? DependentValidations { get; set; }
@@ -63,7 +62,7 @@ internal class ValidationOperation
     public ICrossError? Error { get; set; }
     public string? FieldDisplayName { get; set; }
     public HttpStatusCode? HttpStatusCode { get; set; }
-    // public Type CrossErrorToException { get; set; }
+    public Type? CrossErrorToException { get; set; }
     public Func<bool>? Condition { get; set; }
     public Func<Task<bool>>? AsyncCondition { get; set; }
     public IValidationOperation? NextValidation { get; set; }
@@ -143,11 +142,8 @@ internal class ValidationOperation
             {
                 return true;
             }
-
-            // TODO
-            // error.CrossErrorToException = CrossErrorToException;
+            
             HandleError(error, context);
-            // validValidation.Clean();
             return false;
         }
         else if (AsyncValidator is not null)
@@ -163,11 +159,8 @@ internal class ValidationOperation
             {
                 return true;
             }
-
-            // TODO
-            // error.CrossErrorToException = CrossErrorToException;
+            
             HandleError(error, context);
-            // validValidation.Clean();
             return false;
         }
         else if (ValidationScope is not null)
@@ -254,6 +247,7 @@ internal class ValidationOperation
 
     private void AddCustomizationsToError(ICrossError error, ValidationContext context)
     {
+        error.CrossErrorToException = CrossErrorToException;
         error.FieldName = context.FieldName; // TODO: Save it in ValidationOperation
         error.FieldDisplayName = GetFieldDisplayNameToFill(error);
         error.Code = GetCodeToFill(error, context);

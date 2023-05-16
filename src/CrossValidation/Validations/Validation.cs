@@ -71,8 +71,6 @@ public interface IValidation<out TField> : IValidationOperation
     
     string? FieldFullPath { get; set; }
     
-    Type? CrossErrorToException { get; set; }
-
     TField GetFieldValue();
 
     IValidation<TField> CreateNextValidation();
@@ -363,16 +361,15 @@ internal class Validation<TField> :
 
         return this;
     }
+    
+    public Func<TField>? GetGenericFieldValue { get; set; }
+    public ValidationContext? Context { get; set; }
+    public string? FieldFullPath { get; set; }
 
     public async Task ValidateAsync()
     {
         await Context!.ValidationTree!.TraverseAsync(Context);
     }
-
-    public Func<TField>? GetGenericFieldValue { get; set; }
-    public ValidationContext? Context { get; set; }
-    public string? FieldFullPath { get; set; }
-    public Type? CrossErrorToException { get; set; }
 
     public TField GetFieldValue()
     {
