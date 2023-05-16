@@ -30,7 +30,6 @@ public static class ValidationExtensions
         where TField : struct
     {
         validation.Condition = () => validation.GetFieldValue() is not null;
-        
         return validation.SetScope(() =>
         {
             validation.IsScopeCreator = true;
@@ -49,7 +48,6 @@ public static class ValidationExtensions
         where TField : class
     {
         validation.Condition = () => validation.GetFieldValue() is not null;
-        
         return validation.SetScope(() =>
         {
             validation.IsScopeCreator = true;
@@ -156,11 +154,6 @@ public static class ValidationExtensions
         this IValidation<IEnumerable<TInnerType>> validation,
         Func<IValidation<TInnerType>, IValidation<TReturnedField>> action)
     {
-        if (validation.HasFailed)
-        {
-            return IValidation<IEnumerable<TInnerType>>.CreateFailed();
-        }
-
         return validation.SetScope(() =>
         {
             validation.IsScopeCreator = true;
