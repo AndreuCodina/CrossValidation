@@ -191,31 +191,19 @@ internal class Validation<TField> :
 
     public IValidation<TField> WithCode(string code)
     {
-        if (!HasFailed)
-        {
-            Code = code;
-        }
-
+        Code = code;
         return this;
     }
     
     public IValidation<TField> WithMessage(string message)
     {
-        if (!HasFailed)
-        {
-            Message = message;
-        }
-
+        Message = message;
         return this;
     }
     
     public IValidation<TField> WithDetails(string details)
     {
-        if (!HasFailed)
-        {
-            Details = details;
-        }
-
+        Details = details;
         return this;
     }
 
@@ -233,41 +221,25 @@ internal class Validation<TField> :
 
     public IValidation<TField> WithFieldDisplayName(string fieldDisplayName)
     {
-        if (!HasFailed)
-        {
-            FieldDisplayName = fieldDisplayName;
-        }
-
+        FieldDisplayName = fieldDisplayName;
         return this;
     }
 
     public IValidation<TField> WithHttpStatusCode(HttpStatusCode code)
     {
-        if (!HasFailed)
-        {
-            HttpStatusCode = code;
-        }
-
+        HttpStatusCode = code;
         return this;
     }
 
     public IValidation<TField> When(Func<bool> condition)
     {
-        if (!HasFailed)
-        {
-            Condition = condition;
-        }
-
+        Condition = condition;
         return this;
     }
 
     public IValidation<TField> When(Func<TField, bool> condition)
     {
-        if (!HasFailed)
-        {
-            Condition = () => condition(GetFieldValue());
-        }
-
+        Condition = () => condition(GetFieldValue());
         return this;
     }
 
@@ -306,16 +278,7 @@ internal class Validation<TField> :
 
                 if (error is not null)
                 {
-                    // TODO
-                    
-                    // if (Context.ValidationOperationsCollected.Any())
-                    // {
-                    //     Context!.CurrentOperation =
-                    //         Context.ValidationOperationsCollected[0];
-                    // }
-                    //
-                    // WithError(error);
-                    // Context!.CurrentOperation = new ValidationOperation();
+                    WithError(error);
                 }
 
                 return new ErrorPredicateValidator(() => error);
@@ -337,11 +300,7 @@ internal class Validation<TField> :
                 
                 if (error is not null)
                 {
-                    // TODO
-                    
-                    // Context!.CurrentOperation = Context.ValidationOperationsCollected[0];
-                    // WithError(error);
-                    // Context.CurrentOperation = new ValidationOperation();
+                    WithError(error);
                 }
 
                 return new ErrorPredicateValidator(() => error);
