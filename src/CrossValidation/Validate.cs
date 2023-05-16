@@ -81,38 +81,44 @@ public abstract class Validate<TException>
         string? details = null,
         HttpStatusCode? httpStatusCode = null)
     {
-        throw new NotImplementedException();
-        // if (!condition)
-        // {
-        //     var validation = IValidation<bool>.CreateFromField(() => condition, typeof(TException));
-        //
-        //     if (error is not null)
-        //     {
-        //         validation = validation.WithError(error);
-        //     }
-        //
-        //     if (message is not null)
-        //     {
-        //         validation = validation.WithMessage(message);
-        //     }
-        //
-        //     if (code is not null)
-        //     {
-        //         validation = validation.WithCode(code);
-        //     }
-        //
-        //     if (details is not null)
-        //     {
-        //         validation = validation.WithDetails(details);
-        //     }
-        //
-        //     if (httpStatusCode is not null)
-        //     {
-        //         validation = validation.WithHttpStatusCode(httpStatusCode.Value);
-        //     }
-        //
-        //     validation.Must(_ => false);
-        // }
+        if (!condition)
+        {
+            var validation = That(
+                field: condition,
+                error: null,
+                message: null,
+                code: null,
+                details: null,
+                httpStatusCode: null,
+                fieldDisplayName: null);
+        
+            if (error is not null)
+            {
+                validation = validation.WithError(error);
+            }
+        
+            if (message is not null)
+            {
+                validation = validation.WithMessage(message);
+            }
+        
+            if (code is not null)
+            {
+                validation = validation.WithCode(code);
+            }
+        
+            if (details is not null)
+            {
+                validation = validation.WithDetails(details);
+            }
+        
+            if (httpStatusCode is not null)
+            {
+                validation = validation.WithHttpStatusCode(httpStatusCode.Value);
+            }
+        
+            validation.Must(_ => false);
+        }
     }
     
     public static IValidation<TField> Argument<TField>(
