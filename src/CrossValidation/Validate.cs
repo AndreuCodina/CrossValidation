@@ -11,7 +11,7 @@ public abstract class Validate<TException>
     where TException : Exception
 {
     public static IValidation<TField> That<TField>(
-        TField fieldValue,
+        TField field,
         ICrossError? error = null,
         string? message = null,
         string? code = null,
@@ -20,8 +20,8 @@ public abstract class Validate<TException>
         string? fieldDisplayName = null)
     {
         return new Validation<TField>(
-            () => fieldValue,
-            typeof(TException),
+            getFieldValue: () => field,
+            crossErrorToException: typeof(TException),
             parentValidation: null,
             generalizeError: true,
             error: error,
@@ -43,10 +43,9 @@ public abstract class Validate<TException>
         [CallerArgumentExpression(nameof(field))] string fieldName = default!)
     {
         return IValidation<TField>.CreateFromFieldName(
-            () => field,
-            typeof(TException),
-            fieldName,
-            allowFieldNameWithoutModel: false,
+            getFieldValue: () => field,
+            crossErrorToException: typeof(TException),
+            fieldName: fieldName,
             error: error,
             message: message,
             code: code,
@@ -133,7 +132,6 @@ public abstract class Validate<TException>
                 ? typeof(ArgumentException)
                 : typeof(TException),
             fieldName,
-            allowFieldNameWithoutModel: true,
             error: error,
             message: message,
             code: code,

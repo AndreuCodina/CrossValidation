@@ -43,7 +43,6 @@ public abstract record ModelValidator<TModel>
             () => field,
             typeof(CrossException),
             fieldName,
-            allowFieldNameWithoutModel: false,
             context: Context,
             error: error,
             message: message,

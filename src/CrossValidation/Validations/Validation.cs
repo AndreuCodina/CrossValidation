@@ -78,10 +78,9 @@ public interface IValidation<out TField> : IValidationOperation
     IValidation<TField> CreateNextValidation();
 
     static IValidation<TField> CreateFromFieldName(
-        Func<TField>? fieldValue,
+        Func<TField>? getFieldValue,
         Type? crossErrorToException,
         string fieldName,
-        bool allowFieldNameWithoutModel,
         ValidationContext? context = null,
         ICrossError? error = null,
         string? message = null,
@@ -90,32 +89,21 @@ public interface IValidation<out TField> : IValidationOperation
         HttpStatusCode? httpStatusCode = null,
         string? fieldDisplayName = null)
     {
-        // if (!allowFieldNameWithoutModel)
-        // {
-        //     if (!fieldName.Contains("."))
-        //     {
-        //         throw new ArgumentException("Use Field without a model is not allowed");
-        //     }
-        // }
-
-        throw new NotImplementedException();
-
-        // var fieldFullPath = allowFieldNameWithoutModel
-        //     ? fieldName
-        //     : fieldName.Substring(fieldName.IndexOf('.') + 1);
-        // return new Validation<TField>(
-        //     getFieldValue: fieldValue,
-        //     crossErrorToException: crossErrorToException,
-        //     generalizeError: false,
-        //     
-        //     fieldFullPath: fieldFullPath,
-        //     context: context,
-        //     error: error,
-        //     message: message,
-        //     code: code,
-        //     details: details,
-        //     httpStatusCode: httpStatusCode,
-        //     fieldDisplayName: fieldDisplayName);
+        var fieldFullPath = fieldName.Contains('.')
+            ? fieldName.Substring(fieldName.IndexOf('.') + 1)
+            : fieldName;
+        return new Validation<TField>(
+            getFieldValue: getFieldValue,
+            crossErrorToException: crossErrorToException,
+            parentValidation: null,
+            generalizeError: false,
+            fieldFullPath: fieldFullPath,
+            error: error,
+            message: message,
+            code: code,
+            details: details,
+            httpStatusCode: httpStatusCode,
+            fieldDisplayName: fieldDisplayName);
     }
 
     static IValidation<TField> CreateFailed()
