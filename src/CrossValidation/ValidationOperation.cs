@@ -36,7 +36,7 @@ public interface IValidationOperation
     bool HasBeenExecuted { get; set; }
     bool HasPendingAsyncValidation { get; set; }
     bool IsScopeCreator { get; set; }
-    List<IValidationOperation>? DependentValidations { get; set; }
+    List<IValidationOperation>? ScopeValidations { get; set; }
     int? Index { get; set; }
     string? ParentPath { get; set; } 
     public bool IsInsideScope { get; set; }
@@ -72,7 +72,7 @@ internal class ValidationOperation
     // public bool HasAsyncNextValidationsPendingToExecute { get; set; } = false;
     public bool HasPendingAsyncValidation { get; set; }
     public bool IsScopeCreator { get; set; }
-    public List<IValidationOperation>? DependentValidations { get; set; }
+    public List<IValidationOperation>? ScopeValidations { get; set; }
     public int? Index { get; set; }
     public string? ParentPath { get; set; }
     public bool IsInsideScope { get; set; }
@@ -101,9 +101,9 @@ internal class ValidationOperation
         {
             HasPendingAsyncValidation = false;
 
-            foreach (var dependentValidation in DependentValidations!)
+            foreach (var scopeValidation in ScopeValidations!)
             {
-                await dependentValidation.TraverseAsync(context);
+                await scopeValidation.TraverseAsync(context);
             }
         }
         

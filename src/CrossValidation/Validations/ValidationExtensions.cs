@@ -34,11 +34,11 @@ public static class ValidationExtensions
         {
             validation.IsScopeCreator = true;
             var getFieldValue = () => validation.GetFieldValue()!.Value;
-            var dependentValidation = CreateDependentValidation(
+            var scopeValidation = CreateScopeValidation(
                 validation: validation,
                 getFieldValue: getFieldValue,
                 index: null);
-            action(dependentValidation);
+            action(scopeValidation);
         });
     }
 
@@ -52,11 +52,11 @@ public static class ValidationExtensions
         {
             validation.IsScopeCreator = true;
             var getFieldValue = () => validation.GetFieldValue()!;
-            var dependentValidation = CreateDependentValidation(
+            var scopeValidation = CreateScopeValidation(
                 validation: validation,
                 getFieldValue: getFieldValue,
                 index: null);
-            action(dependentValidation);
+            action(scopeValidation);
         });
     }
 
@@ -166,8 +166,8 @@ public static class ValidationExtensions
             foreach (var innerField in fieldCollection)
             {
                 var getFieldValue = () => innerField;
-                var dependentValidation = CreateDependentValidation(validation, getFieldValue, index);
-                action(dependentValidation);
+                var scopeValidation = CreateScopeValidation(validation, getFieldValue, index);
+                action(scopeValidation);
                 index++;
                 var areAllItemsIterated = (index + 1) == totalItems;
                 var stopWithFailedScope =
@@ -191,12 +191,12 @@ public static class ValidationExtensions
         return validation.SetValidator(() => new RegularExpressionValidator(validation.GetFieldValue(), pattern));
     }
     
-    private static IValidation<TDependentField> CreateDependentValidation<TField, TDependentField>(
+    private static IValidation<TDependentField> CreateScopeValidation<TField, TDependentField>(
         IValidation<TField> validation,
         Func<TDependentField> getFieldValue,
         int? index)
     {
-        var dependentValidation = new Validation<TDependentField>(
+        var scopeValidation = new Validation<TDependentField>(
             getFieldValue: getFieldValue,
             crossErrorToException: validation.CrossErrorToException,
             generalizeError: false,
@@ -210,12 +210,12 @@ public static class ValidationExtensions
             details: null,
             httpStatusCode: null,
             fieldDisplayName: null);
-        dependentValidation.HasFailed = validation.HasFailed;
-        dependentValidation.HasPendingAsyncValidation = validation.HasPendingAsyncValidation;
-        dependentValidation.IsInsideScope = true;
-        dependentValidation.ScopeCreatorValidation = validation;
-        validation.DependentValidations ??= new();
-        validation.DependentValidations.Add(dependentValidation);
-        return dependentValidation;
+        scopeValidation.HasFailed = validation.HasFailed;
+        scopeValidation.HasPendingAsyncValidation = validation.HasPendingAsyncValidation;
+        scopeValidation.IsInsideScope = true;
+        scopeValidation.ScopeCreatorValidation = validation;
+        validation.ScopeValidations ??= new();
+        validation.ScopeValidations.Add(scopeValidation);
+        return scopeValidation;
     }
 }
