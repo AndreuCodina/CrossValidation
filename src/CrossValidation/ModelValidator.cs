@@ -43,7 +43,9 @@ public abstract record ModelValidator<TModel>
             : fieldName;
         ScopeCreatorValidation!.FieldFullPath = fieldFullPath;
         var getFieldValue = () => field;
-        return ScopeCreatorValidation.CreateScopeValidation(getFieldValue: getFieldValue, index: null);
+        var scopeValidation = ScopeCreatorValidation.CreateScopeValidation(getFieldValue: getFieldValue, index: null);
+        scopeValidation.HasFailed = false;
+        return scopeValidation;
     }
 
     [Pure]
@@ -57,7 +59,9 @@ public abstract record ModelValidator<TModel>
         string? fieldDisplayName = null)
     {
         var getFieldValue = () => field;
-        return ScopeCreatorValidation!.CreateScopeValidation(getFieldValue: getFieldValue, index: null);
+        var scopeValidation = ScopeCreatorValidation!.CreateScopeValidation(getFieldValue: getFieldValue, index: null);
+        scopeValidation.HasFailed = false;
+        return scopeValidation;
     }
 
     public abstract void CreateValidations(TModel model);

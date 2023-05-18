@@ -167,7 +167,7 @@ public class ModelValidatorTests :
      {
          var expectedCodes = new[]
          {
-             "ErrorCode1", "ErrorCode2", "ErrorCode3", "ErrorCode4", "ErrorCode5"
+             "ErrorCode1", "ErrorCode2", "ErrorCode3", "ErrorCode4"
          };
 
          var nestedModelValidator = _commonFixture.CreateNestedModelValidator(validator =>
@@ -193,12 +193,12 @@ public class ModelValidatorTests :
                  .NotNull();
              
              validator.Field(_model.NestedModel)
+                 .WithCode("UnexpectedCode")
                  .SetModelValidator(nestedModelValidator)
-                 .WithCode(expectedCodes[3])
                  .Must(_commonFixture.NotBeValid);
              
              validator.Field(_model.NestedModel.Int)
-                 .WithCode(expectedCodes[4])
+                 .WithCode(expectedCodes[3])
                  .GreaterThan(_model.NestedModel.Int)
                  .WithCode("UnexpectedErrorCode")
                  .GreaterThan(_model.NestedModel.Int);

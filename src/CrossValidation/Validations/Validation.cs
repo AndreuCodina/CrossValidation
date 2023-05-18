@@ -312,6 +312,8 @@ internal class Validation<TField> :
             fieldDisplayName: null);
         nextValidation.HasFailed = HasFailed;
         nextValidation.HasPendingAsyncValidation = HasPendingAsyncValidation;
+        nextValidation.IsInsideScope = true;
+        nextValidation.ScopeCreatorValidation = ScopeCreatorValidation;
         NextValidation = nextValidation;
         return nextValidation;
     }
