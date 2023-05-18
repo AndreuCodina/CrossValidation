@@ -10,21 +10,20 @@ namespace CrossValidation;
 public abstract record ModelValidator<TModel>
 {
     private ValidationMode _validationMode = ValidationMode.StopOnFirstError;
-    public ValidationContext? Context { get; set; }
-    public TModel? Model { get; set; }
+    internal IValidation<TModel>? ScopeCreatorValidation { private get; set; }
 
     public ValidationMode ValidationMode
     {
         get => _validationMode;
         set
         {
-            if (Context!.IsChildContext)
+            if (ScopeCreatorValidation!.Context!.IsChildContext)
             {
                 throw new InvalidOperationException("Cannot change the validation mode in a child model validator");
             }
 
             _validationMode = value;
-            Context!.ValidationMode = _validationMode;
+            ScopeCreatorValidation.Context!.ValidationMode = _validationMode;
         }
     }
 
@@ -39,22 +38,17 @@ public abstract record ModelValidator<TModel>
         string? fieldDisplayName = null,
         [CallerArgumentExpression(nameof(field))] string fieldName = default!)
     {
-        return IValidation<TField>.CreateFromFieldName(
-            () => field,
-            typeof(CrossException),
-            fieldName,
-            context: Context,
-            error: error,
-            message: message,
-            code: code,
-            details: details,
-            httpStatusCode: httpStatusCode,
-            fieldDisplayName: fieldDisplayName);
+        var fieldFullPath = fieldName.Contains('.')
+            ? fieldName.Substring(fieldName.IndexOf('.') + 1)
+            : fieldName;
+        ScopeCreatorValidation!.FieldFullPath = fieldFullPath;
+        var getFieldValue = () => field;
+        return ScopeCreatorValidation.CreateScopeValidation(getFieldValue: getFieldValue, index: null);
     }
 
     [Pure]
     public IValidation<TField> That<TField>(
-        TField fieldValue,
+        TField field,
         ICrossError? error = null,
         string? message = null,
         string? code = null,
@@ -62,45 +56,49 @@ public abstract record ModelValidator<TModel>
         HttpStatusCode? httpStatusCode = null,
         string? fieldDisplayName = null)
     {
-        return new Validation<TField>(
-            getFieldValue: () => fieldValue,
-            crossErrorToException: typeof(CrossException),
-            generalizeError: true,
-            context: Context,
-            error: error,
-            message: message,
-            code: code,
-            details: details,
-            httpStatusCode: httpStatusCode,
-            fieldDisplayName: fieldDisplayName);
+        var getFieldValue = () => field;
+        return ScopeCreatorValidation!.CreateScopeValidation(getFieldValue: getFieldValue, index: null);
     }
 
     public abstract void CreateValidations(TModel model);
 
     public void Validate(TModel model)
     {
-        if (Context is not {IsChildContext: true})
-        {
-            CrossValidation.Validate.ModelNullability(model);
-            Context = new ValidationContext();
-        }
-
-        Model = model;
-        CreateValidations(model);
-        // TODO: Create ValidateAsync and InternalValidateAsync
-        Context.ExecuteOperationsCollectedAsync<object>(useAsync: true)
+        InternalValidateAsync(model, useAsync: false)
             .GetAwaiter()
-            .GetResult(); // Pass any type because we aren't going to return a validation
+            .GetResult();
+    }
+    
+    public async Task ValidateAsync(TModel model)
+    {
+        await InternalValidateAsync(model, useAsync: true);
+    }
 
-        if (!Context.IsChildContext && Context.ErrorsCollected is not null)
+    private async ValueTask InternalValidateAsync(TModel model, bool useAsync)
+    {
+        CrossValidation.Validate.ModelNullability(model);
+        ScopeCreatorValidation = CrossValidation.Validate
+                .That(model);
+        ScopeCreatorValidation.IsScopeCreator = true;
+        ScopeCreatorValidation.SetScope(() =>
         {
-            if (Context.ErrorsCollected.Count == 1)
+            CreateValidations(model);
+        });
+
+        if (useAsync)
+        {
+            await ScopeCreatorValidation.ValidateAsync();
+        }
+        
+        if (ScopeCreatorValidation.Context!.ErrorsCollected is not null)
+        {
+            if (ScopeCreatorValidation.Context.ErrorsCollected.Count == 1)
             {
-                throw Context.ErrorsCollected[0].ToException();
+                throw ScopeCreatorValidation.Context.ErrorsCollected[0].ToException();
             }
             else
             {
-                throw new ValidationListException(Context.ErrorsCollected);
+                throw new ValidationListException(ScopeCreatorValidation.Context.ErrorsCollected);
             }
         }
     }

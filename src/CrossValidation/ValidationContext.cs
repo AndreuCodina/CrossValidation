@@ -23,8 +23,6 @@ public class ValidationContext
     public string? FieldDisplayName { get; set; }
     public ICrossErrorToException? CrossErrorToException { get; set; }
     public bool GeneralizeError { get; set; } = false;
-    public bool HasAsyncValidations { get; set; } = false;
-    public bool IsAsyncExecutionTriggered { get; set; } = false;
 
     public ValidationContext CloneForChildModelValidator(string? parentPath)
     {
@@ -38,29 +36,5 @@ public class ValidationContext
             GeneralizeError = GeneralizeError
         };
         return newContext;
-    }
-
-#pragma warning disable CS1998
-    public async ValueTask ExecuteOperationsCollectedAsync<TField>(bool useAsync)
-#pragma warning restore CS1998
-    {
-        throw new NotImplementedException();
-        // var firstItemIndex = 0;
-        //
-        // while (ValidationOperationsCollected.Any())
-        // {
-        //     var operation = ValidationOperationsCollected[firstItemIndex];
-        //     var isValid = await operation.ExecuteAsync(this, useAsync);
-        //
-        //     if (!isValid)
-        //     {
-        //         break;
-        //     }
-        //     
-        //     ValidationOperationsCollected.RemoveAt(firstItemIndex);
-        // }
-        //
-        // ValidationOperationsCollected.Clear();
-        // CurrentOperation = new ValidationOperation();
     }
 }

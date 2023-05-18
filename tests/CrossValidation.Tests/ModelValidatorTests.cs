@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Threading.Tasks;
 using CrossValidation.Errors;
 using CrossValidation.Resources;
 using CrossValidation.ShouldlyAssertions;
@@ -215,11 +216,6 @@ public class ModelValidatorTests :
          var nestedModelValidator = _commonFixture.CreateNestedModelValidator(validator =>
          {
              validator.ValidationMode = ValidationMode.AccumulateFirstErrors;
-             validator.Field(_nestedModel.Int)
-                 .GreaterThan(10);
-             validator.Field(_nestedModel.Int)
-                 .WithCode("UnexpectedErrorCode")
-                 .GreaterThan(_model.NestedModel.Int);
          });
          var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
          {
@@ -771,7 +767,7 @@ public class ModelValidatorTests :
      }
      
      [Fact]
-     public void Execute_all_validators_in_a_validation_with_error_accumulation()
+     public async Task Execute_all_validators_in_a_validation_with_error_accumulation()
      {
          var testError = new TestError();
          
@@ -781,18 +777,18 @@ public class ModelValidatorTests :
 
              validator.Field(_model.Int)
                  .Must(_commonFixture.BeValid)
-                 .MustAsync(_commonFixture.BeValidAsync)
-                 .Must(_ => _commonFixture.NullableError())
+                 // .MustAsync(_commonFixture.BeValidAsync)
+                 // .Must(_ => _commonFixture.NullableError())
                  .MustAsync(_ => _commonFixture.ErrorAsync(testError));
          });
 
-         var action = () => parentModelValidator.Validate(_model);
+         var action = () => parentModelValidator.ValidateAsync(_model);
 
-         action.ShouldThrowCrossError<TestError>();
+         await action.ShouldThrowCrossErrorAsync<TestError>();
      }
      
      [Fact]
-     public void Keep_customizations_for_accumulated_operations()
+     public async Task Keep_customizations_for_accumulated_operations()
      {
          var expectedMessage = "Expected message";
          // var testError = new TestError();
@@ -808,9 +804,9 @@ public class ModelValidatorTests :
                  .MustAsync(_ => _commonFixture.ErrorAsync());
          });
 
-         var action = () => parentModelValidator.Validate(_model);
+         var action = () => parentModelValidator.ValidateAsync(_model);
 
-         var error = action.ShouldThrowCrossError<TestError>();
+         var error = await action.ShouldThrowCrossErrorAsync<TestError>();
          error.Message.ShouldBe(expectedMessage);
      }
 

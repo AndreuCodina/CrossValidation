@@ -157,7 +157,6 @@ public static class ValidationExtensions
         return validation.SetScope(() =>
         {
             validation.IsScopeCreator = true;
-        
             var fieldCollection = validation.GetFieldValue()
                 .ToList();
             var index = 0;
@@ -191,8 +190,8 @@ public static class ValidationExtensions
         return validation.SetValidator(() => new RegularExpressionValidator(validation.GetFieldValue(), pattern));
     }
     
-    private static IValidation<TDependentField> CreateScopeValidation<TField, TDependentField>(
-        IValidation<TField> validation,
+    public static IValidation<TDependentField> CreateScopeValidation<TField, TDependentField>(
+        this IValidation<TField> validation,
         Func<TDependentField> getFieldValue,
         int? index)
     {
