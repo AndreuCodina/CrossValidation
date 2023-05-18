@@ -45,6 +45,7 @@ public abstract record ModelValidator<TModel>
         var getFieldValue = () => field;
         var scopeValidation = ScopeCreatorValidation.CreateScopeValidation(getFieldValue: getFieldValue, index: null);
         scopeValidation.HasFailed = false;
+        scopeValidation.GeneralizeError = false;
         return scopeValidation;
     }
 
@@ -61,6 +62,7 @@ public abstract record ModelValidator<TModel>
         var getFieldValue = () => field;
         var scopeValidation = ScopeCreatorValidation!.CreateScopeValidation(getFieldValue: getFieldValue, index: null);
         scopeValidation.HasFailed = false;
+        scopeValidation.GeneralizeError = true;
         return scopeValidation;
     }
 
@@ -94,7 +96,7 @@ public abstract record ModelValidator<TModel>
             await ScopeCreatorValidation.ValidateAsync();
         }
         
-        if (ScopeCreatorValidation.Context!.ErrorsCollected is not null)
+        if (ScopeCreatorValidation.Context!.ErrorsCollected.Any())
         {
             if (ScopeCreatorValidation.Context.ErrorsCollected.Count == 1)
             {

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using CrossValidation.Errors;
 using CrossValidation.ShouldlyAssertions;
 using CrossValidation.Tests.TestUtils;
@@ -141,7 +142,7 @@ public class WhenNotNullTests :
     }
     
     [Fact]
-    public void Accumulate_errors_with_operation_accumulation()
+    public async Task Accumulate_errors_with_operation_accumulation()
     {
         var expectedMessage = "Expected message";
         _model = new ParentModelBuilder()
@@ -167,10 +168,9 @@ public class WhenNotNullTests :
             validator.Field(_model.Int)
                 .Must(_commonFixture.NotBeValid);
         });
+        var action = () => parentModelValidator.ValidateAsync(_model);
 
-        var action = () => parentModelValidator.Validate(_model);
-
-        var errors = action.ShouldThrowCrossErrors();
+        var errors = await action.ShouldThrowCrossErrorsAsync();
         errors.Count.ShouldBe(2);
         errors[0].ShouldBeOfType<CommonCrossError.Predicate>();
         errors[0].Message.ShouldBe(expectedMessage);

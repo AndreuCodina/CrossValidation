@@ -41,6 +41,7 @@ public interface IValidationOperation
     string? ParentPath { get; set; } 
     public bool IsInsideScope { get; set; }
     public IValidationOperation? ScopeCreatorValidation { get; set; }
+    public bool GeneralizeError { get; set; }
     ValueTask TraverseAsync(ValidationContext context);
     ValueTask ExecuteAsync(ValidationContext context, bool useAsync);
     void HandleError(ICrossError error, ValidationContext context);
@@ -77,6 +78,7 @@ internal class ValidationOperation
     public string? ParentPath { get; set; }
     public bool IsInsideScope { get; set; }
     public IValidationOperation? ScopeCreatorValidation { get; set; }
+    public bool GeneralizeError { get; set; }
 
     public async ValueTask TraverseAsync(ValidationContext context)
     {
@@ -188,7 +190,7 @@ internal class ValidationOperation
     
     public void TakeCustomizationsFromInstanceError(ICrossError error, ValidationContext context)
     {
-        if (!context.GeneralizeError)
+        if (GeneralizeError)
         {
             return;
         }
@@ -240,7 +242,6 @@ internal class ValidationOperation
     private void AddError(ICrossError error, ValidationContext context)
     {
         AddCustomizationsToError(error, context);
-        context.ErrorsCollected ??= new List<ICrossError>();
         error.AddPlaceholderValues();
         context.ErrorsCollected.Add(error);
     }
@@ -263,7 +264,7 @@ internal class ValidationOperation
             return Code;
         }
         
-        if (context.GeneralizeError) // TODO: Save it in ValidationOperation
+        if (GeneralizeError)
         {
             return nameof(ErrorResource.General);
         }
@@ -283,7 +284,7 @@ internal class ValidationOperation
             return CrossValidationOptions.GetMessageFromCode(Code);
         }
         
-        if (context.GeneralizeError) // TODO: Save it in ValidationOperation
+        if (GeneralizeError)
         {
             return CrossValidationOptions.GetMessageFromCode(nameof(ErrorResource.General));
         }

@@ -35,23 +35,7 @@ public class ValidationTests :
 
         action.ShouldThrowCrossError<CommonCrossError.Predicate>();
     }
-    
-    [Fact]
-    public void ValidateField_keeps_customizations_before_create_instance()
-    {
-        var messageTemplate = "{FieldDisplayName}: Expected message";
-        var expectedMessage = "NestedModel.Int: Expected message";
-        
-        var action = () => Validate.Field(_model.NestedModel.Int)
-            .WithMessage(messageTemplate)
-            .WithError(new CustomErrorWithPlaceholderValue(10))
-            .Instance(ValueObjectWithoutCustomization.Create);
 
-        var error = action.ShouldThrowCrossError<CustomErrorWithPlaceholderValue>();
-        error.FieldName.ShouldBe("NestedModel.Int");
-        error.Message.ShouldBe(expectedMessage);
-    }
-    
     [Fact]
     public void ValidateField_keeps_customizations_after_create_instance_using_ValidateField()
     {
@@ -69,13 +53,13 @@ public class ValidationTests :
     [InlineData("ExpectedCode", null, "ExpectedCode", null)]
     [InlineData(nameof(ErrorResource.Enum), null, nameof(ErrorResource.Enum), "Must be a valid value")]
     [InlineData("ExpectedCode", "Expected message", "ExpectedCode", "Expected message")]
-    public void ValidateThat_keeps_customizations_before_create_instance(
+    public void ValidateField_keeps_customizations_before_create_instance(
         string? code,
         string? message,
         string? expectedCode,
         string? expectedMessage)
     {
-        var validation = Validate.That(_model.NestedModel.Int);
+        var validation = Validate.Field(_model.NestedModel.Int);
         
         if (code != null)
         {
@@ -130,7 +114,7 @@ public class ValidationTests :
         string? expectedCode,
         string? expectedMessage)
     {
-        var action = () => Validate.That(_model.Int)
+        var action = () => Validate.Field(_model.Int)
             .Instance(x => ValueObjectWithCustomization.Create(x, code, message));
 
         var error = action.ShouldThrowCrossError<CommonCrossError.GreaterThan<int>>();

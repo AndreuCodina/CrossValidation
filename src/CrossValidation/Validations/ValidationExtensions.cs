@@ -168,7 +168,7 @@ public static class ValidationExtensions
                 var scopeValidation = CreateScopeValidation(validation, getFieldValue, index);
                 action(scopeValidation);
                 index++;
-                var areAllItemsIterated = (index + 1) == totalItems;
+                var areAllItemsIterated = index  == totalItems;
                 var stopWithFailedScope =
                     validation.HasFailed
                     && validation.Context!.ValidationMode is ValidationMode.AccumulateFirstErrors;
@@ -198,7 +198,7 @@ public static class ValidationExtensions
         var scopeValidation = new Validation<TDependentField>(
             getFieldValue: getFieldValue,
             crossErrorToException: validation.CrossErrorToException,
-            generalizeError: false,
+            generalizeError: validation.GeneralizeError,
             fieldFullPath: validation.FieldFullPath,
             context: validation.Context,
             index: index,

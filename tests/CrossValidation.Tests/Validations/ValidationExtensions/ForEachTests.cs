@@ -187,7 +187,7 @@ public class ForEachTests :
     [InlineData(ValidationMode.StopOnFirstError)]
     [InlineData(ValidationMode.AccumulateFirstErrors)]
     [InlineData(ValidationMode.AccumulateFirstErrorsAndAllIterationFirstErrors)]
-    public void That_keeps_settings_with_error_accumulation(ValidationMode validationMode)
+    public void That_keeps_customizations_with_error_accumulation(ValidationMode validationMode)
     {
         var expectedFieldDisplayName = "Expected field display name";
         var expectedHttpStatusCode = HttpStatusCode.Created;

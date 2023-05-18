@@ -381,10 +381,7 @@ internal class Validation<TField> :
         GetNonGenericFieldValue = () => getFieldValue!()!;
         CrossErrorToException = crossErrorToException;
         FieldFullPath = fieldFullPath;
-        Context.GeneralizeError = Context.IsChildContext && Context.GeneralizeError
-            ? true
-            : generalizeError;
-
+        GeneralizeError = generalizeError;
         Index = index;
         var indexRepresentation = Context.FieldName is not null && index is not null
             ? $"[{index}]"
@@ -453,7 +450,7 @@ internal class Validation<TField> :
         var nextValidation = new Validation<TField>(
             getFieldValue: GetFieldValue,
             crossErrorToException: CrossErrorToException,
-            generalizeError: false,
+            generalizeError: GeneralizeError,
             fieldFullPath: FieldFullPath,
             context: Context,
             index: Index,

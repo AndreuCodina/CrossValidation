@@ -739,7 +739,7 @@ public class ModelValidatorTests :
      }
      
      [Fact]
-     public void ValidateThat_with_child_model_validators_apply_generalization_when_they_use_ValidateField()
+     public void ValidateThat_with_child_model_then_validators_do_not_apply_generalization_when_they_use_ValidateField()
      {
          _model = new ParentModelBuilder()
              .WithNullableInt(1)
@@ -758,12 +758,12 @@ public class ModelValidatorTests :
              validator.That(_model.NestedModel)
                  .SetModelValidator(nestedModelValidator);
          });
-
          var action = () => parentModelValidator.Validate(_model);
 
          var error = action.ShouldThrowCrossError<CommonCrossError.GreaterThan<int>>();
-         error.Code.ShouldBe(nameof(ErrorResource.General));
-         error.Message.ShouldBe(ErrorResource.General);
+         
+         error.Code.ShouldBe(nameof(ErrorResource.GreaterThan));
+         error.Message.ShouldBe(ErrorResource.GreaterThan);
      }
      
      [Fact]

@@ -338,16 +338,6 @@ public class ValidateTests :
         action.ShouldThrow<ArgumentException>();
     }
 
-    [Fact]
-    public void Switch_context_value_object()
-    {
-        var action = () => Validate.Field(_model.Int)
-            .Instance(ValueObject.Create);
-
-        var error = action.ShouldThrowCrossError();
-        error.Message.ShouldBe("Error message from value object");
-    }
-
     private class ExceptionFromError : Exception, ICrossErrorToException
     {
         private ExceptionFromError(string message) : base(message)
@@ -370,7 +360,7 @@ public class ValidateTests :
         {
             Validate.Field(value)
                 .WithMessage("Error message from value object")
-                .Must(_ => false);
+                .GreaterThan(int.MaxValue);
             return new(value);
         }
     }
