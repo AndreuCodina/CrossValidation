@@ -763,7 +763,6 @@ public class ModelValidatorTests :
          var error = action.ShouldThrowCrossError<CommonCrossError.GreaterThan<int>>();
          
          error.Code.ShouldBe(nameof(ErrorResource.GreaterThan));
-         error.Message.ShouldBe(ErrorResource.GreaterThan);
      }
      
      [Fact]

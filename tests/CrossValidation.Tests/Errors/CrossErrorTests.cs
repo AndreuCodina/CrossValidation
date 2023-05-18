@@ -78,7 +78,6 @@ public class CrossErrorTests :
         {
             AddPlaceholderValue(Name);
             AddPlaceholderValue(Age);
-            base.AddPlaceholderValues();
         }
     }
     
@@ -87,7 +86,6 @@ public class CrossErrorTests :
         public override void AddPlaceholderValues()
         {
             AddPlaceholderValue(Name);
-            base.AddPlaceholderValues();
         }
     }
     
@@ -97,7 +95,6 @@ public class CrossErrorTests :
         {
             AddPlaceholderValue(Name);
             AddPlaceholderValue(Age);
-            base.AddPlaceholderValues();
         }
     }
     

@@ -16,6 +16,7 @@ public interface ICrossError
     Dictionary<string, object>? PlaceholderValues { get; set; }
     public Type? CrossErrorToException { get; set; }
     Func<object>? GetFieldValue { get; set; }
+    bool IsCommon { get; set; }
     void AddPlaceholderValues();
     IEnumerable<string> GetFieldNames();
     Exception ToException();
@@ -35,6 +36,7 @@ public record CrossError : ICrossError
     public Dictionary<string, object>? PlaceholderValues { get; set; }
     public Type? CrossErrorToException { get; set; }
     public Func<object>? GetFieldValue { get; set; }
+    public virtual bool IsCommon { get; set; } = false;
 
     public CrossError(
         string? FieldName = null,
@@ -96,7 +98,6 @@ public record CrossError : ICrossError
     public Exception ToException()
     {
         AddPlaceholderValues();
-
         var canUseCrossValidationCustomizations = CrossErrorToException!
             .GetInterface(nameof(ICrossErrorToException)) is not null;
 
@@ -152,7 +153,7 @@ public record CrossError : ICrossError
     {
         var arePlaceholderValuesAdded = GetType().GetMethod(nameof(AddPlaceholderValues))!.DeclaringType == GetType();
 
-        if (!arePlaceholderValuesAdded && CrossValidationOptions.LocalizeErrorInClient)
+        if (!arePlaceholderValuesAdded && (IsCommon || CrossValidationOptions.LocalizeErrorInClient))
         {
             var properties = GetType().GetProperties();
             var customPlaceholderNames = GetFieldNames();

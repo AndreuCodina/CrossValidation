@@ -4,12 +4,20 @@ namespace CrossValidation.Errors;
 
 public record CommonCrossError(string Code) : CodeCrossError(Code)
 {
+    public override bool IsCommon => true;
+    
     public record NotNull() : CommonCrossError(nameof(ErrorResource.NotNull));
     
     public record Null() : CommonCrossError(nameof(ErrorResource.Null));
 
     public record GreaterThan<TField>(TField ComparisonValue) :
-        CommonCrossError(nameof(ErrorResource.GreaterThan));
+        CommonCrossError(nameof(ErrorResource.GreaterThan))
+    {
+        // public override void AddPlaceholderValues()
+        // {
+        //     AddPlaceholderValue(ComparisonValue);
+        // }
+    }
 
     public record Enum() : CommonCrossError(nameof(ErrorResource.Enum));
     

@@ -314,7 +314,7 @@ public class RealAsyncTests :
     }
     
     [Fact]
-    public void ModelValidator_automatically_execute_accumulated_operations()
+    public async Task ModelValidator_automatically_execute_accumulated_operations()
     {
         var expectedCodes = new List<string> { "Code1", "Code2" };
         _model = new ParentModelBuilder()
@@ -336,9 +336,9 @@ public class RealAsyncTests :
                 .MustAsync(_commonFixture.NotBeValidAsync);
         });
 
-        var action = () => parentModelValidator.Validate(_model);
+        var action = () => parentModelValidator.ValidateAsync(_model);
         
-        var errors = action.ShouldThrowCrossErrors();
+        var errors = await action.ShouldThrowCrossErrorsAsync();
         errors.Select(x => x.Code)
             .SequenceEqual(expectedCodes)
             .ShouldBeTrue();
