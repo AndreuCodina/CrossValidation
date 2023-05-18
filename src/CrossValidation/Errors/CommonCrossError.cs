@@ -9,15 +9,8 @@ public record CommonCrossError(string Code) : CodeCrossError(Code)
     public record Null() : CommonCrossError(nameof(ErrorResource.Null));
 
     public record GreaterThan<TField>(TField ComparisonValue) :
-        CommonCrossError(nameof(ErrorResource.GreaterThan))
-    {
-        public override void AddPlaceholderValues()
-        {
-            AddPlaceholderValue(ComparisonValue!);
-            base.AddPlaceholderValues();
-        }
-    }
-    
+        CommonCrossError(nameof(ErrorResource.GreaterThan));
+
     public record Enum() : CommonCrossError(nameof(ErrorResource.Enum));
     
     public record EnumRange() : CommonCrossError(nameof(ErrorResource.Enum));
@@ -31,7 +24,6 @@ public record CommonCrossError(string Code) : CodeCrossError(Code)
             AddPlaceholderValue(Minimum);
             AddPlaceholderValue(Maximum);
             AddPlaceholderValue(TotalLength);
-            base.AddPlaceholderValues();
         }
     }
     
@@ -43,7 +35,6 @@ public record CommonCrossError(string Code) : CodeCrossError(Code)
         {
             AddPlaceholderValue(Minimum);
             AddPlaceholderValue(TotalLength);
-            base.AddPlaceholderValues();
         }
     }
     

@@ -9,13 +9,13 @@ public interface ICrossError
 {
     string? FieldName { get; set; }
     string? FieldDisplayName { get; set; }
-    object? FieldValue { get; set; }
     string? Code { get; set; }
     string? Message { get; set; }
     string? Details { get; set; }
     HttpStatusCode? HttpStatusCode { get; set; }
     Dictionary<string, object>? PlaceholderValues { get; set; }
     public Type? CrossErrorToException { get; set; }
+    Func<object>? GetFieldValue { get; set; }
     void AddPlaceholderValues();
     IEnumerable<string> GetFieldNames();
     Exception ToException();
@@ -28,18 +28,17 @@ public record CrossError : ICrossError
 
     public string? FieldName { get; set; }
     public string? FieldDisplayName { get; set; }
-    public object? FieldValue { get; set; }
     public string? Code { get; set; }
     public string? Message { get; set; }
     public string? Details { get; set; }
     public HttpStatusCode? HttpStatusCode { get; set; }
     public Dictionary<string, object>? PlaceholderValues { get; set; }
     public Type? CrossErrorToException { get; set; }
+    public Func<object>? GetFieldValue { get; set; }
 
     public CrossError(
         string? FieldName = null,
         string? FieldDisplayName = null,
-        object? FieldValue = null,
         string? Code = null,
         string? Message = null,
         string? Details = null,
@@ -48,7 +47,6 @@ public record CrossError : ICrossError
     {
         this.FieldName = FieldName;
         this.FieldDisplayName = FieldDisplayName;
-        this.FieldValue = FieldValue;
         this.Code = Code;
         this.Message = Message;
         
@@ -97,11 +95,8 @@ public record CrossError : ICrossError
 
     public Exception ToException()
     {
-        if (PlaceholderValues is null)
-        {
-            AddCustomErrorPlaceholderValues();
-        }
-        
+        AddPlaceholderValues();
+
         var canUseCrossValidationCustomizations = CrossErrorToException!
             .GetInterface(nameof(ICrossErrorToException)) is not null;
 
@@ -146,7 +141,11 @@ public record CrossError : ICrossError
     {
         AddPlaceholderValue(FieldName);
         AddPlaceholderValue(FieldDisplayName);
-        AddPlaceholderValue(FieldValue);
+
+        if (GetFieldValue is not null)
+        {
+            AddPlaceholderValue(GetFieldValue!(), "FieldValue");
+        }
     }
 
     private void AddCustomErrorPlaceholderValues()

@@ -261,7 +261,6 @@ internal class ValidationOperation
     private void AddError(ICrossError error, ValidationContext context)
     {
         AddCustomizationsToError(error, context);
-        error.AddPlaceholderValues();
         context.ErrorsCollected.Add(error);
     }
 
@@ -270,6 +269,7 @@ internal class ValidationOperation
         error.CrossErrorToException = CrossErrorToException;
         error.FieldName = context.FieldName; // TODO: Save it in ValidationOperation
         error.FieldDisplayName = GetFieldDisplayNameToFill(error);
+        error.GetFieldValue = GetNonGenericFieldValue;
         error.Code = GetCodeToFill(error, context);
         error.Message = GetMessageToFill(error, context);
         error.Details = Details ?? error.Details;

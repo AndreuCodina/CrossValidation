@@ -190,6 +190,7 @@ internal class Validation<TField> :
         {
             error.CrossErrorToException = CrossErrorToException;
             TakeCustomizationsFromError(error);
+            error.GetFieldValue = GetNonGenericFieldValue;
             Error = error;
         }
 

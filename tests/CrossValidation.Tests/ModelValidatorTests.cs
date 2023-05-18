@@ -78,7 +78,7 @@ public class ModelValidatorTests :
 
          var error = action.ShouldThrowCrossError();
          error.FieldName.ShouldBe(expectedFieldName);
-         error.FieldValue.ShouldBe(expectedFieldValue);
+         error.GetFieldValue!().ShouldBe(expectedFieldValue);
      }
 
      [Fact]
@@ -101,7 +101,7 @@ public class ModelValidatorTests :
 
          var error = action.ShouldThrowCrossError();
          error.FieldName.ShouldBe(expectedFieldName);
-         error.FieldValue.ShouldBe(expectedFieldValue);
+         error.GetFieldValue!().ShouldBe(expectedFieldValue);
      }
 
      [Fact]
@@ -122,7 +122,7 @@ public class ModelValidatorTests :
 
          var error = action.ShouldThrowCrossError();
          error.FieldName.ShouldBe(expectedFieldName);
-         error.FieldValue.ShouldBe(expectedFieldValue);
+         error.GetFieldValue!().ShouldBe(expectedFieldValue);
      }
      
      [Fact]
@@ -254,7 +254,7 @@ public class ModelValidatorTests :
          var action = () => parentModelValidator.Validate(_model);
      
          var error = action.ShouldThrowCrossError();
-         error.FieldValue.ShouldBe(expectedTransformation);
+         error.GetFieldValue!().ShouldBe(expectedTransformation);
      }
      
      [Fact]
@@ -273,7 +273,7 @@ public class ModelValidatorTests :
          var action = () => parentModelValidator.Validate(_model);
      
          var error = action.ShouldThrowCrossError<CommonCrossError.NotNull>();
-         error.FieldValue.ShouldBe(null);
+         error.GetFieldValue!().ShouldBe(null);
      }
      
      [Fact]
@@ -301,7 +301,7 @@ public class ModelValidatorTests :
          var action = () => parentModelValidator.Validate(_model);
      
          var error = action.ShouldThrowCrossError();
-         error.FieldValue.ShouldBe(expectedTransformation);
+         error.GetFieldValue!().ShouldBe(expectedTransformation);
      }
      
      [Fact]
@@ -325,7 +325,7 @@ public class ModelValidatorTests :
      
          var error = action.ShouldThrowCrossError();
          error.FieldName.ShouldBeNull();
-         error.FieldValue.ShouldBe(expectedTransformation);
+         error.GetFieldValue!().ShouldBe(expectedTransformation);
      }
      
      [Fact]
@@ -376,7 +376,7 @@ public class ModelValidatorTests :
          var action = () => parentModelValidator.Validate(_model);
 
          var error = action.ShouldThrowCrossError();
-         error.FieldValue.ShouldBe(expectedFieldValue);
+         error.GetFieldValue!().ShouldBe(expectedFieldValue);
      }
 
      [Fact]

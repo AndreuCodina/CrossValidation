@@ -51,14 +51,14 @@ public class WhenNotNullTests :
             .WhenNotNull(x => x
                 .GreaterThan(_model.NullableInt!.Value));
         var error = structValidationAction.ShouldThrowCrossError();
-        error.FieldValue.ShouldNotBeOfType<int?>();
-        error.FieldValue.ShouldBeOfType<int>();
+        error.GetFieldValue!().ShouldNotBeOfType<int?>();
+        error.GetFieldValue!().ShouldBeOfType<int>();
 
         var classValidationAction = () => Validate.That(_model.NullableString)
             .WhenNotNull(x => x
                 .Must(_commonFixture.NotBeValid));
         error = classValidationAction.ShouldThrowCrossError();
-        error.FieldValue.ShouldBeOfType<string>();
+        error.GetFieldValue!().ShouldBeOfType<string>();
     }
     
     [Fact]
@@ -112,8 +112,8 @@ public class WhenNotNullTests :
             .NotNull();
 
         var error = action.ShouldThrowCrossError<CommonCrossError.NotNull>();
-        error.FieldValue.ShouldNotBeOfType<int>();
-        error.FieldValue.ShouldBeNull();
+        error.GetFieldValue!().ShouldNotBeOfType<int>();
+        error.GetFieldValue!().ShouldBeNull();
     }
     
     [Fact]
