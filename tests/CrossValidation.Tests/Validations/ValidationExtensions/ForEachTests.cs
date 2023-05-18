@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Threading.Tasks;
 using CrossValidation.Errors;
 using CrossValidation.Exceptions;
 using CrossValidation.ShouldlyAssertions;
@@ -262,7 +263,7 @@ public class ForEachTests :
     [InlineData(
         ValidationMode.AccumulateFirstErrorsAndAllIterationFirstErrors,
         new[] {"1", "2", "3"})]
-    public void Throw_errors_with_model_validator(
+    public async Task Throw_errors_with_model_validator(
         ValidationMode validationMode,
         string[] expectedErrorCodes)
     {
@@ -275,6 +276,7 @@ public class ForEachTests :
             validator.ValidationMode = validationMode;
             
             validator.Field(_model.NullableIntList)
+                .MustAsync(_commonFixture.BeValidAsync)
                 .NotNull()
                 .ForEach(x => x
                     .GreaterThan(0)
@@ -289,9 +291,9 @@ public class ForEachTests :
                 .Must(_commonFixture.NotBeValid);
         });
         
-        var action = () => parentModelValidator.Validate(_model);
+        var action = () => parentModelValidator.ValidateAsync(_model);
 
-        var exception = action.ShouldThrow<Exception>();
+        var exception = await action.ShouldThrowAsync<Exception>();
 
         if (exception is ValidationListException validationListException)
         {

@@ -166,6 +166,7 @@ public static class ValidationExtensions
             {
                 var getFieldValue = () => innerField;
                 var scopeValidation = CreateScopeValidation(validation, getFieldValue, index);
+                scopeValidation.HasFailed = false;
                 action(scopeValidation);
                 index++;
                 var areAllItemsIterated = index  == totalItems;

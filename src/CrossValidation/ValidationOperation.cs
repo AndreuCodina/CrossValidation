@@ -43,6 +43,7 @@ public interface IValidationOperation
     public IValidationOperation? ScopeCreatorValidation { get; set; }
     public bool GeneralizeError { get; set; }
     ValueTask TraverseAsync(ValidationContext context);
+    void MarkAllDescendantValidationsAsPendingAsync();
     ValueTask ExecuteAsync(ValidationContext context, bool useAsync);
     void HandleError(ICrossError error, ValidationContext context);
     void TakeCustomizationsFromInstanceError(ICrossError error, ValidationContext context);
@@ -101,7 +102,7 @@ internal class ValidationOperation
 
         while (IsScopeCreator && HasPendingAsyncValidation)
         {
-            HasPendingAsyncValidation = false;
+            MarkAllDescendantValidationsAsPendingAsync();
 
             foreach (var scopeValidation in ScopeValidations!)
             {
@@ -114,7 +115,25 @@ internal class ValidationOperation
             await NextValidation.TraverseAsync(context);
         }
     }
-    
+
+    public void MarkAllDescendantValidationsAsPendingAsync()
+    {
+        HasPendingAsyncValidation = false;
+        
+        if (ScopeValidations is not null)
+        {
+            foreach (var scopeValidation in ScopeValidations)
+            {
+                scopeValidation.MarkAllDescendantValidationsAsPendingAsync();
+            }
+        }
+        
+        if (NextValidation is not null)
+        {
+            NextValidation.MarkAllDescendantValidationsAsPendingAsync();
+        }
+    }
+
     public async ValueTask ExecuteAsync(ValidationContext context, bool useAsync)
     {
         if (Condition is not null)
