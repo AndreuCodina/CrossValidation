@@ -23,6 +23,10 @@ public abstract class Validate<TException>
             getFieldValue: () => field,
             crossErrorToException: typeof(TException),
             generalizeError: true,
+            fieldFullPath: null,
+            context: null,
+            index: null,
+            parentPath: null,
             error: error,
             message: message,
             code: code,
@@ -45,6 +49,7 @@ public abstract class Validate<TException>
             getFieldValue: () => field,
             crossErrorToException: typeof(TException),
             fieldName: fieldName,
+            context: null,
             error: error,
             message: message,
             code: code,
@@ -132,11 +137,12 @@ public abstract class Validate<TException>
         [CallerArgumentExpression(nameof(field))] string fieldName = default!)
     {
         return IValidation<TField>.CreateFromFieldName(
-            () => field,
-            typeof(TException) == typeof(CrossException)
+            getFieldValue: () => field,
+            crossErrorToException: typeof(TException) == typeof(CrossException)
                 ? typeof(ArgumentException)
                 : typeof(TException),
             fieldName,
+            context: null,
             error: error,
             message: message,
             code: code,
