@@ -43,7 +43,7 @@ public interface IValidationOperation
     public IValidationOperation? ScopeCreatorValidation { get; set; }
     public bool GeneralizeError { get; set; }
     ValueTask TraverseAsync(ValidationContext context);
-    void MarkAllDescendantValidationsAsPendingAsync();
+    void MarkAllDescendantValidationsAsNotPendingAsync();
     ValueTask ExecuteAsync(ValidationContext context, bool useAsync);
     void HandleError(ICrossError error, ValidationContext context);
     void TakeCustomizationsFromInstanceError(ICrossError error, ValidationContext context);
@@ -99,24 +99,27 @@ internal class ValidationOperation
                 return;
             }
         }
-
-        while (IsScopeCreator && HasPendingAsyncValidation)
+        
+        if (IsScopeCreator)
         {
-            MarkAllDescendantValidationsAsPendingAsync();
+            MarkAllDescendantValidationsAsNotPendingAsync();
 
             foreach (var scopeValidation in ScopeValidations!)
             {
-                await scopeValidation.TraverseAsync(context);
+                do
+                {
+                    await scopeValidation.TraverseAsync(context);
+                } while (scopeValidation.HasPendingAsyncValidation);
             }
         }
-        
-        if (NextValidation is not null)
+
+        if (!HasFailed && NextValidation is not null)
         {
             await NextValidation.TraverseAsync(context);
         }
     }
 
-    public void MarkAllDescendantValidationsAsPendingAsync()
+    public void MarkAllDescendantValidationsAsNotPendingAsync()
     {
         HasPendingAsyncValidation = false;
         
@@ -124,13 +127,13 @@ internal class ValidationOperation
         {
             foreach (var scopeValidation in ScopeValidations)
             {
-                scopeValidation.MarkAllDescendantValidationsAsPendingAsync();
+                scopeValidation.MarkAllDescendantValidationsAsNotPendingAsync();
             }
         }
         
         if (NextValidation is not null)
         {
-            NextValidation.MarkAllDescendantValidationsAsPendingAsync();
+            NextValidation.MarkAllDescendantValidationsAsNotPendingAsync();
         }
     }
 

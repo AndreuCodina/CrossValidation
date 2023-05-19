@@ -37,7 +37,7 @@ public static class ValidationExtensions
             var scopeValidation = CreateScopeValidation(
                 validation: validation,
                 getFieldValue: getFieldValue,
-                index: null);
+                index: validation.Index);
             action(scopeValidation);
         });
     }
@@ -55,7 +55,7 @@ public static class ValidationExtensions
             var scopeValidation = CreateScopeValidation(
                 validation: validation,
                 getFieldValue: getFieldValue,
-                index: null);
+                index: validation.Index);
             action(scopeValidation);
         });
     }
@@ -190,7 +190,7 @@ public static class ValidationExtensions
     {
         return validation.SetValidator(() => new RegularExpressionValidator(validation.GetFieldValue(), pattern));
     }
-    
+
     public static IValidation<TDependentField> CreateScopeValidation<TField, TDependentField>(
         this IValidation<TField> validation,
         Func<TDependentField> getFieldValue,

@@ -53,7 +53,7 @@ public interface IValidation<out TField> : IValidationOperation
 
     [Pure]
     TField Instance();
-    
+
     [Pure]
     TInstance Instance<TInstance>(Func<TField, TInstance> fieldToInstance);
 

@@ -337,6 +337,47 @@ public class ForEachTests :
         var error = action.ShouldThrowCrossError();
         error.Code.ShouldBe(expectedErrorCode);
     }
+    
+    [Fact]
+    public void Nested_ForEach_with_AccumulateFirstErrorsAndAllIterationFirstErrors_validation_mode_returns_errors()
+    {
+        var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
+        {
+            validator.ValidationMode = ValidationMode.AccumulateFirstErrorsAndAllIterationFirstErrors;
+
+            validator.Field(_model.IntListList)
+                .ForEach(x => x
+                    .ForEach(x => x
+                        .Must(x => x >= 2)));
+        });
+        var action = () => parentModelValidator.Validate(_model);
+        
+        var errors = action.ShouldThrowCrossErrors();
+        errors.Count.ShouldBe(3);
+    }
+    
+    [Fact]
+    public async Task Accumulate_operations()
+    {
+        var expectedIntList = new List<int> { 1, 2, 3 };
+        var expectedMessage = "Expected message";
+        _model = new ParentModelBuilder()
+            .WithIntList(expectedIntList)
+            .Build();
+        var action = () => Validate.That(_model.IntList)
+            .ForEach(x => x
+                .MustAsync(_commonFixture.BeValidAsync)
+                .Must(_commonFixture.BeValid)
+                .WithMessage(expectedMessage)
+                .MustAsync(_commonFixture.NotBeValidAsync)
+                .Must(_commonFixture.ThrowException))
+            .Must(_commonFixture.ThrowException)
+            .ValidateAsync();
+
+        var error = await action.ShouldThrowCrossErrorAsync<CommonCrossError.Predicate>();
+        
+        error.Message.ShouldBe(expectedMessage);
+    }
 
     private record ErrorTest : CrossError;
 }

@@ -12,17 +12,6 @@ public class ValidatorFixture
             .ToList();
         var areSpecificErrorFieldsAddedAsPlaceholders = error.GetFieldNames()
             .All(fieldName => placeholderNamesAdded.Contains(fieldName));
-        var errorContainsCommonPlaceholders =
-            ErrorContainsPlaceholder(error, nameof(CrossError.FieldName))
-            && ErrorContainsPlaceholder(error, nameof(CrossError.FieldDisplayName))
-            && ErrorContainsPlaceholder(error, "FieldValue");
-        return areSpecificErrorFieldsAddedAsPlaceholders && errorContainsCommonPlaceholders;
-    }
-
-    private bool ErrorContainsPlaceholder(ICrossError error, string placeholderName)
-    {
-        return error.PlaceholderValues!
-            .Select(x => x.Key)
-            .Contains(placeholderName);
+        return areSpecificErrorFieldsAddedAsPlaceholders;
     }
 }

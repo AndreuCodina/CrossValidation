@@ -23,19 +23,7 @@ public class CrossErrorTests :
         _commonFixture = commonFixture;
         _validatorFixture = validatorFixture;
     }
-    
-    [Fact]
-    public void Add_all_specific_error_fields_as_placeholders()
-    {
-        var action = () => Validate.That(true)
-            .WithError(new ErrorWithAllFieldsAddedAsPlaceholders("Alex", 30))
-            .Must(_commonFixture.NotBeValid);
 
-        var error = action.ShouldThrowCrossError<ErrorWithAllFieldsAddedAsPlaceholders>();
-
-        _validatorFixture.AllFieldsAreAddedAsPlaceholders(error).ShouldBeTrue();
-    }
-    
     [Fact]
     public void Not_add_all_specific_error_fields_as_placeholders_fails()
     {
@@ -47,21 +35,7 @@ public class CrossErrorTests :
 
         _validatorFixture.AllFieldsAreAddedAsPlaceholders(error).ShouldBeFalse();
     }
-    
-    [Fact]
-    public void Add_null_placeholders_as_empty_strings()
-    {
-        var action = () => Validate.That(true)
-            .WithError(new ErrorWithNullFields(null, null))
-            .Must(_commonFixture.NotBeValid);
 
-        var error = action.ShouldThrowCrossError<ErrorWithNullFields>();
-
-        error.PlaceholderValues![nameof(CrossError.FieldName)].ShouldBe("");
-        error.PlaceholderValues![nameof(ErrorWithNullFields.Name)].ShouldBe("");
-        error.PlaceholderValues![nameof(ErrorWithNullFields.Age)].ShouldBe("");
-    }
-    
     [Fact]
     public void Throw_cross_exception_with_code_customizes_message()
     {

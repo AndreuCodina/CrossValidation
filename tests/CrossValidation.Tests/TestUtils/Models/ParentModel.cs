@@ -12,6 +12,7 @@ public class ParentModel
     public required NestedModel? NullableNestedModel { get; set; }
     public required List<int> IntList { get; set; }
     public required List<int>? NullableIntList { get; set; }
+    public required List<List<int>> IntListList { get; set; }
     public required List<string> StringList { get; set; }
     public required List<string>? NullableStringList { get; set; }
     public required int Int { get; set; }

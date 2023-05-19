@@ -10,6 +10,11 @@ public class ParentModelBuilder
     private NestedModel _nestedModel = new NestedModelBuilder().Build();
     private List<int> _intList = new List<int> {1, 2, 3};
     private List<int>? _nullableIntList;
+    private List<List<int>> _intListList = new()
+    {
+        new() {1, 2, 3},
+        new() {4, 5, 6}
+    };
     private int? _nullableInt;
 
     public ParentModel Build()
@@ -23,6 +28,11 @@ public class ParentModelBuilder
             NullableNestedModel = null,
             IntList = _intList,
             NullableIntList = _nullableIntList,
+            IntListList = new()
+            {
+                new() {1, 2, 1},
+                new() {4, 1, 6}
+            },
             StringList = new List<string> {"1", "2", "3"},
             NullableStringList = null,
             Int = 1,
