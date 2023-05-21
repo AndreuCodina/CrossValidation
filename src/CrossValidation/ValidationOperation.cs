@@ -102,12 +102,11 @@ internal class ValidationOperation
         
         if (IsScopeCreator)
         {
-            MarkAllDescendantValidationsAsNotPendingAsync();
-
             foreach (var scopeValidation in ScopeValidations!)
             {
                 do
                 {
+                    MarkAllDescendantValidationsAsNotPendingAsync();
                     await scopeValidation.TraverseAsync(context);
                 } while (scopeValidation.HasPendingAsyncValidation);
             }

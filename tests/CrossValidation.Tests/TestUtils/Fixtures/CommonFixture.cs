@@ -81,7 +81,7 @@ public class CommonFixture
     
     public bool ThrowException<T>(T parameter)
     {
-        throw new Exception();
+        throw new Exception("Unexpected exception");
     }
     
     private Task<bool> ReturnBoolTask(bool value)

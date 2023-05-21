@@ -318,4 +318,29 @@ public class WhenNotNullTests :
 
         await action.ShouldNotThrowAsync();
     }
+
+    [Fact]
+    public async Task Stop_executing_nested_failed_scope_with_previous_scope_with_pending_asynchronous_validation()
+    {
+        _model = new ParentModelBuilder()
+            .WithNullableNestedModel()
+            .Build();
+        var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
+        {
+            validator.ValidationMode = ValidationMode.AccumulateFirstErrors;
+
+            validator.That(_model.NullableNestedModel)
+                .WhenNotNull(x => x
+                    .MustAsync(_commonFixture.BeValidAsync)
+                    .Transform(x => (NestedModel?)x)
+                    .WhenNotNull(x => x
+                        .MustAsync(_commonFixture.NotBeValidAsync)
+                        .Must(_commonFixture.ThrowException))
+                    .Must(_commonFixture.ThrowException))
+                .Must(_commonFixture.ThrowException);
+        });
+        var action = () => parentModelValidator.ValidateAsync(_model);
+
+        await action.ShouldThrowCrossErrorAsync();
+    }
 }
