@@ -68,9 +68,7 @@ public interface IValidation<out TField> : IValidationOperation
     Task ValidateAsync();
     
     ValidationContext? Context { get; set; }
-    
-    string? FieldFullPath { get; set; }
-    
+
     TField GetFieldValue();
 
     static IValidation<TField> CreateFromFieldName(
@@ -85,14 +83,14 @@ public interface IValidation<out TField> : IValidationOperation
         HttpStatusCode? httpStatusCode,
         string? fieldDisplayName)
     {
-        var fieldFullPath = fieldName.Contains('.')
+        var fullPath = fieldName.Contains('.')
             ? fieldName.Substring(fieldName.IndexOf('.') + 1)
             : fieldName;
         return new Validation<TField>(
             getFieldValue: getFieldValue,
             crossErrorToException: crossErrorToException,
             generalizeError: false,
-            fieldFullPath: fieldFullPath,
+            fieldPath: fullPath,
             context: null,
             index: null,
             parentPath: null,
@@ -324,7 +322,7 @@ internal class Validation<TField> :
             getFieldValue: getFieldValueTransformed,
             crossErrorToException: CrossErrorToException,
             generalizeError: false,
-            fieldFullPath: FieldFullPath,
+            fieldPath: FieldPath,
             context: Context,
             index: Index,
             parentPath: ParentPath,
@@ -346,18 +344,54 @@ internal class Validation<TField> :
     public IValidation<TField> SetModelValidator<TChildModel>(ModelValidator<TChildModel> validator)
     {
         validator.ScopeCreatorValidation = (IValidation<TChildModel>?)this;
-        Context = Context!.CloneForChildModelValidator(FieldFullPath);
-        var nextValidation = SetScope(() =>
+        var oldContext = Context;
+        Context = Context!.CloneForChildModelValidator();
+        var oldParentPath = ParentPath;
+        var oldFieldPath = FieldPath;
+        var oldFieldName = FieldName;
+
+        SetScope(() =>
         {
+            IsScopeCreator = true;
+            validator.ScopeCreatorValidation = (IValidation<TChildModel>?)this;
+            ParentPath = FieldName;
+            FieldPath = null;
+            FieldName = null;
             var childModel = (TChildModel)(object)GetFieldValue()!;
             validator.CreateValidations(childModel);
         }, Validations.ScopeType.ModelValidator);
+
+        if (HasFailed)
+        {
+            return IValidation<TField>.CreateFailed();
+        }
+        
+        var nextValidation = new Validation<TField>(
+            getFieldValue: GetFieldValue,
+            crossErrorToException: CrossErrorToException,
+            generalizeError: GeneralizeError,
+            fieldPath: oldFieldPath,
+            context: oldContext,
+            index: Index,
+            parentPath: oldParentPath,
+            fixedError: oldContext!.Error,
+            fixedMessage: oldContext!.Message,
+            fixedCode: oldContext!.Code,
+            fixedDetails: oldContext!.Details,
+            fixedHttpStatusCode: oldContext!.HttpStatusCode,
+            fixedFieldDisplayName: oldContext!.FieldDisplayName);
+        nextValidation.FieldName = oldFieldName;
+        nextValidation.HasFailed = HasFailed;
+        nextValidation.HasPendingAsyncValidation = HasPendingAsyncValidation;
+        nextValidation.ScopeType = ScopeType;
+        nextValidation.IsInsideScope = IsInsideScope;
+        nextValidation.ScopeCreatorValidation = ScopeCreatorValidation;
+        NextValidation = nextValidation;
         return nextValidation;
     }
     
     public Func<TField>? GetGenericFieldValue { get; set; }
     public ValidationContext? Context { get; set; }
-    public string? FieldFullPath { get; set; }
 
     public async Task ValidateAsync()
     {
@@ -377,7 +411,7 @@ internal class Validation<TField> :
         Func<TField>? getFieldValue,
         Type? crossErrorToException,
         bool generalizeError,
-        string? fieldFullPath,
+        string? fieldPath,
         ValidationContext? context,
         int? index,
         string? parentPath,
@@ -397,44 +431,21 @@ internal class Validation<TField> :
             Context = new ValidationContext();
         }
         
-        if (Context.ValidationTree is null)
-        {
-            Context.ValidationTree = this;
-        }
-
+        Context.ValidationTree ??= this;
         GetGenericFieldValue = getFieldValue;
         GetNonGenericFieldValue = () => getFieldValue!()!;
         CrossErrorToException = crossErrorToException;
-        FieldFullPath = fieldFullPath;
         GeneralizeError = generalizeError;
         Index = index;
-        var indexRepresentation = Context.FieldName is not null && index is not null
-            ? $"[{index}]"
-            : null;
         ParentPath = parentPath;
-        string? parentPathValue = null;
+        FieldPath = fieldPath;
+        var parentPathPathSeparator = parentPath is not null ? "." : null;
 
-        if (parentPath is not null)
+        if (parentPath is not null || fieldPath is not null)
         {
-            parentPathValue = parentPath;
+            FieldName = $"{parentPath}{parentPathPathSeparator}{fieldPath}";
         }
-        else if (Context.ParentPath is not null)
-        {
-            parentPathValue = Context.ParentPath;
-        }
-
-        if (parentPathValue is not null)
-        {
-            parentPathValue += ".";
-        }
-
-        Context.FieldName = parentPathValue + fieldFullPath + indexRepresentation;
-
-        if (Context.FieldName is "")
-        {
-            Context.FieldName = null;
-        }
-
+        
         Context.Error = fixedError;
         Context.Message = fixedMessage;
         Context.Code = fixedCode;
@@ -476,7 +487,7 @@ internal class Validation<TField> :
             getFieldValue: GetFieldValue,
             crossErrorToException: CrossErrorToException,
             generalizeError: GeneralizeError,
-            fieldFullPath: FieldFullPath,
+            fieldPath: FieldPath,
             context: Context,
             index: Index,
             parentPath: ParentPath,

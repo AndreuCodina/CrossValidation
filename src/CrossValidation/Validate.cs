@@ -23,7 +23,7 @@ public abstract class Validate<TException>
             getFieldValue: () => field,
             crossErrorToException: typeof(TException),
             generalizeError: true,
-            fieldFullPath: null,
+            fieldPath: null,
             context: null,
             index: null,
             parentPath: null,

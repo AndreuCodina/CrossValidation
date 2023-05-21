@@ -38,12 +38,15 @@ public abstract record ModelValidator<TModel>
         string? fieldDisplayName = null,
         [CallerArgumentExpression(nameof(field))] string fieldName = default!)
     {
-        var fieldFullPath = fieldName.Contains('.')
+        var fieldPath = fieldName.Contains('.')
             ? fieldName.Substring(fieldName.IndexOf('.') + 1)
             : fieldName;
-        ScopeCreatorValidation!.FieldFullPath = fieldFullPath;
+        ScopeCreatorValidation!.FieldPath = fieldPath; // TODO: Remove ??
         var getFieldValue = () => field;
-        var scopeValidation = ScopeCreatorValidation.CreateScopeValidation(getFieldValue: getFieldValue, index: null);
+        var scopeValidation = ScopeCreatorValidation.CreateScopeValidation(
+            getFieldValue: getFieldValue,
+            index: null,
+            fieldPathToOverride: null);
         scopeValidation.HasFailed = false;
         scopeValidation.GeneralizeError = false;
         return scopeValidation;
@@ -60,7 +63,10 @@ public abstract record ModelValidator<TModel>
         string? fieldDisplayName = null)
     {
         var getFieldValue = () => field;
-        var scopeValidation = ScopeCreatorValidation!.CreateScopeValidation(getFieldValue: getFieldValue, index: null);
+        var scopeValidation = ScopeCreatorValidation!.CreateScopeValidation(
+            getFieldValue: getFieldValue,
+            index: null,
+            fieldPathToOverride: null);
         scopeValidation.HasFailed = false;
         scopeValidation.GeneralizeError = true;
         return scopeValidation;

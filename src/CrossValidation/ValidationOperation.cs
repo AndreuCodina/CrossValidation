@@ -39,11 +39,13 @@ public interface IValidationOperation
     bool IsScopeCreator { get; set; }
     List<IValidationOperation>? ScopeValidations { get; set; }
     int? Index { get; set; }
-    string? ParentPath { get; set; } 
     public bool IsInsideScope { get; set; }
     public IValidationOperation? ScopeCreatorValidation { get; set; }
     public bool GeneralizeError { get; set; }
     public ScopeType? ScopeType { get; set; }
+    public string? ParentPath { get; set; }
+    public string? FieldPath { get; set; }
+    public string? FieldName { get; set; }
     ValueTask TraverseAsync(ValidationContext context);
     void MarkAllDescendantValidationsAsNotPendingAsync();
     ValueTask ExecuteAsync(ValidationContext context, bool useAsync);
@@ -73,16 +75,17 @@ internal class ValidationOperation
     public IValidationOperation? NextValidation { get; set; }
     public bool HasFailed { get; set; }
     public bool HasBeenExecuted { get; set; }
-    // public bool HasAsyncNextValidationsPendingToExecute { get; set; } = false;
     public bool HasPendingAsyncValidation { get; set; }
     public bool IsScopeCreator { get; set; }
     public List<IValidationOperation>? ScopeValidations { get; set; }
     public int? Index { get; set; }
-    public string? ParentPath { get; set; }
     public bool IsInsideScope { get; set; }
     public IValidationOperation? ScopeCreatorValidation { get; set; }
     public bool GeneralizeError { get; set; }
     public ScopeType? ScopeType { get; set; }
+    public string? ParentPath { get; set; }
+    public string? FieldPath { get; set; }
+    public string? FieldName { get; set; }
 
     public async ValueTask TraverseAsync(ValidationContext context)
     {
@@ -284,7 +287,7 @@ internal class ValidationOperation
     private void AddCustomizationsToError(ICrossError error, ValidationContext context)
     {
         error.CrossErrorToException = CrossErrorToException;
-        error.FieldName = context.FieldName; // TODO: Save it in ValidationOperation
+        error.FieldName = FieldName;
         error.FieldDisplayName = GetFieldDisplayNameToFill(error, context);
         error.GetFieldValue = GetNonGenericFieldValue;
         error.Code = GetCodeToFill(error, context);

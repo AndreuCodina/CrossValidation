@@ -37,7 +37,8 @@ public static class ValidationExtensions
             var scopeValidation = CreateScopeValidation(
                 validation: validation,
                 getFieldValue: getFieldValue,
-                index: validation.Index);
+                index: validation.Index,
+                fieldPathToOverride: null);
             action(scopeValidation);
         }, ScopeType.WhenNotNull);
     }
@@ -55,7 +56,8 @@ public static class ValidationExtensions
             var scopeValidation = CreateScopeValidation(
                 validation: validation,
                 getFieldValue: getFieldValue,
-                index: validation.Index);
+                index: validation.Index,
+                fieldPathToOverride: null);
             action(scopeValidation);
         }, ScopeType.WhenNotNull);
     }
@@ -165,7 +167,11 @@ public static class ValidationExtensions
             foreach (var innerField in fieldCollection)
             {
                 var getFieldValue = () => innerField;
-                var scopeValidation = CreateScopeValidation(validation, getFieldValue, index);
+                var scopeValidation = CreateScopeValidation(
+                    validation: validation,
+                    getFieldValue: getFieldValue,
+                    index: index,
+                    fieldPathToOverride: validation.GetFieldPathWithIndex(validation.FieldPath, index));
                 scopeValidation.HasFailed = false;
                 action(scopeValidation);
                 index++;
@@ -191,16 +197,17 @@ public static class ValidationExtensions
         return validation.SetValidator(() => new RegularExpressionValidator(validation.GetFieldValue(), pattern));
     }
 
-    public static IValidation<TDependentField> CreateScopeValidation<TField, TDependentField>(
+    internal static IValidation<TDependentField> CreateScopeValidation<TField, TDependentField>(
         this IValidation<TField> validation,
         Func<TDependentField> getFieldValue,
-        int? index)
+        int? index,
+        string? fieldPathToOverride)
     {
         var scopeValidation = new Validation<TDependentField>(
             getFieldValue: getFieldValue,
             crossErrorToException: validation.CrossErrorToException,
             generalizeError: validation.GeneralizeError,
-            fieldFullPath: validation.FieldFullPath,
+            fieldPath: fieldPathToOverride ?? validation.FieldPath,
             context: validation.Context,
             index: index,
             parentPath: validation.ParentPath,
@@ -218,5 +225,19 @@ public static class ValidationExtensions
         validation.ScopeValidations ??= new();
         validation.ScopeValidations.Add(scopeValidation);
         return scopeValidation;
+    }
+
+    internal static string? GetFieldPathWithIndex<TField>(
+        this IValidation<TField> validation,
+        string? fieldPath,
+        int? index)
+    {
+        if (fieldPath is null)
+        {
+            return null;
+        }
+        
+        var indexRepresentation = index is not null ? $"[{index}]" : null;
+        return $"{fieldPath}{indexRepresentation}";
     }
 }

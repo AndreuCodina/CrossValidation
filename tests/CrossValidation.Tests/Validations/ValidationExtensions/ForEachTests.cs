@@ -446,6 +446,44 @@ public class ForEachTests :
             errors.Count.ShouldBe(numberOfErrors!.Value);
         }
     }
+    
+    [Fact]
+    public void Get_field_name()
+    {
+        _model = new ParentModelBuilder()
+            .WithIntListList(new()
+            {
+                new() { 1, 10, 1 },
+                new() { 10 }
+
+            })
+            .Build();
+        var nestedModel = _model.NestedModel;
+        var nestedModelValidator = _commonFixture.CreateNestedModelValidator(validator =>
+        {
+            validator.Field(nestedModel.Int)
+                .GreaterThan(nestedModel.Int);
+        });
+        var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
+        {
+            validator.ValidationMode = ValidationMode.AccumulateFirstErrorsAndAllIterationFirstErrors;
+
+            validator.Field(_model.IntListList)
+                .ForEach(x => x
+                    .ForEach(x => x
+                        .Must(x => x == 1)));
+            
+            validator.Field(_model.NestedModelList)
+                .ForEach(x => x
+                    .SetModelValidator(nestedModelValidator));
+        });
+        var action = () => parentModelValidator.Validate(_model);
+        
+        var errors = action.ShouldThrowCrossErrors();
+        errors[0].FieldName.ShouldBe("IntListList[0][1]");
+        errors[1].FieldName.ShouldBe("IntListList[1][0]");
+        errors[2].FieldName.ShouldBe("NestedModelList[0].Int");
+    }
 
     private record ErrorTest : CrossError;
 }

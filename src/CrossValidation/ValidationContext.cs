@@ -5,14 +5,12 @@ using CrossValidation.Exceptions;
 namespace CrossValidation;
 
 /// <summary>
-/// Settings to share between ValidationOperations and even Validations
+/// Settings to share between validations
 /// </summary>
 public class ValidationContext
 {
     public IValidationOperation? ValidationTree { get; set; }
     public List<ICrossError> ErrorsCollected { get; set; } = new();
-    public string? FieldName { get; set; }
-    public string? ParentPath { get; set; }
     public ValidationMode ValidationMode { get; set; } = ValidationMode.StopOnFirstError;
     public bool IsChildContext { get; set; }
     public ICrossError? Error { get; set; }
@@ -23,16 +21,14 @@ public class ValidationContext
     public string? FieldDisplayName { get; set; }
     public ICrossErrorToException? CrossErrorToException { get; set; }
 
-    public ValidationContext CloneForChildModelValidator(string? parentPath)
+    public ValidationContext CloneForChildModelValidator()
     {
-        var newContext = new ValidationContext
+        return new ValidationContext
         {
             IsChildContext = true,
-            ParentPath = parentPath,
             ErrorsCollected = ErrorsCollected,
             ValidationMode = ValidationMode,
             CrossErrorToException = CrossErrorToException
         };
-        return newContext;
     }
 }
