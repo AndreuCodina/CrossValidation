@@ -41,7 +41,7 @@ public abstract record ModelValidator<TModel>
         var fieldPath = fieldName.Contains('.')
             ? fieldName.Substring(fieldName.IndexOf('.') + 1)
             : fieldName;
-        ScopeCreatorValidation!.FieldPath = fieldPath; // TODO: Remove ??
+        ScopeCreatorValidation!.FieldPath = fieldPath;
         var getFieldValue = () => field;
         var scopeValidation = ScopeCreatorValidation.CreateScopeValidation(
             getFieldValue: getFieldValue,
