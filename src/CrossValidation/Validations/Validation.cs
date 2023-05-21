@@ -61,7 +61,7 @@ public interface IValidation<out TField> : IValidationOperation
 
     IValidation<TField> SetAsyncValidator(Func<Task<IValidator<ICrossError>>> validator);
 
-    IValidation<TField> SetScope(Action scope);
+    IValidation<TField> SetScope(Action scope, ScopeType type);
     
     IValidation<TField> SetModelValidator<TChildModel>(ModelValidator<TChildModel> validator);
     
@@ -150,7 +150,7 @@ internal class Validation<TField> :
         return CreateNextValidation();
     }
     
-    public IValidation<TField> SetScope(Action scope)
+    public IValidation<TField> SetScope(Action scope, ScopeType type)
     {
         if (HasFailed)
         {
@@ -158,6 +158,7 @@ internal class Validation<TField> :
         }
         
         Scope = scope;
+        ScopeType = type;
     
         if (!HasPendingAsyncValidation)
         {
@@ -316,6 +317,7 @@ internal class Validation<TField> :
             fieldDisplayName: null);
         nextValidation.HasFailed = HasFailed;
         nextValidation.HasPendingAsyncValidation = HasPendingAsyncValidation;
+        nextValidation.ScopeType = ScopeType;
         nextValidation.IsInsideScope = true;
         nextValidation.ScopeCreatorValidation = ScopeCreatorValidation;
         NextValidation = nextValidation;
@@ -330,7 +332,7 @@ internal class Validation<TField> :
         {
             var childModel = (TChildModel)(object)GetFieldValue()!;
             validator.CreateValidations(childModel);
-        });
+        }, Validations.ScopeType.ModelValidator);
         return nextValidation;
     }
     
@@ -467,6 +469,7 @@ internal class Validation<TField> :
             fieldDisplayName: null);
         nextValidation.HasFailed = HasFailed;
         nextValidation.HasPendingAsyncValidation = HasPendingAsyncValidation;
+        nextValidation.ScopeType = ScopeType;
         nextValidation.IsInsideScope = IsInsideScope;
         nextValidation.ScopeCreatorValidation = ScopeCreatorValidation;
         NextValidation = nextValidation;

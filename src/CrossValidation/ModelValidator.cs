@@ -86,10 +86,7 @@ public abstract record ModelValidator<TModel>
         ScopeCreatorValidation = CrossValidation.Validate
                 .That(model);
         ScopeCreatorValidation.IsScopeCreator = true;
-        ScopeCreatorValidation.SetScope(() =>
-        {
-            CreateValidations(model);
-        });
+        ScopeCreatorValidation.SetScope(() => CreateValidations(model), ScopeType.ModelValidator);
 
         if (useAsync)
         {

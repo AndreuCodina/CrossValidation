@@ -39,7 +39,7 @@ public static class ValidationExtensions
                 getFieldValue: getFieldValue,
                 index: validation.Index);
             action(scopeValidation);
-        });
+        }, ScopeType.WhenNotNull);
     }
 
     public static IValidation<TField?> WhenNotNull<TField, TReturnedField>(
@@ -57,7 +57,7 @@ public static class ValidationExtensions
                 getFieldValue: getFieldValue,
                 index: validation.Index);
             action(scopeValidation);
-        });
+        }, ScopeType.WhenNotNull);
     }
 
     public static IValidation<TField?> Null<TField>(
@@ -180,7 +180,7 @@ public static class ValidationExtensions
                     break;
                 }
             }
-        });
+        }, ScopeType.ForEach);
     }
 
     public static IValidation<string> Regex(
@@ -212,6 +212,7 @@ public static class ValidationExtensions
             fieldDisplayName: null);
         scopeValidation.HasFailed = validation.HasFailed;
         scopeValidation.HasPendingAsyncValidation = validation.HasPendingAsyncValidation;
+        scopeValidation.ScopeType = validation.ScopeType;
         scopeValidation.IsInsideScope = true;
         scopeValidation.ScopeCreatorValidation = validation;
         validation.ScopeValidations ??= new();

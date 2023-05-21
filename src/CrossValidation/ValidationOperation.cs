@@ -1,6 +1,7 @@
 using System.Net;
 using CrossValidation.Errors;
 using CrossValidation.Resources;
+using CrossValidation.Validations;
 using CrossValidation.Validators;
 
 namespace CrossValidation;
@@ -42,6 +43,7 @@ public interface IValidationOperation
     public bool IsInsideScope { get; set; }
     public IValidationOperation? ScopeCreatorValidation { get; set; }
     public bool GeneralizeError { get; set; }
+    public ScopeType? ScopeType { get; set; }
     ValueTask TraverseAsync(ValidationContext context);
     void MarkAllDescendantValidationsAsNotPendingAsync();
     ValueTask ExecuteAsync(ValidationContext context, bool useAsync);
@@ -80,12 +82,20 @@ internal class ValidationOperation
     public bool IsInsideScope { get; set; }
     public IValidationOperation? ScopeCreatorValidation { get; set; }
     public bool GeneralizeError { get; set; }
+    public ScopeType? ScopeType { get; set; }
 
     public async ValueTask TraverseAsync(ValidationContext context)
     {
-        if (HasFailed
-            && (!IsScopeCreator
-                || (IsScopeCreator && context.ValidationMode is not ValidationMode.AccumulateFirstErrorsAndAllIterationFirstErrors)))
+        bool StopExecution()
+        {
+            var isModelValidator = ScopeType is not null && ScopeType is Validations.ScopeType.ModelValidator;
+            var stopForEach = (ScopeType is not null && ScopeType is Validations.ScopeType.ForEach && context.ValidationMode is not ValidationMode.AccumulateFirstErrorsAndAllIterationFirstErrors);
+            var stopWhenNotNull = (ScopeType is not null && ScopeType is Validations.ScopeType.WhenNotNull);
+            return HasFailed
+                    && (!IsScopeCreator || stopForEach || stopWhenNotNull)
+                    && !isModelValidator;
+        }
+        if (StopExecution())
         {
             return;
         }
@@ -106,6 +116,11 @@ internal class ValidationOperation
             {
                 do
                 {
+                    if (StopExecution()) //&& !scopeValidation.HasPendingAsyncValidation)
+                    {
+                        break;
+                    }
+                    
                     MarkAllDescendantValidationsAsNotPendingAsync();
                     await scopeValidation.TraverseAsync(context);
                 } while (scopeValidation.HasPendingAsyncValidation);

@@ -319,15 +319,19 @@ public class WhenNotNullTests :
         await action.ShouldNotThrowAsync();
     }
 
-    [Fact]
-    public async Task Stop_executing_nested_failed_scope_with_previous_scope_with_pending_asynchronous_validation()
+    [Theory]
+    [InlineData(ValidationMode.StopOnFirstError)]
+    [InlineData(ValidationMode.AccumulateFirstErrors)]
+    [InlineData(ValidationMode.AccumulateFirstErrorsAndAllIterationFirstErrors)]
+    public async Task Stop_executing_nested_failed_scope_with_previous_scope_with_pending_asynchronous_validation(
+        ValidationMode validationMode)
     {
         _model = new ParentModelBuilder()
             .WithNullableNestedModel()
             .Build();
         var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
         {
-            validator.ValidationMode = ValidationMode.AccumulateFirstErrors;
+            validator.ValidationMode = validationMode;
 
             validator.That(_model.NullableNestedModel)
                 .WhenNotNull(x => x
@@ -342,5 +346,40 @@ public class WhenNotNullTests :
         var action = () => parentModelValidator.ValidateAsync(_model);
 
         await action.ShouldThrowCrossErrorAsync();
+    }
+    
+    [Theory]
+    [InlineData(ValidationMode.StopOnFirstError, null)]
+    [InlineData(ValidationMode.AccumulateFirstErrors, null)]
+    [InlineData(ValidationMode.AccumulateFirstErrorsAndAllIterationFirstErrors, 2)]
+    public async Task ForEach_works_inside_WhenNotNull(ValidationMode validationMode, int? numberOfErrors)
+    {
+        _model = new ParentModelBuilder()
+            .WithNullableNestedModel()
+            .Build();
+        var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
+        {
+            validator.ValidationMode = validationMode;
+            
+            validator.That(_model.IntListList)
+                .WhenNotNull(x => x
+                    .MustAsync(_commonFixture.BeValidAsync)
+                    .ForEach(x => x
+                        .MustAsync(_commonFixture.NotBeValidAsync)
+                        .Must(_commonFixture.ThrowException))
+                    .Must(_commonFixture.ThrowException))
+                .Must(_commonFixture.ThrowException);
+        });
+        var action = () => parentModelValidator.ValidateAsync(_model);
+
+        if (validationMode is ValidationMode.StopOnFirstError or ValidationMode.AccumulateFirstErrors)
+        {
+            await action.ShouldThrowCrossErrorAsync();
+        }
+        else
+        {
+            var errors = await action.ShouldThrowCrossErrorsAsync();
+            errors.Count.ShouldBe(numberOfErrors!.Value);
+        }
     }
 }
