@@ -27,12 +27,12 @@ public abstract class Validate<TException>
             context: null,
             index: null,
             parentPath: null,
-            error: error,
-            message: message,
-            code: code,
-            details: details,
-            httpStatusCode: httpStatusCode,
-            fieldDisplayName: fieldDisplayName);
+            fixedError: error,
+            fixedMessage: message,
+            fixedCode: code,
+            fixedDetails: details,
+            fixedHttpStatusCode: httpStatusCode,
+            fixedFieldDisplayName: fieldDisplayName);
     }
     
     public static IValidation<TField> Field<TField>(

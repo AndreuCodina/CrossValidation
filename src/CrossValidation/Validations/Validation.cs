@@ -98,12 +98,12 @@ public interface IValidation<out TField> : IValidationOperation
             context: null,
             index: null,
             parentPath: null,
-            error: error,
-            message: message,
-            code: code,
-            details: details,
-            httpStatusCode: httpStatusCode,
-            fieldDisplayName: fieldDisplayName);
+            fixedError: error,
+            fixedMessage: message,
+            fixedCode: code,
+            fixedDetails: details,
+            fixedHttpStatusCode: httpStatusCode,
+            fixedFieldDisplayName: fieldDisplayName);
     }
 
     static IValidation<TField> CreateFailed()
@@ -172,19 +172,19 @@ internal class Validation<TField> :
 
     public IValidation<TField> WithCode(string code)
     {
-        Code = code;
+        Code = Context!.Code ?? code;;
         return this;
     }
     
     public IValidation<TField> WithMessage(string message)
     {
-        Message = message;
+        Message = Context!.Message ?? message;
         return this;
     }
     
     public IValidation<TField> WithDetails(string details)
     {
-        Details = details;
+        Details = Context!.Details ?? details;
         return this;
     }
 
@@ -192,10 +192,11 @@ internal class Validation<TField> :
     {
         if (!HasFailed)
         {
+            var errorToAdd = Context!.Error ?? error;
             error.CrossErrorToException = CrossErrorToException;
-            TakeCustomizationsFromError(error);
+            TakeCustomizationsFromError(errorToAdd);
             error.GetFieldValue = GetNonGenericFieldValue;
-            Error = error;
+            Error = errorToAdd;
         }
 
         return this;
@@ -203,13 +204,13 @@ internal class Validation<TField> :
 
     public IValidation<TField> WithFieldDisplayName(string fieldDisplayName)
     {
-        FieldDisplayName = fieldDisplayName;
+        FieldDisplayName = Context!.FieldDisplayName ?? fieldDisplayName;;
         return this;
     }
 
     public IValidation<TField> WithHttpStatusCode(HttpStatusCode code)
     {
-        HttpStatusCode = code;
+        HttpStatusCode = Context!.HttpStatusCode ?? code;
         return this;
     }
 
@@ -309,12 +310,12 @@ internal class Validation<TField> :
             context: Context,
             index: Index,
             parentPath: ParentPath,
-            error: null,
-            message: null,
-            code: null,
-            details: null,
-            httpStatusCode: null,
-            fieldDisplayName: null);
+            fixedError: null,
+            fixedMessage: null,
+            fixedCode: null,
+            fixedDetails: null,
+            fixedHttpStatusCode: null,
+            fixedFieldDisplayName: null);
         nextValidation.HasFailed = HasFailed;
         nextValidation.HasPendingAsyncValidation = HasPendingAsyncValidation;
         nextValidation.ScopeType = ScopeType;
@@ -362,12 +363,12 @@ internal class Validation<TField> :
         ValidationContext? context,
         int? index,
         string? parentPath,
-        ICrossError? error,
-        string? message,
-        string? code,
-        string? details,
-        HttpStatusCode? httpStatusCode,
-        string? fieldDisplayName)
+        ICrossError? fixedError,
+        string? fixedMessage,
+        string? fixedCode,
+        string? fixedDetails,
+        HttpStatusCode? fixedHttpStatusCode,
+        string? fixedFieldDisplayName)
     {
         if (context != null)
         {
@@ -416,12 +417,12 @@ internal class Validation<TField> :
             Context.FieldName = null;
         }
 
-        Context.Error = error;
-        Context.Message = message;
-        Context.Code = code;
-        Context.Details = details;
-        Context.HttpStatusCode = httpStatusCode;
-        Context.FieldDisplayName = fieldDisplayName;
+        Context.Error = fixedError;
+        Context.Message = fixedMessage;
+        Context.Code = fixedCode;
+        Context.Details = fixedDetails;
+        Context.HttpStatusCode = fixedHttpStatusCode;
+        Context.FieldDisplayName = fixedFieldDisplayName;
     }
 
     public TField Instance()
@@ -461,12 +462,12 @@ internal class Validation<TField> :
             context: Context,
             index: Index,
             parentPath: ParentPath,
-            error: null,
-            message: null,
-            code: null,
-            details: null,
-            httpStatusCode: null,
-            fieldDisplayName: null);
+            fixedError: null,
+            fixedMessage: null,
+            fixedCode: null,
+            fixedDetails: null,
+            fixedHttpStatusCode: null,
+            fixedFieldDisplayName: null);
         nextValidation.HasFailed = HasFailed;
         nextValidation.HasPendingAsyncValidation = HasPendingAsyncValidation;
         nextValidation.ScopeType = ScopeType;
