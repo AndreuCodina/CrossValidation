@@ -223,6 +223,7 @@ public class ValidateTests :
             .WithHttpStatusCode(HttpStatusCode.Accepted)
             .WithFieldDisplayName("Unexpected field display name")
             .ForEach(x => x
+                .Must(_commonFixture.BeValid)
                 .Must(_commonFixture.NotBeValid));
 
         var error = action.ShouldThrowCrossError<TestError>();

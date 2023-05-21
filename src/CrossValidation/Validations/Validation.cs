@@ -73,8 +73,6 @@ public interface IValidation<out TField> : IValidationOperation
     
     TField GetFieldValue();
 
-    IValidation<TField> CreateNextValidation();
-
     static IValidation<TField> CreateFromFieldName(
         Func<TField>? getFieldValue,
         Type? crossErrorToException,
@@ -172,19 +170,31 @@ internal class Validation<TField> :
 
     public IValidation<TField> WithCode(string code)
     {
-        Code = Context!.Code ?? code;;
+        if (!HasFailed)
+        {
+            Code = Context!.Code ?? code;
+        }
+
         return this;
     }
-    
+
     public IValidation<TField> WithMessage(string message)
     {
-        Message = Context!.Message ?? message;
+        if (!HasFailed)
+        {
+            Message = Context!.Message ?? message;
+        }
+        
         return this;
     }
     
     public IValidation<TField> WithDetails(string details)
     {
-        Details = Context!.Details ?? details;
+        if (!HasFailed)
+        {
+            Details = Context!.Details ?? details;
+        }
+        
         return this;
     }
 
@@ -194,7 +204,7 @@ internal class Validation<TField> :
         {
             var errorToAdd = Context!.Error ?? error;
             error.CrossErrorToException = CrossErrorToException;
-            TakeCustomizationsFromError(errorToAdd);
+            TakeCustomizationsFromError(errorToAdd, Context);
             error.GetFieldValue = GetNonGenericFieldValue;
             Error = errorToAdd;
         }
@@ -204,13 +214,21 @@ internal class Validation<TField> :
 
     public IValidation<TField> WithFieldDisplayName(string fieldDisplayName)
     {
-        FieldDisplayName = Context!.FieldDisplayName ?? fieldDisplayName;;
+        if (!HasFailed)
+        {
+            FieldDisplayName = Context!.FieldDisplayName ?? fieldDisplayName;
+        }
+        
         return this;
     }
 
     public IValidation<TField> WithHttpStatusCode(HttpStatusCode code)
     {
-        HttpStatusCode = Context!.HttpStatusCode ?? code;
+        if (!HasFailed)
+        {
+            HttpStatusCode = Context!.HttpStatusCode ?? code;
+        }
+        
         return this;
     }
 
@@ -310,12 +328,12 @@ internal class Validation<TField> :
             context: Context,
             index: Index,
             parentPath: ParentPath,
-            fixedError: null,
-            fixedMessage: null,
-            fixedCode: null,
-            fixedDetails: null,
-            fixedHttpStatusCode: null,
-            fixedFieldDisplayName: null);
+            fixedError: Context!.Error ?? Error,
+            fixedMessage: Context!.Message ?? Message,
+            fixedCode: Context!.Code ?? Code,
+            fixedDetails: Context!.Details ?? Details,
+            fixedHttpStatusCode: Context!.HttpStatusCode ?? HttpStatusCode,
+            fixedFieldDisplayName: Context!.FieldDisplayName ?? FieldDisplayName);
         nextValidation.HasFailed = HasFailed;
         nextValidation.HasPendingAsyncValidation = HasPendingAsyncValidation;
         nextValidation.ScopeType = ScopeType;
@@ -447,7 +465,7 @@ internal class Validation<TField> :
         }
     }
     
-    public IValidation<TField> CreateNextValidation()
+    private IValidation<TField> CreateNextValidation()
     {
         if (HasFailed)
         {
@@ -462,12 +480,12 @@ internal class Validation<TField> :
             context: Context,
             index: Index,
             parentPath: ParentPath,
-            fixedError: null,
-            fixedMessage: null,
-            fixedCode: null,
-            fixedDetails: null,
-            fixedHttpStatusCode: null,
-            fixedFieldDisplayName: null);
+            fixedError: Context!.Error,
+            fixedMessage: Context!.Message,
+            fixedCode: Context!.Code,
+            fixedDetails: Context!.Details,
+            fixedHttpStatusCode: Context!.HttpStatusCode,
+            fixedFieldDisplayName: Context!.FieldDisplayName);
         nextValidation.HasFailed = HasFailed;
         nextValidation.HasPendingAsyncValidation = HasPendingAsyncValidation;
         nextValidation.ScopeType = ScopeType;

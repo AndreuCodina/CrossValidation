@@ -49,7 +49,7 @@ public interface IValidationOperation
     ValueTask ExecuteAsync(ValidationContext context, bool useAsync);
     void HandleError(ICrossError error, ValidationContext context);
     void TakeCustomizationsFromInstanceError(ICrossError error, ValidationContext context);
-    void TakeCustomizationsFromError(ICrossError error);
+    void TakeCustomizationsFromError(ICrossError error, ValidationContext context);
     void MarkAsPendingAsyncValidation();
     void MarkAsFailed();
     
@@ -116,7 +116,7 @@ internal class ValidationOperation
             {
                 do
                 {
-                    if (StopExecution()) //&& !scopeValidation.HasPendingAsyncValidation)
+                    if (StopExecution())
                     {
                         break;
                     }
@@ -212,7 +212,7 @@ internal class ValidationOperation
 
     public void HandleError(ICrossError error, ValidationContext context)
     {
-        var errorToAdd = Error ?? error;
+        var errorToAdd = context.Error ?? (Error ?? error);
         AddError(errorToAdd, context);
 
         if (context is {ValidationMode: ValidationMode.StopOnFirstError})
@@ -246,13 +246,13 @@ internal class ValidationOperation
         Code = codeToAdd;
     }
     
-    public void TakeCustomizationsFromError(ICrossError error)
+    public void TakeCustomizationsFromError(ICrossError error, ValidationContext context)
     {
-        Code = error.Code ?? Code;
-        Message = error.Message ?? Message;
-        Details = error.Details ?? Details;
-        HttpStatusCode = error.HttpStatusCode ?? HttpStatusCode;
-        FieldDisplayName = error.FieldDisplayName ?? FieldDisplayName;
+        Code = context.Code ?? (error.Code ?? Code);
+        Message = context.Message ?? (error.Message ?? Message);
+        Details = context.Details ?? (error.Details ?? Details);
+        HttpStatusCode = context.HttpStatusCode ?? (error.HttpStatusCode ?? HttpStatusCode);
+        FieldDisplayName = context.FieldDisplayName ?? (error.FieldDisplayName ?? FieldDisplayName);
     }
     
     public void MarkAsPendingAsyncValidation()
@@ -285,16 +285,21 @@ internal class ValidationOperation
     {
         error.CrossErrorToException = CrossErrorToException;
         error.FieldName = context.FieldName; // TODO: Save it in ValidationOperation
-        error.FieldDisplayName = GetFieldDisplayNameToFill(error);
+        error.FieldDisplayName = GetFieldDisplayNameToFill(error, context);
         error.GetFieldValue = GetNonGenericFieldValue;
         error.Code = GetCodeToFill(error, context);
         error.Message = GetMessageToFill(error, context);
-        error.Details = Details ?? error.Details;
-        error.HttpStatusCode = HttpStatusCode ?? error.HttpStatusCode;
+        error.Details = context.Details ?? (Details ?? error.Details);
+        error.HttpStatusCode = context.HttpStatusCode ?? (HttpStatusCode ?? error.HttpStatusCode);
     }
 
     private string? GetCodeToFill(ICrossError error, ValidationContext context)
     {
+        if (context.Code is not null)
+        {
+            return context.Code;
+        }
+        
         if (Code is not null)
         {
             return Code;
@@ -310,6 +315,11 @@ internal class ValidationOperation
 
     private string? GetMessageToFill(ICrossError error, ValidationContext context)
     {
+        if (context.Message is not null)
+        {
+            return context.Message;
+        }
+        
         if (Message is not null)
         {
             return Message;
@@ -338,8 +348,13 @@ internal class ValidationOperation
         return null;
     }
 
-    private string? GetFieldDisplayNameToFill(ICrossError error)
+    private string? GetFieldDisplayNameToFill(ICrossError error, ValidationContext context)
     {
+        if (context.FieldDisplayName is not null)
+        {
+            return context.FieldDisplayName;
+        }
+        
         if (FieldDisplayName is not null)
         {
             return FieldDisplayName;
