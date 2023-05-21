@@ -9,13 +9,8 @@ public class ParentModelBuilder
     private string? _nullableString;
     private NestedModel _nestedModel = new NestedModelBuilder().Build();
     private NestedModel? _nullableNestedModel;
-    private List<int> _intList = new List<int> {1, 2, 3};
+    private List<int> _intList = new() {1, 2, 3};
     private List<int>? _nullableIntList;
-    private List<List<int>> _intListList = new()
-    {
-        new() {1, 2, 3},
-        new() {4, 5, 6}
-    };
     private int? _nullableInt;
 
     public ParentModel Build()

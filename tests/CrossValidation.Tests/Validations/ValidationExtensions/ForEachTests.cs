@@ -378,6 +378,74 @@ public class ForEachTests :
         
         error.Message.ShouldBe(expectedMessage);
     }
+    
+    [Theory]
+    [InlineData(ValidationMode.StopOnFirstError, null)]
+    [InlineData(ValidationMode.AccumulateFirstErrors, null)]
+    [InlineData(ValidationMode.AccumulateFirstErrorsAndAllIterationFirstErrors, 2)]
+    public void Synchronous_WhenNotNull_works_inside_ForEach(ValidationMode validationMode, int? numberOfErrors)
+    {
+        _model = new ParentModelBuilder()
+            .WithIntList(new() { 1, 10, 1 })
+            .Build();
+        var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
+        {
+            validator.ValidationMode = validationMode;
+            
+            validator.That(_model.IntList)
+                .ForEach(x => x
+                    .Transform(x => (int?)x)
+                    .WhenNotNull(x => x
+                        .Must(x => x > 1)))
+                .Must(_commonFixture.ThrowException);
+        });
+        var action = () => parentModelValidator.Validate(_model);
+
+        if (validationMode is ValidationMode.StopOnFirstError or ValidationMode.AccumulateFirstErrors)
+        {
+            action.ShouldThrowCrossError();
+        }
+        else
+        {
+            var errors = action.ShouldThrowCrossErrors();
+            errors.Count.ShouldBe(numberOfErrors!.Value);
+        }
+    }
+    
+    [Theory]
+    [InlineData(ValidationMode.StopOnFirstError, null)]
+    [InlineData(ValidationMode.AccumulateFirstErrors, null)]
+    [InlineData(ValidationMode.AccumulateFirstErrorsAndAllIterationFirstErrors, 2)]
+    public async Task Asynchronous_WhenNotNull_works_inside_ForEach(ValidationMode validationMode, int? numberOfErrors)
+    {
+        _model = new ParentModelBuilder()
+            .WithIntList(new() { 1, 10, 1 })
+            .Build();
+        var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
+        {
+            validator.ValidationMode = validationMode;
+
+            validator.That(_model.IntList)
+                .ForEach(x => x
+                    .MustAsync(_commonFixture.BeValidAsync)
+                    .Transform(x => (int?)x)
+                    .WhenNotNull(x => x
+                        .MustAsync(_commonFixture.BeValidAsync)
+                        .Must(x => x > 1)))
+                .Must(_commonFixture.ThrowException);
+        });
+        var action = () => parentModelValidator.ValidateAsync(_model);
+
+        if (validationMode is ValidationMode.StopOnFirstError or ValidationMode.AccumulateFirstErrors)
+        {
+            await action.ShouldThrowCrossErrorAsync();
+        }
+        else
+        {
+            var errors = await action.ShouldThrowCrossErrorsAsync();
+            errors.Count.ShouldBe(numberOfErrors!.Value);
+        }
+    }
 
     private record ErrorTest : CrossError;
 }
