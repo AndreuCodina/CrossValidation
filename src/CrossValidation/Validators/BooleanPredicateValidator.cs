@@ -2,11 +2,11 @@
 
 namespace CrossValidation.Validators;
 
-public record PredicateValidator(bool Condition) : Validator
+public record BooleanPredicateValidator(Func<bool> Predicate) : Validator
 {
     public override bool IsValid()
     {
-        return Condition;
+        return Predicate();
     }
 
     public override CrossError CreateError()

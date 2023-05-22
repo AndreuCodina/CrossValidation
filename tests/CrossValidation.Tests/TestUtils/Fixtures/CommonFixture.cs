@@ -54,7 +54,7 @@ public class CommonFixture
     
     public ICrossError? Error()
     {
-        ICrossError? error = new CrossError();
+        ICrossError? error = new TestError();
         return error;
     }
 
@@ -62,8 +62,7 @@ public class CommonFixture
     {
         if (error is null)
         {
-            ICrossError? nullableError = new CrossError();
-            return await ReturnErrorTask(nullableError);
+            return await ReturnErrorTask(new TestError());
         }
         
         return await ReturnErrorTask(error);
@@ -71,14 +70,18 @@ public class CommonFixture
     
     public ICrossError? NullableError()
     {
-        ICrossError? error = null;
-        return error;
+        return default;
     }
     
     public async Task<ICrossError?> NullErrorAsync()
     {
         ICrossError? error = null;
         return await ReturnErrorTask(error);
+    }
+    
+    public bool ThrowException<T>(T parameter)
+    {
+        throw new Exception("Unexpected exception");
     }
     
     private Task<bool> ReturnBoolTask(bool value)
