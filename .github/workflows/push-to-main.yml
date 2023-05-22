@@ -5,9 +5,6 @@ on:
     branches:
       - feature/github-actions
 
-env:
-  TEST_COVERAGE_FOLDER: ${{ github.workspace }}/generated/coverage
-
 jobs:
   execute:
     name: Execute
