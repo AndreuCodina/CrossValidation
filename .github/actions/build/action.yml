@@ -1,0 +1,23 @@
+name: Build
+description: Build solution
+
+runs:
+  using: "composite"
+
+  steps:
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: "7.0.x"
+
+    - name: Restore
+      run: dotnet restore
+      shell: bash
+
+    - name: Build
+      run: |
+        dotnet build \
+          --configuration Release \
+          --no-restore \
+          -p:ContinuousIntegrationBuild=true
+      shell: bash
