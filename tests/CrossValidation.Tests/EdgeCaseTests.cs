@@ -31,9 +31,9 @@ public class EdgeCaseTests : TestBase
     {
         var action = () => Validate.That(_model.NullableString)
             .When(x => x is not null) // Decides whether to execute the next validator
-            .Transform(x => x!) // This method is not a validator
-            .Must(x => x.StartsWith("T")); // This validator will not be executed
+            .Transform(x => x!) // This method is not a validator and a new validation is created
+            .Must(x => x.StartsWith("T")); // This validator will be executed because it hasn't condition
 
-        action.ShouldNotThrow();
+        action.ShouldThrow<NullReferenceException>();
     }
 }

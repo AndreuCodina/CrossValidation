@@ -9,7 +9,7 @@ public interface IValidator<out TValidationError>
     public TValidationError? GetError();
 }
 
-public abstract record Validator : Validator<CrossError>;
+public abstract record Validator : Validator<ICrossError>;
 
 public abstract record Validator<TValidationError> : IValidator<TValidationError>
     where TValidationError : class, ICrossError

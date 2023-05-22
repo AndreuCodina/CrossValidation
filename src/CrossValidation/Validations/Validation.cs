@@ -1,22 +1,24 @@
-﻿using System.Diagnostics.Contracts;
+﻿using System.Diagnostics;
+using System.Diagnostics.Contracts;
 using System.Net;
 using CrossValidation.Errors;
+using CrossValidation.Exceptions;
 using CrossValidation.Validators;
 
 namespace CrossValidation.Validations;
 
-public interface IValidation<out TField>
+/// <summary>
+/// To be used by the library users to validate data.
+/// </summary>
+public interface IValidation<out TField> : IValidationOperation
 {
-    [Pure]
-    IValidation<TField> SetValidator(IValidator<ICrossError> validator);
-
     [Pure]
     IValidation<TFieldTransformed> Transform<TFieldTransformed>(
         Func<TField, TFieldTransformed> transformer);
 
     [Pure]
     IValidation<TField> WithCode(string code);
-    
+
     [Pure]
     IValidation<TField> WithMessage(string message);
     
@@ -33,7 +35,7 @@ public interface IValidation<out TField>
     IValidation<TField> WithHttpStatusCode(HttpStatusCode code);
 
     [Pure]
-    IValidation<TField> When(bool condition);
+    IValidation<TField> When(Func<bool> condition);
 
     [Pure]
     IValidation<TField> When(Func<TField, bool> condition);
@@ -51,75 +53,158 @@ public interface IValidation<out TField>
 
     [Pure]
     TField Instance();
-    
+
     [Pure]
     TInstance Instance<TInstance>(Func<TField, TInstance> fieldToInstance);
 
+    IValidation<TField> SetValidator(Func<IValidator<ICrossError>> validator);
+
+    IValidation<TField> SetAsyncValidator(Func<Task<IValidator<ICrossError>>> validator);
+
+    IValidation<TField> SetScope(Action scope, ScopeType type);
+    
     IValidation<TField> SetModelValidator<TChildModel>(ModelValidator<TChildModel> validator);
+    
+    Task ValidateAsync();
+    
+    ValidationContext? Context { get; set; }
+
+    TField GetFieldValue();
+
+    static IValidation<TField> CreateFromFieldName(
+        Func<TField>? getFieldValue,
+        Type? crossErrorToException,
+        string fieldName,
+        ValidationContext? context,
+        ICrossError? error,
+        string? message,
+        string? code,
+        string? details,
+        HttpStatusCode? httpStatusCode,
+        string? fieldDisplayName)
+    {
+        var fullPath = fieldName.Contains('.')
+            ? fieldName.Substring(fieldName.IndexOf('.') + 1)
+            : fieldName;
+        return new Validation<TField>(
+            getFieldValue: getFieldValue,
+            crossErrorToException: crossErrorToException,
+            generalizeError: false,
+            fieldPath: fullPath,
+            context: null,
+            index: null,
+            parentPath: null,
+            fixedError: error,
+            fixedMessage: message,
+            fixedCode: code,
+            fixedDetails: details,
+            fixedHttpStatusCode: httpStatusCode,
+            fixedFieldDisplayName: fieldDisplayName);
+    }
+
+    static IValidation<TField> CreateFailed()
+    {
+        return new Validation<TField>
+        {
+            HasFailed = true
+        };
+    }
 }
 
-internal abstract class Validation<TField> : IValidation<TField>
+internal class Validation<TField> :
+    ValidationOperation,
+    IValidation<TField>
 {
-    public IValidation<TField> SetValidator(IValidator<ICrossError> validator)
+    public IValidation<TField> SetValidator(Func<IValidator<ICrossError>> validator)
     {
-        if (this is IValidValidation<TField> validValidation)
+        if (HasFailed)
         {
-            if (validValidation.ExecuteNextValidator)
-            {
-                var error = validator.GetError();
+            return IValidation<TField>.CreateFailed();
+        }
+        
+        Validator = validator;
 
-                if (error is not null)
-                {
-                    error.CrossErrorToException = validValidation.CrossErrorToException;
-                    validValidation.HandleError(error);
-                    validValidation.Clean();
-                    return IInvalidValidation<TField>.Create();
-                }
-            }
-
-            validValidation.Clean();
+        if (!HasPendingAsyncValidation)
+        {
+            ExecuteAsync(Context!, useAsync: false)
+                .GetAwaiter()
+                .GetResult();
         }
 
-        return this;
+        return CreateNextValidation();
+    }
+    
+    public IValidation<TField> SetAsyncValidator(Func<Task<IValidator<ICrossError>>> validator)
+    {
+        if (HasFailed)
+        {
+            return IValidation<TField>.CreateFailed();
+        }
+        
+        AsyncValidator = validator;
+        MarkAsPendingAsyncValidation();
+        return CreateNextValidation();
+    }
+    
+    public IValidation<TField> SetScope(Action scope, ScopeType type)
+    {
+        if (HasFailed)
+        {
+            return IValidation<TField>.CreateFailed();
+        }
+        
+        Scope = scope;
+        ScopeType = type;
+    
+        if (!HasPendingAsyncValidation)
+        {
+            ExecuteAsync(Context!, useAsync: false)
+                .GetAwaiter()
+                .GetResult();
+        }
+    
+        return CreateNextValidation();
     }
 
     public IValidation<TField> WithCode(string code)
     {
-        if (this is IValidValidation<TField> validValidation && validValidation.ExecuteNextValidator)
+        if (!HasFailed)
         {
-            validValidation.Code = code;
+            Code = Context!.Code ?? code;
         }
 
         return this;
     }
-    
+
     public IValidation<TField> WithMessage(string message)
     {
-        if (this is IValidValidation<TField> validValidation && validValidation.ExecuteNextValidator)
+        if (!HasFailed)
         {
-            validValidation.Message = message;
+            Message = Context!.Message ?? message;
         }
-
+        
         return this;
     }
     
     public IValidation<TField> WithDetails(string details)
     {
-        if (this is IValidValidation<TField> validValidation && validValidation.ExecuteNextValidator)
+        if (!HasFailed)
         {
-            validValidation.Details = details;
+            Details = Context!.Details ?? details;
         }
-
+        
         return this;
     }
 
     public IValidation<TField> WithError(ICrossError error)
     {
-        if (this is IValidValidation<TField> validValidation && validValidation.ExecuteNextValidator)
+        if (!HasFailed)
         {
-            error.CrossErrorToException = validValidation.CrossErrorToException;
-            validValidation.TakeCustomizationsFromError(error);
-            validValidation.Error = error;
+            var errorToAdd = Context!.Error ?? error;
+            error.CrossErrorToException = CrossErrorToException;
+            TakeCustomizationsFromError(errorToAdd, Context);
+            error.GetFieldValue = GetNonGenericFieldValue;
+            Error = errorToAdd;
         }
 
         return this;
@@ -127,93 +212,78 @@ internal abstract class Validation<TField> : IValidation<TField>
 
     public IValidation<TField> WithFieldDisplayName(string fieldDisplayName)
     {
-        if (this is IValidValidation<TField> validValidation && validValidation.ExecuteNextValidator)
+        if (!HasFailed)
         {
-            validValidation.FieldDisplayName = fieldDisplayName;
+            FieldDisplayName = Context!.FieldDisplayName ?? fieldDisplayName;
         }
-
+        
         return this;
     }
 
     public IValidation<TField> WithHttpStatusCode(HttpStatusCode code)
     {
-        if (this is IValidValidation<TField> validValidation && validValidation.ExecuteNextValidator)
+        if (!HasFailed)
         {
-            validValidation.HttpStatusCode = code;
+            HttpStatusCode = Context!.HttpStatusCode ?? code;
         }
-
+        
         return this;
     }
 
-    public IValidation<TField> When(bool condition)
+    public IValidation<TField> When(Func<bool> condition)
     {
-        if (this is IValidValidation<TField> validValidation && validValidation.ExecuteNextValidator)
-        {
-            validValidation.ExecuteNextValidator = condition;
-        }
-
+        Condition = condition;
         return this;
     }
 
     public IValidation<TField> When(Func<TField, bool> condition)
     {
-        if (this is IValidValidation<TField> validValidation && validValidation.ExecuteNextValidator)
-        {
-            validValidation.ExecuteNextValidator = condition(validValidation.GetFieldValue());
-        }
-
+        Condition = () => condition(GetFieldValue());
         return this;
     }
 
     public IValidation<TField> WhenAsync(Func<TField, Task<bool>> condition)
     {
-        if (this is IValidValidation<TField> validValidation && validValidation.ExecuteNextValidator)
-        {
-            validValidation.ExecuteNextValidator = condition(validValidation.GetFieldValue())
-                .GetAwaiter()
-                .GetResult();
-        }
-
+        HasPendingAsyncValidation = true;
+        AsyncCondition = async () => await condition(GetFieldValue());
         return this;
     }
 
     public IValidation<TField> Must(Func<TField, bool> condition)
     {
-        if (this is IValidValidation<TField> validValidation)
+        return SetValidator(() =>
         {
-            var conditionResult = condition(validValidation.GetFieldValue());
-            return SetValidator(new PredicateValidator(conditionResult));
-        }
-
-        return this;
+            var predicate = () => condition(GetFieldValue());
+            return new BooleanPredicateValidator(predicate);
+        });
     }
     
     public IValidation<TField> MustAsync(Func<TField, Task<bool>> condition)
     {
-        if (this is IValidValidation<TField> validValidation)
+        return SetAsyncValidator(async () =>
         {
-            return SetValidator(new PredicateValidator(
-                condition(validValidation.GetFieldValue())
-                    .GetAwaiter()
-                    .GetResult()));
-        }
-
-        return this;
+            var predicate = await condition(GetFieldValue());
+            return new BooleanPredicateValidator(() => predicate);
+        });
     }
     
     public IValidation<TField> Must(Func<TField, ICrossError?> condition)
     {
-        if (this is IValidValidation<TField> validValidation)
+        if (!HasFailed)
         {
-            var error = condition(validValidation.GetFieldValue());
-
-            if (error is not null)
+            var predicate = () =>
             {
-                validValidation.WithError(error);
-                return SetValidator(new PredicateValidator(false));
-            }
-            
-            return this;
+                var error = condition(GetFieldValue());
+
+                if (error is not null)
+                {
+                    WithError(error);
+                }
+
+                return new ErrorPredicateValidator(() => error);
+            };
+
+            return SetValidator(predicate);
         }
 
         return this;
@@ -221,70 +291,218 @@ internal abstract class Validation<TField> : IValidation<TField>
 
     public IValidation<TField> MustAsync(Func<TField, Task<ICrossError?>> condition)
     {
-        if (this is IValidValidation<TField> validValidation)
+        if (!HasFailed)
         {
-            var error = condition(validValidation.GetFieldValue())
-                .GetAwaiter()
-                .GetResult();
-
-            if (error is not null)
+            return SetAsyncValidator(async () =>
             {
-                validValidation.WithError(error);
-                return SetValidator(new PredicateValidator(false));
-            }
-            
-            return this;
+                var error = await condition(GetFieldValue());
+                
+                if (error is not null)
+                {
+                    WithError(error);
+                }
+
+                return new ErrorPredicateValidator(() => error);
+            });
         }
 
         return this;
     }
-
-    public abstract TField Instance();
     
-    public abstract TInstance Instance<TInstance>(Func<TField, TInstance> fieldToInstance);
-
     public IValidation<TFieldTransformed> Transform<TFieldTransformed>(
         Func<TField, TFieldTransformed> transformer)
     {
-        if (this is IValidValidation<TField> validValidation && validValidation.ExecuteNextValidator)
+        if (HasFailed)
         {
-            var fieldValueTransformed = transformer(validValidation.GetFieldValue());
-            return IValidValidation<TFieldTransformed>.CreateFromField(
-                fieldValueTransformed,
-                validValidation.CrossErrorToException,
-                generalizeError: validValidation.Context.GeneralizeError,
-                fieldFullPath: validValidation.Context.FieldName,
-                context: validValidation.Context,
-                error: validValidation.Error,
-                message: validValidation.Message,
-                code: validValidation.Code,
-                details: validValidation.Details,
-                httpStatusCode: validValidation.HttpStatusCode,
-                fieldDisplayName: validValidation.FieldDisplayName);
+            return IValidation<TFieldTransformed>.CreateFailed();
         }
-
-        return IInvalidValidation<TFieldTransformed>.Create();
+        
+        var getFieldValueTransformed = () => transformer(GetFieldValue());
+        var nextValidation = new Validation<TFieldTransformed>(
+            getFieldValue: getFieldValueTransformed,
+            crossErrorToException: CrossErrorToException,
+            generalizeError: false,
+            fieldPath: FieldPath,
+            context: Context,
+            index: Index,
+            parentPath: ParentPath,
+            fixedError: Context!.Error ?? Error,
+            fixedMessage: Context!.Message ?? Message,
+            fixedCode: Context!.Code ?? Code,
+            fixedDetails: Context!.Details ?? Details,
+            fixedHttpStatusCode: Context!.HttpStatusCode ?? HttpStatusCode,
+            fixedFieldDisplayName: Context!.FieldDisplayName ?? FieldDisplayName);
+        nextValidation.HasFailed = HasFailed;
+        nextValidation.HasPendingAsyncValidation = HasPendingAsyncValidation;
+        nextValidation.ScopeType = ScopeType;
+        nextValidation.IsInsideScope = true;
+        nextValidation.ScopeCreatorValidation = ScopeCreatorValidation;
+        NextValidation = nextValidation;
+        return nextValidation;
     }
 
     public IValidation<TField> SetModelValidator<TChildModel>(ModelValidator<TChildModel> validator)
     {
-        if (this is IValidValidation<TField> validValidation)
+        validator.ScopeCreatorValidation = (IValidation<TChildModel>?)this;
+        var oldContext = Context;
+        Context = Context!.CloneForChildModelValidator();
+        var oldParentPath = ParentPath;
+        var oldFieldPath = FieldPath;
+        var oldFieldName = FieldName;
+
+        SetScope(() =>
         {
-            validValidation.Clean(); // Ignore customizations for model validators
+            IsScopeCreator = true;
+            validator.ScopeCreatorValidation = (IValidation<TChildModel>?)this;
+            ParentPath = FieldName;
+            FieldPath = null;
+            FieldName = null;
+            var childModel = (TChildModel)(object)GetFieldValue()!;
+            validator.CreateValidations(childModel);
+        }, Validations.ScopeType.ModelValidator);
 
-            if (validValidation.ExecuteNextValidator)
-            {
-                var oldContext = validValidation.Context;
-                var childContext = validValidation.Context.CloneForChildModelValidator(validValidation.FieldFullPath);
-                validator.Context = childContext;
-                var childModel = (TChildModel)(object)validValidation.GetFieldValue()!;
-                validator.Validate(childModel);
-                var newErrors = validator.Context.ErrorsCollected;
-                validator.Context = oldContext;
-                validator.Context.ErrorsCollected = newErrors;
-            }
+        if (HasFailed)
+        {
+            return IValidation<TField>.CreateFailed();
         }
+        
+        var nextValidation = new Validation<TField>(
+            getFieldValue: GetFieldValue,
+            crossErrorToException: CrossErrorToException,
+            generalizeError: GeneralizeError,
+            fieldPath: oldFieldPath,
+            context: oldContext,
+            index: Index,
+            parentPath: oldParentPath,
+            fixedError: oldContext!.Error,
+            fixedMessage: oldContext!.Message,
+            fixedCode: oldContext!.Code,
+            fixedDetails: oldContext!.Details,
+            fixedHttpStatusCode: oldContext!.HttpStatusCode,
+            fixedFieldDisplayName: oldContext!.FieldDisplayName);
+        nextValidation.FieldName = oldFieldName;
+        nextValidation.HasFailed = HasFailed;
+        nextValidation.HasPendingAsyncValidation = HasPendingAsyncValidation;
+        nextValidation.ScopeType = ScopeType;
+        nextValidation.IsInsideScope = IsInsideScope;
+        nextValidation.ScopeCreatorValidation = ScopeCreatorValidation;
+        NextValidation = nextValidation;
+        return nextValidation;
+    }
+    
+    public Func<TField>? GetGenericFieldValue { get; set; }
+    public ValidationContext? Context { get; set; }
 
-        return this;
+    public async Task ValidateAsync()
+    {
+        await Context!.ValidationTree!.TraverseAsync(Context);
+    }
+
+    public TField GetFieldValue()
+    {
+        return GetGenericFieldValue!();
+    }
+
+    public Validation()
+    {
+    }
+
+    public Validation(
+        Func<TField>? getFieldValue,
+        Type? crossErrorToException,
+        bool generalizeError,
+        string? fieldPath,
+        ValidationContext? context,
+        int? index,
+        string? parentPath,
+        ICrossError? fixedError,
+        string? fixedMessage,
+        string? fixedCode,
+        string? fixedDetails,
+        HttpStatusCode? fixedHttpStatusCode,
+        string? fixedFieldDisplayName)
+    {
+        if (context != null)
+        {
+            Context = context;
+        }
+        else
+        {
+            Context = new ValidationContext();
+        }
+        
+        Context.ValidationTree ??= this;
+        GetGenericFieldValue = getFieldValue;
+        GetNonGenericFieldValue = () => getFieldValue!()!;
+        CrossErrorToException = crossErrorToException;
+        GeneralizeError = generalizeError;
+        Index = index;
+        ParentPath = parentPath;
+        FieldPath = fieldPath;
+        var parentPathPathSeparator = parentPath is not null ? "." : null;
+
+        if (parentPath is not null || fieldPath is not null)
+        {
+            FieldName = $"{parentPath}{parentPathPathSeparator}{fieldPath}";
+        }
+        
+        Context.Error = fixedError;
+        Context.Message = fixedMessage;
+        Context.Code = fixedCode;
+        Context.Details = fixedDetails;
+        Context.HttpStatusCode = fixedHttpStatusCode;
+        Context.FieldDisplayName = fixedFieldDisplayName;
+    }
+
+    public TField Instance()
+    {
+        return GetGenericFieldValue!();
+    }
+
+    public TInstance Instance<TInstance>(Func<TField, TInstance> fieldToInstance)
+    {
+        try
+        {
+            return fieldToInstance(GetGenericFieldValue!());
+        }
+        catch (CrossException e)
+        {
+            e.Error.FieldName = null;
+            e.Error.PlaceholderValues = null;
+            e.Error.CrossErrorToException = CrossErrorToException;
+            TakeCustomizationsFromInstanceError(e.Error, Context!);
+            HandleError(e.Error, Context!);
+            throw new UnreachableException();
+        }
+    }
+    
+    private IValidation<TField> CreateNextValidation()
+    {
+        if (HasFailed)
+        {
+            return IValidation<TField>.CreateFailed();
+        }
+        
+        var nextValidation = new Validation<TField>(
+            getFieldValue: GetFieldValue,
+            crossErrorToException: CrossErrorToException,
+            generalizeError: GeneralizeError,
+            fieldPath: FieldPath,
+            context: Context,
+            index: Index,
+            parentPath: ParentPath,
+            fixedError: Context!.Error,
+            fixedMessage: Context!.Message,
+            fixedCode: Context!.Code,
+            fixedDetails: Context!.Details,
+            fixedHttpStatusCode: Context!.HttpStatusCode,
+            fixedFieldDisplayName: Context!.FieldDisplayName);
+        nextValidation.HasFailed = HasFailed;
+        nextValidation.HasPendingAsyncValidation = HasPendingAsyncValidation;
+        nextValidation.ScopeType = ScopeType;
+        nextValidation.IsInsideScope = IsInsideScope;
+        nextValidation.ScopeCreatorValidation = ScopeCreatorValidation;
+        NextValidation = nextValidation;
+        return nextValidation;
     }
 }

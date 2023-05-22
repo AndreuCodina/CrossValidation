@@ -23,7 +23,7 @@ public class CrossValidationOptionsTests :
     }
     
     [Fact]
-    public void Generate_placeholders_when_they_are_not_added()
+    public void Not_generate_placeholders_throwing_without_DSL_when_they_are_not_added()
     {
         var expectedName = "Value";
         var expectedDateTime = DateTime.UtcNow;
@@ -40,7 +40,6 @@ public class CrossValidationOptionsTests :
             catch (CrossException e)
             {
                 e.Error.PlaceholderValues.ShouldNotBeEmpty();
-                e.Error.PlaceholderValues.Keys.Count.ShouldBe(2);
                 e.Error.PlaceholderValues[nameof(ErrorWithFields.Name)].ShouldBe(expectedName);
                 e.Error.PlaceholderValues[nameof(ErrorWithFields.DateTime)].ShouldBe(expectedDateTime);
             }

@@ -26,6 +26,7 @@ public class LengthRangeTests : TestBase
             .LengthRange(_model.String.Length + 1, _model.String.Length);
 
         var error = action.ShouldThrowCrossError<CommonCrossError.LengthRange>();
+        
         error.Code.ShouldBe(nameof(ErrorResource.LengthRange));
     }
 }
