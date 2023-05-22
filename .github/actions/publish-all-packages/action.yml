@@ -19,7 +19,7 @@ runs:
   using: "composite"
 
   steps:
-    - name: Add GitHub NuGet source
+    - name: Add github NuGet source
       if: ${{ inputs.repository == 'github' }}
       run: |
         dotnet nuget add source \
@@ -28,6 +28,11 @@ runs:
           --store-password-in-clear-text \
           --name github \
           "https://nuget.pkg.github.com/AndreuCodina/index.json"
+      shell: bash
+
+    - name: Remove nuget.org NuGet source
+      if: ${{ inputs.repository != 'nuget.org' }}
+      run: dotnet nuget remove source nuget.org
       shell: bash
 
     - name: Publish NuGet
