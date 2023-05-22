@@ -1,12 +1,10 @@
 name: Build
+description: Build solution
 
 runs:
   using: "composite"
 
   steps:
-    # - name: Checkout repository
-    #   uses: actions/checkout@v3
-
     - name: Setup .NET
       uses: actions/setup-dotnet@v3
       with:
@@ -14,6 +12,7 @@ runs:
 
     - name: Restore
       run: dotnet restore
+      shell: bash
 
     - name: Build
       run: |
@@ -21,3 +20,4 @@ runs:
           --configuration Release \
           --no-restore \
           -p:ContinuousIntegrationBuild=true
+      shell: bash
