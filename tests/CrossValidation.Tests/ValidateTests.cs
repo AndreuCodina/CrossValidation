@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net;
+using System.Threading.Tasks;
 using CrossValidation.Errors;
 using CrossValidation.Exceptions;
 using CrossValidation.Resources;
@@ -74,16 +75,18 @@ public class ValidateTests :
     }
     
     [Fact]
-    public void ValidateMustAsync_with_returned_error_fails()
+    public async Task ValidateMustAsync_with_returned_error_fails()
     {
         var expectedCode = nameof(ErrorResource.NotNull);
         var expectedMessage = ErrorResource.NotNull;
         var expectedDetails = "Expected details";
-        var errorForValidation = new TestError(Code: expectedCode, Details: expectedDetails);
+        var testError = new TestError(Code: expectedCode, Details: expectedDetails);
         var action = () => Validate.That(_model.NullableInt)
-            .MustAsync(_ => _commonFixture.ErrorAsync(errorForValidation));
+            .MustAsync(_ => _commonFixture.ErrorAsync(testError))
+            .ValidateAsync();
 
-        var error = action.ShouldThrowCrossError<TestError>();
+        var error = await action.ShouldThrowCrossErrorAsync<TestError>();
+        
         error.Code.ShouldBe(expectedCode);
         error.Message.ShouldBe(expectedMessage);
         error.Details.ShouldBe(expectedDetails);
@@ -220,6 +223,7 @@ public class ValidateTests :
             .WithHttpStatusCode(HttpStatusCode.Accepted)
             .WithFieldDisplayName("Unexpected field display name")
             .ForEach(x => x
+                .Must(_commonFixture.BeValid)
                 .Must(_commonFixture.NotBeValid));
 
         var error = action.ShouldThrowCrossError<TestError>();
@@ -334,6 +338,81 @@ public class ValidateTests :
             .NotNull();
         action.ShouldThrow<ArgumentException>();
     }
+    
+    [Fact]
+    public async Task Not_execute_scope_value_when_there_are_pending_asynchronous_operations()
+    {
+        var action = () => Validate.That(_model.NullableIntList)
+            .MustAsync(_commonFixture.BeValidAsync)
+            .NotNull()
+            .ForEach(x => x
+                .Must(_commonFixture.ThrowException))
+            .ValidateAsync();
+
+        await action.ShouldThrowCrossErrorAsync<CommonCrossError.NotNull>();
+    }
+    
+    [Fact]
+    public async Task Not_execute_synchronous_validation_when_there_are_asynchronous_validations_pending_to_execute()
+    {
+        var expectedMessage = "Expected message";
+        var action = () => Validate.That(_model.Int)
+            .WithMessage(expectedMessage)
+            .MustAsync(_commonFixture.NotBeValidAsync)
+            .Must(_commonFixture.NotBeValid)
+            .ValidateAsync();
+
+        var error = await action.ShouldThrowCrossErrorAsync();
+        
+        error.Message.ShouldBe(expectedMessage);
+    }
+    
+    [Fact]
+    public async Task Not_execute_accumulated_operations_when_any_not_accumulated_already_failed()
+    {
+        var expectedMessage = "Expected message";
+        var action = () => Validate.That(_model.NullableString)
+            .WithMessage(expectedMessage)
+            .NotNull()
+            .MustAsync(_commonFixture.BeValidAsync)
+            .ValidateAsync();
+
+        var error = await action.ShouldThrowCrossErrorAsync<CommonCrossError.NotNull>();
+        
+        error.Message.ShouldBe(expectedMessage);
+    }
+    
+    [Fact]
+    public async Task Execute_validation_after_async_validation_node()
+    {
+        var expectedMessage = "Expected message";
+        var action = () => Validate.That(_model.Int)
+            .Must(_commonFixture.BeValid)
+            .MustAsync(_commonFixture.BeValidAsync)
+            .WithMessage(expectedMessage)
+            .Must(_commonFixture.NotBeValid)
+            .ValidateAsync();
+
+        var error = await action.ShouldThrowCrossErrorAsync();
+        
+        error.Message.ShouldBe(expectedMessage);
+    }
+    
+    [Fact]
+    public async Task Not_execute_predicate_returning_error_customization()
+    {
+        var expectedMessage = "Expected message";
+        var action = () => Validate.That(_model.NullableString)
+            .WithMessage(expectedMessage)
+            .MustAsync(_commonFixture.NotBeValidAsync)
+            .NotNull()
+            .Must(x => new CrossError(Message: x.Substring(0)))
+            .ValidateAsync();
+
+        var error = await action.ShouldThrowCrossErrorAsync<CommonCrossError.Predicate>();
+        
+        error.Message.ShouldBe(expectedMessage);
+    }
 
     private class ExceptionFromError : Exception, ICrossErrorToException
     {
@@ -349,5 +428,16 @@ public class ValidateTests :
 
     private class ExceptionWithoutConstructor : Exception
     {
+    }
+    
+    private record ValueObject(int Value)
+    {
+        public static ValueObject Create(int value)
+        {
+            Validate.Field(value)
+                .WithMessage("Error message from value object")
+                .GreaterThan(int.MaxValue);
+            return new(value);
+        }
     }
 }

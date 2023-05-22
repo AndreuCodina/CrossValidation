@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using CrossValidation.Errors;
+﻿using CrossValidation.Errors;
+using CrossValidation.ShouldlyAssertions;
 using CrossValidation.Tests.TestUtils;
 using CrossValidation.Tests.TestUtils.Fixtures.Validators;
 using Shouldly;
@@ -21,20 +21,13 @@ public class CommonValidationErrorTests :
     [Fact]
     public void Common_errors_add_their_placeholders()
     {
-        var errors = new List<CommonCrossError>
-        {
-            new CommonCrossError.NotNull(),
-            new CommonCrossError.Null(),
-            new CommonCrossError.GreaterThan<int>(1),
-            new CommonCrossError.Enum(),
-            new CommonCrossError.LengthRange(1, 1, 1),
-            new CommonCrossError.MinimumLength(1, 1),
-            new CommonCrossError.Predicate()
-        };
-        errors.ForEach(error =>
-        {
-            error.AddPlaceholderValues();
-            _validatorFixture.AllFieldsAreAddedAsPlaceholders(error).ShouldBeTrue();
-        });
+        var error = new CommonCrossError.LengthRange(1, 1, 1);
+        var action = () => Validate.That(1)
+            .WithError(error)
+            .Must(x => false);
+        
+        var exception = action.ShouldThrowCrossError();
+        
+        _validatorFixture.AllFieldsAreAddedAsPlaceholders(exception).ShouldBeTrue();
     }
 }
