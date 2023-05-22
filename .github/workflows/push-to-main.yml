@@ -30,6 +30,6 @@ jobs:
       - name: Publish all packages to github
         uses: ./.github/actions/publish-all-packages
         with:
-          repository-token: ${{ secrets.GITHUB_PACKAGES_TEST }}
+          repository-token: ${{ secrets.PACKAGES_TEST }}
           repository: github
           package-version: 0.0.1-preview.${{ github.sha }}
