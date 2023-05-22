@@ -1,0 +1,54 @@
+name: Publish all NuGet packages
+description: Publish all NuGet package
+
+inputs:
+  registry-token:
+    description: Registry token
+    required: true
+    default: ""
+  registry:
+    description: Registry
+    required: true
+    default: ""
+  package-version:
+    description: Package version
+    required: true
+    default: ""
+
+runs:
+  using: "composite"
+
+  steps:
+    - name: Add github NuGet source
+      if: ${{ inputs.registry == 'github' }}
+      run: |
+        dotnet nuget add source \
+          --username AndreuCodina \
+          --password ${{ inputs.registry-token }} \
+          --store-password-in-clear-text \
+          --name github \
+          "https://nuget.pkg.github.com/AndreuCodina/index.json"
+      shell: bash
+
+    - name: Remove nuget.org NuGet source
+      if: ${{ inputs.registry != 'nuget.org' }}
+      run: dotnet nuget remove source nuget.org
+      shell: bash
+
+    - name: Publish NuGet
+      uses: ./.github/actions/publish-package
+      with:
+        registry-token: ${{ inputs.registry-token }}
+        package-version: ${{ inputs.package-version }}
+        project: src/CrossValidation/CrossValidation.csproj
+        project-name: CrossValidation
+        registry: ${{ inputs.registry }}
+
+    - name: Publish NuGet
+      uses: ./.github/actions/publish-package
+      with:
+        registry-token: ${{ inputs.registry-token }}
+        package-version: ${{ inputs.package-version }}
+        project: src/CrossValidation.ShouldlyAssertions/CrossValidation.ShouldlyAssertions.csproj
+        project-name: CrossValidation.ShouldlyAssertions
+        registry: ${{ inputs.registry }}
