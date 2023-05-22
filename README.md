@@ -1,6 +1,6 @@
 <img alt="Logo" src="docs/logo.jpg" width="522" height="396">
 
-[![CI workflow state](https://github.com/AndreuCodina/CrossValidation/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/AndreuCodina/CrossValidation/actions/workflows/ci.yml)
+[![CI workflow state](https://github.com/AndreuCodina/CrossValidation/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/AndreuCodina/CrossValidation/actions/workflows/push-to-main.yml)
 [![Coverage Status](https://coveralls.io/repos/github/AndreuCodina/CrossValidation/badge.svg?branch=main&kill_cache=1)](https://coveralls.io/github/AndreuCodina/CrossValidation?branch=main)
 [![NuGet](https://img.shields.io/nuget/v/CrossValidation?color=blue&label=nuget)](https://www.nuget.org/packages/CrossValidation)
 
