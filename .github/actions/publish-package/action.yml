@@ -46,6 +46,6 @@ runs:
     - name: Push package
       run: |
         dotnet nuget push ${{ format('{0}/{1}.{2}.{3}', inputs.nuget-folder, inputs.project-name, inputs.package-version, inputs.registry == 'nuget.org' && 'snupkg' || 'nupkg') }} \
-          --source ${{ inputs.registry }} \
+          --source ${{ inputs.registry == 'nuget.org' && 'https://api.nuget.org/v3/index.json' || 'https://nuget.pkg.github.com/AndreuCodina/index.json' }} \
           --api-key ${{ inputs.registry-token }}
       shell: bash
