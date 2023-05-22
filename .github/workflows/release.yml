@@ -19,21 +19,12 @@ jobs:
       - name: Build
         uses: ./.github/actions/build
 
-      - name: Publish NuGet
-        uses: ./.github/actions/publish-nuget
+      - name: Publish all packages
+        uses: ./.github/actions/publish-all-packages
         with:
-          nuget-api-key: ${{ secrets.NUGET_API_KEY }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          repository: nuget.org
           package-version: ${{ env.RELEASE_VERSION }}
-          project: src/CrossValidation/CrossValidation.csproj
-          project-name: CrossValidation
-
-      - name: Publish NuGet
-        uses: ./.github/actions/publish-nuget
-        with:
-          nuget-api-key: ${{ secrets.NUGET_API_KEY }}
-          package-version: ${{ env.RELEASE_VERSION }}
-          project: src/CrossValidation.ShouldlyAssertions/CrossValidation.ShouldlyAssertions.csproj
-          project-name: CrossValidation.ShouldlyAssertions
 
       # It's not possible disable the artifact creation
       - name: Execute benchmarks

@@ -1,13 +1,13 @@
-name: Publish NuGet
-description: Publish NuGet
+name: Publish NuGet package
+description: Publish NuGet package
 
 inputs:
   nuget-folder:
     description: Output folder for the NuGet package
     required: false
     default: ${{ github.workspace }}/generated/nuget
-  nuget-api-key:
-    description: Output folder for the NuGet package
+  github-token:
+    description: GitHub token
     required: true
     default: ""
   package-version:
@@ -20,6 +20,10 @@ inputs:
     default: ""
   project-name:
     description: Project name
+    required: true
+    default: ""
+  repository:
+    description: nuget.org or github
     required: true
     default: ""
 
@@ -42,6 +46,6 @@ runs:
     - name: Push package
       run: |
         dotnet nuget push ${{ format('{0}/{1}.{2}.snupkg', inputs.nuget-folder, inputs.project-name, inputs.package-version) }} \
-          --source https://api.nuget.org/v3/index.json \
-          --api-key ${{ inputs.nuget-api-key }}
+          --source ${{ inputs.repository }} \
+          --api-key ${{ inputs.github-token }}
       shell: bash
