@@ -45,7 +45,7 @@ runs:
 
     - name: Push package
       run: |
-        dotnet nuget push ${{ format('{0}/{1}.{2}.nupkg', inputs.nuget-folder, inputs.project-name, inputs.package-version) }} \
-          --source github \
+        dotnet nuget push ${{ format('{0}/{1}.{2}.{3}', inputs.nuget-folder, inputs.project-name, inputs.package-version, inputs.repository == 'nuget.org' && 'snupkg' || 'nupkg') }} \
+          --source ${{ inputs.repository }} \
           --api-key ${{ inputs.repository-token }}
       shell: bash
