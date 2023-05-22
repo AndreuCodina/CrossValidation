@@ -21,7 +21,7 @@
 
     <ItemGroup>
         <None Include="..\..\docs\logo.jpg" Pack="true" Visible="false" PackagePath="" />
-        <None Include="..\..\docs\crossvalidation-shouldly-assertions-nuget-readme.md" Pack="true" PackagePath="" />
+        <None Include="..\..\docs\crossvalidation-shouldly-assertions-nuget-readme.md" Visible="false" Pack="true" PackagePath="" />
     </ItemGroup>
 
 </Project>
