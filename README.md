@@ -1,4 +1,4 @@
-![CrossValidation logo](https://user-images.githubusercontent.com/30506301/218343967-ba157171-c491-4a96-960c-73fb663467f0.png)
+<img alt="Logo" src="docs/logo.jpg" width="522" height="396">
 
 [![CI workflow state](https://github.com/AndreuCodina/CrossValidation/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/AndreuCodina/CrossValidation/actions/workflows/ci.yml)
 [![Coverage Status](https://coveralls.io/repos/github/AndreuCodina/CrossValidation/badge.svg?branch=main&kill_cache=1)](https://coveralls.io/github/AndreuCodina/CrossValidation?branch=main)

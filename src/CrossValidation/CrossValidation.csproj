@@ -7,6 +7,7 @@
         <LangVersion>11</LangVersion>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageIcon>logo.jpg</PackageIcon>
     </PropertyGroup>
 
     <ItemGroup>
@@ -39,6 +40,10 @@
       <PackageReference Include="Microsoft.AspNetCore.Localization" />
       <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
       <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Include="logo.jpg" Pack="true" Visible="false" PackagePath="..\..\docs" />
     </ItemGroup>
 
 </Project>
