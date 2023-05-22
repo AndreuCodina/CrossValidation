@@ -1,0 +1,51 @@
+name: Publish NuGet package
+description: Publish NuGet package
+
+inputs:
+  nuget-folder:
+    description: Output folder for the NuGet package
+    required: false
+    default: ${{ github.workspace }}/generated/nuget
+  registry-token:
+    description: Registry token
+    required: true
+    default: ""
+  package-version:
+    description: Package version
+    required: true
+    default: ""
+  project:
+    description: Project
+    required: true
+    default: ""
+  project-name:
+    description: Project name
+    required: true
+    default: ""
+  registry:
+    description: nuget.org or github
+    required: true
+    default: ""
+
+runs:
+  using: "composite"
+
+  steps:
+    - name: Create package
+      run: |
+        dotnet pack ${{ inputs.project }} \
+          --configuration Release \
+          --no-build \
+          --output ${{ inputs.nuget-folder }} \
+          --include-symbols \
+          -p:SymbolPackageFormat=snupkg \
+          -p:PackageVersion=${{ inputs.package-version }} \
+          -p:PublishRepositoryUrl=true
+      shell: bash
+
+    - name: Push package
+      run: |
+        dotnet nuget push ${{ format('{0}/{1}.{2}.{3}', inputs.nuget-folder, inputs.project-name, inputs.package-version, inputs.registry == 'nuget.org' && 'snupkg' || 'nupkg') }} \
+          --source ${{ inputs.registry }} \
+          --api-key ${{ inputs.registry-token }}
+      shell: bash

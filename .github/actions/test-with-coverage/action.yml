@@ -1,0 +1,18 @@
+name: Test with coverage
+description: Test solution with coverage
+
+runs:
+  using: "composite"
+
+  steps:
+    # https://github.com/coverlet-coverage/coverlet/blob/master/Documentation/VSTestIntegration.md#passing-runsettings-arguments-through-commandline
+    - name: Test with coverage
+      run: |
+        dotnet test \
+          --configuration Release \
+          --no-build \
+          --verbosity normal \
+          --collect:"XPlat Code Coverage;Format=lcov" \
+          --results-directory ./generated/coverage \
+          -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Exclude="[*]CrossValidation.WebApplication*,[*]CrossValidation.Resources*"
+      shell: bash

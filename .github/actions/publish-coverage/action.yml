@@ -1,0 +1,27 @@
+name: Publish coverage
+description: Publish coverage
+
+inputs:
+  test-coverage-folder:
+    description: Folder where the coverage files are located
+    required: false
+    default: ${{ github.workspace }}/generated/coverage
+
+  github-token:
+    description: GitHub token
+    required: true
+    default: ""
+
+runs:
+  using: "composite"
+
+  steps:
+    - name: Copy coverage to a predictable location
+      run: cp ${{ inputs.test-coverage-folder }}/*/coverage.info ${{ inputs.test-coverage-folder }}/lcov.info
+      shell: bash
+
+    - name: Coveralls
+      uses: coverallsapp/github-action@v2.1.2
+      with:
+        github-token: ${{ inputs.github-token }}
+        file: ${{ inputs.test-coverage-folder }}/lcov.info
