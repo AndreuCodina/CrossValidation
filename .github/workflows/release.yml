@@ -42,9 +42,9 @@ jobs:
             --configuration ${{ env.DOTNET_CONFIGURATION }} \
             --no-build \
             --output ${{ env.NUGET_FOLDER }} \
+            --include-symbols \
+            -p:SymbolPackageFormat=snupkg \
             -p:PackageVersion=${{ env.RELEASE_VERSION }}
-            -p:IncludeSymbols=true
-            -p:SymbolPackageFormat=snupkg
 
       - name: Push CrossValidation package
         run: |
@@ -67,9 +67,9 @@ jobs:
             --configuration ${{ env.DOTNET_CONFIGURATION }} \
             --no-build \
             --output ${{ env.NUGET_FOLDER }} \
+            --include-symbols \
+            -p:SymbolPackageFormat=snupkg \
             -p:PackageVersion=${{ env.RELEASE_VERSION }}
-            -p:IncludeSymbols=true
-            -p:SymbolPackageFormat=snupkg
 
       - name: Push CrossValidation.ShouldlyAssertions package
         run: |
@@ -81,10 +81,27 @@ jobs:
     name: Execute benchmarks
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: "7.0.x"
+
+      - name: Restore CrossValidation dependencies
+        run: dotnet restore ${{ env.CROSS_VALIDATION_PROJECT }}
+
+      - name: Build CrossValidation
+        run: |
+          dotnet build ${{ env.CROSS_VALIDATION_PROJECT }} \
+            --configuration ${{ env.DOTNET_CONFIGURATION }} \
+            --no-restore
+
       # It's not possible disable the artifact creation
       - name: Execute benchmarks
         run: |
           dotnet run \
-            --project .\benchmarks\CrossValidation.Benchmarks\CrossValidation.Benchmarks.csproj \
+            --project ./benchmarks/CrossValidation.Benchmarks/CrossValidation.Benchmarks.csproj \
             --configuration ${{ env.DOTNET_CONFIGURATION }} \
-            -- --artifacts ./generated/benchmarks
+            -- --artifacts generated/benchmarks

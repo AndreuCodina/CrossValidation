@@ -7,6 +7,7 @@
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageIcon>logo.jpg</PackageIcon>
+        <PackageReadmeFile>nuget-readme.md</PackageReadmeFile>
     </PropertyGroup>
 
     <ItemGroup>
@@ -18,7 +19,8 @@
     </ItemGroup>
 
     <ItemGroup>
-        <None Include="logo.jpg" Pack="true" Visible="false" PackagePath="..\..\docs" />
+        <None Include="..\..\docs\logo.jpg" Pack="true" Visible="false" PackagePath="" />
+        <None Include="..\..\docs\nuget-readme.md" Pack="true" PackagePath=""/>
     </ItemGroup>
 
 </Project>
