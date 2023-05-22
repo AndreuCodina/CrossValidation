@@ -7,6 +7,11 @@ inputs:
     required: false
     default: ${{ github.workspace }}/generated/coverage
 
+  github-token:
+    description: GitHub token
+    required: true
+    default: ""
+
 runs:
   using: "composite"
 
@@ -18,5 +23,5 @@ runs:
     - name: Coveralls
       uses: coverallsapp/github-action@1.1.3
       with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
+        github-token: ${{ inputs.github-token }}
         path-to-lcov: ${{ inputs.test-coverage-folder }}/lcov.info
