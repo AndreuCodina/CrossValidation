@@ -22,7 +22,7 @@ jobs:
       - name: Publish all packages
         uses: ./.github/actions/publish-all-packages
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          repository-token: ${{ secrets.NUGET_API_KEY }}
           repository: nuget.org
           package-version: ${{ env.RELEASE_VERSION }}
 

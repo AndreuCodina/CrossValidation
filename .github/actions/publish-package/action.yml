@@ -6,8 +6,8 @@ inputs:
     description: Output folder for the NuGet package
     required: false
     default: ${{ github.workspace }}/generated/nuget
-  github-token:
-    description: GitHub token
+  repository-token:
+    description: Repository token
     required: true
     default: ""
   package-version:
@@ -47,5 +47,5 @@ runs:
       run: |
         dotnet nuget push ${{ format('{0}/{1}.{2}.snupkg', inputs.nuget-folder, inputs.project-name, inputs.package-version) }} \
           --source ${{ inputs.repository }} \
-          --api-key ${{ inputs.github-token }}
+          --api-key ${{ inputs.repository-token }}
       shell: bash

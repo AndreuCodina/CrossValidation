@@ -2,8 +2,8 @@ name: Publish all NuGet packages
 description: Publish all NuGet package
 
 inputs:
-  github-token:
-    description: GitHub token
+  repository-token:
+    description: Repository token
     required: true
     default: ""
   repository:
@@ -24,25 +24,25 @@ runs:
       run: |
         dotnet nuget add source \
           --username AndreuCodina \
-          --password ${{ inputs.github-token }} \
+          --password ${{ inputs.repository-token }} \
           --store-password-in-clear-text \
           --name github \
           "https://nuget.pkg.github.com/AndreuCodina/index.json"
       shell: bash
 
     - name: Publish NuGet
-      uses: ./.github/actions/publish-nuget
+      uses: ./.github/actions/publish-package
       with:
-        github-token: ${{ inputs.github-token }}
+        repository-token: ${{ inputs.repository-token }}
         package-version: ${{ inputs.package-version }}
         project: src/CrossValidation/CrossValidation.csproj
         project-name: CrossValidation
         repository: ${{ inputs.repository }}
 
     - name: Publish NuGet
-      uses: ./.github/actions/publish-nuget
+      uses: ./.github/actions/publish-package
       with:
-        github-token: ${{ inputs.github-token }}
+        repository-token: ${{ inputs.repository-token }}
         package-version: ${{ inputs.package-version }}
         project: src/CrossValidation.ShouldlyAssertions/CrossValidation.ShouldlyAssertions.csproj
         project-name: CrossValidation.ShouldlyAssertions
