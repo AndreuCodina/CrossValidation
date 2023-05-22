@@ -75,6 +75,7 @@ jobs:
 
   execute_benchmarks:
     name: Execute benchmarks
+    runs-on: ubuntu-latest
     steps:
       # It's not possible disable the artifact creation
       - name: Execute benchmarks

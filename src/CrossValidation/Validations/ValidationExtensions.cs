@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 using CrossValidation.Validators;
 using CrossValidation.Validators.LengthValidators;
@@ -12,100 +11,69 @@ public static class ValidationExtensions
         this IValidation<TField?> validation)
         where TField : class
     {
-        var validationToReturn = validation;
 
-        if (validation is IValidValidation<TField?> validValidation)
-        {
-            validationToReturn =
-                validValidation.SetValidator(new NotNullValidator<TField?>(validValidation.GetFieldValue()));
-        }
-
-        return validationToReturn.Transform(x => x!);
+        return validation.SetValidator(() => new NotNullValidator<TField?>(validation.GetFieldValue()))
+            .Transform(x => x!);
     }
 
     public static IValidation<TField> NotNull<TField>(
         this IValidation<TField?> validation)
         where TField : struct
     {
-        var validationToReturn = validation;
-
-        if (validation is IValidValidation<TField?> validValidation)
-        {
-            validationToReturn =
-                validValidation.SetValidator(new NotNullValidator<TField?>(validValidation.GetFieldValue()));
-        }
-
-        return validationToReturn.Transform(x => x!.Value);
+        return validation.SetValidator(() => new NotNullValidator<TField?>(validation.GetFieldValue()))
+            .Transform(x => x!.Value);
     }
 
     public static IValidation<TField?> WhenNotNull<TField, TReturnedField>(
         this IValidation<TField?> validation,
-        Func<IValidation<TField>, IValidation<TReturnedField>> notNullValidation)
+        Func<IValidation<TField>, IValidation<TReturnedField>> action)
         where TField : struct
     {
-        if (validation is not IValidValidation<TField?> validValidation)
+        validation.Condition = () => validation.GetFieldValue() is not null;
+        return validation.SetScope(() =>
         {
-            return validation;
-        }
-
-        if (validValidation.GetFieldValue() is not null)
-        {
-            var validationReturned = notNullValidation(validation.Transform(x => x!.Value));
-
-            if (validationReturned is IInvalidValidation<TReturnedField>)
-            {
-                return IInvalidValidation<TField?>.Create();
-            }
-        }
-
-        return validation;
+            validation.IsScopeCreator = true;
+            var getFieldValue = () => validation.GetFieldValue()!.Value;
+            var scopeValidation = CreateScopeValidation(
+                validation: validation,
+                getFieldValue: getFieldValue,
+                index: validation.Index,
+                fieldPathToOverride: null);
+            action(scopeValidation);
+        }, ScopeType.WhenNotNull);
     }
 
     public static IValidation<TField?> WhenNotNull<TField, TReturnedField>(
         this IValidation<TField?> validation,
-        Func<IValidation<TField>, IValidation<TReturnedField>> notNullValidation)
+        Func<IValidation<TField>, IValidation<TReturnedField>> action)
         where TField : class
     {
-        if (validation is not IValidValidation<TField?> validValidation)
+        validation.Condition = () => validation.GetFieldValue() is not null;
+        return validation.SetScope(() =>
         {
-            return validation;
-        }
-
-        if (validValidation.GetFieldValue() is not null)
-        {
-            var validationReturned = notNullValidation(validation.Transform(x => x!));
-
-            if (validationReturned is IInvalidValidation<TReturnedField>)
-            {
-                return IInvalidValidation<TField?>.Create();
-            }
-        }
-
-        return validation;
+            validation.IsScopeCreator = true;
+            var getFieldValue = () => validation.GetFieldValue()!;
+            var scopeValidation = CreateScopeValidation(
+                validation: validation,
+                getFieldValue: getFieldValue,
+                index: validation.Index,
+                fieldPathToOverride: null);
+            action(scopeValidation);
+        }, ScopeType.WhenNotNull);
     }
 
     public static IValidation<TField?> Null<TField>(
         this IValidation<TField?> validation)
         where TField : class
     {
-        if (validation is IValidValidation<TField?> validValidation)
-        {
-            return validation.SetValidator(new NullValidator<TField?>(validValidation.GetFieldValue()));
-        }
-
-        return validation;
+        return validation.SetValidator(() => new NullValidator<TField?>(validation.GetFieldValue()));
     }
 
     public static IValidation<TField?> Null<TField>(
         this IValidation<TField?> validation)
         where TField : struct
     {
-        if (validation is IValidValidation<TField?> validValidation)
-        {
-            return validation.SetValidator(new NullValidator<TField?>(validValidation.GetFieldValue()));
-        }
-
-        return validation;
+        return validation.SetValidator(() => new NullValidator<TField?>(validation.GetFieldValue()));
     }
 
     public static IValidation<TField> GreaterThan<TField>(
@@ -113,56 +81,31 @@ public static class ValidationExtensions
         TField valueToCompare)
         where TField : IComparisonOperators<TField, TField, bool>
     {
-        if (validation is IValidValidation<TField> validValidation)
-        {
-            return validation.SetValidator(new GreaterThanValidator<TField>(validValidation.GetFieldValue(),
-                valueToCompare));
-        }
-
-        return validation;
+        return validation.SetValidator(() =>
+            new GreaterThanValidator<TField>(validation.GetFieldValue(), valueToCompare));
     }
 
     public static IValidation<TField> Enum<TField>(
         this IValidation<TField> validation)
         where TField : Enum
     {
-        if (validation is IValidValidation<TField> validValidation)
-        {
-            return validation.SetValidator(new EnumValidator<TField>(validValidation.GetFieldValue(), typeof(TField)));
-        }
-
-        return validation;
+        return validation.SetValidator(() => new EnumValidator<TField>(validation.GetFieldValue(), typeof(TField)));
     }
 
     public static IValidation<TEnum> Enum<TEnum>(
         this IValidation<int> validation)
         where TEnum : Enum
     {
-        var validationToReturn = validation;
-
-        if (validation is IValidValidation<int> validValidation)
-        {
-            validationToReturn =
-                validValidation.SetValidator(new EnumValidator<int>(validValidation.GetFieldValue(), typeof(TEnum)));
-        }
-
-        return validationToReturn.Transform(x => (TEnum)(object)x);
+        return validation.SetValidator(() => new EnumValidator<int>(validation.GetFieldValue(), typeof(TEnum)))
+            .Transform(x => (TEnum)(object)x);
     }
 
     public static IValidation<TEnum> Enum<TEnum>(
         this IValidation<string> validation)
         where TEnum : Enum
     {
-        var validationToReturn = validation;
-
-        if (validation is IValidValidation<string> validValidation)
-        {
-            validationToReturn = validValidation.SetValidator(
-                new EnumValidator<string>(validValidation.GetFieldValue(), typeof(TEnum)));
-        }
-
-        return validationToReturn.Transform(x =>
-            (TEnum)System.Enum.Parse(typeof(TEnum), x, ignoreCase: true));
+        return validation.SetValidator(() => new EnumValidator<string>(validation.GetFieldValue(), typeof(TEnum)))
+            .Transform(x => (TEnum)System.Enum.Parse(typeof(TEnum), x, ignoreCase: true));
     }
 
     public static IValidation<TField> Enum<TField>(
@@ -170,13 +113,8 @@ public static class ValidationExtensions
         params TField[] allowedValues)
         where TField : Enum
     {
-        if (validation is IValidValidation<TField> validValidation)
-        {
-            return validation.SetValidator(
-                new EnumRangeValidator<TField, TField>(validValidation.GetFieldValue(), allowedValues));
-        }
-
-        return validation;
+        return validation.SetValidator(() =>
+            new EnumRangeValidator<TField, TField>(validation.GetFieldValue(), allowedValues));
     }
 
     public static IValidation<TEnum> Enum<TEnum>(
@@ -184,15 +122,9 @@ public static class ValidationExtensions
         params TEnum[] allowedValues)
         where TEnum : Enum
     {
-        var validationToReturn = validation;
-
-        if (validation is IValidValidation<int> validValidation)
-        {
-            validationToReturn = validValidation.SetValidator(
-                new EnumRangeValidator<int, TEnum>(validValidation.GetFieldValue(), allowedValues));
-        }
-
-        return validationToReturn.Transform(x => (TEnum)(object)x);
+        return validation
+            .SetValidator(() => new EnumRangeValidator<int, TEnum>(validation.GetFieldValue(), allowedValues))
+            .Transform(x => (TEnum)(object)x);
     }
 
     public static IValidation<TEnum> Enum<TEnum>(
@@ -200,16 +132,9 @@ public static class ValidationExtensions
         params TEnum[] allowedValues)
         where TEnum : Enum
     {
-        var validationToReturn = validation;
-
-        if (validation is IValidValidation<string> validValidation)
-        {
-            validationToReturn = validValidation.SetValidator(
-                new EnumRangeValidator<string, TEnum>(validValidation.GetFieldValue(), allowedValues));
-        }
-
-        return validationToReturn.Transform(x =>
-            (TEnum)System.Enum.Parse(typeof(TEnum), x, ignoreCase: true));
+        return validation.SetValidator(
+                () => new EnumRangeValidator<string, TEnum>(validation.GetFieldValue(), allowedValues))
+            .Transform(x => (TEnum)System.Enum.Parse(typeof(TEnum), x, ignoreCase: true));
     }
 
     public static IValidation<string> LengthRange(
@@ -217,104 +142,51 @@ public static class ValidationExtensions
         int minimum,
         int maximum)
     {
-        if (validation is IValidValidation<string> validValidation)
-        {
-            return validation.SetValidator(new LengthRangeValidator(validValidation.GetFieldValue(), minimum, maximum));
-        }
-
-        return validation;
+        return validation.SetValidator(() => new LengthRangeValidator(validation.GetFieldValue(), minimum, maximum));
     }
 
     public static IValidation<string> MinimumLength(
         this IValidation<string> validation,
         int minimum)
     {
-        if (validation is IValidValidation<string> validValidation)
-        {
-            return validation.SetValidator(new MinimumLengthValidator(validValidation.GetFieldValue(), minimum));
-        }
-
-        return validation;
+        return validation.SetValidator(() => new MinimumLengthValidator(validation.GetFieldValue(), minimum));
     }
 
-    public static IValidation<IEnumerable<TReturnedField>> ForEach<TInnerType, TReturnedField>(
+    public static IValidation<IEnumerable<TInnerType>> ForEach<TInnerType, TReturnedField>(
         this IValidation<IEnumerable<TInnerType>> validation,
         Func<IValidation<TInnerType>, IValidation<TReturnedField>> action)
     {
-        if (validation is not IValidValidation<IEnumerable<TInnerType>> validValidation)
+        return validation.SetScope(() =>
         {
-            return IInvalidValidation<IEnumerable<TReturnedField>>.Create();
-        }
+            validation.IsScopeCreator = true;
+            var fieldCollection = validation.GetFieldValue()
+                .ToList();
+            var index = 0;
+            var totalItems = fieldCollection.Count();
 
-        var fieldCollection = validValidation.GetFieldValue();
-        var fieldFullPath = validValidation.Context.FieldName;
-        var index = 0;
-        var areErrors = false;
-        var returnedFieldValues = new List<TReturnedField>();
-
-        foreach (var innerField in fieldCollection)
-        {
-            var newValidation = IValidValidation<TInnerType>.CreateFromField(
-                innerField,
-                validValidation.CrossErrorToException,
-                generalizeError: validValidation.Context.GeneralizeError,
-                fieldFullPath: fieldFullPath,
-                context:validValidation.Context,
-                index: index,
-                parentPath: validValidation.Context.ParentPath,
-                error: validValidation.Context.Error,
-                message: validValidation.Context.Message,
-                code: validValidation.Context.Code,
-                details: validValidation.Context.Details,
-                httpStatusCode: validValidation.Context.HttpStatusCode,
-                fieldDisplayName: validValidation.Context.FieldDisplayName);
-            var validationReturned = action(newValidation);
-
-            if (validationReturned is IInvalidValidation<TReturnedField>)
+            foreach (var innerField in fieldCollection)
             {
-                if (validValidation.Context.ValidationMode is ValidationMode.StopValidationOnFirstError
-                    || validValidation.Context.ValidationMode is ValidationMode.AccumulateFirstErrorEachValidation)
+                var getFieldValue = () => innerField;
+                var scopeValidation = CreateScopeValidation(
+                    validation: validation,
+                    getFieldValue: getFieldValue,
+                    index: index,
+                    fieldPathToOverride: validation.GetFieldPathWithIndex(validation.FieldPath, index));
+                scopeValidation.HasFailed = false;
+                action(scopeValidation);
+                index++;
+                var areAllItemsIterated = index  == totalItems;
+                var stopWithFailedScope =
+                    validation.HasFailed
+                    && validation.Context!.ValidationMode is ValidationMode.AccumulateFirstErrors;
+            
+                if (areAllItemsIterated || stopWithFailedScope)
                 {
-                    return IInvalidValidation<IEnumerable<TReturnedField>>.Create();
-                }
-                else if (validValidation.Context.ValidationMode is ValidationMode
-                             .AccumulateFirstErrorEachValidationAndAllFirstErrorsCollectionIteration)
-                {
-                    areErrors = true;
-                    index++;
-                    continue;
-                }
-                else
-                {
-                    throw new UnreachableException();
+                    validation.HasBeenExecuted = true;
+                    break;
                 }
             }
-            else if (validationReturned is IValidValidation<TReturnedField> validValidationReturned)
-            {
-                returnedFieldValues.Add(validValidationReturned.GetFieldValue());
-            }
-            else
-            {
-                throw new UnreachableException();
-            }
-
-            index++;
-        }
-
-        if (areErrors)
-        {
-            return IInvalidValidation<IEnumerable<TReturnedField>>.Create();
-        }
-        else
-        {
-            return IValidValidation<IEnumerable<TReturnedField>>.CreateFromField(
-                returnedFieldValues,
-                validValidation.CrossErrorToException,
-                fieldFullPath: fieldFullPath,
-                context: validValidation.Context,
-                index: index,
-                parentPath: validValidation.Context.ParentPath);
-        }
+        }, ScopeType.ForEach);
     }
 
     public static IValidation<string> Regex(
@@ -322,12 +194,50 @@ public static class ValidationExtensions
         [StringSyntax(StringSyntaxAttribute.Regex)]
         string pattern)
     {
-        if (validation is IValidValidation<string> validValidation)
-        {
-            return validation.SetValidator(
-                new RegularExpressionValidator(validValidation.GetFieldValue(), pattern));
-        }
+        return validation.SetValidator(() => new RegularExpressionValidator(validation.GetFieldValue(), pattern));
+    }
 
-        return validation;
+    internal static IValidation<TDependentField> CreateScopeValidation<TField, TDependentField>(
+        this IValidation<TField> validation,
+        Func<TDependentField> getFieldValue,
+        int? index,
+        string? fieldPathToOverride)
+    {
+        var scopeValidation = new Validation<TDependentField>(
+            getFieldValue: getFieldValue,
+            crossErrorToException: validation.CrossErrorToException,
+            generalizeError: validation.GeneralizeError,
+            fieldPath: fieldPathToOverride ?? validation.FieldPath,
+            context: validation.Context,
+            index: index,
+            parentPath: validation.ParentPath,
+            fixedError: validation.Context!.Error,
+            fixedMessage: validation.Context!.Message,
+            fixedCode: validation.Context!.Code,
+            fixedDetails: validation.Context!.Details,
+            fixedHttpStatusCode: validation.Context!.HttpStatusCode,
+            fixedFieldDisplayName: validation.Context!.FieldDisplayName);
+        scopeValidation.HasFailed = validation.HasFailed;
+        scopeValidation.HasPendingAsyncValidation = validation.HasPendingAsyncValidation;
+        scopeValidation.ScopeType = validation.ScopeType;
+        scopeValidation.IsInsideScope = true;
+        scopeValidation.ScopeCreatorValidation = validation;
+        validation.ScopeValidations ??= new();
+        validation.ScopeValidations.Add(scopeValidation);
+        return scopeValidation;
+    }
+
+    internal static string? GetFieldPathWithIndex<TField>(
+        this IValidation<TField> validation,
+        string? fieldPath,
+        int? index)
+    {
+        if (fieldPath is null)
+        {
+            return null;
+        }
+        
+        var indexRepresentation = index is not null ? $"[{index}]" : null;
+        return $"{fieldPath}{indexRepresentation}";
     }
 }

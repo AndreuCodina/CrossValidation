@@ -1,5 +1,5 @@
-﻿using System;
-using System.Net;
+﻿using System.Net;
+using System.Threading.Tasks;
 using CrossValidation.Errors;
 using CrossValidation.Exceptions;
 using CrossValidation.Resources;
@@ -35,21 +35,17 @@ public class ValidationTests :
 
         action.ShouldThrowCrossError<CommonCrossError.Predicate>();
     }
-    
-    [Fact]
-    public void ValidateField_keeps_customizations_before_create_instance()
-    {
-        var messageTemplate = "{FieldDisplayName}: Expected message";
-        var expectedMessage = "NestedModel.Int: Expected message";
-        
-        var action = () => Validate.Field(_model.NestedModel.Int)
-            .WithMessage(messageTemplate)
-            .WithError(new CustomErrorWithPlaceholderValue(10))
-            .Instance(ValueObjectWithoutCustomization.Create);
 
-        var error = action.ShouldThrowCrossError<CustomErrorWithPlaceholderValue>();
+    [Fact]
+    public void ValidateField_keeps_customizations_after_create_instance_using_ValidateField()
+    {
+        var action = () => Validate.Field(_model.NestedModel.Int)
+            .Instance(ValueObjectFieldWithoutCustomization.Create);
+
+        var error = action.ShouldThrowCrossError<CommonCrossError.GreaterThan<int>>();
         error.FieldName.ShouldBe("NestedModel.Int");
-        error.Message.ShouldBe(expectedMessage);
+        error.Code.ShouldBe(nameof(ErrorResource.GreaterThan));
+        error.Message.ShouldBe("Must be greater than 1");
     }
     
     [Theory]
@@ -57,13 +53,13 @@ public class ValidationTests :
     [InlineData("ExpectedCode", null, "ExpectedCode", null)]
     [InlineData(nameof(ErrorResource.Enum), null, nameof(ErrorResource.Enum), "Must be a valid value")]
     [InlineData("ExpectedCode", "Expected message", "ExpectedCode", "Expected message")]
-    public void ValidateThat_keeps_customizations_before_create_instance(
+    public void ValidateField_keeps_customizations_before_create_instance(
         string? code,
         string? message,
         string? expectedCode,
         string? expectedMessage)
     {
-        var validation = Validate.That(_model.NestedModel.Int);
+        var validation = Validate.Field(_model.NestedModel.Int);
         
         if (code != null)
         {
@@ -118,7 +114,7 @@ public class ValidationTests :
         string? expectedCode,
         string? expectedMessage)
     {
-        var action = () => Validate.That(_model.Int)
+        var action = () => Validate.Field(_model.Int)
             .Instance(x => ValueObjectWithCustomization.Create(x, code, message));
 
         var error = action.ShouldThrowCrossError<CommonCrossError.GreaterThan<int>>();
@@ -128,47 +124,7 @@ public class ValidationTests :
         error.HttpStatusCode.ShouldBe(HttpStatusCode.Accepted);
         error.FieldDisplayName.ShouldBe("Expected field display name");
     }
-    
-    [Fact]
-    public void Call_Instance_from_invalid_validation_fails()
-    {
-        var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
-        {
-            validator.ValidationMode = ValidationMode.AccumulateFirstErrorEachValidation;
 
-            validator.Field(_model.NullableInt)
-                .NotNull()
-                .Transform(x => x + 1)
-                .Transform(x => x.ToString())
-                .Transform(int.Parse)
-                .Instance();
-        });
-    
-        var action = () => parentModelValidator.Validate(_model);
-    
-        action.ShouldThrow<InvalidOperationException>();
-    }
-    
-    [Fact]
-    public void Call_Instance_with_function_from_invalid_validation_fails()
-    {
-        var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
-        {
-            validator.ValidationMode = ValidationMode.AccumulateFirstErrorEachValidation;
-
-            validator.Field(_model.NullableInt)
-                .NotNull()
-                .Transform(x => x + 1)
-                .Transform(x => x.ToString())
-                .Transform(int.Parse)
-                .Instance(ValueObjectWithoutCustomization.Create);
-        });
-    
-        var action = () => parentModelValidator.Validate(_model);
-    
-        action.ShouldThrow<InvalidOperationException>();
-    }
-    
     [Fact]
     public void Get_instance()
     {
@@ -208,11 +164,12 @@ public class ValidationTests :
     [Fact]
     public void Validator_with_conditional_execution()
     {
-        var expectedMessage = "TrueCase";
+        var expectedMessage = "Expected message";
+        
         var action = () => Validate.That(_model.NestedModel.Int)
             .When(_commonFixture.NotBeValid)
             .GreaterThan(_model.NestedModel.Int + 1)
-            .When(true)
+            .When(() => true)
             .WithMessage(expectedMessage)
             .GreaterThan(_model.NestedModel.Int);
 
@@ -221,7 +178,7 @@ public class ValidationTests :
     }
     
     [Fact]
-    public void Validator_with_async_conditional_execution()
+    public async Task Validator_with_async_conditional_execution()
     {
         var expectedMessage = "TrueCase";
         var action = () => Validate.That(_model.NestedModel.Int)
@@ -229,9 +186,10 @@ public class ValidationTests :
             .GreaterThan(_model.NestedModel.Int + 1)
             .WhenAsync(_commonFixture.BeValidAsync)
             .WithMessage(expectedMessage)
-            .GreaterThan(_model.NestedModel.Int);
+            .GreaterThan(_model.NestedModel.Int)
+            .ValidateAsync();
 
-        var error = action.ShouldThrowCrossError();
+        var error = await action.ShouldThrowCrossErrorAsync();
         error.Message.ShouldBe(expectedMessage);
     }
 
@@ -263,12 +221,13 @@ public class ValidationTests :
     }
     
     [Fact]
-    public void MustAsync_fails()
+    public async Task MustAsync_fails()
     {
         var action = () => Validate.That(1)
-            .MustAsync(_commonFixture.NotBeValidAsync);
+            .MustAsync(_commonFixture.NotBeValidAsync)
+            .ValidateAsync();
 
-        action.ShouldThrow<CrossException>();
+        await action.ShouldThrowAsync<CrossException>();
     }
     
     [Fact]
@@ -338,6 +297,16 @@ public class ValidationTests :
         public static ValueObjectWithoutCustomization Create(int value)
         {
             Validate.That(value).GreaterThan(value + 1);
+            return new(value);
+        }
+    }
+    
+    private record ValueObjectFieldWithoutCustomization(int Value)
+    {
+        public static ValueObjectWithoutCustomization Create(int value)
+        {
+            Validate.Field(value)
+                .GreaterThan(value + 1);
             return new(value);
         }
     }
