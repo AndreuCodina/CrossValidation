@@ -3,7 +3,7 @@ name: Push to main
 on:
   push:
     branches:
-      - main
+      - feature/test-github-packages
 
 jobs:
   execute:
@@ -27,7 +27,7 @@ jobs:
       - name: Refresh coverage badge
         run: curl -X PURGE https://camo.githubusercontent.com/c4fea259f903ccde969de79288d9a4bdc04d9eb5b6674d62c963490d13276a5b/68747470733a2f2f636f766572616c6c732e696f2f7265706f732f6769746875622f416e64726575436f64696e612f43726f737356616c69646174696f6e2f62616467652e7376673f6272616e63683d6d61696e
 
-      - name: Publish all packages
+      - name: Publish all packages to github
         uses: ./.github/actions/publish-all-packages
         with:
           repository-token: ${{ secrets.GITHUB_TOKEN }}

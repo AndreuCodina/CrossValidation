@@ -43,9 +43,9 @@ runs:
           -p:PublishRepositoryUrl=true
       shell: bash
 
-    - name: Push package
-      run: |
-        dotnet nuget push ${{ format('{0}/{1}.{2}.snupkg', inputs.nuget-folder, inputs.project-name, inputs.package-version) }} \
-          --source ${{ inputs.repository }} \
-          --api-key ${{ inputs.repository-token }}
-      shell: bash
+    # - name: Push package
+    #   run: |
+    #     dotnet nuget push ${{ format('{0}/{1}.{2}.snupkg', inputs.nuget-folder, inputs.project-name, inputs.package-version) }} \
+    #       --source ${{ inputs.repository }} \
+    #       --api-key ${{ inputs.repository-token }}
+    #   shell: bash
