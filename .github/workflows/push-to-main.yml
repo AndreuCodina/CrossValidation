@@ -32,4 +32,4 @@ jobs:
         with:
           repository-token: ${{ secrets.GITHUB_TOKEN }}
           repository: github
-          package-version: 0.0.1-preview.1
+          package-version: 0.0.1-preview.${{ github.sha }}
