@@ -43,12 +43,10 @@ jobs:
             --configuration ${{ env.DOTNET_CONFIGURATION }} \
             --no-build \
             --output ${{ env.NUGET_FOLDER }} \
-            --include-source \
             --include-symbols \
             -p:SymbolPackageFormat=snupkg \
             -p:PackageVersion=${{ env.RELEASE_VERSION }} \
-            -p:PublishRepositoryUrl=true \
-            -p:EmbedUntrackedSources=true
+            -p:PublishRepositoryUrl=true
 
       - name: Push CrossValidation package
         run: |
@@ -75,12 +73,11 @@ jobs:
             --include-symbols \
             -p:SymbolPackageFormat=snupkg \
             -p:PackageVersion=${{ env.RELEASE_VERSION }} \
-            -p:PublishRepositoryUrl=true \
-            -p:EmbedUntrackedSources=true
+            -p:PublishRepositoryUrl=true
 
       - name: Push CrossValidation.ShouldlyAssertions package
         run: |
-          dotnet nuget push ${{ format('{0}/CrossValidation.ShouldlyAssertions.{1}.nupkg', env.NUGET_FOLDER, env.RELEASE_VERSION) }} \
+          dotnet nuget push ${{ format('{0}/CrossValidation.ShouldlyAssertions.{1}.snupkg', env.NUGET_FOLDER, env.RELEASE_VERSION) }} \
             --source https://api.nuget.org/v3/index.json \
             --api-key ${{ secrets.NUGET_API_KEY }}
 
