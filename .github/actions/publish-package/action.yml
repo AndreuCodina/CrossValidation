@@ -38,7 +38,7 @@ runs:
           --no-build \
           --output ${{ inputs.nuget-folder }} \
           --include-symbols \
-          -p:SymbolPackageFormat=nupkg \
+          -p:SymbolPackageFormat=snupkg \
           -p:PackageVersion=${{ inputs.package-version }} \
           -p:PublishRepositoryUrl=true
       shell: bash
