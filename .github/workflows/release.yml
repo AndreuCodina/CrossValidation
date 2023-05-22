@@ -19,11 +19,11 @@ jobs:
       - name: Build
         uses: ./.github/actions/build
 
-      - name: Publish all packages
+      - name: Publish all packages to nuget.org
         uses: ./.github/actions/publish-all-packages
         with:
-          repository-token: ${{ secrets.NUGET_API_KEY }}
-          repository: nuget.org
+          registry-token: ${{ secrets.NUGET_API_KEY }}
+          registry: nuget.org
           package-version: ${{ env.RELEASE_VERSION }}
 
       # It's not possible disable the artifact creation
