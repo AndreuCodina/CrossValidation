@@ -1,12 +1,9 @@
-name: Push to main
+name: Pull request
 
 on:
-  push:
+  pull_request:
     branches:
-      - feature/github-actions
-
-env:
-  TEST_COVERAGE_FOLDER: ${{ github.workspace }}/generated/coverage
+      - main
 
 jobs:
   build_and_test:

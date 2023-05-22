@@ -1,0 +1,22 @@
+name: Publish NuGet
+description: Publish NuGet
+
+inputs:
+  test-coverage-folder:
+    description: Folder where the coverage files are located
+    required: false
+    default: ${{ github.workspace }}/generated/coverage
+
+runs:
+  using: "composite"
+
+  steps:
+    - name: Copy coverage to a predictable location
+      run: cp ${{ inputs.test-coverage-folder }}/*/coverage.info ${{ inputs.test-coverage-folder }}/lcov.info
+      shell: bash
+
+    - name: Coveralls
+      uses: coverallsapp/github-action@1.1.3
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        path-to-lcov: ${{ inputs.test-coverage-folder }}/lcov.info
