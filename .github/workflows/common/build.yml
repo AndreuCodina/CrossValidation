@@ -2,6 +2,7 @@ name: Build
 
 runs:
   using: "composite"
+
   steps:
     - name: Setup .NET
       uses: actions/setup-dotnet@v3

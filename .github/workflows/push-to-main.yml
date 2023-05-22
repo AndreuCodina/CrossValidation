@@ -16,16 +16,8 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v3
-        with:
-          dotnet-version: 7.0.x
-
-      - name: Restore dependencies
-        run: dotnet restore
-
       - name: Build
-        run: dotnet build --configuration Release --no-restore
+        uses: ./.github/workflows/common/build@main
 
       # https://github.com/coverlet-coverage/coverlet/blob/master/Documentation/VSTestIntegration.md#passing-runsettings-arguments-through-commandline
       - name: Test

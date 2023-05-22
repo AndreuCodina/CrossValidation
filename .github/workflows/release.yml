@@ -50,7 +50,7 @@ jobs:
 
       - name: Push CrossValidation package
         run: |
-          dotnet nuget push ${{ format('{0}/CrossValidation.{1}.nupkg', env.NUGET_FOLDER, env.RELEASE_VERSION) }} \
+          dotnet nuget push ${{ format('{0}/CrossValidation.{1}.snupkg', env.NUGET_FOLDER, env.RELEASE_VERSION) }} \
             --source https://api.nuget.org/v3/index.json \
             --api-key ${{ secrets.NUGET_API_KEY }}
 
