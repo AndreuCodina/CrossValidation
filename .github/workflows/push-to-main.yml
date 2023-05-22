@@ -9,8 +9,8 @@ env:
   TEST_COVERAGE_FOLDER: ${{ github.workspace }}/generated/coverage
 
 jobs:
-  build_and_test:
-    name: Build and test
+  execute:
+    name: Execute
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository

@@ -12,8 +12,8 @@ env:
   NUGET_FOLDER: ${{ github.workspace }}/generated/nuget
 
 jobs:
-  publish_nuget_packages:
-    name: Publish NuGet packages
+  execute:
+    name: Execute
     runs-on: ubuntu-latest
     steps:
       - name: Set release version
