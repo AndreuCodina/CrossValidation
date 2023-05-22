@@ -42,9 +42,11 @@ jobs:
             --configuration ${{ env.DOTNET_CONFIGURATION }} \
             --no-build \
             --output ${{ env.NUGET_FOLDER }} \
+            --include-source \
             --include-symbols \
             -p:SymbolPackageFormat=snupkg \
-            -p:PackageVersion=${{ env.RELEASE_VERSION }}
+            -p:PackageVersion=${{ env.RELEASE_VERSION }} \
+            -p:ContinuousIntegrationBuild=true
 
       - name: Push CrossValidation package
         run: |
@@ -67,9 +69,11 @@ jobs:
             --configuration ${{ env.DOTNET_CONFIGURATION }} \
             --no-build \
             --output ${{ env.NUGET_FOLDER }} \
+            --include-source \
             --include-symbols \
             -p:SymbolPackageFormat=snupkg \
-            -p:PackageVersion=${{ env.RELEASE_VERSION }}
+            -p:PackageVersion=${{ env.RELEASE_VERSION }} \
+            -p:ContinuousIntegrationBuild=true
 
       - name: Push CrossValidation.ShouldlyAssertions package
         run: |
