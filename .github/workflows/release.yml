@@ -34,7 +34,8 @@ jobs:
         run: |
           dotnet build ${{ env.CROSS_VALIDATION_PROJECT }} \
             --configuration ${{ env.DOTNET_CONFIGURATION }} \
-            --no-restore
+            --no-restore \
+            -p:ContinuousIntegrationBuild=true
 
       - name: Create CrossValidation package
         run: |
@@ -46,7 +47,8 @@ jobs:
             --include-symbols \
             -p:SymbolPackageFormat=snupkg \
             -p:PackageVersion=${{ env.RELEASE_VERSION }} \
-            -p:ContinuousIntegrationBuild=true
+            -p:PublishRepositoryUrl=true \
+            -p:EmbedUntrackedSources=true
 
       - name: Push CrossValidation package
         run: |
@@ -61,7 +63,8 @@ jobs:
         run: |
           dotnet build ${{ env.CROSS_VALIDATION_SHOULDLY_ASSERTIONS_PROJECT }} \
             --configuration ${{ env.DOTNET_CONFIGURATION }} \
-            --no-restore
+            --no-restore \
+            -p:ContinuousIntegrationBuild=true
 
       - name: Create CrossValidation.ShouldlyAssertions package
         run: |
@@ -69,11 +72,11 @@ jobs:
             --configuration ${{ env.DOTNET_CONFIGURATION }} \
             --no-build \
             --output ${{ env.NUGET_FOLDER }} \
-            --include-source \
             --include-symbols \
             -p:SymbolPackageFormat=snupkg \
             -p:PackageVersion=${{ env.RELEASE_VERSION }} \
-            -p:ContinuousIntegrationBuild=true
+            -p:PublishRepositoryUrl=true \
+            -p:EmbedUntrackedSources=true
 
       - name: Push CrossValidation.ShouldlyAssertions package
         run: |
