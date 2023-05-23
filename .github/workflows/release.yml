@@ -18,7 +18,7 @@ jobs:
 
       - name: Set release version
         id: set-release-version
-        run: echo "RELEASE_VERSION=$(git describe --tags --abbrev=0)" >> $GITHUB_OUTPUT
+        run: echo "RELEASE_VERSION=${{ github.event.release.tag_name }}" >> $GITHUB_OUTPUT
 
       - name: Publish all packages to nuget.org
         uses: ./.github/actions/publish-all-packages
