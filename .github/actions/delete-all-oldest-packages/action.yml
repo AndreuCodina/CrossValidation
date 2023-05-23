@@ -18,7 +18,7 @@ runs:
 
     - name: Set minimum packages to keep
       id: set-minimum-packages-to-keep
-      run: echo "MINIMUM_PACKAGES_TO_KEEP=2" >> $GITHUB_OUTPUT
+      run: echo "MINIMUM_PACKAGES_TO_KEEP=10" >> $GITHUB_OUTPUT
       shell: bash
 
     - name: Delete old CrossValidation packages
