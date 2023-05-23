@@ -23,7 +23,7 @@ jobs:
       - name: Publish all packages to nuget.org
         uses: ./.github/actions/publish-all-packages
         with:
-          registry-token: notValid
+          registry-token: ${{ secrets.NUGET_API_KEY }}
           registry: nuget.org
           package-version: ${{ steps.set-release-version.outputs.RELEASE_VERSION }}
 
