@@ -41,6 +41,7 @@ runs:
           -p:SymbolPackageFormat=snupkg \
           -p:PackageVersion=${{ inputs.package-version }} \
           -p:PublishRepositoryUrl=true
+          -p:EmbedUntrackedSources=true
       shell: bash
 
     - name: Push package
