@@ -14,8 +14,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Build
-        uses: ./.github/actions/build
+      - name: Print context
+        run: echo "$GITHUB_CONTEXT"
+
+      # - name: Build
+      #   uses: ./.github/actions/build
 
       - name: Set release version
         id: set-release-version
