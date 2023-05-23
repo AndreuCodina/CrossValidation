@@ -17,7 +17,7 @@ jobs:
       # - name: Print context
       #   run: echo "$GITHUB_CONTEXT"
 
-      - name: Print context
+      - name: Print context2
         env:
           CONTEXT: ${{ toJson(github) }}
         run: echo "$CONTEXT"
