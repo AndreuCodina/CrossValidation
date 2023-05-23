@@ -1,4 +1,5 @@
 <Project>
+
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -6,4 +7,5 @@
     <LangVersion>11</LangVersion>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
  </PropertyGroup>
+
 </Project>
