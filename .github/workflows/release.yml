@@ -17,17 +17,17 @@ jobs:
       # - name: Print context
       #   run: echo "$GITHUB_CONTEXT"
 
-      - name: Print context2
-        env:
-          CONTEXT: ${{ toJson(github) }}
-        run: echo "$CONTEXT"
+      # - name: Print context2
+      #   env:
+      #     CONTEXT: ${{ toJson(github) }}
+      #   run: echo "$CONTEXT"
 
       # - name: Build
       #   uses: ./.github/actions/build
 
       - name: Set release version
         id: set-release-version
-        run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_OUTPUT
+        run: echo "RELEASE_VERSION=$(git describe --tags --abbrev=0)" >> $GITHUB_OUTPUT
 
       # - name: Print release version
       #   env:
