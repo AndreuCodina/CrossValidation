@@ -1,10 +1,9 @@
 name: Release
 
 on:
-  push
-  # release:
-  #   types:
-  #     - published
+  release:
+    types:
+      - published
 
 jobs:
   execute:
