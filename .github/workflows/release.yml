@@ -25,6 +25,12 @@ jobs:
       # - name: Build
       #   uses: ./.github/actions/build
 
+      - name: Debug Git information
+        run: |
+          git fetch --tags
+          git tag -l
+          git log --oneline --decorate --graph --all
+
       - name: Set release version
         id: set-release-version
         run: echo "RELEASE_VERSION=$(git describe --tags --abbrev=0)" >> $GITHUB_OUTPUT
