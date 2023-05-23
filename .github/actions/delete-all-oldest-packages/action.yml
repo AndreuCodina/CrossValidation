@@ -1,0 +1,36 @@
+name: Delete all the oldest NuGet packages in GitHub Packages
+description: Delete all oldest NuGet packages in GitHub Packages
+
+inputs:
+  registry-token:
+    description: Registry token
+    required: true
+    default: ""
+
+runs:
+  using: "composite"
+
+  steps:
+    - name: Set package type
+      id: set-package-type
+      run: echo "PACKAGE_TYPE=nuget" >> $GITHUB_OUTPUT
+      shell: bash
+
+    - name: Set minimum packages to keep
+      id: set-minimum-packages-to-keep
+      run: echo "MINIMUM_PACKAGES_TO_KEEP=2" >> $GITHUB_OUTPUT
+      shell: bash
+
+    - name: Delete old CrossValidation packages
+      uses: actions/delete-package-versions@v4.1.1
+      with:
+        package-name: CrossValidation
+        package-type: ${{ steps.set-package-type.outputs.PACKAGE_TYPE }}
+        min-versions-to-keep: ${{ steps.set-minimum-packages-to-keep.outputs.MINIMUM_PACKAGES_TO_KEEP }}
+
+    - name: Delete old CrossValidation.ShouldlyAssertions packages
+      uses: actions/delete-package-versions@v4.1.1
+      with:
+        package-name: CrossValidation.ShouldlyAssertions
+        package-type: ${{ steps.set-package-type.outputs.PACKAGE_TYPE }}
+        min-versions-to-keep: ${{ steps.set-minimum-packages-to-keep.outputs.MINIMUM_PACKAGES_TO_KEEP }}

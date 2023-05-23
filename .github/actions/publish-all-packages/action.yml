@@ -35,7 +35,7 @@ runs:
       run: dotnet nuget remove source nuget.org
       shell: bash
 
-    - name: Publish NuGet
+    - name: Publish CrossValidation NuGet
       uses: ./.github/actions/publish-package
       with:
         registry-token: ${{ inputs.registry-token }}
@@ -44,7 +44,7 @@ runs:
         project-name: CrossValidation
         registry: ${{ inputs.registry }}
 
-    - name: Publish NuGet
+    - name: Publish CrossValidation.ShouldlyAssertions NuGet
       uses: ./.github/actions/publish-package
       with:
         registry-token: ${{ inputs.registry-token }}

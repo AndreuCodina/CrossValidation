@@ -13,19 +13,21 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Set release version
-        run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
-
       - name: Build
         uses: ./.github/actions/build
+
+      - name: Set release version
+        id: set-release-version
+        run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_OUTPUT
 
       - name: Publish all packages to nuget.org
         uses: ./.github/actions/publish-all-packages
         with:
           registry-token: ${{ secrets.NUGET_API_KEY }}
           registry: nuget.org
-          package-version: ${{ env.RELEASE_VERSION }}
+          package-version: ${{ steps.set-release-version.outputs.RELEASE_VERSION }}
 
+      # https://aakinshin.net/posts/github-actions-perf-stability/
       # It's not possible disable the artifact creation
       - name: Execute benchmarks
         run: |
