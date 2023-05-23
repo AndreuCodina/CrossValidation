@@ -46,7 +46,7 @@ jobs:
         with:
           registry-token: notValid
           registry: nuget.org
-          package-version: package-version: ${{ env.RELEASE_VERSION }}
+          package-version: ${{ env.RELEASE_VERSION }}
 
       # # https://aakinshin.net/posts/github-actions-perf-stability/
       # # It's not possible disable the artifact creation
