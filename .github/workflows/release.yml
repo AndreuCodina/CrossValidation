@@ -25,15 +25,16 @@ jobs:
       # - name: Build
       #   uses: ./.github/actions/build
 
-      - name: Debug Git information
-        run: |
-          git fetch --tags
-          git tag -l
-          git log --oneline --decorate --graph --all
+      # - name: Debug Git information
+      #   run: |
+      #     git fetch --tags
+      #     git tag -l
+      #     git log --oneline --decorate --graph --all
 
       - name: Set release version
         id: set-release-version
-        run: echo "RELEASE_VERSION=$(git describe --tags --abbrev=0)" >> $GITHUB_OUTPUT
+        # run: echo "RELEASE_VERSION=$(git describe --tags --abbrev=0)" >> $GITHUB_OUTPUT
+        run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
 
       # - name: Print release version
       #   env:
@@ -45,7 +46,7 @@ jobs:
         with:
           registry-token: notValid
           registry: nuget.org
-          package-version: ${{ steps.set-release-version.outputs.RELEASE_VERSION }}
+          package-version: package-version: ${{ env.RELEASE_VERSION }}
 
       # # https://aakinshin.net/posts/github-actions-perf-stability/
       # # It's not possible disable the artifact creation
