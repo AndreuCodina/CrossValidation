@@ -40,7 +40,7 @@ runs:
           --include-symbols \
           -p:SymbolPackageFormat=snupkg \
           -p:PackageVersion=${{ inputs.package-version }} \
-          -p:PublishRepositoryUrl=true
+          -p:PublishRepositoryUrl=true \
           -p:EmbedUntrackedSources=true
       shell: bash
 
