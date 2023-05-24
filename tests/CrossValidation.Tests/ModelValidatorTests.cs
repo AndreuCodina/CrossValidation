@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
+﻿using System.Net;
 using CrossValidation.Errors;
 using CrossValidation.Resources;
 using CrossValidation.ShouldlyAssertions;
@@ -204,7 +200,8 @@ public class ModelValidatorTests :
 
          var errors = action.ShouldThrowCrossErrors();
          
-         errors.Select(x => x.Code).ShouldBe(expectedCodes);
+         errors.Select(x => x.Code)
+             .ShouldBe(expectedCodes);
      }
 
      [Fact]
@@ -805,10 +802,9 @@ public class ModelValidatorTests :
          var action = () => parentModelValidator.ValidateAsync(_model);
         
          var errors = await action.ShouldThrowCrossErrorsAsync();
-         
+
          errors.Select(x => x.Code)
-             .SequenceEqual(expectedCodes)
-             .ShouldBeTrue();
+             .ShouldBe(expectedCodes);
      }
      
      [Fact]
@@ -835,10 +831,9 @@ public class ModelValidatorTests :
          var action = () => parentModelValidator.Validate(_model);
 
          var errors = action.ShouldThrowCrossErrors();
-         
+
          errors.Select(x => x.Code)
-             .SequenceEqual(expectedCodes)
-             .ShouldBeTrue();
+             .ShouldBe(expectedCodes);
      }
 
      private record CustomErrorWithCode(string Code) : CrossError(Code: Code);
