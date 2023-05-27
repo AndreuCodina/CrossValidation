@@ -2,6 +2,7 @@
 using CrossValidation.Errors;
 using CrossValidation.Exceptions;
 using CrossValidation.Validations;
+using CrossValidation.WebApplication.Resources;
 
 namespace CrossValidation.WebApplication;
 
@@ -54,6 +55,13 @@ public static class TestEndpoints
         group.MapGet(ApiPath.Test.Exception, () =>
         {
             throw new Exception();
+        });
+        
+        group.MapGet(ApiPath.Test.UseDecimal, () =>
+        {
+            Validate.That("")
+                .WithMessage(string.Format(ErrorResource1.UseDecimal, 3.3))
+                .Must(_ => false);
         });
 
         return builder;

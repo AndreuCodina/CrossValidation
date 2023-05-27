@@ -37,7 +37,7 @@ public class CrossValidationOptionsBuilder
             var typeFullName = resourceBaseName + languageCodeResourceExtension;
             var newResourceType = resourceType.Assembly.GetType(typeFullName);
             
-            if (newResourceType != null)
+            if (newResourceType is not null)
             {
                 supportedCultureCodes.Add(cultureCode);
             }

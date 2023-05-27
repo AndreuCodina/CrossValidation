@@ -1,9 +1,5 @@
-﻿using System;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
+﻿using System.Net;
 using System.Net.Http.Json;
-using System.Threading.Tasks;
 using CrossValidation.DependencyInjection;
 using CrossValidation.Resources;
 using CrossValidation.Tests.TestUtils;
@@ -280,6 +276,28 @@ public class DependencyInjectionTests :
         problemDetails.Errors!.Count().ShouldBe(1);
         var error = problemDetails.Errors!.First();
         error.Code.ShouldBe(nameof(ErrorResource1.Hello));
+        error.Message.ShouldBe(expectedMessage);
+    }
+    
+    [Theory]
+    [InlineData("en", "The value is 3.3")]
+    [InlineData("es", "El valor es 3,3")]
+    public async Task Get_message_with_decimal(string languageCode, string expectedMessage)
+    {
+        _client = new TestApplicationFactory(services =>
+        {
+            services.AddCrossValidation(x =>
+            {
+                x.AddResxAndAssociatedCultures<ErrorResource1>();
+            });
+        }).CreateClient();
+        _client.DefaultRequestHeaders.Add("Accept-Language", languageCode);
+        
+        var response = await _client.GetAsync(ApiPath.Test.Prefix + ApiPath.Test.UseDecimal);
+        
+        response.StatusCode.ShouldBe(HttpStatusCode.UnprocessableEntity);
+        var problemDetails = await GetProblemDetailsFromResponse(response);
+        var error = problemDetails.Errors!.First();
         error.Message.ShouldBe(expectedMessage);
     }
 

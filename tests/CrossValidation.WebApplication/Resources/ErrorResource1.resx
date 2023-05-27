@@ -24,4 +24,7 @@
     <data name="NotNull" xml:space="preserve">
         <value>Replaced NotNull</value>
     </data>
+    <data name="UseDecimal" xml:space="preserve">
+        <value>The value is {0}</value>
+    </data>
 </root>
