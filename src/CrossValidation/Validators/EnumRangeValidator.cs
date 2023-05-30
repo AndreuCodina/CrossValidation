@@ -46,7 +46,7 @@ public record EnumRangeValidator<TField, TEnum>(
         return false;
     }
 
-    public override CrossError CreateError()
+    public override ICrossError CreateError()
     {
         return new CommonCrossError.EnumRange();
     }

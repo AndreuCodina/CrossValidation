@@ -13,7 +13,7 @@ public record GreaterThanValidator<TField>(
         return FieldValue > ComparisonValue;
     }
 
-    public override CrossError CreateError()
+    public override ICrossError CreateError()
     {
         return new CommonCrossError.GreaterThan<TField>(ComparisonValue);
     }

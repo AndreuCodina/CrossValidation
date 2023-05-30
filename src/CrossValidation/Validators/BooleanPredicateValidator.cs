@@ -9,7 +9,7 @@ public record BooleanPredicateValidator(Func<bool> Predicate) : Validator
         return Predicate();
     }
 
-    public override CrossError CreateError()
+    public override ICrossError CreateError()
     {
         return new CommonCrossError.Predicate();
     }

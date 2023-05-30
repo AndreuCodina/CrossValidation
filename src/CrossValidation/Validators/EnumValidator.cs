@@ -11,7 +11,7 @@ public record EnumValidator<TField>(
         return Enum.IsDefined(EnumType, FieldValue!);
     }
 
-    public override CrossError CreateError()
+    public override ICrossError CreateError()
     {
         return new CommonCrossError.Enum();
     }

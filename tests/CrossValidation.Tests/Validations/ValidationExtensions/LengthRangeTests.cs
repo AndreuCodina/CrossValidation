@@ -20,7 +20,16 @@ public class LengthRangeTests : TestBase
     }
     
     [Fact]
-    public void Return_error_when_the_validation_fails()
+    public void Not_fail_when_is_out_of_range()
+    {
+        var action = () => Validate.Field(_model.String)
+            .LengthRange(_model.String.Length, _model.String.Length);
+
+        action.ShouldNotThrow();
+    }
+    
+    [Fact]
+    public void Fail_when_is_out_of_range()
     {
         var action = () => Validate.Field(_model.String)
             .LengthRange(_model.String.Length + 1, _model.String.Length);

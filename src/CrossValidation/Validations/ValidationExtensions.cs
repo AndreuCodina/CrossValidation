@@ -196,6 +196,26 @@ public static class ValidationExtensions
     {
         return validation.SetValidator(() => new RegularExpressionValidator(validation.GetFieldValue(), pattern));
     }
+    
+    public static IValidation<string> Empty(this IValidation<string> validation)
+    {
+        return validation.SetValidator(() => new EmptyStringValidator(validation.GetFieldValue()));
+    }
+    
+    public static IValidation<IEnumerable<TField>> Empty<TField>(this IValidation<IEnumerable<TField>> validation)
+    {
+        return validation.SetValidator(() => new EmptyCollectionValidator<TField>(validation.GetFieldValue()));
+    }
+    
+    public static IValidation<string> NotEmpty(this IValidation<string> validation)
+    {
+        return validation.SetValidator(() => new NotEmptyStringValidator(validation.GetFieldValue()));
+    }
+    
+    public static IValidation<IEnumerable<TField>> NotEmpty<TField>(this IValidation<IEnumerable<TField>> validation)
+    {
+        return validation.SetValidator(() => new NotEmptyCollectionValidator<TField>(validation.GetFieldValue()));
+    }
 
     internal static IValidation<TDependentField> CreateScopeValidation<TField, TDependentField>(
         this IValidation<TField> validation,

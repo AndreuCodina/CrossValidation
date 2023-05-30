@@ -103,7 +103,9 @@ public abstract record ModelValidator<TModel>
         {
             if (ScopeCreatorValidation.Context.ErrorsCollected.Count == 1)
             {
-                throw ScopeCreatorValidation.Context.ErrorsCollected[0].ToException();
+                throw ScopeCreatorValidation.Context
+                    .ErrorsCollected[0]
+                    .ToException();
             }
             else
             {
@@ -111,6 +113,7 @@ public abstract record ModelValidator<TModel>
                 {
                     errorCollected.AddPlaceholderValues();
                 }
+                
                 throw new ValidationListException(ScopeCreatorValidation.Context.ErrorsCollected);
             }
         }
