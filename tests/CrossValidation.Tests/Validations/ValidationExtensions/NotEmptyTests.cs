@@ -60,7 +60,7 @@ public class NotEmptyTests : TestBase
             .Build();
         
         var action = () => Validate.Field(_model.IntList)
-            .Empty();
+            .NotEmpty();
 
         var error = action.ShouldThrowCrossError<CommonCrossError.NotEmptyCollection>();
         error.Code.ShouldBe(nameof(ErrorResource.NotEmptyCollection));
