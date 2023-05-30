@@ -42,4 +42,16 @@
     <data name="General" xml:space="preserve">
         <value>An error has occured</value>
     </data>
+    <data name="NotEmptyString" xml:space="preserve">
+        <value>Must have a value</value>
+    </data>
+    <data name="EmptyString" xml:space="preserve">
+        <value>Must not have a value</value>
+    </data>
+    <data name="EmptyCollection" xml:space="preserve">
+        <value>Must not add any value</value>
+    </data>
+    <data name="NotEmptyCollection" xml:space="preserve">
+        <value>Must add a value</value>
+    </data>
 </root>

@@ -28,4 +28,13 @@ public record CommonCrossError(string Code) : CodeCrossError(Code)
     public record Predicate() : CommonCrossError(nameof(ErrorResource.General));
     
     public record RegularExpression() : CommonCrossError(nameof(ErrorResource.RegularExpression));
+    
+    public record EmptyString() : CommonCrossError(nameof(ErrorResource.EmptyString));
+    
+    public record NotEmptyString() : CommonCrossError(nameof(ErrorResource.NotEmptyString));
+    
+    public record EmptyCollection() : CommonCrossError(nameof(ErrorResource.EmptyCollection));
+    
+    public record NotEmptyCollection() : CommonCrossError(nameof(ErrorResource.NotEmptyCollection));
+    
 }

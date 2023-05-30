@@ -10,7 +10,7 @@ public record RegularExpressionValidator(string FieldValue, string Pattern) : Va
         return Regex.IsMatch(FieldValue, Pattern, RegexOptions.None, TimeSpan.FromSeconds(2.0));
     }
 
-    public override CrossError CreateError()
+    public override ICrossError CreateError()
     {
         return new CommonCrossError.RegularExpression();
     }

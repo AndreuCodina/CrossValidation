@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using CrossValidation.Tests.TestUtils.Models;
+﻿using CrossValidation.Tests.TestUtils.Models;
 
 namespace CrossValidation.Tests.TestUtils.Builders;
 
@@ -17,12 +15,13 @@ public class ParentModelBuilder
         new() {4, 1, 6}
     };
     private int? _nullableInt;
+    private string _string = "The string";
 
     public ParentModel Build()
     {
         var model = new ParentModel
         {
-            String = "The string",
+            String = _string,
             NullableString = _nullableString,
             NullableDateTime = DateTime.UtcNow,
             NestedModel = _nestedModel,
@@ -61,33 +60,39 @@ public class ParentModelBuilder
         return this;
     }
 
-    public ParentModelBuilder WithNullableString(string? nullableString)
+    public ParentModelBuilder WithNullableString(string? value)
     {
-        _nullableString = nullableString;
+        _nullableString = value;
         return this;
     }
     
-    public ParentModelBuilder WithIntList(List<int> intList)
+    public ParentModelBuilder WithIntList(List<int> value)
     {
-        _intList = intList;
+        _intList = value;
         return this;
     }
     
-    public ParentModelBuilder WithIntListList(List<List<int>> intListList)
+    public ParentModelBuilder WithIntListList(List<List<int>> value)
     {
-        _intListList = intListList;
+        _intListList = value;
         return this;
     }
 
-    public ParentModelBuilder WithNullableIntList(List<int>? nullableIntList)
+    public ParentModelBuilder WithNullableIntList(List<int>? value)
     {
-        _nullableIntList = nullableIntList;
+        _nullableIntList = value;
         return this;
     }
     
-    public ParentModelBuilder WithNullableInt(int? nullableInt)
+    public ParentModelBuilder WithNullableInt(int? value)
     {
-        _nullableInt = nullableInt;
+        _nullableInt = value;
+        return this;
+    }
+
+    public ParentModelBuilder WithString(string value)
+    {
+        _string = value;
         return this;
     }
 }
