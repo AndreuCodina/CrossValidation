@@ -39,16 +39,14 @@ public record CompleteCrossError : ICrossError
     public virtual bool IsCommon { get; set; } = false;
 
     public CompleteCrossError(
-        string? FieldName = null,
-        string? FieldDisplayName = null,
         string? Code = null,
         string? Message = null,
         string? Details = null,
         HttpStatusCode? HttpStatusCode = null,
+        string? FieldName = null,
+        string? FieldDisplayName = null,
         Type? CrossErrorToException = null)
     {
-        this.FieldName = FieldName;
-        this.FieldDisplayName = FieldDisplayName;
         this.Code = Code;
         this.Message = Message;
         
@@ -59,6 +57,8 @@ public record CompleteCrossError : ICrossError
         
         this.Details = Details;
         this.HttpStatusCode = HttpStatusCode;
+        this.FieldName = FieldName;
+        this.FieldDisplayName = FieldDisplayName;
         this.CrossErrorToException = CrossErrorToException ?? typeof(CrossException);
     }
     
