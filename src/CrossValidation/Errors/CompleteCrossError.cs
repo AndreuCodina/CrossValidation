@@ -22,7 +22,7 @@ public interface ICrossError
     Exception ToException();
 }
 
-public record CrossError : ICrossError
+public record CompleteCrossError : ICrossError
 {
     private const string DefaultPlaceholderValue = "";
     private static readonly Regex PlaceholderRegex = new("{([^{}:]+)}", RegexOptions.Compiled);
@@ -38,7 +38,7 @@ public record CrossError : ICrossError
     public Func<object>? GetFieldValue { get; set; }
     public virtual bool IsCommon { get; set; } = false;
 
-    public CrossError(
+    public CompleteCrossError(
         string? FieldName = null,
         string? FieldDisplayName = null,
         string? Code = null,
@@ -188,9 +188,3 @@ public record CrossError : ICrossError
         });
     }
 }
-
-public record CodeCrossError(string Code) :
-    CrossError(Code: Code);
-
-public record MessageCrossError(string Message) :
-    CrossError(Message: Message);

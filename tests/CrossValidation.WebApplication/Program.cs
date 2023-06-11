@@ -17,6 +17,6 @@ public partial class Program
 {
 }
 
-public record ErrorWithCodeFromCustomResx() : CodeCrossError(nameof(ErrorResource1.Hello));
+public record ErrorWithCodeFromCustomResx() : CodeCrossError(ErrorResource1.Hello);
 
-public record ErrorWithCodeWithoutResxKey() : CodeCrossError("RandomCode");
+public record ErrorWithCodeWithoutResxKey() : CompleteCrossError(Code: "RandomCode");

@@ -62,5 +62,11 @@ namespace CrossValidation.WebApplication.Resources {
                 return ResourceManager.GetString("UseDecimal", resourceCulture);
             }
         }
+        
+        internal static string Code_With_Stops {
+            get {
+                return ResourceManager.GetString("Code.With.Stops", resourceCulture);
+            }
+        }
     }
 }

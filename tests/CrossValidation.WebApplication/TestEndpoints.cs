@@ -14,7 +14,7 @@ public static class TestEndpoints
         
         group.MapGet(ApiPath.Test.CrossException, () =>
         {
-            throw new CrossException(new CrossError());
+            throw new CrossException(new CompleteCrossError());
         });
 
         group.MapGet(ApiPath.Test.ValidationListException, () =>
@@ -49,7 +49,7 @@ public static class TestEndpoints
 
         group.MapGet(ApiPath.Test.ErrorWithStatusCode, () =>
         {
-            throw new CrossError(HttpStatusCode: HttpStatusCode.Created).ToException();
+            throw new CompleteCrossError(HttpStatusCode: HttpStatusCode.Created).ToException();
         });
 
         group.MapGet(ApiPath.Test.Exception, () =>

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net;
-using System.Threading.Tasks;
+﻿using System.Net;
 using CrossValidation.Errors;
 using CrossValidation.Exceptions;
 using CrossValidation.Resources;
@@ -43,7 +40,7 @@ public class ValidateTests :
         var expectedCode = nameof(ErrorResource.NotNull);
         var expectedMessage = ErrorResource.NotNull;
         var expectedDetails = "Expected details";
-        var errorForValidation = new CrossError
+        var errorForValidation = new CompleteCrossError
         {
             Code = expectedCode,
             Details = expectedDetails
@@ -149,7 +146,7 @@ public class ValidateTests :
                 details: expectedDetails,
                 httpStatusCode: expectedHttpStatusCode,
                 fieldDisplayName: expectedFieldDisplayName)
-            .WithError(new CrossError())
+            .WithError(new CompleteCrossError())
             .WithMessage("Unexpected message")
             .WithCode("UnexpectedCode")
             .WithDetails("Unexpected details")
@@ -182,7 +179,7 @@ public class ValidateTests :
                 details: expectedDetails,
                 httpStatusCode: expectedHttpStatusCode,
                 fieldDisplayName: expectedFieldDisplayName)
-            .WithError(new CrossError())
+            .WithError(new CompleteCrossError())
             .WithMessage("Unexpected message")
             .WithCode("UnexpectedCode")
             .WithDetails("Unexpected details")
@@ -216,7 +213,7 @@ public class ValidateTests :
                 details: expectedDetails,
                 httpStatusCode: expectedHttpStatusCode,
                 fieldDisplayName: expectedFieldDisplayName)
-            .WithError(new CrossError())
+            .WithError(new CompleteCrossError())
             .WithMessage("Unexpected message")
             .WithCode("UnexpectedCode")
             .WithDetails("Unexpected details")
@@ -406,7 +403,7 @@ public class ValidateTests :
             .WithMessage(expectedMessage)
             .MustAsync(_commonFixture.NotBeValidAsync)
             .NotNull()
-            .Must(x => new CrossError(Message: x.Substring(0)))
+            .Must(x => new CompleteCrossError(Message: x.Substring(0)))
             .ValidateAsync();
 
         var error = await action.ShouldThrowCrossErrorAsync<CommonCrossError.Predicate>();

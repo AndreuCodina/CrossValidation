@@ -1,5 +1,4 @@
-﻿using System;
-using CrossValidation.Errors;
+﻿using CrossValidation.Errors;
 using CrossValidation.Resources;
 using CrossValidation.ShouldlyAssertions;
 using CrossValidation.Tests.TestUtils;
@@ -10,7 +9,7 @@ using Xunit;
 
 namespace CrossValidation.Tests.Errors;
 
-public class CrossErrorTests :
+public class CompleteCrossErrorTests :
     TestBase,
     IClassFixture<CommonFixture>,
     IClassFixture<ValidatorFixture>
@@ -18,7 +17,7 @@ public class CrossErrorTests :
     private readonly CommonFixture _commonFixture;
     private readonly ValidatorFixture _validatorFixture;
 
-    public CrossErrorTests(CommonFixture commonFixture, ValidatorFixture validatorFixture)
+    public CompleteCrossErrorTests(CommonFixture commonFixture, ValidatorFixture validatorFixture)
     {
         _commonFixture = commonFixture;
         _validatorFixture = validatorFixture;
@@ -46,7 +45,7 @@ public class CrossErrorTests :
         error.Message.ShouldBe(ErrorResource.NotNull);
     }
 
-    private record ErrorWithAllFieldsAddedAsPlaceholders(string Name, int Age) : CrossError
+    private record ErrorWithAllFieldsAddedAsPlaceholders(string Name, int Age) : CompleteCrossError
     {
         public override void AddPlaceholderValues()
         {
@@ -55,7 +54,7 @@ public class CrossErrorTests :
         }
     }
     
-    private record ErrorWithNotAllFieldsAddedAsPlaceholders(string Name, int Age) : CrossError
+    private record ErrorWithNotAllFieldsAddedAsPlaceholders(string Name, int Age) : CompleteCrossError
     {
         public override void AddPlaceholderValues()
         {
@@ -63,7 +62,7 @@ public class CrossErrorTests :
         }
     }
     
-    private record ErrorWithNullFields(string? Name, int? Age) : CrossError
+    private record ErrorWithNullFields(string? Name, int? Age) : CompleteCrossError
     {
         public override void AddPlaceholderValues()
         {
@@ -72,5 +71,5 @@ public class CrossErrorTests :
         }
     }
     
-    private record CustomNotNull() : CodeCrossError(nameof(ErrorResource.NotNull));
+    private record CustomNotNull() : CodeCrossError(ErrorResource.NotNull);
 }

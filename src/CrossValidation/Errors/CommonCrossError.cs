@@ -2,7 +2,7 @@
 
 namespace CrossValidation.Errors;
 
-public record CommonCrossError(string Code) : CodeCrossError(Code)
+public record CommonCrossError(string Code) : CompleteCrossError(Code: Code)
 {
     public override bool IsCommon => true;
     
@@ -36,5 +36,4 @@ public record CommonCrossError(string Code) : CodeCrossError(Code)
     public record EmptyCollection() : CommonCrossError(nameof(ErrorResource.EmptyCollection));
     
     public record NotEmptyCollection() : CommonCrossError(nameof(ErrorResource.NotEmptyCollection));
-    
 }

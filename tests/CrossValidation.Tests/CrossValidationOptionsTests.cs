@@ -1,5 +1,4 @@
-﻿using System;
-using CrossValidation.Errors;
+﻿using CrossValidation.Errors;
 using CrossValidation.Exceptions;
 using CrossValidation.ShouldlyAssertions;
 using CrossValidation.Tests.TestUtils;
@@ -69,9 +68,9 @@ public class CrossValidationOptionsTests :
         CrossValidationOptions.LocalizeErrorInClient = defaultConfiguration;
     }
 
-    private record ErrorWithFields(string Name, DateTime DateTime) : CrossError;
+    private record ErrorWithFields(string Name, DateTime DateTime) : CompleteCrossError;
     
-    private record CustomErrorWithPlaceholderValue(int Value) : CrossError;
+    private record CustomErrorWithPlaceholderValue(int Value) : CompleteCrossError;
 
     public void Dispose()
     {

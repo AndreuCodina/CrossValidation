@@ -836,5 +836,5 @@ public class ModelValidatorTests :
              .ShouldBe(expectedCodes);
      }
 
-     private record CustomErrorWithCode(string Code) : CrossError(Code: Code);
+     private record CustomErrorWithCode(string Code) : CompleteCrossError(Code: Code);
 }

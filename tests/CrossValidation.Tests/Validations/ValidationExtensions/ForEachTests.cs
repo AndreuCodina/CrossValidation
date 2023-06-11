@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
+﻿using System.Net;
 using CrossValidation.Errors;
 using CrossValidation.Exceptions;
 using CrossValidation.ShouldlyAssertions;
@@ -485,5 +481,5 @@ public class ForEachTests :
         errors[2].FieldName.ShouldBe("NestedModelList[0].Int");
     }
 
-    private record ErrorTest : CrossError;
+    private record ErrorTest : CompleteCrossError;
 }

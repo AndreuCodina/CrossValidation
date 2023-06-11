@@ -28,7 +28,7 @@ public class MustBenchmarks
         try
         {
             Validate.That(Value)
-                .WithError(new CrossError())
+                .WithError(new CompleteCrossError())
                 .Must(_ => CheckReturnsBoolean());
         }
         catch (Exception)
@@ -38,7 +38,7 @@ public class MustBenchmarks
 
     private ICrossError CheckReturnsError()
     {
-        return new CrossError();
+        return new CompleteCrossError();
     }
     
     private bool CheckReturnsBoolean()

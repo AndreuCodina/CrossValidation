@@ -5,4 +5,4 @@ namespace CrossValidation.Tests.TestUtils;
 public record TestError(
     string? Code = null,
     string? Details = null) :
-    CrossError(Code: Code, Details: Details);
+    CompleteCrossError(Code: Code, Details: Details);

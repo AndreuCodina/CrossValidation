@@ -1,5 +1,4 @@
-﻿using System;
-using CrossValidation.Errors;
+﻿using CrossValidation.Errors;
 using CrossValidation.Exceptions;
 using CrossValidation.Resources;
 using CrossValidation.Tests.TestUtils;
@@ -34,7 +33,7 @@ public class FromCrossErrorTests : TestBase
         crossException.Error.Message.ShouldBe(ErrorResource.NotNull);
         
         var withErrorAction = () => Validate<ExceptionFromError>.That(_model.NullableInt)
-            .WithError(new CrossError())
+            .WithError(new CompleteCrossError())
             .NotNull();
         withErrorAction.ShouldThrow<ExceptionFromError>();
         
@@ -42,7 +41,7 @@ public class FromCrossErrorTests : TestBase
             .Instance(ValueObject.Create);
         valueObjectAction.ShouldThrow<ExceptionFromError>();
         
-        Action exceptionAction = () => throw new CrossError().ToException();
+        Action exceptionAction = () => throw new CompleteCrossError().ToException();
         exceptionAction.ShouldThrow<CrossException>();
     }
 

@@ -1,5 +1,4 @@
 ﻿using System.Net;
-using System.Threading.Tasks;
 using CrossValidation.Errors;
 using CrossValidation.Exceptions;
 using CrossValidation.Resources;
@@ -290,7 +289,7 @@ public class ValidationTests :
         error.HttpStatusCode.ShouldBe(HttpStatusCode.Created);
     }
 
-    private record CustomErrorWithPlaceholderValue(int Value) : CrossError;
+    private record CustomErrorWithPlaceholderValue(int Value) : CompleteCrossError;
 
     private record ValueObjectWithoutCustomization(int Value)
     {
@@ -336,7 +335,7 @@ public class ValidationTests :
         }
     }
 
-    private record ErrorWithCustomization() : CrossError(
+    private record ErrorWithCustomization() : CompleteCrossError(
         Code: nameof(CommonCrossError.NotNull),
         Details: "Expected details",
         HttpStatusCode: System.Net.HttpStatusCode.Created);

@@ -27,4 +27,7 @@
     <data name="UseDecimal" xml:space="preserve">
         <value>El valor es {0}</value>
     </data>
+    <data name="Code.With.Stops" xml:space="preserve">
+        <value>El mensaje</value>
+    </data>
 </root>
