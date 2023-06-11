@@ -4,13 +4,25 @@ public static class NullExtensions
 {
     public static TResult? Map<T, TResult>(this T? value, Func<T, TResult> f)
         where T : struct
+        where TResult : class
     {
-        return value is not null ? f(value.Value) : default;
+        if (value is null)
+        {
+            return null;
+        }
+        
+        return f(value.Value);
     }
     
     public static TResult? Map<T, TResult>(this T? value, Func<T, TResult> f)
         where T : class
+        where TResult : class
     {
-        return value is not null ? f(value) : default;
+        if (value is null)
+        {
+            return null;
+        }
+        
+        return f(value);
     }
 }
