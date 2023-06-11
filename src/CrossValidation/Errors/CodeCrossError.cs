@@ -13,8 +13,7 @@ public record CodeCrossError(
     [CallerArgumentExpression(nameof(Code))]
     string CodeName = default!) :
     CompleteCrossError(
-        Code: CodeName.AsSpan(CodeName.IndexOf('.') + 1)
-            .ToString(),
+        Code: CodeName.Substring(CodeName.IndexOf('.') + 1),
         Message: Message,
         HttpStatusCode: HttpStatusCode,
         Details: Details);
