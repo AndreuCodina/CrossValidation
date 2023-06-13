@@ -131,14 +131,11 @@ A domain error or service error mustn't define a presentation detail (the error 
 You can throw CrossException (the built-in equivalent of AppException) when you want to return an error, but don't type it.
 
 ```csharp
-public record UserServiceError(string Message) : MessageValidationError(Message)
-{
-    public record UserNotFoundError() : UserServiceError("Couldn't find the user")
-    public record NicknameNotAvailableError(string Nickname) : UserServiceError($"'{Nickname}' is not available")
-}
-
 public class UserService
-{  
+{
+    public record UserNotFoundError() : MessageCrossError("Couldn't find the user")
+    public record NicknameNotAvailableError(string Nickname) : MessageCrossError($"'{Nickname}' is not available")
+
     public void ChangeNickname(UserDto userDto)
     {
         var user = _context.Users.FirstOrDefault(x => x.Id == userDto.Id);
@@ -163,7 +160,7 @@ public class UserService
     {
         var user = GetUser(userDto.Id);
         CheckNicknameIsAvailable(userDto.Nickname)
-    
+        
         user.Nickname = userDto.Nickname;
         _context.Update(user);
         _context.SaveChanges();
@@ -248,7 +245,7 @@ myDomain.AddFavoriteColor(request.FavoriteColorId.Value); // int?
 ```csharp
 var favoriteColorId = Validate.Field(request.FavoriteColorId)
   .NotNull()
-  .GreaterThan(x => x > 0)
+  .GreaterThan(0)
   .Instance();
 
 myDomain.AddFavoriteColor(favoriteColorId);
@@ -258,6 +255,7 @@ Another example could be
 
 ```csharp
 var color = Validate.Field(request.ColorId)
+  .NotNull()
   .Enum<Color>()
   .Instance();
 ```
