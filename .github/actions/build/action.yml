@@ -20,4 +20,5 @@ runs:
           --configuration Release \
           --no-restore \
           -p:ContinuousIntegrationBuild=true
+          -p:Deterministic=true
       shell: bash
