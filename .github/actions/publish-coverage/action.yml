@@ -16,15 +16,16 @@ runs:
   using: "composite"
 
   steps:
-    # - name: Copy coverage to a predictable location
-    #   run: cp ${{ inputs.test-coverage-folder }}/*/coverage.info ${{ inputs.test-coverage-folder }}/lcov.info
-    #   shell: bash
+    - name: Copy coverage to a predictable location
+      run: cp ${{ inputs.test-coverage-folder }}/*/coverage.info ${{ inputs.test-coverage-folder }}/lcov.info
+      shell: bash
 
-    # - name: Publish coverage to Coveralls
-    #   uses: coverallsapp/github-action@v2.1.2
-    #   with:
-    #     github-token: ${{ inputs.github-token }}
-    #     file: ${{ inputs.test-coverage-folder }}/lcov.info
+    - name: Publish coverage to Coveralls
+      uses: coverallsapp/github-action@v2.1.2
+      with:
+        github-token: ${{ inputs.github-token }}
+        file: ${{ inputs.test-coverage-folder }}/lcov.info
+
     - name: Refresh coverage badge in README.md
       run: |
         current_milliseconds=$(date '+%s')
