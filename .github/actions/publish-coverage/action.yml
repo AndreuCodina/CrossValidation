@@ -16,15 +16,15 @@ runs:
   using: "composite"
 
   steps:
-    - name: Copy coverage to a predictable location
-      run: cp ${{ inputs.test-coverage-folder }}/*/coverage.info ${{ inputs.test-coverage-folder }}/lcov.info
-      shell: bash
+    # - name: Copy coverage to a predictable location
+    #   run: cp ${{ inputs.test-coverage-folder }}/*/coverage.info ${{ inputs.test-coverage-folder }}/lcov.info
+    #   shell: bash
 
-    - name: Publish coverage to Coveralls
-      uses: coverallsapp/github-action@v2.1.2
-      with:
-        github-token: ${{ inputs.github-token }}
-        file: ${{ inputs.test-coverage-folder }}/lcov.info
+    # - name: Publish coverage to Coveralls
+    #   uses: coverallsapp/github-action@v2.1.2
+    #   with:
+    #     github-token: ${{ inputs.github-token }}
+    #     file: ${{ inputs.test-coverage-folder }}/lcov.info
 
     - name: Refresh coverage badge in README.md
       run: |
@@ -34,7 +34,12 @@ runs:
         mv README_new.md README.md
       shell: bash
 
-    - name: Commit changes
+    # - name: Save original branch name
+    #   id: save-original-branch-name
+    #   run: echo "ORIGINAL_BRANCH_NAME=$GITHUB_REF_NAME" >> $GITHUB_OUTPUT
+    #   shell: bash
+
+    - name: Commit README changes
       with:
         ref: ${{ github.ref_name }}
       run: |
@@ -42,5 +47,5 @@ runs:
         git config --local user.name "GitHub Action"
         git add README.md
         git commit -m "Refresh coverage badge in README.md"
-        git push
+        git push origin HEAD:$GITHUB_HEAD_REF
       shell: bash
