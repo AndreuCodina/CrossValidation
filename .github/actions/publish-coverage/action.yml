@@ -47,7 +47,7 @@ runs:
         git config --local user.name "GitHub Action"
         git add README.md
         git commit -m "Refresh coverage badge in README.md"
-        git push origin $TARGET_BRANCH
+        git push origin HEAD:$TARGET_BRANCH
       shell: bash
 
     # git push origin HEAD:$TARGET_BRANCH
