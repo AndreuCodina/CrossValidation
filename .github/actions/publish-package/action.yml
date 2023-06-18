@@ -40,8 +40,7 @@ runs:
           --include-symbols \
           -p:SymbolPackageFormat=snupkg \
           -p:PackageVersion=${{ inputs.package-version }} \
-          -p:PublishRepositoryUrl=true \
-          -p:EmbedUntrackedSources=true
+          -p:PublishRepositoryUrl=true
       shell: bash
 
     - name: Push package
