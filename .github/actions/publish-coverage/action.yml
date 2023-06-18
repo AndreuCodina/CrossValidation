@@ -34,18 +34,17 @@ runs:
         mv README_new.md README.md
       shell: bash
 
-    # - name: Save original branch name
-    #   id: save-original-branch-name
-    #   run: echo "ORIGINAL_BRANCH_NAME=$GITHUB_REF_NAME" >> $GITHUB_OUTPUT
-    #   shell: bash
+    - name: Save original branch name
+      run: echo "TARGET_BRANCH=$(echo $GITHUB_BASE_REF)" >> $GITHUB_OUTPUT
+      shell: bash
 
     - name: Commit README changes
-      with:
-        ref: ${{ github.ref_name }}
+      # with:
+      #   ref: ${{ github.ref_name }}
       run: |
         git config --local user.email "github-action@users.noreply.github.com"
         git config --local user.name "GitHub Action"
         git add README.md
         git commit -m "Refresh coverage badge in README.md"
-        git push origin HEAD:$GITHUB_HEAD_REF
+        git push origin HEAD:$TARGET_BRANCH
       shell: bash
