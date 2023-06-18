@@ -28,8 +28,8 @@ runs:
     - name: Refresh coverage badge in README.md
       run: |
         current_milliseconds=$(date '+%s')
-        new_value="\&coveralls_badge_current_milliseconds=$current_milliseconds)"
-        awk -v new_value="$new_value" '{sub(/\&coveralls_badge_current_milliseconds=[^)]*\)/, new_value)}1' README.md > README_new.md
+        new_value="coveralls_badge_current_milliseconds=$current_milliseconds)"
+        awk -v new_value="$new_value" '{sub(/coveralls_badge_current_milliseconds=[^)]*\)/, new_value)}1' README.md > README_new.md
         mv README_new.md README.md
       shell: bash
 
