@@ -11,6 +11,7 @@ public abstract record ModelValidator<TModel>
 {
     private ValidationMode _validationMode = ValidationMode.StopOnFirstError;
     internal IValidation<TModel>? ScopeCreatorValidation { private get; set; }
+    public TModel Model { get; set; } = default!;
 
     public ValidationMode ValidationMode
     {
@@ -72,7 +73,7 @@ public abstract record ModelValidator<TModel>
         return scopeValidation;
     }
 
-    public abstract void CreateValidations(TModel model);
+    public abstract void CreateValidations();
 
     public void Validate(TModel model)
     {
@@ -89,10 +90,11 @@ public abstract record ModelValidator<TModel>
     private async ValueTask InternalValidateAsync(TModel model, bool useAsync)
     {
         CrossValidation.Validate.ModelNullability(model);
+        Model = model;
         ScopeCreatorValidation = CrossValidation.Validate
                 .That(model);
         ScopeCreatorValidation.IsScopeCreator = true;
-        ScopeCreatorValidation.SetScope(() => CreateValidations(model), ScopeType.ModelValidator);
+        ScopeCreatorValidation.SetScope(CreateValidations, ScopeType.ModelValidator);
 
         if (useAsync)
         {

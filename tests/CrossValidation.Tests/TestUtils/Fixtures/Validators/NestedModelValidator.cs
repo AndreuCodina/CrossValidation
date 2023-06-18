@@ -4,7 +4,7 @@ namespace CrossValidation.Tests.TestUtils.Fixtures.Validators;
 
 public record NestedModelValidator : ModelValidator<NestedModel>
 {
-    public override void CreateValidations(NestedModel model)
+    public override void CreateValidations()
     {
     }
 }

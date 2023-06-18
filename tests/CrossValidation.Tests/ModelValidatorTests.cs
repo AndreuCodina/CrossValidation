@@ -835,6 +835,27 @@ public class ModelValidatorTests :
          errors.Select(x => x.Code)
              .ShouldBe(expectedCodes);
      }
+     
+     [Fact]
+     public async Task Get_model_value_through_Model_property()
+     {
+         var nestedModelValidator = _commonFixture.CreateNestedModelValidator(validator =>
+         {
+             validator.Model
+                 .ShouldNotBeNull();
+         });
+         var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
+         {
+             validator.Model
+                 .ShouldNotBeNull();
+             
+             validator.That(_model.NestedModel)
+                 .MustAsync(_commonFixture.BeValidAsync)
+                 .SetModelValidator(nestedModelValidator);
+         });
+         
+         await parentModelValidator.ValidateAsync(_model);
+     }
 
      private record CustomErrorWithCode(string Code) : CompleteCrossError(Code: Code);
 }

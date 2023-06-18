@@ -1,6 +1,5 @@
 ﻿using CrossValidation.Errors;
 using CrossValidation.Tests.TestUtils.Fixtures.Validators;
-using CrossValidation.Tests.TestUtils.Models;
 using Moq;
 
 namespace CrossValidation.Tests.TestUtils.Fixtures;
@@ -13,7 +12,7 @@ public class CommonFixture
         {
             CallBase = true
         };
-        validatorMock.Setup(x => x.CreateValidations(It.IsAny<ParentModel>()))
+        validatorMock.Setup(x => x.CreateValidations())
             .Callback(() => validator(validatorMock.Object));
         return validatorMock.Object;
     }
@@ -25,7 +24,7 @@ public class CommonFixture
         {
             CallBase = true
         };
-        validatorMock.Setup(x => x.CreateValidations(It.IsAny<NestedModel>()))
+        validatorMock.Setup(x => x.CreateValidations())
             .Callback(() => validator(validatorMock.Object));
         return validatorMock.Object;
     }

@@ -344,7 +344,7 @@ internal class Validation<TField> :
     public IValidation<TField> SetModelValidator<TChildModel>(ModelValidator<TChildModel> validator)
     {
         validator.ScopeCreatorValidation = (IValidation<TChildModel>?)this;
-        var oldContext = Context;
+        var oldContext = Context!;
         Context = Context!.CloneForChildModelValidator();
         var oldParentPath = ParentPath;
         var oldFieldPath = FieldPath;
@@ -358,7 +358,8 @@ internal class Validation<TField> :
             FieldPath = null;
             FieldName = null;
             var childModel = (TChildModel)(object)GetFieldValue()!;
-            validator.CreateValidations(childModel);
+            validator.Model = childModel;
+            validator.CreateValidations();
         }, Validations.ScopeType.ModelValidator);
 
         if (HasFailed)
@@ -374,12 +375,12 @@ internal class Validation<TField> :
             context: oldContext,
             index: Index,
             parentPath: oldParentPath,
-            fixedError: oldContext!.Error,
-            fixedMessage: oldContext!.Message,
-            fixedCode: oldContext!.Code,
-            fixedDetails: oldContext!.Details,
-            fixedHttpStatusCode: oldContext!.HttpStatusCode,
-            fixedFieldDisplayName: oldContext!.FieldDisplayName);
+            fixedError: oldContext.Error,
+            fixedMessage: oldContext.Message,
+            fixedCode: oldContext.Code,
+            fixedDetails: oldContext.Details,
+            fixedHttpStatusCode: oldContext.HttpStatusCode,
+            fixedFieldDisplayName: oldContext.FieldDisplayName);
         nextValidation.FieldName = oldFieldName;
         nextValidation.HasFailed = HasFailed;
         nextValidation.HasPendingAsyncValidation = HasPendingAsyncValidation;
