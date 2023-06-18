@@ -19,6 +19,6 @@ runs:
         dotnet build \
           --configuration Release \
           --no-restore \
-          -p:ContinuousIntegrationBuild=true
+          -p:ContinuousIntegrationBuild=true \
           -p:Deterministic=true
       shell: bash
