@@ -21,7 +21,5 @@ runs:
           --no-restore \
           -p:ContinuousIntegrationBuild=true \
           -p:Deterministic=true \
-          -p:PublishRepositoryUrl=true \
-          -p:EmbedUntrackedSources=true \
-          -p:IncludeSymbols=true
+          -p:EmbedUntrackedSources=true
       shell: bash
