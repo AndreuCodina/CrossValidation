@@ -20,8 +20,24 @@ runs:
       run: cp ${{ inputs.test-coverage-folder }}/*/coverage.info ${{ inputs.test-coverage-folder }}/lcov.info
       shell: bash
 
-    - name: Coveralls
+    - name: Publish coverage to Coveralls
       uses: coverallsapp/github-action@v2.1.2
       with:
         github-token: ${{ inputs.github-token }}
         file: ${{ inputs.test-coverage-folder }}/lcov.info
+
+    - name: Refresh coverage badge in README.md
+      run: |
+        current_milliseconds=$(date '+%s')
+        new_value="\&coveralls_badge_current_milliseconds=$current_milliseconds)"
+        awk -v new_value="$new_value" '{sub(/\&coveralls_badge_current_milliseconds=[^)]*\)/, new_value)}1' README.md > README_new.md
+        mv README_new.md README.md
+      shell: bash
+
+    - name: Commit changes
+      run: |
+        git config --local user.email "github-action@users.noreply.github.com"
+        git config --local user.name "GitHub Action"
+        git commit -m "Refresh coverage badge in README.md"
+        git push
+      shell: bash
