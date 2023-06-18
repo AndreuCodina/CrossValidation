@@ -6,6 +6,7 @@
     <Nullable>enable</Nullable>
     <LangVersion>preview</LangVersion>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <Authors>Andreu Codina</Authors>
   </PropertyGroup>
 
 </Project>
