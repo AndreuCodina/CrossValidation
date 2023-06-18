@@ -32,22 +32,23 @@ runs:
         awk -v new_value="$new_value" '{sub(/\&coveralls_badge_current_milliseconds=[^)]*\)/, new_value)}1' README.md > README_new.md
         mv README_new.md README.md
       shell: bash
+    # - name: Save original branch name
+    #   run: echo "TARGET_BRANCH=$(echo $GITHUB_BASE_REF)" >> $GITHUB_OUTPUT
+    #   shell: bash
 
-    - name: Save original branch name
-      run: echo "TARGET_BRANCH=$(echo $GITHUB_BASE_REF)" >> $GITHUB_OUTPUT
-      shell: bash
+    - uses: stefanzweifel/git-auto-commit-action@v4.16.0
 
-    - name: Commit README changes
-      # with:
-      #   ref: ${{ github.ref_name }}
-      # with:
-      #   ref: ${{ github.event.pull_request.head.ref }}
-      run: |
-        git config --local user.email "github-action@users.noreply.github.com"
-        git config --local user.name "GitHub Action"
-        git add README.md
-        git commit -m "Refresh coverage badge in README.md"
-        git push origin HEAD:$TARGET_BRANCH
-      shell: bash
+    # - name: Commit README changes
+    #   # with:
+    #   #   ref: ${{ github.ref_name }}
+    #   # with:
+    #   #   ref: ${{ github.event.pull_request.head.ref }}
+    #   run: |
+    #     git config --local user.email "github-action@users.noreply.github.com"
+    #     git config --local user.name "GitHub Action"
+    #     git add README.md
+    #     git commit -m "Refresh coverage badge in README.md"
+    #     git push origin HEAD:$TARGET_BRANCH
+    #   shell: bash
 
     # git push origin HEAD:$TARGET_BRANCH
