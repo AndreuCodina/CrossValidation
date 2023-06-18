@@ -20,5 +20,8 @@ runs:
           --configuration Release \
           --no-restore \
           -p:ContinuousIntegrationBuild=true \
-          -p:Deterministic=true
+          -p:Deterministic=true \
+          -p:PublishRepositoryUrl=true \
+          -p:EmbedUntrackedSources=true \
+          -p:IncludeSymbols=true
       shell: bash
