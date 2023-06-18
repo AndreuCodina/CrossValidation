@@ -113,9 +113,9 @@ internal class ValidationOperation
             }
         }
         
-        if (IsScopeCreator)
+        if (IsScopeCreator && ScopeValidations is not null)
         {
-            foreach (var scopeValidation in ScopeValidations!)
+            foreach (var scopeValidation in ScopeValidations)
             {
                 do
                 {
