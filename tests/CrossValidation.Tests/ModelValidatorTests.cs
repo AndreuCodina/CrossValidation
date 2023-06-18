@@ -205,7 +205,7 @@ public class ModelValidatorTests :
      }
 
      [Fact]
-     public void Validation_mode_cannot_be_changed_in_children_validators()
+     public void Validation_mode_cannot_be_changed_in_child_validator()
      {
          var nestedModelValidator = _commonFixture.CreateNestedModelValidator(validator =>
          {
@@ -219,6 +219,27 @@ public class ModelValidatorTests :
          var action = () => parentModelValidator.Validate(_model);
 
          action.ShouldThrow<InvalidOperationException>();
+     }
+     
+     [Fact]
+     public void Validation_mode_is_replicated_in_child_validator()
+     {
+         var expectedValidationMode = ValidationMode.AccumulateFirstErrorsAndAllIterationFirstErrors;
+         
+         var nestedModelValidator = _commonFixture.CreateNestedModelValidator(validator =>
+         {
+             validator.ValidationMode
+                 .ShouldBe(expectedValidationMode);
+         });
+         var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
+         {
+             validator.ValidationMode = expectedValidationMode;
+             
+             validator.Field(_model.NestedModel)
+                 .SetModelValidator(nestedModelValidator);
+         });
+         
+         parentModelValidator.Validate(_model);
      }
 
      [Fact]

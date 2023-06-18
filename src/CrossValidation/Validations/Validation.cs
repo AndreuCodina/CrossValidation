@@ -346,6 +346,7 @@ internal class Validation<TField> :
         validator.ScopeCreatorValidation = (IValidation<TChildModel>?)this;
         var oldContext = Context!;
         Context = Context!.CloneForChildModelValidator();
+        validator._validationMode = Context.ValidationMode;
         var oldParentPath = ParentPath;
         var oldFieldPath = FieldPath;
         var oldFieldName = FieldName;

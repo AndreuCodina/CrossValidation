@@ -9,7 +9,7 @@ namespace CrossValidation;
 
 public abstract record ModelValidator<TModel>
 {
-    private ValidationMode _validationMode = ValidationMode.StopOnFirstError;
+    internal ValidationMode _validationMode = ValidationMode.StopOnFirstError;
     internal IValidation<TModel>? ScopeCreatorValidation { private get; set; }
     public TModel Model { get; set; } = default!;
 
