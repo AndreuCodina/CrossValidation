@@ -25,7 +25,6 @@ runs:
     #   with:
     #     github-token: ${{ inputs.github-token }}
     #     file: ${{ inputs.test-coverage-folder }}/lcov.info
-
     - name: Refresh coverage badge in README.md
       run: |
         current_milliseconds=$(date '+%s')
@@ -41,14 +40,14 @@ runs:
     - name: Commit README changes
       # with:
       #   ref: ${{ github.ref_name }}
-      with:
-        ref: ${{ github.event.pull_request.head.ref }}
+      # with:
+      #   ref: ${{ github.event.pull_request.head.ref }}
       run: |
         git config --local user.email "github-action@users.noreply.github.com"
         git config --local user.name "GitHub Action"
         git add README.md
         git commit -m "Refresh coverage badge in README.md"
-        git push
+        git push origin $TARGET_BRANCH
       shell: bash
 
     # git push origin HEAD:$TARGET_BRANCH
