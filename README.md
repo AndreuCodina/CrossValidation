@@ -6,6 +6,49 @@
 
 State-of-the-art .NET library to handle errors and validate data.
 
+# Example <!-- omit in toc -->
+
+Create ErrorResource.resx with the next key:
+
+```
+EmailAlreadyExists = "The email '{Email}' is already being used at {Company}";
+```
+
+Create your business exception:
+
+```csharp
+public partial class EmailAlreadyExistsException(string email, string company)
+  : BusinessException(ErrorResource.EmailAlreadyExists)
+```
+
+Throw the exception:
+
+```csharp
+// Add CrossValidation
+app.UseCrossValidation(options => options.AddResx<ErrorResource>());
+
+// Expose endpoint
+app.MapPost("/users", () => throw new EmailAlreadyExistsException("alex@gmail.com", "Microsoft"));
+```
+
+Call the endpoint and this is the response:
+
+```
+{
+  "Errors": [
+    {
+      "Code": "EmailAlreadyExists",
+      "Message": "The email 'alex@gmail.com' is already being used at Microsoft"
+    }
+  ]
+}
+```
+
+Magic! And perfomant! It doesn't use reflection.
+
+You can pass the `Accept-Language` HTTP header and the message will be returned in requested language.
+
+
 # Impact of this library in your company: <!-- omit in toc -->
 
 - Stop delivering software without a proper error handling mechanism.
@@ -185,7 +228,7 @@ public record ModelValidator : ModelValidator<Model>
 {
     public override void CreateValidations()
     {
-        if (model.CustomerIsPreferred)
+        if (Model.CustomerIsPreferred)
         {
             Field(Model.CustomerDiscount)
                 .NotNull()

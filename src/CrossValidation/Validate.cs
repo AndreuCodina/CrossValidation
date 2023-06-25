@@ -157,6 +157,4 @@ public abstract class Validate<TException>
     }
 }
 
-public abstract class Validate : Validate<CrossException>
-{
-}
+public abstract class Validate : Validate<CrossException>;
