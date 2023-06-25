@@ -11,7 +11,7 @@ State-of-the-art .NET library to handle errors and validate data.
 Create ErrorResource.resx with the next key:
 
 ```
-EmailAlreadyExists = "The email '{Email}' is already being used at {Company}";
+EmailAlreadyExists = "The email '{email}' is already being used at {company}";
 ```
 
 Create your business exception:
