@@ -35,7 +35,8 @@ Call the endpoint and this is the response:
 
 ```json
 {
-  "Errors": [
+  "Errors":
+  [
     {
       "Code": "EmailAlreadyExists",
       "Message": "The email 'alex@gmail.com' is already being used at Microsoft"
