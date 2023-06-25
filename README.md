@@ -46,7 +46,7 @@ Call the endpoint and this is the response:
 
 Magic! And perfomant! It doesn't use reflection.
 
-You can pass the `Accept-Language` HTTP header and the message will be returned in requested language.
+You can send the `Accept-Language` HTTP header and the message will be returned in requested language.
 
 
 # Impact of this library in your company: <!-- omit in toc -->
