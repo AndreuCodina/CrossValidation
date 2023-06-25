@@ -33,7 +33,7 @@ app.MapPost("/users", () => throw new EmailAlreadyExistsException("alex@gmail.co
 
 Call the endpoint and this is the response:
 
-```
+```json
 {
   "Errors": [
     {
