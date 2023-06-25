@@ -25,7 +25,8 @@ Throw the exception:
 
 ```csharp
 // Add CrossValidation
-app.UseCrossValidation(options => options.AddResx<ErrorResource>());
+services.AddCrossValidation(options => options.AddResx<ErrorResource>());
+app.UseCrossValidation();
 
 // Expose endpoint
 app.MapPost("/users", () => throw new EmailAlreadyExistsException("alex@gmail.com", "Microsoft"));
