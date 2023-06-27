@@ -8,7 +8,7 @@ State-of-the-art .NET library to handle errors and validate data.
 
 # Example <!-- omit in toc -->
 
-Create ErrorResource.resx with the next key:
+Create ErrorResource.resx with the next entry:
 
 ```
 EmailAlreadyExists = "The email '{email}' is already being used at {company}";
