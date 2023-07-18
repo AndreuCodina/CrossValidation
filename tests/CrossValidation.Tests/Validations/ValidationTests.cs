@@ -71,7 +71,7 @@ public class ValidationTests :
         }
 
         var action = () => validation
-            .WithError(new CustomErrorWithPlaceholderValue(10))
+            .WithException(new CustomErrorWithPlaceholderValue(10))
             .Instance(x => ValueObjectWithCustomization.Create(x, code: null, message: null));
 
         var error = action.ShouldThrowCrossError<CustomErrorWithPlaceholderValue>();
@@ -120,7 +120,7 @@ public class ValidationTests :
         error.Code.ShouldBe(expectedCode);
         error.Message.ShouldBe(expectedMessage);
         error.Details.ShouldBe("Expected details");
-        error.HttpStatusCode.ShouldBe(HttpStatusCode.Accepted);
+        error.StatusCode.ShouldBe(HttpStatusCode.Accepted);
         error.FieldDisplayName.ShouldBe("Expected field display name");
     }
 
@@ -207,7 +207,7 @@ public class ValidationTests :
         var action = () => Validate.That(1)
             .Must(x => x != 1);
 
-        action.ShouldThrow<CrossException>();
+        action.ShouldThrow<BusinessException>();
     }
     
     [Fact]
@@ -226,7 +226,7 @@ public class ValidationTests :
             .MustAsync(_commonFixture.NotBeValidAsync)
             .ValidateAsync();
 
-        await action.ShouldThrowAsync<CrossException>();
+        await action.ShouldThrowAsync<BusinessException>();
     }
     
     [Fact]
@@ -247,8 +247,8 @@ public class ValidationTests :
     public void Repeat_error_customization_applies_new_error()
     {
         var action = () => Validate.That(_model.NullableInt)
-            .WithError(new CommonCrossError.NotNull())
-            .WithError(new CommonCrossError.Enum())
+            .WithException(new CommonCrossError.NotNull())
+            .WithException(new CommonCrossError.Enum())
             .Must(_commonFixture.NotBeValid);
 
         var error = action.ShouldThrowCrossError<CommonCrossError.Enum>();
@@ -271,7 +271,7 @@ public class ValidationTests :
         error.Code.ShouldBe(nameof(ErrorResource.NotNull));
         error.Message.ShouldBe(ErrorResource.NotNull);
         error.Details.ShouldBe(expectedDetails);
-        error.HttpStatusCode.ShouldBe(expectedHttpStatusCode);
+        error.StatusCode.ShouldBe(expectedHttpStatusCode);
     }
     
     [Fact]
@@ -279,17 +279,19 @@ public class ValidationTests :
     {
         var expectedDetails = "Expected details";
         var action = () => Validate.That(_model.Int)
-            .WithError(new ErrorWithCustomization())
+            .WithException(new ErrorWithCustomization())
             .GreaterThan(_model.Int);
 
         var error = action.ShouldThrowCrossError<ErrorWithCustomization>();
         error.Code.ShouldBe(nameof(ErrorResource.NotNull));
         error.Message.ShouldBe(ErrorResource.NotNull);
         error.Details.ShouldBe(expectedDetails);
-        error.HttpStatusCode.ShouldBe(HttpStatusCode.Created);
+        error.StatusCode.ShouldBe(HttpStatusCode.Created);
     }
 
-    private record CustomErrorWithPlaceholderValue(int Value) : CompleteCrossError;
+#pragma warning disable CS9113 // Parameter is unread.
+    private class CustomErrorWithPlaceholderValue(int value) : BusinessException;
+#pragma warning restore CS9113 // Parameter is unread.
 
     private record ValueObjectWithoutCustomization(int Value)
     {
@@ -335,8 +337,8 @@ public class ValidationTests :
         }
     }
 
-    private record ErrorWithCustomization() : CompleteCrossError(
-        Code: nameof(CommonCrossError.NotNull),
-        Details: "Expected details",
-        HttpStatusCode: System.Net.HttpStatusCode.Created);
+    private class ErrorWithCustomization() : BusinessException(
+        code: nameof(CommonCrossError.NotNull),
+        details: "Expected details",
+        statusCode: HttpStatusCode.Created);
 }

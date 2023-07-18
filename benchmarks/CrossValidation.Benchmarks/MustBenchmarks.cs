@@ -1,5 +1,5 @@
 using BenchmarkDotNet.Attributes;
-using CrossValidation.Errors;
+using CrossValidation.Exceptions;
 
 namespace CrossValidation.Benchmarks;
 
@@ -28,7 +28,7 @@ public class MustBenchmarks
         try
         {
             Validate.That(Value)
-                .WithError(new CompleteCrossError())
+                .WithException(new BusinessException())
                 .Must(_ => CheckReturnsBoolean());
         }
         catch (Exception)
@@ -36,9 +36,9 @@ public class MustBenchmarks
         }
     }
 
-    private ICrossError CheckReturnsError()
+    private BusinessException CheckReturnsError()
     {
-        return new CompleteCrossError();
+        return new BusinessException();
     }
     
     private bool CheckReturnsBoolean()

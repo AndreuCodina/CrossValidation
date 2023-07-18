@@ -1,15 +1,16 @@
 using CrossValidation.Errors;
+using CrossValidation.Exceptions;
 
 namespace CrossValidation.Validators;
 
-public record EmptyCollectionValidator<TField>(IEnumerable<TField> FieldValue) : Validator
+public class EmptyCollectionValidator<TField>(IEnumerable<TField> fieldValue) : Validator
 {
     public override bool IsValid()
     {
-        return !FieldValue.Any();
+        return !fieldValue.Any();
     }
 
-    public override ICrossError CreateError()
+    public override BusinessException CreateError()
     {
         return new CommonCrossError.EmptyCollection();
     }

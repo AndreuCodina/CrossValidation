@@ -23,7 +23,7 @@ public class CommonValidationErrorTests :
     {
         var error = new CommonCrossError.LengthRange(1, 1, 1);
         var action = () => Validate.That(1)
-            .WithError(error)
+            .WithException(error)
             .Must(x => false);
         
         var exception = action.ShouldThrowCrossError();

@@ -1,7 +1,6 @@
 ﻿using System.Diagnostics.Contracts;
 using System.Net;
 using System.Runtime.CompilerServices;
-using CrossValidation.Errors;
 using CrossValidation.Exceptions;
 using CrossValidation.Validations;
 
@@ -31,7 +30,7 @@ public abstract record ModelValidator<TModel>
     [Pure]
     public IValidation<TField> Field<TField>(
         TField field,
-        ICrossError? error = null,
+        BusinessException? exception = null,
         string? message = null,
         string? code = null,
         string? details = null,
@@ -56,7 +55,7 @@ public abstract record ModelValidator<TModel>
     [Pure]
     public IValidation<TField> That<TField>(
         TField field,
-        ICrossError? error = null,
+        BusinessException? exception = null,
         string? message = null,
         string? code = null,
         string? details = null,
@@ -101,22 +100,21 @@ public abstract record ModelValidator<TModel>
             await ScopeCreatorValidation.ValidateAsync();
         }
         
-        if (ScopeCreatorValidation.Context!.ErrorsCollected.Any())
+        if (ScopeCreatorValidation.Context!.ExceptionsCollected.Any())
         {
-            if (ScopeCreatorValidation.Context.ErrorsCollected.Count == 1)
+            if (ScopeCreatorValidation.Context.ExceptionsCollected.Count == 1)
             {
                 throw ScopeCreatorValidation.Context
-                    .ErrorsCollected[0]
-                    .ToException();
+                    .ExceptionsCollected[0];
             }
             else
             {
-                foreach (var errorCollected in ScopeCreatorValidation.Context.ErrorsCollected)
+                foreach (var errorCollected in ScopeCreatorValidation.Context.ExceptionsCollected)
                 {
                     errorCollected.AddPlaceholderValues();
                 }
                 
-                throw new ValidationListException(ScopeCreatorValidation.Context.ErrorsCollected);
+                throw new ValidationListException(ScopeCreatorValidation.Context.ExceptionsCollected);
             }
         }
     }

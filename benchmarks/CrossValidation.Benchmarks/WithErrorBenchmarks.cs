@@ -1,5 +1,5 @@
 ﻿using BenchmarkDotNet.Attributes;
-using CrossValidation.Errors;
+using CrossValidation.Exceptions;
 using CrossValidation.Validations;
 
 namespace CrossValidation.Benchmarks;
@@ -20,7 +20,7 @@ public class WithErrorBenchmarks
     public void WithError()
     {
         _validation
-            .WithError(new CompleteCrossError(Message: "Error message"))
+            .WithException(new BusinessException(message: "Error message"))
             .Must(_ => true);
     }
 }

@@ -1,6 +1,5 @@
 ﻿using System.Net;
 using System.Text.Json;
-using CrossValidation.Errors;
 using CrossValidation.Exceptions;
 using CrossValidation.Utils;
 using Microsoft.AspNetCore.Hosting;
@@ -46,12 +45,12 @@ public class CrossValidationMiddleware : IMiddleware
         string? details = null;
         List<CrossProblemDetailsError> errors = new();
 
-        if (exception is CrossException crossException)
+        if (exception is BusinessException businessException)
         {
             _isExceptionHandled = true;
-            httpStatusCode = crossException.Error.HttpStatusCode ?? HttpStatusCode.UnprocessableEntity;
+            httpStatusCode = businessException.StatusCode;
             title = "A validation error occurred";
-            var error = CreateCrossProblemDetailsError(crossException.Error);
+            var error = CreateCrossProblemDetailsError(businessException);
             
             var allErrorCustomizationsAreNotSet =
                 error.Code is null
@@ -70,7 +69,7 @@ public class CrossValidationMiddleware : IMiddleware
             httpStatusCode = HttpStatusCode.UnprocessableEntity;
             title = "Several validation errors occurred";
 
-            foreach (var error in validationListException.Errors)
+            foreach (var error in validationListException.Exceptions)
             {
                 errors.Add(CreateCrossProblemDetailsError(error));
             }
@@ -114,7 +113,7 @@ public class CrossValidationMiddleware : IMiddleware
         await context.Response.WriteAsync(response);
     }
 
-    private CrossProblemDetailsError CreateCrossProblemDetailsError(ICrossError crossError)
+    private CrossProblemDetailsError CreateCrossProblemDetailsError(BusinessException crossError)
     {
         var error = new CrossProblemDetailsError
         {

@@ -1,5 +1,4 @@
-﻿using CrossValidation.Errors;
-using CrossValidation.Exceptions;
+﻿using CrossValidation.Exceptions;
 using CrossValidation.ShouldlyAssertions;
 using CrossValidation.Tests.TestUtils;
 using CrossValidation.Tests.TestUtils.Builders;
@@ -34,13 +33,13 @@ public class CrossValidationOptionsTests :
 
             try
             {
-                throw new ErrorWithFields(expectedName, expectedDateTime).ToException();
+                throw new ErrorWithFields(expectedName, expectedDateTime);
             }
-            catch (CrossException e)
+            catch (BusinessException e)
             {
-                e.Error.PlaceholderValues.ShouldNotBeEmpty();
-                e.Error.PlaceholderValues[nameof(ErrorWithFields.Name)].ShouldBe(expectedName);
-                e.Error.PlaceholderValues[nameof(ErrorWithFields.DateTime)].ShouldBe(expectedDateTime);
+                e.PlaceholderValues.ShouldNotBeEmpty();
+                e.PlaceholderValues[nameof(ErrorWithFields.Name)].ShouldBe(expectedName);
+                e.PlaceholderValues[nameof(ErrorWithFields.DateTime)].ShouldBe(expectedDateTime);
             }
         }
         finally
@@ -56,7 +55,7 @@ public class CrossValidationOptionsTests :
         CrossValidationOptions.LocalizeErrorInClient = true;
         
         var action = () => Validate.That(_model.NestedModel.Int)
-            .WithError(new CustomErrorWithPlaceholderValue(_model.NestedModel.Int))
+            .WithException(new CustomErrorWithPlaceholderValue(_model.NestedModel.Int))
             .GreaterThan(_model.NestedModel.Int);
 
         var error = action.ShouldThrowCrossError();
@@ -68,9 +67,16 @@ public class CrossValidationOptionsTests :
         CrossValidationOptions.LocalizeErrorInClient = defaultConfiguration;
     }
 
-    private record ErrorWithFields(string Name, DateTime DateTime) : CompleteCrossError;
+    private class ErrorWithFields(string name, DateTime dateTime) : BusinessException
+    {
+        public string Name => name;
+        public DateTime DateTime => dateTime;
+    }
     
-    private record CustomErrorWithPlaceholderValue(int Value) : CompleteCrossError;
+    private class CustomErrorWithPlaceholderValue(int value) : BusinessException
+    {
+        public int Value => value;
+    }
 
     public void Dispose()
     {

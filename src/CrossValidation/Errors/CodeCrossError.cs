@@ -1,5 +1,6 @@
 using System.Net;
 using System.Runtime.CompilerServices;
+using CrossValidation.Exceptions;
 
 namespace CrossValidation.Errors;
 
@@ -11,9 +12,10 @@ public record CodeCrossError(
     HttpStatusCode? HttpStatusCode = null,
     string? Details = null,
     [CallerArgumentExpression(nameof(Code))]
+    // ReSharper disable once NotAccessedPositionalProperty.Global
     string CodeName = default!) :
-    CompleteCrossError(
-        Code: CodeName.Substring(CodeName.IndexOf('.') + 1),
+    BusinessException(
+        Code: CodeName,
         Message: Message,
         HttpStatusCode: HttpStatusCode,
         Details: Details);

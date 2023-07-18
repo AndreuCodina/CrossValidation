@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using CrossValidation.Errors;
+using CrossValidation.Exceptions;
 using CrossValidation.Resources;
 using CrossValidation.ShouldlyAssertions;
 using CrossValidation.Tests.TestUtils;
@@ -418,7 +419,7 @@ public class ModelValidatorTests :
          var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
          {
              validator.Field(_model.NullableString)
-                 .WithError(new CustomErrorWithCode("COD123"))
+                 .WithException(new CustomErrorWithCode("COD123"))
                  .NotNull();
          });
          var action = () => parentModelValidator.Validate(_model);
@@ -468,7 +469,7 @@ public class ModelValidatorTests :
          var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
          {
              validator.Field(_model.NullableString)
-                 .WithError(expectedError)
+                 .WithException(expectedError)
                  .WithMessage(expectedMessage)
                  .NotNull();
          });
@@ -489,7 +490,7 @@ public class ModelValidatorTests :
          {
              validator.Field(_model.NullableString)
                  .WithMessage(expectedMessage)
-                 .WithError(expectedError)
+                 .WithException(expectedError)
                  .NotNull();
          });
          var action = () => parentModelValidator.Validate(_model);
@@ -531,7 +532,7 @@ public class ModelValidatorTests :
          error.Message.ShouldBe(expectedMessage);
          error.Code.ShouldBe(expectedCode);
          error.Details.ShouldBe(expectedDetails);
-         error.HttpStatusCode.ShouldBe(expectedHttpStatusCode);
+         error.StatusCode.ShouldBe(expectedHttpStatusCode);
      }
      
      [Fact]
@@ -762,7 +763,7 @@ public class ModelValidatorTests :
      [Fact]
      public async Task Execute_all_validators_in_a_validation_with_error_accumulation()
      {
-         var testError = new TestError();
+         var testError = new TestException();
          var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
          {
              validator.ValidationMode = ValidationMode.AccumulateFirstErrors;
@@ -770,12 +771,12 @@ public class ModelValidatorTests :
              validator.Field(_model.Int)
                  .Must(_commonFixture.BeValid)
                  .MustAsync(_commonFixture.BeValidAsync)
-                 .Must(_ => _commonFixture.NullableError())
-                 .MustAsync(_ => _commonFixture.ErrorAsync(testError));
+                 .Must(_ => _commonFixture.NullableException())
+                 .MustAsync(_ => _commonFixture.ExceptionAsync(testError));
          });
          var action = () => parentModelValidator.ValidateAsync(_model);
 
-         await action.ShouldThrowCrossErrorAsync<TestError>();
+         await action.ShouldThrowCrossErrorAsync<TestException>();
      }
      
      [Fact]
@@ -790,11 +791,11 @@ public class ModelValidatorTests :
                  .WithMessage("Unexpected message")
                  .MustAsync(_commonFixture.BeValidAsync)
                  .WithMessage(expectedMessage)
-                 .MustAsync(_ => _commonFixture.ErrorAsync());
+                 .MustAsync(_ => _commonFixture.ExceptionAsync());
          });
          var action = () => parentModelValidator.ValidateAsync(_model);
 
-         var error = await action.ShouldThrowCrossErrorAsync<TestError>();
+         var error = await action.ShouldThrowCrossErrorAsync<TestException>();
          
          error.Message.ShouldBe(expectedMessage);
      }
@@ -878,5 +879,5 @@ public class ModelValidatorTests :
          await parentModelValidator.ValidateAsync(_model);
      }
 
-     private record CustomErrorWithCode(string Code) : CompleteCrossError(Code: Code);
+     private class CustomErrorWithCode(string code) : BusinessException(code: code);
 }

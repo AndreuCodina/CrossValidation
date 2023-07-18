@@ -1,6 +1,4 @@
-﻿using System;
-using System.Linq;
-using CrossValidation.Exceptions;
+﻿using CrossValidation.Exceptions;
 using CrossValidation.ShouldlyAssertions;
 using CrossValidation.Tests.TestUtils;
 using CrossValidation.Tests.TestUtils.Models;
@@ -55,6 +53,6 @@ public class EnumRangeValidatorTests : TestBase
         var stringValue = "Not valid enum value";
         var stringAction = () => Validate.That(stringValue)
             .Enum(ParentModelEnum.Case1);
-        stringAction.ShouldThrow<CrossException>();
+        stringAction.ShouldThrow<BusinessException>();
     }
 }

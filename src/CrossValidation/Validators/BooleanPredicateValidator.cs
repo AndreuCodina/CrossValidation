@@ -1,15 +1,16 @@
 ﻿using CrossValidation.Errors;
+using CrossValidation.Exceptions;
 
 namespace CrossValidation.Validators;
 
-public record BooleanPredicateValidator(Func<bool> Predicate) : Validator
+public class BooleanPredicateValidator(Func<bool> predicate) : Validator
 {
     public override bool IsValid()
     {
-        return Predicate();
+        return predicate();
     }
 
-    public override ICrossError CreateError()
+    public override BusinessException CreateError()
     {
         return new CommonCrossError.Predicate();
     }

@@ -1,4 +1,5 @@
 ﻿using CrossValidation.Errors;
+using CrossValidation.Exceptions;
 using CrossValidation.Resources;
 using CrossValidation.ShouldlyAssertions;
 using CrossValidation.Tests.TestUtils;
@@ -24,50 +25,30 @@ public class CompleteCrossErrorTests :
     }
 
     [Fact]
-    public void Not_add_all_specific_error_fields_as_placeholders_fails()
-    {
-        var action = () => Validate.That(true)
-            .WithError(new ErrorWithNotAllFieldsAddedAsPlaceholders("Alex", 30))
-            .Must(_commonFixture.NotBeValid);
-
-        var error = action.ShouldThrowCrossError<ErrorWithNotAllFieldsAddedAsPlaceholders>();
-
-        _validatorFixture.AllFieldsAreAddedAsPlaceholders(error).ShouldBeFalse();
-    }
-
-    [Fact]
     public void Throw_cross_exception_with_code_customizes_message()
     {
-        Action action = () => throw new CustomNotNull().ToException();
+        Action action = () => throw new CustomNotNull();
 
         var error = action.ShouldThrowCrossError<CustomNotNull>();
         error.Code.ShouldBe(nameof(ErrorResource.NotNull));
         error.Message.ShouldBe(ErrorResource.NotNull);
     }
 
-    private record ErrorWithAllFieldsAddedAsPlaceholders(string Name, int Age) : CompleteCrossError
+    private class ErrorWithAllFieldsAddedAsPlaceholders(string name, int age) : BusinessException
     {
         public override void AddPlaceholderValues()
         {
-            AddPlaceholderValue(Name);
-            AddPlaceholderValue(Age);
+            AddPlaceholderValue(name);
+            AddPlaceholderValue(age);
         }
     }
     
-    private record ErrorWithNotAllFieldsAddedAsPlaceholders(string Name, int Age) : CompleteCrossError
+    private class ErrorWithNullFields(string? name, int? age) : BusinessException
     {
         public override void AddPlaceholderValues()
         {
-            AddPlaceholderValue(Name);
-        }
-    }
-    
-    private record ErrorWithNullFields(string? Name, int? Age) : CompleteCrossError
-    {
-        public override void AddPlaceholderValues()
-        {
-            AddPlaceholderValue(Name);
-            AddPlaceholderValue(Age);
+            AddPlaceholderValue(name);
+            AddPlaceholderValue(age);
         }
     }
     

@@ -1,25 +1,25 @@
-﻿using CrossValidation.Errors;
+﻿using CrossValidation.Exceptions;
 
 namespace CrossValidation.Validators;
 
-public interface IValidator<out TValidationError>
+public interface IValidator<out TValidationException>
 {
     public bool IsValid();
-    public TValidationError CreateError();
-    public TValidationError? GetError();
+    public TValidationException CreateError();
+    public TValidationException? GetError();
 }
 
-public abstract record Validator : Validator<ICrossError>;
+public abstract class Validator : Validator<BusinessException>;
 
-public abstract record Validator<TValidationError> : IValidator<TValidationError>
-    where TValidationError : class, ICrossError
+public abstract class Validator<TValidationException> : IValidator<TValidationException>
+    where TValidationException : BusinessException
 {
     public abstract bool IsValid();
     
-    public abstract TValidationError CreateError();
+    public abstract TValidationException CreateError();
     
-    public TValidationError? GetError()
+    public TValidationException? GetError()
     {
-        return !IsValid() ? (TValidationError?)CreateError() : null;
+        return !IsValid() ? (TValidationException?)CreateError() : null;
     }
 }

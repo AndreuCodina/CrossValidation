@@ -1,39 +1,80 @@
-﻿using CrossValidation.Resources;
+﻿using CrossValidation.Exceptions;
+using CrossValidation.Resources;
 
 namespace CrossValidation.Errors;
 
-public record CommonCrossError(string Code) : CompleteCrossError(Code: Code)
+#pragma warning disable CS9113 // Parameter is unread.
+public static class CommonCrossError
 {
-    public override bool IsCommon => true;
-    
-    public record NotNull() : CommonCrossError(nameof(ErrorResource.NotNull));
-    
-    public record Null() : CommonCrossError(nameof(ErrorResource.Null));
+    public class NotNull() : BusinessException(nameof(ErrorResource.NotNull))
+    {
+        public override bool IsCommon => true;
+    }
 
-    public record GreaterThan<TField>(TField ComparisonValue) :
-        CommonCrossError(nameof(ErrorResource.GreaterThan));
+    public class Null() : BusinessException(nameof(ErrorResource.Null))
+    {
+        public override bool IsCommon => true;
+    }
 
-    public record Enum() : CommonCrossError(nameof(ErrorResource.Enum));
-    
-    public record EnumRange() : CommonCrossError(nameof(ErrorResource.Enum));
+    public class GreaterThan<TField>(TField comparisonValue) :
+        BusinessException(nameof(ErrorResource.GreaterThan))
+    {
+        public override bool IsCommon => true;
+        public TField ComparisonValue => comparisonValue;
+    }
 
-    public record LengthRange(int Minimum, int Maximum, int TotalLength) :
-        CommonCrossError(nameof(ErrorResource.LengthRange)),
-        ILengthError;
+    public class Enum() : BusinessException(nameof(ErrorResource.Enum))
+    {
+        public override bool IsCommon => true;
+    }
 
-    public record MinimumLength(int Minimum, int TotalLength) :
-        CommonCrossError(nameof(ErrorResource.MinimumLength)),
-        ILengthError;
+    public class EnumRange() : BusinessException(nameof(ErrorResource.Enum))
+    {
+        public override bool IsCommon => true;
+    }
+
+    public class LengthRange(int minimum, int maximum, int totalLength) :
+        LengthException(nameof(ErrorResource.LengthRange))
+    {
+        public override bool IsCommon => true;
+        public override int TotalLength => totalLength;
+    }
+
+    public class MinimumLength(int minimum, int totalLength)
+        : LengthException(nameof(ErrorResource.MinimumLength))
+    {
+        public override bool IsCommon => true;
+        public override int TotalLength => totalLength;
+    }
+
+    public class Predicate() : BusinessException(nameof(ErrorResource.General))
+    {
+        public override bool IsCommon => true;
+    }
     
-    public record Predicate() : CommonCrossError(nameof(ErrorResource.General));
+    public class RegularExpression() : BusinessException(nameof(ErrorResource.RegularExpression))
+    {
+        public override bool IsCommon => true;
+    }
     
-    public record RegularExpression() : CommonCrossError(nameof(ErrorResource.RegularExpression));
+    public class EmptyString() : BusinessException(nameof(ErrorResource.EmptyString))
+    {
+        public override bool IsCommon => true;
+    }
     
-    public record EmptyString() : CommonCrossError(nameof(ErrorResource.EmptyString));
+    public class NotEmptyString() : BusinessException(nameof(ErrorResource.NotEmptyString))
+    {
+        public override bool IsCommon => true;
+    }
     
-    public record NotEmptyString() : CommonCrossError(nameof(ErrorResource.NotEmptyString));
+    public class EmptyCollection() : BusinessException(nameof(ErrorResource.EmptyCollection))
+    {
+        public override bool IsCommon => true;
+    }
     
-    public record EmptyCollection() : CommonCrossError(nameof(ErrorResource.EmptyCollection));
-    
-    public record NotEmptyCollection() : CommonCrossError(nameof(ErrorResource.NotEmptyCollection));
+    public class NotEmptyCollection() : BusinessException(nameof(ErrorResource.NotEmptyCollection))
+    {
+        public override bool IsCommon => true;
+    }
 }
+#pragma warning restore CS9113 // Parameter is unread.

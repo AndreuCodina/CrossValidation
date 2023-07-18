@@ -1,10 +1,12 @@
+using CrossValidation.Exceptions;
+
 namespace CrossValidation.Errors;
 
-public record MessageCrossError(string Message) :
-    CompleteCrossError(Message: Message)
+public class MessageCrossError(string message) :
+    BusinessException(message: message)
 {
-    public MessageCrossError(string Message, params object[] MessageParameters)
-        : this(string.Format(Message, MessageParameters))
+    public MessageCrossError(string message, params object[] messageParameters)
+        : this(string.Format(message, messageParameters))
     {
     }
 }

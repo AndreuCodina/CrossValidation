@@ -1,6 +1,5 @@
 ﻿using System.Net;
 using System.Runtime.CompilerServices;
-using CrossValidation.Errors;
 using CrossValidation.Exceptions;
 using CrossValidation.Utils;
 using CrossValidation.Validations;
@@ -12,7 +11,7 @@ public abstract class Validate<TException>
 {
     public static IValidation<TField> That<TField>(
         TField field,
-        ICrossError? error = null,
+        BusinessException? exception = null,
         string? message = null,
         string? code = null,
         string? details = null,
@@ -27,7 +26,7 @@ public abstract class Validate<TException>
             context: null,
             index: null,
             parentPath: null,
-            fixedError: error,
+            fixedException: exception,
             fixedMessage: message,
             fixedCode: code,
             fixedDetails: details,
@@ -37,7 +36,7 @@ public abstract class Validate<TException>
     
     public static IValidation<TField> Field<TField>(
         TField field,
-        ICrossError? error = null,
+        BusinessException? exception = null,
         string? message = null,
         string? code = null,
         string? details = null,
@@ -50,7 +49,7 @@ public abstract class Validate<TException>
             crossErrorToException: typeof(TException),
             fieldName: fieldName,
             context: null,
-            error: error,
+            exception: exception,
             message: message,
             code: code,
             details: details,
@@ -58,9 +57,9 @@ public abstract class Validate<TException>
             fieldDisplayName: fieldDisplayName);
     }
 
-    public static void Must(bool condition, ICrossError error)
+    public static void Must(bool condition, BusinessException exception)
     {
-        InternalMust(condition, error: error);
+        InternalMust(condition, exception: exception);
     }
     
     public static void Must(
@@ -68,38 +67,38 @@ public abstract class Validate<TException>
         string? message = null,
         string? code = null,
         string? details = null,
-        HttpStatusCode? httpStatusCode = null)
+        HttpStatusCode? statusCode = null)
     {
         InternalMust(
             condition,
             message: message,
             code: code,
             details: details,
-            httpStatusCode: httpStatusCode);
+            statusCode: statusCode);
     }
     
     private static void InternalMust(
         bool condition,
-        ICrossError? error = null,
+        BusinessException? exception = null,
         string? message = null,
         string? code = null,
         string? details = null,
-        HttpStatusCode? httpStatusCode = null)
+        HttpStatusCode? statusCode = null)
     {
         if (!condition)
         {
             var validation = That(
                 field: condition,
-                error: null,
+                exception: null,
                 message: null,
                 code: null,
                 details: null,
                 httpStatusCode: null,
                 fieldDisplayName: null);
         
-            if (error is not null)
+            if (exception is not null)
             {
-                validation = validation.WithError(error);
+                validation = validation.WithException(exception);
             }
         
             if (message is not null)
@@ -117,9 +116,9 @@ public abstract class Validate<TException>
                 validation = validation.WithDetails(details);
             }
         
-            if (httpStatusCode is not null)
+            if (statusCode is not null)
             {
-                validation = validation.WithHttpStatusCode(httpStatusCode.Value);
+                validation = validation.WithHttpStatusCode(statusCode.Value);
             }
         
             validation.Must(_ => false);
@@ -128,7 +127,7 @@ public abstract class Validate<TException>
     
     public static IValidation<TField> Argument<TField>(
         TField field,
-        ICrossError? error = null,
+        BusinessException? exception = null,
         string? message = null,
         string? code = null,
         string? details = null,
@@ -138,12 +137,12 @@ public abstract class Validate<TException>
     {
         return IValidation<TField>.CreateFromFieldName(
             getFieldValue: () => field,
-            crossErrorToException: typeof(TException) == typeof(CrossException)
+            crossErrorToException: typeof(TException) == typeof(BusinessException)
                 ? typeof(ArgumentException)
                 : typeof(TException),
             fieldName,
             context: null,
-            error: error,
+            exception: exception,
             message: message,
             code: code,
             details: details,
@@ -157,4 +156,4 @@ public abstract class Validate<TException>
     }
 }
 
-public abstract class Validate : Validate<CrossException>;
+public abstract class Validate : Validate<BusinessException>;
