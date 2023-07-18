@@ -49,14 +49,14 @@ public class ValidationTests :
     
     [Theory]
     [InlineData(null, "Expected message", nameof(ErrorResource.General), "Expected message")]
-    [InlineData("ExpectedCode", "", "ExpectedCode", null)]
+    [InlineData("ExpectedCode", "", "ExpectedCode", "")]
     [InlineData(nameof(ErrorResource.Enum), "", nameof(ErrorResource.Enum), "Must be a valid value")]
     [InlineData("ExpectedCode", "Expected message", "ExpectedCode", "Expected message")]
     public void ValidateField_keeps_customizations_before_create_instance(
         string? code,
         string message,
         string? expectedCode,
-        string? expectedMessage)
+        string expectedMessage)
     {
         var validation = Validate.Field(_model.NestedModel.Int);
         
@@ -105,13 +105,13 @@ public class ValidationTests :
     [Theory]
     [InlineData(null, "", nameof(ErrorResource.General), "An error has occured")]
     [InlineData(null, "Expected message", nameof(ErrorResource.General), "Expected message")]
-    [InlineData("RandomCode", "", "RandomCode", null)]
+    [InlineData("RandomCode", "", "RandomCode", "")]
     [InlineData(nameof(ErrorResource.NotNull), "", nameof(ErrorResource.NotNull), "Must have a value")]
     public void Keep_instance_customizations(
         string? code,
         string message,
         string? expectedCode,
-        string? expectedMessage)
+        string expectedMessage)
     {
         var action = () => Validate.Field(_model.Int)
             .Instance(x => ValueObjectWithCustomization.Create(x, code, message));

@@ -235,7 +235,7 @@ internal class ValidationOperation
         }
 
         var codeToAdd = Code ?? exception.Code;
-        var isInstanceCallerWithCodeAndWithoutMessage = Code is not null && Message is null;
+        var isInstanceCallerWithCodeAndWithoutMessage = Code is not null && Message == "";
         
         if (isInstanceCallerWithCodeAndWithoutMessage && codeToAdd is not null)
         {
@@ -243,7 +243,9 @@ internal class ValidationOperation
         }
         else
         {
-            Message ??= exception.Message;
+            Message = Message != ""
+                ? Message
+                : exception.Message;
         }
 
         Code = codeToAdd;

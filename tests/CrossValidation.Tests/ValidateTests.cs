@@ -234,13 +234,13 @@ public class ValidateTests :
     [Theory]
     [InlineData(null, "", nameof(ErrorResource.General), "An error has occured")]
     [InlineData(null, "Expected message", nameof(ErrorResource.General), "Expected message")]
-    [InlineData("RandomCode", "", "RandomCode", null)]
+    [InlineData("RandomCode", "", "RandomCode", "")]
     [InlineData(nameof(ErrorResource.NotNull), "", nameof(ErrorResource.NotNull), "Must have a value")]
     public void ValidateThat_does_not_generalize_customized_code_or_message(
         string? code,
         string message,
         string? expectedCode,
-        string? expectedMessage)
+        string expectedMessage)
     {
         var validation = Validate.That(_model.Int);
 
@@ -249,7 +249,7 @@ public class ValidateTests :
             validation.WithCode(code);
         }
 
-        if (message != null)
+        if (message != "")
         {
             validation.WithMessage(message);
         }
