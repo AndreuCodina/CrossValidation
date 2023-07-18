@@ -15,8 +15,14 @@ namespace ParentNamespace
     public partial class WithParametersWithDeclaredNamespaceException(int firstParameter, string secondParameter)
         : ResxBusinessException(TestErrorResource.WithParameters);
     
+    public class ClassBase;
+    
     namespace ChildNamespace.GrandchildNamespace
     {
+        public partial class GenericClass<T>()
+            : ResxBusinessException(TestErrorResource.WithNoParameters)
+            where T : ClassBase;
+        
 #pragma warning disable CS9113 // Parameter is unread.
         internal partial class ParentClass<T1>(T1 generic) where T1 : class
 #pragma warning restore CS9113 // Parameter is unread.
