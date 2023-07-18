@@ -79,7 +79,7 @@ public interface IValidation<out TField> : IValidationOperation
         string message,
         string? code,
         string? details,
-        HttpStatusCode? httpStatusCode,
+        HttpStatusCode? statusCode,
         string? fieldDisplayName)
     {
         var fullPath = fieldName.Contains('.')
@@ -97,7 +97,7 @@ public interface IValidation<out TField> : IValidationOperation
             fixedMessage: message,
             fixedCode: code,
             fixedDetails: details,
-            fixedHttpStatusCode: httpStatusCode,
+            fixedStatusCode: statusCode,
             fixedFieldDisplayName: fieldDisplayName);
     }
 
@@ -225,7 +225,7 @@ internal class Validation<TField> :
     {
         if (!HasFailed)
         {
-            HttpStatusCode = Context!.HttpStatusCode ?? code;
+            StatusCode = Context!.StatusCode ?? code;
         }
         
         return this;
@@ -331,7 +331,7 @@ internal class Validation<TField> :
             fixedMessage: Context!.Message ?? Message,
             fixedCode: Context!.Code ?? Code,
             fixedDetails: Context!.Details ?? Details,
-            fixedHttpStatusCode: Context!.HttpStatusCode ?? HttpStatusCode,
+            fixedStatusCode: Context!.StatusCode ?? StatusCode,
             fixedFieldDisplayName: Context!.FieldDisplayName ?? FieldDisplayName);
         nextValidation.HasFailed = HasFailed;
         nextValidation.HasPendingAsyncValidation = HasPendingAsyncValidation;
@@ -381,7 +381,7 @@ internal class Validation<TField> :
             fixedMessage: oldContext.Message,
             fixedCode: oldContext.Code,
             fixedDetails: oldContext.Details,
-            fixedHttpStatusCode: oldContext.HttpStatusCode,
+            fixedStatusCode: oldContext.StatusCode,
             fixedFieldDisplayName: oldContext.FieldDisplayName);
         nextValidation.FieldName = oldFieldName;
         nextValidation.HasFailed = HasFailed;
@@ -422,7 +422,7 @@ internal class Validation<TField> :
         string fixedMessage,
         string? fixedCode,
         string? fixedDetails,
-        HttpStatusCode? fixedHttpStatusCode,
+        HttpStatusCode? fixedStatusCode,
         string? fixedFieldDisplayName)
     {
         if (context != null)
@@ -453,7 +453,7 @@ internal class Validation<TField> :
         Context.Message = fixedMessage;
         Context.Code = fixedCode;
         Context.Details = fixedDetails;
-        Context.HttpStatusCode = fixedHttpStatusCode;
+        Context.StatusCode = fixedStatusCode;
         Context.FieldDisplayName = fixedFieldDisplayName;
     }
 
@@ -498,7 +498,7 @@ internal class Validation<TField> :
             fixedMessage: Context!.Message,
             fixedCode: Context!.Code,
             fixedDetails: Context!.Details,
-            fixedHttpStatusCode: Context!.HttpStatusCode,
+            fixedStatusCode: Context!.StatusCode,
             fixedFieldDisplayName: Context!.FieldDisplayName);
         nextValidation.HasFailed = HasFailed;
         nextValidation.HasPendingAsyncValidation = HasPendingAsyncValidation;

@@ -308,11 +308,11 @@ public class ValidateTests :
             .NotNull();
         action.ShouldThrow<FormatException>();
         
-        action = () => Validate<FormatException>.That(_model.NullableInt)
+        action = () => Validate<FormatException>.Argument(_model.NullableInt)
             .NotNull();
         action.ShouldThrow<FormatException>();
         
-        action = () => Validate<FormatException>.Field(_model.NullableInt)
+        action = () => Validate<FormatException>.Argument(_model.NullableInt)
             .NotNull();
         action.ShouldThrow<FormatException>();
     }

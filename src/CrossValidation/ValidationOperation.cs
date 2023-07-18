@@ -28,7 +28,7 @@ public interface IValidationOperation
     string? Details { get; set; }
     BusinessException? Exception { get; set; }
     string? FieldDisplayName { get; set; }
-    HttpStatusCode? HttpStatusCode { get; set; }
+    HttpStatusCode? StatusCode { get; set; }
     Type? CrossErrorToException { get; set; }
     Func<bool>? Condition { get; set; }
     Func<Task<bool>>? AsyncCondition { get; set; }
@@ -68,7 +68,7 @@ internal class ValidationOperation
     public string? Details { get; set; }
     public BusinessException? Exception { get; set; }
     public string? FieldDisplayName { get; set; }
-    public HttpStatusCode? HttpStatusCode { get; set; }
+    public HttpStatusCode? StatusCode { get; set; }
     public Type? CrossErrorToException { get; set; }
     public Func<bool>? Condition { get; set; }
     public Func<Task<bool>>? AsyncCondition { get; set; }
@@ -222,9 +222,21 @@ internal class ValidationOperation
         {
             if (context.ExceptionsCollected.Count == 1)
             {
+                if (CrossErrorToException is not null)
+                {
+                    throw (Exception)Activator.CreateInstance(
+                        CrossErrorToException,
+                        CreateParametrizedExceptionMessage(context.ExceptionsCollected[0]))!;
+                }
+                
                 throw context.ExceptionsCollected[0];
             }
         }
+    }
+    
+    private string CreateParametrizedExceptionMessage(BusinessException exception)
+    {
+        return $"{FieldName}: {exception.Message}";
     }
     
     public void TakeCustomizationsFromInstanceException(BusinessException exception, ValidationContext context)
@@ -258,7 +270,7 @@ internal class ValidationOperation
             ? context.Message
             : exception.Message != "" ? exception.Message : Message;
         Details = context.Details ?? (exception.Details ?? Details);
-        HttpStatusCode = context.HttpStatusCode ?? exception.StatusCode;
+        StatusCode = context.StatusCode ?? exception.StatusCode;
         FieldDisplayName = context.FieldDisplayName ?? (exception.FieldDisplayName ?? FieldDisplayName);
     }
     
@@ -298,7 +310,7 @@ internal class ValidationOperation
         exception.Code = GetCodeToFill(exception, context);
         exception.FormattedMessage = GetMessageToFill(exception, context);
         exception.Details = context.Details ?? (Details ?? exception.Details);
-        exception.StatusCode = context.HttpStatusCode ?? (HttpStatusCode ?? exception.StatusCode);
+        exception.StatusCode = context.StatusCode ?? (StatusCode ?? exception.StatusCode);
     }
 
     private string? GetCodeToFill(BusinessException exception, ValidationContext context)

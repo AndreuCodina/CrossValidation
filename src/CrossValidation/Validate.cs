@@ -6,8 +6,7 @@ using CrossValidation.Validations;
 
 namespace CrossValidation;
 
-public abstract class Validate<TException>
-    where TException : Exception
+public abstract class Validate
 {
     public static IValidation<TField> That<TField>(
         TField field,
@@ -20,7 +19,7 @@ public abstract class Validate<TException>
     {
         return new Validation<TField>(
             getFieldValue: () => field,
-            crossErrorToException: typeof(TException),
+            crossErrorToException: null,
             generalizeError: true,
             fieldPath: null,
             context: null,
@@ -30,7 +29,7 @@ public abstract class Validate<TException>
             fixedMessage: message,
             fixedCode: code,
             fixedDetails: details,
-            fixedHttpStatusCode: statusCode,
+            fixedStatusCode: statusCode,
             fixedFieldDisplayName: fieldDisplayName);
     }
     
@@ -40,20 +39,20 @@ public abstract class Validate<TException>
         string message = "",
         string? code = null,
         string? details = null,
-        HttpStatusCode? httpStatusCode = null,
+        HttpStatusCode? statusCode = null,
         string? fieldDisplayName = null,
         [CallerArgumentExpression(nameof(field))] string fieldName = default!)
     {
         return IValidation<TField>.CreateFromFieldName(
             getFieldValue: () => field,
-            crossErrorToException: typeof(TException),
+            crossErrorToException: null,
             fieldName: fieldName,
             context: null,
             exception: exception,
             message: message,
             code: code,
             details: details,
-            httpStatusCode: httpStatusCode,
+            statusCode: statusCode,
             fieldDisplayName: fieldDisplayName);
     }
 
@@ -131,23 +130,19 @@ public abstract class Validate<TException>
         string message = "",
         string? code = null,
         string? details = null,
-        HttpStatusCode? httpStatusCode = null,
+        HttpStatusCode? statusCode = null,
         string? fieldDisplayName = null,
         [CallerArgumentExpression(nameof(field))] string fieldName = default!)
     {
-        return IValidation<TField>.CreateFromFieldName(
-            getFieldValue: () => field,
-            crossErrorToException: typeof(TException) == typeof(BusinessException)
-                ? typeof(ArgumentException)
-                : typeof(TException),
-            fieldName,
-            context: null,
+        return Validate<ArgumentException>.Argument(
+            field: field,
             exception: exception,
             message: message,
             code: code,
             details: details,
-            httpStatusCode: httpStatusCode,
-            fieldDisplayName: fieldDisplayName);
+            statusCode: statusCode,
+            fieldDisplayName: fieldDisplayName,
+            fieldName: fieldName);
     }
 
     public static void ModelNullability<TModel>(TModel model)
@@ -156,4 +151,29 @@ public abstract class Validate<TException>
     }
 }
 
-public abstract class Validate : Validate<BusinessException>;
+public abstract class Validate<TException>
+    where TException : Exception
+{
+    public static IValidation<TField> Argument<TField>(
+        TField field,
+        BusinessException? exception = null,
+        string message = "",
+        string? code = null,
+        string? details = null,
+        HttpStatusCode? statusCode = null,
+        string? fieldDisplayName = null,
+        [CallerArgumentExpression(nameof(field))] string fieldName = default!)
+    {
+        return IValidation<TField>.CreateFromFieldName(
+            getFieldValue: () => field,
+            crossErrorToException: typeof(TException),
+            fieldName,
+            context: null,
+            exception: exception,
+            message: message,
+            code: code,
+            details: details,
+            statusCode: statusCode,
+            fieldDisplayName: fieldDisplayName);
+    }
+}

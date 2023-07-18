@@ -34,7 +34,7 @@ public abstract record ModelValidator<TModel>
         string message = "",
         string? code = null,
         string? details = null,
-        HttpStatusCode? httpStatusCode = null,
+        HttpStatusCode? statusCode = null,
         string? fieldDisplayName = null,
         [CallerArgumentExpression(nameof(field))] string fieldName = default!)
     {
@@ -59,7 +59,7 @@ public abstract record ModelValidator<TModel>
         string message = "",
         string? code = null,
         string? details = null,
-        HttpStatusCode? httpStatusCode = null,
+        HttpStatusCode? statusCode = null,
         string? fieldDisplayName = null)
     {
         var getFieldValue = () => field;
