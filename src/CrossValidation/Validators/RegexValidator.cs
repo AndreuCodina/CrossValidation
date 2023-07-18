@@ -13,6 +13,6 @@ public class RegularExpressionValidator(string fieldValue, string pattern) : Val
 
     public override BusinessException CreateError()
     {
-        return new CommonCrossError.RegularExpression();
+        return new CommonCrossException.RegularExpression();
     }
 }

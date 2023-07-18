@@ -4,31 +4,40 @@ using System.Text.RegularExpressions;
 
 namespace CrossValidation.Exceptions;
 
-public class BusinessException(
-    string message = "",
-    string? code = null,
-    HttpStatusCode statusCode = HttpStatusCode.UnprocessableEntity,
-    string? details = null,
-    string? fieldName = null,
-    string? fieldDisplayName = null)
-    : Exception(GetMessage(code, message))
+public class BusinessException : Exception
 {
     private const string DefaultPlaceholderValue = "";
     private static readonly Regex PlaceholderRegex = new("{([^{}:]+)}", RegexOptions.Compiled);
 
     public override string Message => FormattedMessage;
-    public string? Code { get; set;  } = code;
+    public string? Code { get; set;  } 
     public string FormattedMessage { get; set; } = "";
-    public HttpStatusCode StatusCode { get; set; } = statusCode;
-    public string? Details { get; set; } = details;
-    public string? FieldName { get; set; } = fieldName;
-    public string? FieldDisplayName { get; set; } = fieldDisplayName;
+    public HttpStatusCode StatusCode { get; set; }
+    public string? Details { get; set; }
+    public string? FieldName { get; set; }
+    public string? FieldDisplayName { get; set; }
     public Dictionary<string, object>? PlaceholderValues { get; set; }
     public Type? CrossErrorToException { get; set; }
     public Func<object>? GetFieldValue { get; set; }
     public virtual bool IsCommon { get; set; } = false;
+    
+    public BusinessException(
+        string message = "",
+        string? code = null,
+        HttpStatusCode statusCode = HttpStatusCode.UnprocessableEntity,
+        string? details = null,
+        string? fieldName = null,
+        string? fieldDisplayName = null)
+    {
+        FormattedMessage = GetFormattedMessage(code, message);
+        Code = code;
+        StatusCode = statusCode;
+        Details = details;
+        FieldName = fieldName;
+        FieldDisplayName = fieldDisplayName;
+    }
 
-    private static string GetMessage(string? code, string message)
+    private static string GetFormattedMessage(string? code, string message)
     {
         if (code is not null && message == "")
         {

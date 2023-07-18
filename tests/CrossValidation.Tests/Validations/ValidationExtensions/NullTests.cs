@@ -53,7 +53,7 @@ public class NullTests :
         var action = () => Validate.Field(_model.NullableString)
             .Null();
 
-        var error = action.ShouldThrowCrossError<CommonCrossError.Null>();
+        var error = action.ShouldThrowCrossError<CommonCrossException.Null>();
         error.Code.ShouldBe(nameof(ErrorResource.Null));
     }
 }

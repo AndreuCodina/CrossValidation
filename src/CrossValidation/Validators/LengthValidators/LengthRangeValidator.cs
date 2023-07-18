@@ -12,6 +12,6 @@ public class LengthRangeValidator(string FieldValue, int Minimum, int Maximum) :
 
     public override LengthException CreateError()
     {
-        return new CommonCrossError.LengthRange(Minimum, Maximum, GetTotalLength(FieldValue));
+        return new CommonCrossException.LengthRange(Minimum, Maximum, GetTotalLength(FieldValue));
     }
 }

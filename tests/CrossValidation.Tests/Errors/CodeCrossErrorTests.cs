@@ -1,4 +1,4 @@
-using CrossValidation.Errors;
+using CrossValidation.Exceptions;
 using CrossValidation.WebApplication.Resources;
 using Shouldly;
 using Xunit;
@@ -12,7 +12,7 @@ public class CodeCrossErrorTests
     {
         var expectedCode = nameof(ErrorResource1.Code_With_Stops);
         
-        var error = new CodeCrossError(ErrorResource1.Code_With_Stops);
+        var error = new ResxBusinessException(ErrorResource1.Code_With_Stops);
 
         error.Code.ShouldBe(expectedCode);
     }

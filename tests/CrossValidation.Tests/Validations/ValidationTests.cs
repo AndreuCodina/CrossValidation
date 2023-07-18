@@ -32,7 +32,7 @@ public class ValidationTests :
         var action = () => Validate.That(_model.NestedModel)
             .Must(_commonFixture.NotBeValid);
 
-        action.ShouldThrowCrossError<CommonCrossError.Predicate>();
+        action.ShouldThrowCrossError<CommonCrossException.Predicate>();
     }
 
     [Fact]
@@ -41,7 +41,7 @@ public class ValidationTests :
         var action = () => Validate.Field(_model.NestedModel.Int)
             .Instance(ValueObjectFieldWithoutCustomization.Create);
 
-        var error = action.ShouldThrowCrossError<CommonCrossError.GreaterThan<int>>();
+        var error = action.ShouldThrowCrossError<CommonCrossException.GreaterThan<int>>();
         error.FieldName.ShouldBe("NestedModel.Int");
         error.Code.ShouldBe(nameof(ErrorResource.GreaterThan));
         error.Message.ShouldBe("Must be greater than 1");
@@ -86,7 +86,7 @@ public class ValidationTests :
             .WithCode(nameof(ErrorResource.NotNull))
             .Instance(ValueObjectWithoutCustomization.Create);
 
-        var error = action.ShouldThrowCrossError<CommonCrossError.GreaterThan<int>>();
+        var error = action.ShouldThrowCrossError<CommonCrossException.GreaterThan<int>>();
         error.Code.ShouldBe(nameof(ErrorResource.NotNull));
         error.Message.ShouldBe(ErrorResource.NotNull);
     }
@@ -98,7 +98,7 @@ public class ValidationTests :
             .WithMessage(ErrorResource.NotNull)
             .Instance(ValueObjectWithoutCustomization.Create);
 
-        var error = action.ShouldThrowCrossError<CommonCrossError.GreaterThan<int>>();
+        var error = action.ShouldThrowCrossError<CommonCrossException.GreaterThan<int>>();
         error.Message.ShouldBe(ErrorResource.NotNull);
     }
 
@@ -116,7 +116,7 @@ public class ValidationTests :
         var action = () => Validate.Field(_model.Int)
             .Instance(x => ValueObjectWithCustomization.Create(x, code, message));
 
-        var error = action.ShouldThrowCrossError<CommonCrossError.GreaterThan<int>>();
+        var error = action.ShouldThrowCrossError<CommonCrossException.GreaterThan<int>>();
         error.Code.ShouldBe(expectedCode);
         error.Message.ShouldBe(expectedMessage);
         error.Details.ShouldBe("Expected details");
@@ -247,11 +247,11 @@ public class ValidationTests :
     public void Repeat_error_customization_applies_new_error()
     {
         var action = () => Validate.That(_model.NullableInt)
-            .WithException(new CommonCrossError.NotNull())
-            .WithException(new CommonCrossError.Enum())
+            .WithException(new CommonCrossException.NotNull())
+            .WithException(new CommonCrossException.Enum())
             .Must(_commonFixture.NotBeValid);
 
-        var error = action.ShouldThrowCrossError<CommonCrossError.Enum>();
+        var error = action.ShouldThrowCrossError<CommonCrossException.Enum>();
         error.Code.ShouldBe(nameof(ErrorResource.Enum));
         error.Message.ShouldBe(ErrorResource.Enum);
     }
@@ -267,7 +267,7 @@ public class ValidationTests :
             .WithHttpStatusCode(HttpStatusCode.Created)
             .GreaterThan(_model.Int);
 
-        var error = action.ShouldThrowCrossError<CommonCrossError.GreaterThan<int>>();
+        var error = action.ShouldThrowCrossError<CommonCrossException.GreaterThan<int>>();
         error.Code.ShouldBe(nameof(ErrorResource.NotNull));
         error.Message.ShouldBe(ErrorResource.NotNull);
         error.Details.ShouldBe(expectedDetails);
@@ -338,7 +338,7 @@ public class ValidationTests :
     }
 
     private class ErrorWithCustomization() : BusinessException(
-        code: nameof(CommonCrossError.NotNull),
+        code: nameof(CommonCrossException.NotNull),
         details: "Expected details",
         statusCode: HttpStatusCode.Created);
 }

@@ -1,5 +1,4 @@
 using CrossValidation.DependencyInjection;
-using CrossValidation.Errors;
 using CrossValidation.Exceptions;
 using CrossValidation.WebApplication;
 using CrossValidation.WebApplication.Resources;
@@ -18,6 +17,6 @@ public partial class Program
 {
 }
 
-public class ErrorWithCodeFromCustomResx() : CodeCrossError(ErrorResource1.Hello);
+public class ErrorWithCodeFromCustomResx() : ResxBusinessException(ErrorResource1.Hello);
 
 public class ErrorWithCodeWithoutResxKey() : BusinessException(code: "RandomCode");

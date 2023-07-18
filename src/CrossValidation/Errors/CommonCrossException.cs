@@ -4,7 +4,7 @@ using CrossValidation.Resources;
 namespace CrossValidation.Errors;
 
 #pragma warning disable CS9113 // Parameter is unread.
-public static class CommonCrossError
+public static class CommonCrossException
 {
     public class NotNull() : BusinessException(nameof(ErrorResource.NotNull))
     {

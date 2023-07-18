@@ -12,6 +12,6 @@ public class NotEmptyStringValidator(string fieldValue) : Validator
 
     public override BusinessException CreateError()
     {
-        return new CommonCrossError.NotEmptyString();
+        return new CommonCrossException.NotEmptyString();
     }
 }

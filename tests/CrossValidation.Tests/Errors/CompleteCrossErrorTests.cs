@@ -1,5 +1,4 @@
-﻿using CrossValidation.Errors;
-using CrossValidation.Exceptions;
+﻿using CrossValidation.Exceptions;
 using CrossValidation.Resources;
 using CrossValidation.ShouldlyAssertions;
 using CrossValidation.Tests.TestUtils;
@@ -52,5 +51,5 @@ public class CompleteCrossErrorTests :
         }
     }
     
-    private record CustomNotNull() : CodeCrossError(ErrorResource.NotNull);
+    private class CustomNotNull() : ResxBusinessException(ErrorResource.NotNull);
 }

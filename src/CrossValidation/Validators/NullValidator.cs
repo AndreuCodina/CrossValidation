@@ -12,6 +12,6 @@ public class NullValidator<TField>(TField? fieldValue) : Validator
 
     public override BusinessException CreateError()
     {
-        return new CommonCrossError.Null();
+        return new CommonCrossException.Null();
     }
 }

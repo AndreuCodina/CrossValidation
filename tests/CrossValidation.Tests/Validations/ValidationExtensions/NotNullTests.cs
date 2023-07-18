@@ -77,9 +77,9 @@ public class NotNullTests :
 
         var errors = action.ShouldThrowCrossErrors();
         errors.Count.ShouldBe(3);
-        errors[0].ShouldBeOfType<CommonCrossError.NotNull>();
-        errors[1].ShouldBeOfType<CommonCrossError.LengthRange>();
-        errors[2].ShouldBeOfType<CommonCrossError.NotNull>();
+        errors[0].ShouldBeOfType<CommonCrossException.NotNull>();
+        errors[1].ShouldBeOfType<CommonCrossException.LengthRange>();
+        errors[2].ShouldBeOfType<CommonCrossException.NotNull>();
     }
     
     [Fact]
@@ -88,7 +88,7 @@ public class NotNullTests :
         var action = () => Validate.Field(_model.NullableString)
             .NotNull();
 
-        var error = action.ShouldThrowCrossError<CommonCrossError.NotNull>();
+        var error = action.ShouldThrowCrossError<CommonCrossException.NotNull>();
         error.Code.ShouldBe(nameof(ErrorResource.NotNull));
     }
 }

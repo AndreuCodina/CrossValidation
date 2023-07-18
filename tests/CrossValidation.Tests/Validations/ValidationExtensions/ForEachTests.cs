@@ -369,7 +369,7 @@ public class ForEachTests :
             .Must(_commonFixture.ThrowException)
             .ValidateAsync();
 
-        var error = await action.ShouldThrowCrossErrorAsync<CommonCrossError.Predicate>();
+        var error = await action.ShouldThrowCrossErrorAsync<CommonCrossException.Predicate>();
         
         error.Message.ShouldBe(expectedMessage);
     }

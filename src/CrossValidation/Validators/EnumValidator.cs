@@ -14,6 +14,6 @@ public class EnumValidator<TField>(
 
     public override BusinessException CreateError()
     {
-        return new CommonCrossError.Enum();
+        return new CommonCrossException.Enum();
     }
 }

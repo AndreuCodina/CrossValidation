@@ -21,7 +21,7 @@ public class CommonValidationErrorTests :
     [Fact]
     public void Common_errors_add_their_placeholders()
     {
-        var error = new CommonCrossError.LengthRange(1, 1, 1);
+        var error = new CommonCrossException.LengthRange(1, 1, 1);
         var action = () => Validate.That(1)
             .WithException(error)
             .Must(x => false);
