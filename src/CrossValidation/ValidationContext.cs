@@ -13,7 +13,7 @@ public class ValidationContext
     public ValidationMode ValidationMode { get; set; } = ValidationMode.StopOnFirstError;
     public bool IsChildContext { get; set; }
     public BusinessException? Error { get; set; }
-    public string? Message { get; set; }
+    public string Message { get; set; } = "";
     public string? Code { get; set; }
     public string? Details { get; set; }
     public HttpStatusCode? HttpStatusCode { get; set; }

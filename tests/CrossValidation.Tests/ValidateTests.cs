@@ -144,7 +144,7 @@ public class ValidateTests :
                 message: expectedMessage,
                 code: expectedCode,
                 details: expectedDetails,
-                httpStatusCode: expectedHttpStatusCode,
+                statusCode: expectedHttpStatusCode,
                 fieldDisplayName: expectedFieldDisplayName)
             .WithException(new BusinessException())
             .WithMessage("Unexpected message")
@@ -177,7 +177,7 @@ public class ValidateTests :
                 message: expectedMessage,
                 code: expectedCode,
                 details: expectedDetails,
-                httpStatusCode: expectedHttpStatusCode,
+                statusCode: expectedHttpStatusCode,
                 fieldDisplayName: expectedFieldDisplayName)
             .WithException(new BusinessException())
             .WithMessage("Unexpected message")
@@ -211,7 +211,7 @@ public class ValidateTests :
                 message: expectedMessage,
                 code: expectedCode,
                 details: expectedDetails,
-                httpStatusCode: expectedHttpStatusCode,
+                statusCode: expectedHttpStatusCode,
                 fieldDisplayName: expectedFieldDisplayName)
             .WithException(new BusinessException())
             .WithMessage("Unexpected message")
@@ -232,13 +232,13 @@ public class ValidateTests :
     }
 
     [Theory]
-    [InlineData(null, null, nameof(ErrorResource.General), "An error has occured")]
+    [InlineData(null, "", nameof(ErrorResource.General), "An error has occured")]
     [InlineData(null, "Expected message", nameof(ErrorResource.General), "Expected message")]
-    [InlineData("RandomCode", null, "RandomCode", null)]
-    [InlineData(nameof(ErrorResource.NotNull), null, nameof(ErrorResource.NotNull), "Must have a value")]
+    [InlineData("RandomCode", "", "RandomCode", null)]
+    [InlineData(nameof(ErrorResource.NotNull), "", nameof(ErrorResource.NotNull), "Must have a value")]
     public void ValidateThat_does_not_generalize_customized_code_or_message(
         string? code,
-        string? message,
+        string message,
         string? expectedCode,
         string? expectedMessage)
     {

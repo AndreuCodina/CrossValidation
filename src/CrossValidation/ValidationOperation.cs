@@ -24,7 +24,7 @@ public interface IValidationOperation
     Func<Task<IValidator<BusinessException>>>? AsyncValidator { get; set; }
     Action? Scope { get; set; }
     string? Code { get; set; }
-    string? Message { get; set; }
+    string Message { get; set; }
     string? Details { get; set; }
     BusinessException? Exception { get; set; }
     string? FieldDisplayName { get; set; }
@@ -49,7 +49,7 @@ public interface IValidationOperation
     ValueTask TraverseAsync(ValidationContext context);
     void MarkAllDescendantValidationsAsNotPendingAsync();
     ValueTask ExecuteAsync(ValidationContext context, bool useAsync);
-    void HandleException(BusinessException error, ValidationContext context);
+    void HandleException(BusinessException exception, ValidationContext context);
     void TakeCustomizationsFromInstanceException(BusinessException exception, ValidationContext context);
     void TakeCustomizationsFromException(BusinessException error, ValidationContext context);
     void MarkAsPendingAsyncValidation();
@@ -64,7 +64,7 @@ internal class ValidationOperation
     public Func<Task<IValidator<BusinessException>>>? AsyncValidator { get; set; }
     public Action? Scope { get; set; }
     public string? Code { get; set; }
-    public string? Message { get; set; }
+    public string Message { get; set; } = "";
     public string? Details { get; set; }
     public BusinessException? Exception { get; set; }
     public string? FieldDisplayName { get; set; }
@@ -220,7 +220,7 @@ internal class ValidationOperation
 
         if (context is {ValidationMode: ValidationMode.StopOnFirstError})
         {
-            if (context.ExceptionsCollected!.Count == 1)
+            if (context.ExceptionsCollected.Count == 1)
             {
                 throw context.ExceptionsCollected[0];
             }
@@ -252,7 +252,9 @@ internal class ValidationOperation
     public void TakeCustomizationsFromException(BusinessException exception, ValidationContext context)
     {
         Code = context.Code ?? (exception.Code ?? Code);
-        Message = context.Message ?? (exception.Message ?? Message);
+        Message = context.Message != ""
+            ? context.Message
+            : exception.Message != "" ? exception.Message : Message;
         Details = context.Details ?? (exception.Details ?? Details);
         HttpStatusCode = context.HttpStatusCode ?? exception.StatusCode;
         FieldDisplayName = context.FieldDisplayName ?? (exception.FieldDisplayName ?? FieldDisplayName);
@@ -316,36 +318,36 @@ internal class ValidationOperation
         return exception.Code;
     }
 
-    private string GetMessageToFill(BusinessException error, ValidationContext context)
+    private string GetMessageToFill(BusinessException exception, ValidationContext context)
     {
-        if (context.Message is not null)
+        if (context.Message != "")
         {
             return context.Message;
         }
         
-        if (Message is not null)
+        if (Message != "")
         {
             return Message;
         }
 
         if (Code is not null)
         {
-            return CrossValidationOptions.GetMessageFromCode(Code) ?? "";
+            return CrossValidationOptions.GetMessageFromCode(Code);
         }
         
         if (GeneralizeError)
         {
-            return CrossValidationOptions.GetMessageFromCode(nameof(ErrorResource.General)) ?? "";
+            return CrossValidationOptions.GetMessageFromCode(nameof(ErrorResource.General));
         }
 
-        if (error.FormattedMessage != "")
+        if (exception.Message != "")
         {
-            return error.FormattedMessage;
+            return exception.Message;
         }
 
-        if (error.Code is not null)
+        if (exception.Code is not null)
         {
-            return CrossValidationOptions.GetMessageFromCode(error.Code) ?? "";
+            return CrossValidationOptions.GetMessageFromCode(exception.Code);
         }
 
         return "";

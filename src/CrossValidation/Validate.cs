@@ -12,10 +12,10 @@ public abstract class Validate<TException>
     public static IValidation<TField> That<TField>(
         TField field,
         BusinessException? exception = null,
-        string? message = null,
+        string message = "",
         string? code = null,
         string? details = null,
-        HttpStatusCode? httpStatusCode = null,
+        HttpStatusCode? statusCode = null,
         string? fieldDisplayName = null)
     {
         return new Validation<TField>(
@@ -30,14 +30,14 @@ public abstract class Validate<TException>
             fixedMessage: message,
             fixedCode: code,
             fixedDetails: details,
-            fixedHttpStatusCode: httpStatusCode,
+            fixedHttpStatusCode: statusCode,
             fixedFieldDisplayName: fieldDisplayName);
     }
     
     public static IValidation<TField> Field<TField>(
         TField field,
         BusinessException? exception = null,
-        string? message = null,
+        string message = "",
         string? code = null,
         string? details = null,
         HttpStatusCode? httpStatusCode = null,
@@ -64,7 +64,7 @@ public abstract class Validate<TException>
     
     public static void Must(
         bool condition,
-        string? message = null,
+        string message = "",
         string? code = null,
         string? details = null,
         HttpStatusCode? statusCode = null)
@@ -80,7 +80,7 @@ public abstract class Validate<TException>
     private static void InternalMust(
         bool condition,
         BusinessException? exception = null,
-        string? message = null,
+        string message = "",
         string? code = null,
         string? details = null,
         HttpStatusCode? statusCode = null)
@@ -90,10 +90,10 @@ public abstract class Validate<TException>
             var validation = That(
                 field: condition,
                 exception: null,
-                message: null,
+                message: "",
                 code: null,
                 details: null,
-                httpStatusCode: null,
+                statusCode: null,
                 fieldDisplayName: null);
         
             if (exception is not null)
@@ -101,7 +101,7 @@ public abstract class Validate<TException>
                 validation = validation.WithException(exception);
             }
         
-            if (message is not null)
+            if (message != "")
             {
                 validation = validation.WithMessage(message);
             }
@@ -128,7 +128,7 @@ public abstract class Validate<TException>
     public static IValidation<TField> Argument<TField>(
         TField field,
         BusinessException? exception = null,
-        string? message = null,
+        string message = "",
         string? code = null,
         string? details = null,
         HttpStatusCode? httpStatusCode = null,

@@ -31,7 +31,7 @@ public abstract record ModelValidator<TModel>
     public IValidation<TField> Field<TField>(
         TField field,
         BusinessException? exception = null,
-        string? message = null,
+        string message = "",
         string? code = null,
         string? details = null,
         HttpStatusCode? httpStatusCode = null,
@@ -56,7 +56,7 @@ public abstract record ModelValidator<TModel>
     public IValidation<TField> That<TField>(
         TField field,
         BusinessException? exception = null,
-        string? message = null,
+        string message = "",
         string? code = null,
         string? details = null,
         HttpStatusCode? httpStatusCode = null,

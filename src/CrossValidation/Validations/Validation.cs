@@ -76,7 +76,7 @@ public interface IValidation<out TField> : IValidationOperation
         string fieldName,
         ValidationContext? context,
         BusinessException? exception,
-        string? message,
+        string message,
         string? code,
         string? details,
         HttpStatusCode? httpStatusCode,
@@ -179,7 +179,9 @@ internal class Validation<TField> :
     {
         if (!HasFailed)
         {
-            Message = Context!.Message ?? message;
+            Message = Context!.Message != ""
+                ? Context.Message
+                : message;
         }
         
         return this;
@@ -417,7 +419,7 @@ internal class Validation<TField> :
         int? index,
         string? parentPath,
         BusinessException? fixedException,
-        string? fixedMessage,
+        string fixedMessage,
         string? fixedCode,
         string? fixedDetails,
         HttpStatusCode? fixedHttpStatusCode,

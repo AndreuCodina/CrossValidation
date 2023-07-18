@@ -419,12 +419,12 @@ public class ModelValidatorTests :
          var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
          {
              validator.Field(_model.NullableString)
-                 .WithException(new CustomErrorWithCode("COD123"))
+                 .WithException(new CustomExceptionWithCode("COD123"))
                  .NotNull();
          });
          var action = () => parentModelValidator.Validate(_model);
 
-         action.ShouldThrowCrossError<CustomErrorWithCode>();
+         action.ShouldThrowCrossError<CustomExceptionWithCode>();
      }
      
      [Fact]
@@ -465,7 +465,7 @@ public class ModelValidatorTests :
      public void Combine_customization_with_custom_error()
      {
          var expectedMessage = "Expected message";
-         var expectedError = new CustomErrorWithCode("COD123");
+         var expectedError = new CustomExceptionWithCode("COD123");
          var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
          {
              validator.Field(_model.NullableString)
@@ -475,7 +475,7 @@ public class ModelValidatorTests :
          });
          var action = () => parentModelValidator.Validate(_model);
          
-         var error = action.ShouldThrowCrossError<CustomErrorWithCode>();
+         var error = action.ShouldThrowCrossError<CustomExceptionWithCode>();
          
          error.Code.ShouldBe(expectedError.Code);
          error.Message.ShouldBe(expectedMessage);
@@ -485,7 +485,7 @@ public class ModelValidatorTests :
      public void CombineCustomErrorCodeWithCustomization()
      {
          var expectedMessage = "Expected message";
-         var expectedError = new CustomErrorWithCode("COD123");
+         var expectedError = new CustomExceptionWithCode("COD123");
          var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
          {
              validator.Field(_model.NullableString)
@@ -495,7 +495,7 @@ public class ModelValidatorTests :
          });
          var action = () => parentModelValidator.Validate(_model);
          
-         var error = action.ShouldThrowCrossError<CustomErrorWithCode>();
+         var error = action.ShouldThrowCrossError<CustomExceptionWithCode>();
          
          error.Code.ShouldBe(expectedError.Code);
          error.Message.ShouldBe(expectedMessage);
@@ -879,5 +879,5 @@ public class ModelValidatorTests :
          await parentModelValidator.ValidateAsync(_model);
      }
 
-     private class CustomErrorWithCode(string code) : BusinessException(code: code);
+     private class CustomExceptionWithCode(string code) : BusinessException(code: code);
 }

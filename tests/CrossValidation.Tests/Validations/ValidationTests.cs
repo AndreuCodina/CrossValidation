@@ -49,12 +49,12 @@ public class ValidationTests :
     
     [Theory]
     [InlineData(null, "Expected message", nameof(ErrorResource.General), "Expected message")]
-    [InlineData("ExpectedCode", null, "ExpectedCode", null)]
-    [InlineData(nameof(ErrorResource.Enum), null, nameof(ErrorResource.Enum), "Must be a valid value")]
+    [InlineData("ExpectedCode", "", "ExpectedCode", null)]
+    [InlineData(nameof(ErrorResource.Enum), "", nameof(ErrorResource.Enum), "Must be a valid value")]
     [InlineData("ExpectedCode", "Expected message", "ExpectedCode", "Expected message")]
     public void ValidateField_keeps_customizations_before_create_instance(
         string? code,
-        string? message,
+        string message,
         string? expectedCode,
         string? expectedMessage)
     {
@@ -65,14 +65,14 @@ public class ValidationTests :
             validation.WithCode(code);
         }
         
-        if (message != null)
+        if (message != "")
         {
             validation.WithMessage(message);
         }
 
         var action = () => validation
             .WithException(new CustomErrorWithPlaceholderValue(10))
-            .Instance(x => ValueObjectWithCustomization.Create(x, code: null, message: null));
+            .Instance(x => ValueObjectWithCustomization.Create(x, code: null, message: ""));
 
         var error = action.ShouldThrowCrossError<CustomErrorWithPlaceholderValue>();
         error.Code.ShouldBe(expectedCode);
@@ -103,13 +103,13 @@ public class ValidationTests :
     }
 
     [Theory]
-    [InlineData(null, null, nameof(ErrorResource.General), "An error has occured")]
+    [InlineData(null, "", nameof(ErrorResource.General), "An error has occured")]
     [InlineData(null, "Expected message", nameof(ErrorResource.General), "Expected message")]
-    [InlineData("RandomCode", null, "RandomCode", null)]
-    [InlineData(nameof(ErrorResource.NotNull), null, nameof(ErrorResource.NotNull), "Must have a value")]
+    [InlineData("RandomCode", "", "RandomCode", null)]
+    [InlineData(nameof(ErrorResource.NotNull), "", nameof(ErrorResource.NotNull), "Must have a value")]
     public void Keep_instance_customizations(
         string? code,
-        string? message,
+        string message,
         string? expectedCode,
         string? expectedMessage)
     {
@@ -314,7 +314,7 @@ public class ValidationTests :
 
     private record ValueObjectWithCustomization(int Value)
     {
-        public static ValueObjectWithCustomization Create(int value, string? code, string? message)
+        public static ValueObjectWithCustomization Create(int value, string? code, string message)
         {
             var validation = Validate.That(value);
 
@@ -323,7 +323,7 @@ public class ValidationTests :
                 validation.WithCode(code);
             }
 
-            if (message is not null)
+            if (message != "")
             {
                 validation.WithMessage(message);
             }
