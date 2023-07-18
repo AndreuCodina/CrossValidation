@@ -7,9 +7,9 @@ using CrossValidation.Tests.TestUtils.Fixtures.Validators;
 using Shouldly;
 using Xunit;
 
-namespace CrossValidation.Tests.Errors;
+namespace CrossValidation.Tests.Exceptions;
 
-public class CompleteCrossErrorTests :
+public class BusinessExceptionTests :
     TestBase,
     IClassFixture<CommonFixture>,
     IClassFixture<ValidatorFixture>
@@ -17,7 +17,7 @@ public class CompleteCrossErrorTests :
     private readonly CommonFixture _commonFixture;
     private readonly ValidatorFixture _validatorFixture;
 
-    public CompleteCrossErrorTests(CommonFixture commonFixture, ValidatorFixture validatorFixture)
+    public BusinessExceptionTests(CommonFixture commonFixture, ValidatorFixture validatorFixture)
     {
         _commonFixture = commonFixture;
         _validatorFixture = validatorFixture;

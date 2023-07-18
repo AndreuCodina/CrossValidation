@@ -1,5 +1,4 @@
-﻿using CrossValidation.Errors;
-using CrossValidation.Exceptions;
+﻿using CrossValidation.Exceptions;
 
 namespace CrossValidation.Validators;
 

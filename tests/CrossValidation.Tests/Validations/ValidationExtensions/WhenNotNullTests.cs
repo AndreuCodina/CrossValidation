@@ -1,4 +1,4 @@
-﻿using CrossValidation.Errors;
+﻿using CrossValidation.Exceptions;
 using CrossValidation.ShouldlyAssertions;
 using CrossValidation.Tests.TestUtils;
 using CrossValidation.Tests.TestUtils.Builders;

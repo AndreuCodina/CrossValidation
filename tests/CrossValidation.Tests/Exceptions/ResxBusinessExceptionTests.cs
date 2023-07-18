@@ -3,7 +3,7 @@ using CrossValidation.WebApplication.Resources;
 using Shouldly;
 using Xunit;
 
-namespace CrossValidation.Tests.Errors;
+namespace CrossValidation.Tests.Exceptions;
 
 public partial class ResxBusinessExceptionTests
 {
@@ -12,9 +12,9 @@ public partial class ResxBusinessExceptionTests
     {
         var expectedCode = nameof(ErrorResource1.Code_With_Stops);
         
-        var error = new CodeWithStops();
+        var exception = new CodeWithStops();
     
-        error.Code.ShouldBe(expectedCode);
+        exception.Code.ShouldBe(expectedCode);
     }
 
     public partial class CodeWithStops() : ResxBusinessException(ErrorResource1.Code_With_Stops);

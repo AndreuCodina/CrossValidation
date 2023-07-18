@@ -1,6 +1,4 @@
-using CrossValidation.Exceptions;
-
-namespace CrossValidation.Errors;
+namespace CrossValidation.Exceptions;
 
 public class MessageCrossError(string message) :
     BusinessException(message: message)

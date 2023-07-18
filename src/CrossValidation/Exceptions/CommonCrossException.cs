@@ -1,7 +1,6 @@
-﻿using CrossValidation.Exceptions;
-using CrossValidation.Resources;
+﻿using CrossValidation.Resources;
 
-namespace CrossValidation.Errors;
+namespace CrossValidation.Exceptions;
 
 #pragma warning disable CS9113 // Parameter is unread.
 public static class CommonCrossException

@@ -1,6 +1,4 @@
-﻿using CrossValidation.Exceptions;
-
-namespace CrossValidation.Errors;
+﻿namespace CrossValidation.Exceptions;
 
 public abstract class LengthException(string code) : BusinessException(code: code)
 {

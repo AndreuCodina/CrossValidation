@@ -1,5 +1,4 @@
 ﻿using System.Net;
-using CrossValidation.Errors;
 using CrossValidation.Exceptions;
 using CrossValidation.ShouldlyAssertions;
 using CrossValidation.Tests.TestUtils;
