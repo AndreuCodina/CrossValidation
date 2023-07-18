@@ -16,4 +16,13 @@
       <PackageReference Include="Microsoft.CodeAnalysis.CSharp" />
     </ItemGroup>
 
+    <!-- Ensure the library is packaged as a source generator when we use "dotnet pack" -->
+    <ItemGroup>
+        <None
+                Include="$(OutputPath)\$(AssemblyName).dll"
+                Pack="true"
+                PackagePath="analyzers/dotnet/cs"
+                Visible="false"
+        />
+    </ItemGroup>
 </Project>
