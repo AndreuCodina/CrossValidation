@@ -18,6 +18,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrossValidation.Benchmarks"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrossValidation.SourceGenerators", "src\CrossValidation.SourceGenerators\CrossValidation.SourceGenerators.csproj", "{4ED6FB4C-B475-461B-966D-81D3CFECB404}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrossValidation.SourceGenerators.UnitTests", "tests\CrossValidation.SourceGenerators.UnitTests\CrossValidation.SourceGenerators.UnitTests.csproj", "{116D55CE-6AA7-49E5-9212-ACCAC73A4340}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -48,6 +50,10 @@ Global
 		{4ED6FB4C-B475-461B-966D-81D3CFECB404}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4ED6FB4C-B475-461B-966D-81D3CFECB404}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4ED6FB4C-B475-461B-966D-81D3CFECB404}.Release|Any CPU.Build.0 = Release|Any CPU
+		{116D55CE-6AA7-49E5-9212-ACCAC73A4340}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{116D55CE-6AA7-49E5-9212-ACCAC73A4340}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{116D55CE-6AA7-49E5-9212-ACCAC73A4340}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{116D55CE-6AA7-49E5-9212-ACCAC73A4340}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{049100B9-0B86-42B3-8612-CEB09A4FAE0F} = {49061C30-4142-4803-B38C-6E82D2354872}
@@ -56,5 +62,6 @@ Global
 		{C151B7FD-3DFC-4ABB-A38A-5C2A2D2FAD1A} = {2CC84D31-5578-4916-9D07-8346D8DC6171}
 		{5955B6A6-936B-4AF7-BA40-3131368A93EB} = {03F396D1-23C9-4493-AB58-6C7E4E48524B}
 		{4ED6FB4C-B475-461B-966D-81D3CFECB404} = {49061C30-4142-4803-B38C-6E82D2354872}
+		{116D55CE-6AA7-49E5-9212-ACCAC73A4340} = {2CC84D31-5578-4916-9D07-8346D8DC6171}
 	EndGlobalSection
 EndGlobal

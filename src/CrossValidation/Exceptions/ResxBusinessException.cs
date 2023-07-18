@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 
 namespace CrossValidation.Exceptions;
 
-public class ResxBusinessException(
+public abstract class ResxBusinessException(
     string? key = null,
     HttpStatusCode statusCode = HttpStatusCode.UnprocessableEntity,
     string? details = null,

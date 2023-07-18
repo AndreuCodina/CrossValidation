@@ -51,5 +51,5 @@ public class CompleteCrossErrorTests :
         }
     }
     
-    private class CustomNotNull() : ResxBusinessException(ErrorResource.NotNull);
+    private class CustomNotNull() : BusinessException(code: nameof(ErrorResource.NotNull));
 }

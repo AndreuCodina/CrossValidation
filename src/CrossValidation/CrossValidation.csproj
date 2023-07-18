@@ -46,4 +46,12 @@
     </ItemGroup>
 
 
+    <ItemGroup>
+      <ProjectReference 
+              Include="..\CrossValidation.SourceGenerators\CrossValidation.SourceGenerators.csproj"
+              PrivateAssets="contentfiles;build"
+              SetTargetFramework="TargetFramework=netstandard2.0"
+      />
+    </ItemGroup>
+
 </Project>
