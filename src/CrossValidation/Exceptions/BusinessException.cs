@@ -77,12 +77,12 @@ public class BusinessException : Exception
 
     public void AddCommonPlaceholderValues()
     {
-        AddPlaceholderValue(FieldName);
-        AddPlaceholderValue(FieldDisplayName);
+        AddPlaceholderValue(FieldName, "fieldName");
+        AddPlaceholderValue(FieldDisplayName, "fieldDisplayName");
 
         if (GetFieldValue is not null)
         {
-            AddPlaceholderValue(GetFieldValue!(), "FieldValue");
+            AddPlaceholderValue(GetFieldValue!(), "fieldValue");
         }
         
         ReplacePlaceholderValues();

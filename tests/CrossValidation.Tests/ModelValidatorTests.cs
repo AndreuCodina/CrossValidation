@@ -603,8 +603,8 @@ public class ModelValidatorTests :
      [Fact]
      public void Replace_default_placeholders()
      {
-         var template = "{FieldDisplayName} is {FieldValue}";
-         var expectedMessage = $"NullableString is ";
+         var template = "{fieldDisplayName} is {fieldValue}";
+         var expectedMessage = "NullableString is ";
          var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
          {
              validator.Field(_model.NullableString)
@@ -621,7 +621,7 @@ public class ModelValidatorTests :
      [Fact]
      public void Not_replace_placeholders_not_added()
      {
-         var template = "{PlaceholderNotReplaced} is {FieldValue}";
+         var template = "{PlaceholderNotReplaced} is {fieldValue}";
          var expectedMessage = $"{{PlaceholderNotReplaced}} is {_model.NestedModel.Int}";
          var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
          {
@@ -640,7 +640,7 @@ public class ModelValidatorTests :
      public void Replace_custom_error_placeholders()
      {
          var comparisonValue = _model.NestedModel.Int;
-         var template = "{comparisonValue} is not greater than {FieldValue}";
+         var template = "{comparisonValue} is not greater than {fieldValue}";
          var expectedMessage = $"{_model.NestedModel.Int} is not greater than {comparisonValue}";
          var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
          {
