@@ -640,7 +640,7 @@ public class ModelValidatorTests :
      public void Replace_custom_error_placeholders()
      {
          var comparisonValue = _model.NestedModel.Int;
-         var template = "{ComparisonValue} is not greater than {FieldValue}";
+         var template = "{comparisonValue} is not greater than {FieldValue}";
          var expectedMessage = $"{_model.NestedModel.Int} is not greater than {comparisonValue}";
          var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
          {

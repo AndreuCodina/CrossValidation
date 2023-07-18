@@ -20,6 +20,11 @@ public static class CommonCrossException
     {
         public override bool IsCommon => true;
         public TField ComparisonValue => comparisonValue;
+        
+        public override void AddParametersAsPlaceholderValues()
+        {
+            AddPlaceholderValue(comparisonValue);
+        }
     }
 
     public class Enum() : BusinessException(code: nameof(ErrorResource.Enum))
@@ -37,6 +42,11 @@ public static class CommonCrossException
     {
         public override bool IsCommon => true;
         public override int TotalLength => totalLength;
+        
+        public override void AddParametersAsPlaceholderValues()
+        {
+            AddPlaceholderValue(totalLength);
+        }
     }
 
     public class MinimumLength(int minimum, int totalLength)
@@ -44,6 +54,11 @@ public static class CommonCrossException
     {
         public override bool IsCommon => true;
         public override int TotalLength => totalLength;
+        
+        public override void AddParametersAsPlaceholderValues()
+        {
+            AddPlaceholderValue(totalLength);
+        }
     }
 
     public class Predicate() : BusinessException(code: nameof(ErrorResource.General))

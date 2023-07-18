@@ -77,17 +77,17 @@ public class BusinessException : Exception
 
     public void AddCommonPlaceholderValues()
     {
-        if (!CrossValidationOptions.LocalizeErrorInClient)
-        {
-            return;
-        }
-        
         AddPlaceholderValue(FieldName);
         AddPlaceholderValue(FieldDisplayName);
 
         if (GetFieldValue is not null)
         {
             AddPlaceholderValue(GetFieldValue!(), "FieldValue");
+        }
+        
+        if (CrossValidationOptions.LocalizeErrorInClient)
+        {
+            return;
         }
         
         ReplacePlaceholderValues();

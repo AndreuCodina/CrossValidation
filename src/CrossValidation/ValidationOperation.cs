@@ -285,6 +285,7 @@ internal class ValidationOperation
     private void AddException(BusinessException exception, ValidationContext context)
     {
         AddCustomizationsToException(exception, context);
+        exception.AddCommonPlaceholderValues();
         context.ExceptionsCollected.Add(exception);
     }
 
