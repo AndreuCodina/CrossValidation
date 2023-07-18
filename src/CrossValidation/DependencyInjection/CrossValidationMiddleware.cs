@@ -53,10 +53,13 @@ public class CrossValidationMiddleware : IMiddleware
             var error = CreateCrossProblemDetailsError(businessException);
             
             var allErrorCustomizationsAreNotSet =
-                error.Code is null
-                && error.Message is null
-                && error.Details is null
-                && error.Placeholders is null;
+                error is
+                {
+                    Code: null,
+                    Message: null,
+                    Details: null,
+                    Placeholders: null
+                };
 
             if (!allErrorCustomizationsAreNotSet)
             {
@@ -113,21 +116,21 @@ public class CrossValidationMiddleware : IMiddleware
         await context.Response.WriteAsync(response);
     }
 
-    private CrossProblemDetailsError CreateCrossProblemDetailsError(BusinessException crossError)
+    private CrossProblemDetailsError CreateCrossProblemDetailsError(BusinessException exception)
     {
         var error = new CrossProblemDetailsError
         {
-            Code = crossError.Code,
-            Message = crossError.Message,
-            Details = crossError.Details
+            Code = exception.Code,
+            Message = exception.Message == "" ? null : exception.Message,
+            Details = exception.Details
         };
 
         if (CrossValidationOptions.LocalizeErrorInClient
-            && crossError.PlaceholderValues is not null)
+            && exception.PlaceholderValues is not null)
         {
             var placeholders = new Dictionary<string, object>();
             
-            foreach (var placeholder in crossError.PlaceholderValues)
+            foreach (var placeholder in exception.PlaceholderValues)
             {
                 placeholders.Add(placeholder.Key, placeholder.Value);
             }

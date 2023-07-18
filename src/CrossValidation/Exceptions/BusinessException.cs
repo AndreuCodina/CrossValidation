@@ -63,7 +63,7 @@ public class BusinessException : Exception
 
     public virtual void AddPlaceholderValues()
     {
-        AddCommonPlaceholderValues();
+        AddCommonPlaceholderValues(); // They must be added with the DSL
         AddCustomErrorPlaceholderValues();
         ReplacePlaceholderValues();
     }
