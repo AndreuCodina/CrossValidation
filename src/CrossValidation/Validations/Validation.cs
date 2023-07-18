@@ -471,7 +471,7 @@ internal class Validation<TField> :
         catch (BusinessException e)
         {
             e.FieldName = null;
-            e.PlaceholderValues = null;
+            e.PlaceholderValues.Clear();
             e.CrossErrorToException = CrossErrorToException;
             TakeCustomizationsFromInstanceException(e, Context!);
             HandleException(e, Context!);

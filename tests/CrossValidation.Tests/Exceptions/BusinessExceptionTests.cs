@@ -35,7 +35,7 @@ public class BusinessExceptionTests :
 
     private class ErrorWithAllFieldsAddedAsPlaceholders(string name, int age) : BusinessException
     {
-        public override void AddPlaceholderValues()
+        public override void AddParametersAsPlaceholderValues()
         {
             AddPlaceholderValue(name);
             AddPlaceholderValue(age);
@@ -44,7 +44,7 @@ public class BusinessExceptionTests :
     
     private class ErrorWithNullFields(string? name, int? age) : BusinessException
     {
-        public override void AddPlaceholderValues()
+        public override void AddParametersAsPlaceholderValues()
         {
             AddPlaceholderValue(name);
             AddPlaceholderValue(age);

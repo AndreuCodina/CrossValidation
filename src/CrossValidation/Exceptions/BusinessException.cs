@@ -16,7 +16,7 @@ public class BusinessException : Exception
     public string? Details { get; set; }
     public string? FieldName { get; set; }
     public string? FieldDisplayName { get; set; }
-    public Dictionary<string, object>? PlaceholderValues { get; set; }
+    public Dictionary<string, object> PlaceholderValues { get; set; } = new();
     public Type? CrossErrorToException { get; set; }
     public Func<object>? GetFieldValue { get; set; }
     public virtual bool IsCommon { get; set; } = false;
@@ -35,6 +35,8 @@ public class BusinessException : Exception
         Details = details;
         FieldName = fieldName;
         FieldDisplayName = fieldDisplayName;
+        AddParametersAsPlaceholderValues();
+        ReplacePlaceholderValues();
     }
 
     private static string GetFormattedMessage(string? code, string message)
@@ -61,13 +63,6 @@ public class BusinessException : Exception
         PlaceholderValues.Add(name, value ?? DefaultPlaceholderValue);
     }
 
-    public virtual void AddPlaceholderValues()
-    {
-        AddCommonPlaceholderValues(); // They must be added with the DSL
-        AddCustomErrorPlaceholderValues();
-        ReplacePlaceholderValues();
-    }
-
     /// <summary>
     /// Get error constructor parameter names
     /// </summary>
@@ -80,8 +75,13 @@ public class BusinessException : Exception
             .Select(x => x.Name!);
     }
 
-    private void AddCommonPlaceholderValues()
+    public void AddCommonPlaceholderValues()
     {
+        if (!CrossValidationOptions.LocalizeErrorInClient)
+        {
+            return;
+        }
+        
         AddPlaceholderValue(FieldName);
         AddPlaceholderValue(FieldDisplayName);
 
@@ -89,25 +89,12 @@ public class BusinessException : Exception
         {
             AddPlaceholderValue(GetFieldValue!(), "FieldValue");
         }
+        
+        ReplacePlaceholderValues();
     }
 
-    private void AddCustomErrorPlaceholderValues()
+    public virtual void AddParametersAsPlaceholderValues()
     {
-        var arePlaceholderValuesAdded = GetType().GetMethod(nameof(AddPlaceholderValues))!.DeclaringType == GetType();
-
-        if (!arePlaceholderValuesAdded && (IsCommon || CrossValidationOptions.LocalizeErrorInClient))
-        {
-            var properties = GetType().GetProperties();
-            var customPlaceholderNames = GetFieldNames();
-
-            foreach (var customPlaceholderName in customPlaceholderNames)
-            {
-                var value = properties.Where(x => x.Name == customPlaceholderName)
-                    .Select(x => x.GetValue(this)!)
-                    .FirstOrDefault();
-                AddPlaceholderValue(value ?? DefaultPlaceholderValue, customPlaceholderName);
-            }
-        }
     }
 
     private void ReplacePlaceholderValues()
@@ -121,7 +108,7 @@ public class BusinessException : Exception
         {
             var key = evaluator.Groups[1].Value;
 
-            if (!PlaceholderValues!.TryGetValue(key, out var value))
+            if (!PlaceholderValues.TryGetValue(key, out var value))
             {
                 return evaluator.Value;
             }

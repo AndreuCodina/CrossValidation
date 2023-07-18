@@ -111,7 +111,7 @@ public abstract record ModelValidator<TModel>
             {
                 foreach (var errorCollected in ScopeCreatorValidation.Context.ExceptionsCollected)
                 {
-                    errorCollected.AddPlaceholderValues();
+                    errorCollected.AddCommonPlaceholderValues();
                 }
                 
                 throw new ValidationListException(ScopeCreatorValidation.Context.ExceptionsCollected);
