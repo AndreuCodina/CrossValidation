@@ -86,11 +86,6 @@ public class BusinessException : Exception
         }
         
         ReplacePlaceholderValues();
-        
-        if (CrossValidationOptions.LocalizeErrorInClient)
-        {
-            PlaceholderValues.Clear();
-        }
     }
 
     public virtual void AddParametersAsPlaceholderValues()
