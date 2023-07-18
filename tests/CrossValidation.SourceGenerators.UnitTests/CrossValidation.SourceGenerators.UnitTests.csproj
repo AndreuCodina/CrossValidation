@@ -32,4 +32,19 @@
       />
     </ItemGroup>
 
+    <ItemGroup>
+      <EmbeddedResource Update="Resources\TestErrorResource.resx">
+        <Generator>ResXFileCodeGenerator</Generator>
+        <LastGenOutput>TestErrorResource.Designer.cs</LastGenOutput>
+      </EmbeddedResource>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Update="Resources\TestErrorResource.Designer.cs">
+        <DesignTime>True</DesignTime>
+        <AutoGen>True</AutoGen>
+        <DependentUpon>TestErrorResource.resx</DependentUpon>
+      </Compile>
+    </ItemGroup>
+
 </Project>

@@ -151,10 +151,9 @@ public class ResxBusinessExceptionSourceGenerator : IIncrementalGenerator
               {{GenerateParentClassStart(parentClass, ref numberOfParentClasses)}}
                   {{modifiers}} class {{classNameWithRestrictions}}
                   {
-                      public override string Message => FormattedMessage();
-                      public override string FormattedMessage()
+                      public override void AddParametersAsPlaceholderValues()
                       {
-                          {{GenerateFormattedMessageBody(constructorParameterNames)}}
+                          {{GenerateAddParametersAsPlaceholderValuesBody(constructorParameterNames)}}
                       }
                   }
               {{GenerateParentClassEnd(numberOfParentClasses)}}
@@ -164,26 +163,24 @@ public class ResxBusinessExceptionSourceGenerator : IIncrementalGenerator
         return result;
     }
 
-    private static string GenerateFormattedMessageBody(string[]? constructorParameterNames)
+    private static string GenerateAddParametersAsPlaceholderValuesBody(string[]? constructorParameterNames)
     {
-         if (constructorParameterNames is null || !constructorParameterNames.Any())
-         {
-             return
-                 """
-                 return "";
-                 """;
-         }
-         
-         var constructorParameterNamesAsString = string.Join(", ", constructorParameterNames);
-         return
-             $$"""
-               if (MessageTemplate is null)
-               {
-                   return "";
-               }
-               
-               return global::System.String.Format(MessageTemplate, {{constructorParameterNamesAsString}});
-               """;
+        if (constructorParameterNames is null)
+        {
+            return "";
+        }
+        
+        var stringBuilder = new StringBuilder();
+        
+        foreach (var constructorParameterName in constructorParameterNames)
+        {
+            stringBuilder.AppendLine(
+                $$"""
+                  AddPlaceholderValue({{constructorParameterName}});
+                  """);
+        }
+
+        return stringBuilder.ToString();
     }
 
     private static string GenerateParentClassEnd(int numberOfParentClasses)
