@@ -85,12 +85,12 @@ public class BusinessException : Exception
             AddPlaceholderValue(GetFieldValue!(), "FieldValue");
         }
         
+        ReplacePlaceholderValues();
+        
         if (CrossValidationOptions.LocalizeErrorInClient)
         {
-            return;
+            PlaceholderValues.Clear();
         }
-        
-        ReplacePlaceholderValues();
     }
 
     public virtual void AddParametersAsPlaceholderValues()
