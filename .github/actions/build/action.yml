@@ -25,5 +25,6 @@ runs:
           --no-restore \
           -p:ContinuousIntegrationBuild=true \
           -p:Deterministic=true \
-          -p:EmbedUntrackedSources=true
+          -p:EmbedUntrackedSources=true \
+          /maxcpucount:1
       shell: bash
