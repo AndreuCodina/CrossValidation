@@ -1,8 +1,10 @@
 using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Diagnostics.dotTrace;
 using CrossValidation.Exceptions;
 
 namespace CrossValidation.Benchmarks;
 
+[DotTraceDiagnoser]
 [MemoryDiagnoser]
 [RankColumn]
 public class MustBenchmarks

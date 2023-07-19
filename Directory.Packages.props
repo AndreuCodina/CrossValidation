@@ -3,18 +3,20 @@
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
   </PropertyGroup>
   <ItemGroup>
+    <PackageVersion Include="BenchmarkDotNet.Annotations" Version="0.13.6" />
+    <PackageVersion Include="BenchmarkDotNet.Diagnostics.dotTrace" Version="0.13.6" />
     <PackageVersion Include="Bogus" Version="34.0.2" />
-    <PackageVersion Include="Microsoft.AspNetCore.Mvc.Testing" Version="7.0.8" />
+    <PackageVersion Include="Microsoft.AspNetCore.Mvc.Testing" Version="7.0.9" />
     <PackageVersion Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.4" />
     <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="4.6.0" />
-    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.6.2" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.6.3" />
     <PackageVersion Include="Moq" Version="4.18.4" />
     <PackageVersion Include="Shouldly" Version="4.2.1" />
-    <PackageVersion Include="xunit" Version="2.4.2" />
-    <PackageVersion Include="xunit.analyzers" Version="1.1.0" />
-    <PackageVersion Include="xunit.runner.visualstudio" Version="2.4.5" />
+    <PackageVersion Include="xunit" Version="2.5.0" />
+    <PackageVersion Include="xunit.analyzers" Version="1.2.0" />
+    <PackageVersion Include="xunit.runner.visualstudio" Version="2.5.0" />
     <PackageVersion Include="coverlet.collector" Version="6.0.0" />
-    <PackageVersion Include="BenchmarkDotNet" Version="0.13.5" />
+    <PackageVersion Include="BenchmarkDotNet" Version="0.13.6" />
     <PackageVersion Include="Microsoft.AspNetCore.Hosting.Abstractions" Version="2.2.0" />
     <PackageVersion Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
     <PackageVersion Include="Microsoft.AspNetCore.Localization" Version="2.2.0" />
