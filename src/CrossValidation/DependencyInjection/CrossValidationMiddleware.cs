@@ -35,6 +35,7 @@ public class CrossValidationMiddleware : IMiddleware
     {
         var problemDetails = new CrossProblemDetails();
         var statusCode = HttpStatusCode.InternalServerError;
+        string? type = null;
         string? title = null;
         string? details = null;
         List<CrossProblemDetailsError> errors = new();
@@ -90,11 +91,13 @@ public class CrossValidationMiddleware : IMiddleware
             }
             
             _logger.LogError(exception, exception.Message);
+            type = "https://datatracker.ietf.org/doc/html/rfc9110#section-15.6.1";
             title = "An error occurred";
             problemDetails.Detail = _environment.IsDevelopment() ? exception.Message : null;
         }
 
         problemDetails.Status = (int)statusCode;
+        problemDetails.Type = type;
         problemDetails.Title = title;
         problemDetails.Detail = details;
         problemDetails.Errors = errors.Any() ? errors : null;
