@@ -19,7 +19,6 @@ public class BusinessException : Exception
     public Dictionary<string, object> PlaceholderValues { get; set; } = new();
     public Type? CrossErrorToException { get; set; }
     public Func<object>? GetFieldValue { get; set; }
-    public virtual bool IsCommon { get; set; } = false;
     
     public BusinessException(
         string message = "",
