@@ -18,6 +18,7 @@ runs:
       run: dotnet restore
       shell: bash
 
+    # Problem after introducing source generators: https://github.com/dotnet/sdk/issues/2902#issuecomment-1419352659
     - name: Build
       run: |
         dotnet build \

@@ -17,7 +17,7 @@ runs:
 
   steps:
     - name: Merge test coverage files
-      run: dotnet reportgenerator "-reports:${{ inputs.test-coverage-folder }}/lcov.info" "-targetdir:./artifacts/coverage" "-reporttypes:lcov"
+      run: dotnet reportgenerator "-reports:${{ inputs.test-coverage-folder }}/*/coverage.info" "-targetdir:./artifacts/coverage" "-reporttypes:lcov"
       shell: bash
 
     - name: Publish coverage to Coveralls
