@@ -10,7 +10,7 @@ namespace CrossValidation.SourceGenerators.UnitTests;
 public class ResxBusinessExceptionSourceGeneratorTests
 {
     [Fact]
-    public void GenerateOutput()
+    public void Generate_output()
     {
         var code =
             """
@@ -61,7 +61,7 @@ public class ResxBusinessExceptionSourceGeneratorTests
         var generator = new ResxBusinessExceptionSourceGenerator();
         GeneratorDriver driver = CSharpGeneratorDriver.Create(generator);
 
-        driver = driver.RunGeneratorsAndUpdateCompilation(compilation, out var _, out var _);
+        driver = driver.RunGeneratorsAndUpdateCompilation(compilation, out _, out _);
         
         var runResult = driver.GetRunResult();
         var generatedCode = runResult.Results[0]
@@ -72,9 +72,63 @@ public class ResxBusinessExceptionSourceGeneratorTests
             CompareOptions.IgnoreCase | CompareOptions.IgnoreSymbols) == 0;
         equals.ShouldBeTrue();
     }
+    
+    [Fact]
+    public void Not_generate_output_when_exception_is_declared_several_times()
+    {
+        var code =
+            """
+            namespace ParentNamespace
+            {
+                internal partial class ExceptionWithParameters<T>(int age, string email, T generic)
+                    : ResxBusinessException(key: ErrorResource.ResourceKey)
+                
+                internal partial class ExceptionWithParameters<T>;
+            }
+            """;
+        var syntaxTree = CSharpSyntaxTree.ParseText(code);
+        var compilation = CSharpCompilation.Create(
+            assemblyName: nameof(ResxBusinessExceptionSourceGeneratorTests),
+            syntaxTrees: new[] { syntaxTree });
+        var generator = new ResxBusinessExceptionSourceGenerator();
+        GeneratorDriver driver = CSharpGeneratorDriver.Create(generator);
+
+        driver = driver.RunGeneratorsAndUpdateCompilation(compilation, out _, out _);
+        
+        var runResult = driver.GetRunResult();
+        runResult.Results[0]
+            .GeneratedSources
+            .ShouldBeEmpty();
+    }
+    
+    [Fact]
+    public void Not_generate_when_exception_is_not_partial()
+    {
+        var code =
+            """
+            namespace ParentNamespace
+            {
+                internal class ExceptionWithParameters<T>(int age, string email)
+                    : ResxBusinessException(key: ErrorResource.ResourceKey)
+            }
+            """;
+        var syntaxTree = CSharpSyntaxTree.ParseText(code);
+        var compilation = CSharpCompilation.Create(
+            assemblyName: nameof(ResxBusinessExceptionSourceGeneratorTests),
+            syntaxTrees: new[] { syntaxTree });
+        var generator = new ResxBusinessExceptionSourceGenerator();
+        GeneratorDriver driver = CSharpGeneratorDriver.Create(generator);
+
+        driver = driver.RunGeneratorsAndUpdateCompilation(compilation, out _, out _);
+        
+        var runResult = driver.GetRunResult();
+        runResult.Results[0]
+            .GeneratedSources
+            .ShouldBeEmpty();
+    }
 
     [Fact]
-    public void GenerateMessages()
+    public void Generate_messages()
     {
         new WithNoParametersGlobalNamespaceException()
             .Message

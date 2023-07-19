@@ -39,4 +39,10 @@ namespace ParentNamespace
     
     public partial class WithNoParametersNoMessageException()
         : ResxBusinessException(statusCode: HttpStatusCode.Accepted);
+
+    public partial class DeclaredSeveralTimesException : ResxBusinessException;
+    public partial class DeclaredSeveralTimesException;
+    
+    public partial class DeclaredSeveralTimesWithInheritanceException : ResxBusinessException;
+    public partial class DeclaredSeveralTimesWithInheritanceException : ResxBusinessException;
 }
