@@ -23,27 +23,27 @@ public static class CommonCrossException
 
     public class EnumRange() : BusinessException(code: nameof(ErrorResource.Enum));
 
-    public class LengthRange(int minimum, int maximum, int totalLength) :
+    public class LengthRange(int minimumLength, int maximumLength, int totalLength) :
         LengthException(code: nameof(ErrorResource.LengthRange))
     {
         public override int TotalLength => totalLength;
         
         public override void AddParametersAsPlaceholderValues()
         {
-            AddPlaceholderValue(minimum);
-            AddPlaceholderValue(maximum);
+            AddPlaceholderValue(minimumLength);
+            AddPlaceholderValue(maximumLength);
             AddPlaceholderValue(totalLength);
         }
     }
 
-    public class MinimumLength(int minimum, int totalLength)
+    public class MinimumLength(int minimumLength, int totalLength)
         : LengthException(code: nameof(ErrorResource.MinimumLength))
     {
         public override int TotalLength => totalLength;
         
         public override void AddParametersAsPlaceholderValues()
         {
-            AddPlaceholderValue(minimum);
+            AddPlaceholderValue(minimumLength);
             AddPlaceholderValue(totalLength);
         }
     }
