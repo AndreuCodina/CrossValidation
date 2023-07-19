@@ -10,7 +10,6 @@ namespace CrossValidation.DependencyInjection;
 
 public class CrossValidationMiddleware : IMiddleware
 {
-    private bool _isExceptionHandled = false;
     private readonly ILogger<CrossValidationMiddleware> _logger;
     private readonly IHostingEnvironment _environment;
 
@@ -29,11 +28,6 @@ public class CrossValidationMiddleware : IMiddleware
         catch (Exception e)
         {
             await HandleException(e, context);
-
-            if (!_isExceptionHandled)
-            {
-                throw;
-            }
         }
     }
 
@@ -47,7 +41,6 @@ public class CrossValidationMiddleware : IMiddleware
 
         if (exception is BusinessException businessException)
         {
-            _isExceptionHandled = true;
             statusCode = businessException.StatusCode;
             title = "A validation error occurred";
             var error = CreateCrossProblemDetailsError(businessException);
@@ -68,7 +61,6 @@ public class CrossValidationMiddleware : IMiddleware
         }
         else if (exception is ValidationListException validationListException)
         {
-            _isExceptionHandled = true;
             statusCode = HttpStatusCode.UnprocessableEntity;
             title = "Several validation errors occurred";
 
@@ -79,7 +71,6 @@ public class CrossValidationMiddleware : IMiddleware
         }
         else if (exception is NonNullablePropertyIsNullException nonNullablePropertyIsNullException)
         {
-            _isExceptionHandled = true;
             statusCode = HttpStatusCode.BadRequest;
             title = "Nullability error";
             details = $"Non nullable property is null: {nonNullablePropertyIsNullException.PropertyName}";
@@ -87,7 +78,6 @@ public class CrossValidationMiddleware : IMiddleware
         else if (exception is NonNullableItemCollectionWithNullItemException
                  nonNullableItemCollectionWithNullItemException)
         {
-            _isExceptionHandled = true;
             statusCode = HttpStatusCode.BadRequest;
             title = "Nullability error";
             details = $"Non nullable item collection with null item: {nonNullableItemCollectionWithNullItemException.CollectionName}";
@@ -99,9 +89,8 @@ public class CrossValidationMiddleware : IMiddleware
                 return;
             }
             
-            _isExceptionHandled = true;
             _logger.LogError(exception, exception.Message);
-            title = "An error occurred";;
+            title = "An error occurred";
             problemDetails.Detail = _environment.IsDevelopment() ? exception.Message : null;
         }
 
