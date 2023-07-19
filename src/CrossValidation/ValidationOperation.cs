@@ -29,7 +29,7 @@ public interface IValidationOperation
     BusinessException? Exception { get; set; }
     string? FieldDisplayName { get; set; }
     HttpStatusCode? StatusCode { get; set; }
-    Type? CrossErrorToException { get; set; }
+    Type? CustomExceptionToThrow { get; set; }
     Func<bool>? Condition { get; set; }
     Func<Task<bool>>? AsyncCondition { get; set; }
     IValidationOperation? NextValidation { get; set; }
@@ -41,7 +41,7 @@ public interface IValidationOperation
     int? Index { get; set; }
     public bool IsInsideScope { get; set; }
     public IValidationOperation? ScopeCreatorValidation { get; set; }
-    public bool GeneralizeError { get; set; }
+    public bool DoGenericError { get; set; }
     public ScopeType? ScopeType { get; set; }
     public string? ParentPath { get; set; }
     public string? FieldPath { get; set; }
@@ -51,7 +51,7 @@ public interface IValidationOperation
     ValueTask ExecuteAsync(ValidationContext context, bool useAsync);
     void HandleException(BusinessException exception, ValidationContext context);
     void TakeCustomizationsFromInstanceException(BusinessException exception, ValidationContext context);
-    void TakeCustomizationsFromException(BusinessException error, ValidationContext context);
+    void TakeCustomizationsFromException(BusinessException exception, ValidationContext context);
     void MarkAsPendingAsyncValidation();
     void MarkAsFailed();
     
@@ -69,7 +69,7 @@ internal class ValidationOperation
     public BusinessException? Exception { get; set; }
     public string? FieldDisplayName { get; set; }
     public HttpStatusCode? StatusCode { get; set; }
-    public Type? CrossErrorToException { get; set; }
+    public Type? CustomExceptionToThrow { get; set; }
     public Func<bool>? Condition { get; set; }
     public Func<Task<bool>>? AsyncCondition { get; set; }
     public IValidationOperation? NextValidation { get; set; }
@@ -81,7 +81,7 @@ internal class ValidationOperation
     public int? Index { get; set; }
     public bool IsInsideScope { get; set; }
     public IValidationOperation? ScopeCreatorValidation { get; set; }
-    public bool GeneralizeError { get; set; }
+    public bool DoGenericError { get; set; }
     public ScopeType? ScopeType { get; set; }
     public string? ParentPath { get; set; }
     public string? FieldPath { get; set; }
@@ -178,14 +178,14 @@ internal class ValidationOperation
         
         if (Validator is not null)
         {
-            var error = Validator!().GetError();
+            var exception = Validator!().GetException();
 
-            if (error is null)
+            if (exception is null)
             {
                 return;
             }
             
-            HandleException(error, context);
+            HandleException(exception, context);
             MarkAsFailed();
         }
         else if (AsyncValidator is not null)
@@ -195,14 +195,14 @@ internal class ValidationOperation
                 throw new InvalidOperationException("An asynchronous validator cannot be used in synchronous mode");
             }
             
-            var error = (await AsyncValidator()).GetError();
+            var exception = (await AsyncValidator()).GetException();
 
-            if (error is null)
+            if (exception is null)
             {
                 return;
             }
             
-            HandleException(error, context);
+            HandleException(exception, context);
             MarkAsFailed();
         }
         else if (Scope is not null)
@@ -215,17 +215,17 @@ internal class ValidationOperation
 
     public void HandleException(BusinessException exception, ValidationContext context)
     {
-        var exceptionToAdd = context.Error ?? (Exception ?? exception);
+        var exceptionToAdd = context.Exception ?? (Exception ?? exception);
         AddException(exceptionToAdd, context);
 
         if (context is {ValidationMode: ValidationMode.StopOnFirstError})
         {
             if (context.ExceptionsCollected.Count == 1)
             {
-                if (CrossErrorToException is not null)
+                if (CustomExceptionToThrow is not null)
                 {
                     throw (Exception)Activator.CreateInstance(
-                        CrossErrorToException,
+                        CustomExceptionToThrow,
                         CreateParametrizedExceptionMessage(context.ExceptionsCollected[0]))!;
                 }
                 
@@ -241,7 +241,7 @@ internal class ValidationOperation
     
     public void TakeCustomizationsFromInstanceException(BusinessException exception, ValidationContext context)
     {
-        if (GeneralizeError)
+        if (DoGenericError)
         {
             return;
         }
@@ -303,7 +303,7 @@ internal class ValidationOperation
 
     private void AddCustomizationsToException(BusinessException exception, ValidationContext context)
     {
-        exception.CrossErrorToException = CrossErrorToException;
+        exception.CustomExceptionToThrow = CustomExceptionToThrow;
         exception.FieldName = FieldName;
         exception.FieldDisplayName = GetFieldDisplayNameToFill(exception, context);
         exception.GetFieldValue = GetNonGenericFieldValue;
@@ -325,9 +325,9 @@ internal class ValidationOperation
             return Code;
         }
         
-        if (GeneralizeError)
+        if (DoGenericError)
         {
-            return nameof(ErrorResource.General);
+            return nameof(ErrorResource.Generic);
         }
 
         return exception.Code;
@@ -350,9 +350,9 @@ internal class ValidationOperation
             return CrossValidationOptions.GetMessageFromCode(Code);
         }
         
-        if (GeneralizeError)
+        if (DoGenericError)
         {
-            return CrossValidationOptions.GetMessageFromCode(nameof(ErrorResource.General));
+            return CrossValidationOptions.GetMessageFromCode(nameof(ErrorResource.Generic));
         }
 
         if (exception.Message != "")
@@ -368,7 +368,7 @@ internal class ValidationOperation
         return "";
     }
 
-    private string? GetFieldDisplayNameToFill(BusinessException error, ValidationContext context)
+    private string? GetFieldDisplayNameToFill(BusinessException exception, ValidationContext context)
     {
         if (context.FieldDisplayName is not null)
         {
@@ -380,14 +380,14 @@ internal class ValidationOperation
             return FieldDisplayName;
         }
 
-        if (error.FieldDisplayName is not null)
+        if (exception.FieldDisplayName is not null)
         {
-            return error.FieldDisplayName;
+            return exception.FieldDisplayName;
         }
 
-        if (error.FieldName is not null)
+        if (exception.FieldName is not null)
         {
-            return error.FieldName;
+            return exception.FieldName;
         }
 
         return null;

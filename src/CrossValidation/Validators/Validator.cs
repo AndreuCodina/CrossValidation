@@ -5,8 +5,8 @@ namespace CrossValidation.Validators;
 public interface IValidator<out TValidationException>
 {
     public bool IsValid();
-    public TValidationException CreateError();
-    public TValidationException? GetError();
+    public TValidationException CreateException();
+    public TValidationException? GetException();
 }
 
 public abstract class Validator : Validator<BusinessException>;
@@ -16,10 +16,10 @@ public abstract class Validator<TValidationException> : IValidator<TValidationEx
 {
     public abstract bool IsValid();
     
-    public abstract TValidationException CreateError();
+    public abstract TValidationException CreateException();
     
-    public TValidationException? GetError()
+    public TValidationException? GetException()
     {
-        return !IsValid() ? (TValidationException?)CreateError() : null;
+        return !IsValid() ? (TValidationException?)CreateException() : null;
     }
 }

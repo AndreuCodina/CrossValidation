@@ -46,7 +46,7 @@ public class EnumRangeValidator<TField, TEnum>(
         return false;
     }
 
-    public override BusinessException CreateError()
+    public override BusinessException CreateException()
     {
         return new CommonCrossException.EnumRange();
     }

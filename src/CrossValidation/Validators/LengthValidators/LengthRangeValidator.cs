@@ -10,7 +10,7 @@ public class LengthRangeValidator(string FieldValue, int Minimum, int Maximum) :
                && FieldValue.Length <= Maximum;
     }
 
-    public override LengthException CreateError()
+    public override LengthException CreateException()
     {
         return new CommonCrossException.LengthRange(Minimum, Maximum, GetTotalLength(FieldValue));
     }

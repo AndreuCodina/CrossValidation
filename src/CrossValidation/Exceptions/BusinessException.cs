@@ -17,7 +17,7 @@ public class BusinessException : Exception
     public string? FieldName { get; set; }
     public string? FieldDisplayName { get; set; }
     public Dictionary<string, object> PlaceholderValues { get; set; } = new();
-    public Type? CrossErrorToException { get; set; }
+    public Type? CustomExceptionToThrow { get; set; }
     public Func<object>? GetFieldValue { get; set; }
     
     public BusinessException(

@@ -60,7 +60,7 @@ public class CrossValidationMiddleware : IMiddleware
                 errors.Add(error);
             }
         }
-        else if (exception is ValidationListException validationListException)
+        else if (exception is BusinessListException validationListException)
         {
             statusCode = HttpStatusCode.UnprocessableEntity;
             title = "Several validation errors occurred";

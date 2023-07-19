@@ -87,9 +87,9 @@ namespace CrossValidation.Resources {
             }
         }
         
-        internal static string General {
+        internal static string Generic {
             get {
-                return ResourceManager.GetString("General", resourceCulture);
+                return ResourceManager.GetString("Generic", resourceCulture);
             }
         }
         

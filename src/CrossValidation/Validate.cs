@@ -19,8 +19,8 @@ public abstract class Validate
     {
         return new Validation<TField>(
             getFieldValue: () => field,
-            crossErrorToException: null,
-            generalizeError: true,
+            customThrowToThrow: null,
+            doGenericError: true,
             fieldPath: null,
             context: null,
             index: null,
@@ -45,7 +45,7 @@ public abstract class Validate
     {
         return IValidation<TField>.CreateFromFieldName(
             getFieldValue: () => field,
-            crossErrorToException: null,
+            customExceptionToThrow: null,
             fieldName: fieldName,
             context: null,
             exception: exception,
@@ -166,7 +166,7 @@ public abstract class Validate<TException>
     {
         return IValidation<TField>.CreateFromFieldName(
             getFieldValue: () => field,
-            crossErrorToException: typeof(TException),
+            customExceptionToThrow: typeof(TException),
             fieldName,
             context: null,
             exception: exception,

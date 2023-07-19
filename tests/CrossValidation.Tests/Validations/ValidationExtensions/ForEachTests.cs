@@ -1,6 +1,5 @@
 ﻿using System.Net;
 using CrossValidation.Exceptions;
-using CrossValidation.ShouldlyAssertions;
 using CrossValidation.Tests.TestUtils;
 using CrossValidation.Tests.TestUtils.Builders;
 using CrossValidation.Tests.TestUtils.Fixtures;
@@ -65,8 +64,8 @@ public class ForEachTests :
         
         var action = () => parentModelValidator.Validate(_model);
 
-        var error = action.ShouldThrowCrossError();
-        error.FieldName.ShouldBe("NullableIntList[1]");
+        var exception = action.ShouldThrow<BusinessException>();
+        exception.FieldName.ShouldBe("NullableIntList[1]");
     }
     
     [Theory]
@@ -91,8 +90,8 @@ public class ForEachTests :
         
         var action = () => parentModelValidator.Validate(_model);
 
-        var error = action.ShouldThrowCrossError();
-        error.FieldName.ShouldBe("NullableIntList[0]");
+        var exception = action.ShouldThrow<BusinessException>();
+        exception.FieldName.ShouldBe("NullableIntList[0]");
     }
     
     [Theory]
@@ -116,8 +115,8 @@ public class ForEachTests :
 
         var action = () => parentModelValidator.Validate(_model);
 
-        var error = action.ShouldThrowCrossError();
-        error.FieldName.ShouldBe("NullableIntList[1]");
+        var exception = action.ShouldThrow<BusinessException>();
+        exception.FieldName.ShouldBe("NullableIntList[1]");
     }
     
     [Fact]
@@ -160,7 +159,7 @@ public class ForEachTests :
                     .WithFieldDisplayName(expectedFieldDisplayName)
                     .WithCode(expectedCode)
                     .WithMessage(expectedMessage)
-                    .WithException(new ErrorException())
+                    .WithException(new CustomBusinessException())
                     .WithHttpStatusCode(HttpStatusCode.Created)
                     .WithDetails(expectedDetails)
                     .GreaterThan(intList[2]));
@@ -168,15 +167,15 @@ public class ForEachTests :
         
         var action = () => parentModelValidator.Validate(_model);
 
-        var error = action.ShouldThrowCrossError();
-        error.FieldName.ShouldBe("IntList[2]");
-        error.FieldDisplayName.ShouldBe(expectedFieldDisplayName);
-        error.ShouldBeOfType<ErrorException>();
-        error.Code.ShouldBe(expectedCode);
-        error.Message.ShouldBe(expectedMessage);
-        error.Details.ShouldBe(expectedDetails);
-        error.PlaceholderValues.ShouldNotBeEmpty();
-        error.StatusCode.ShouldBe(expectedHttpStatusCode);
+        var exception = action.ShouldThrow<BusinessException>();
+        exception.FieldName.ShouldBe("IntList[2]");
+        exception.FieldDisplayName.ShouldBe(expectedFieldDisplayName);
+        exception.ShouldBeOfType<CustomBusinessException>();
+        exception.Code.ShouldBe(expectedCode);
+        exception.Message.ShouldBe(expectedMessage);
+        exception.Details.ShouldBe(expectedDetails);
+        exception.PlaceholderValues.ShouldNotBeEmpty();
+        exception.StatusCode.ShouldBe(expectedHttpStatusCode);
     }
     
     [Theory]
@@ -203,7 +202,7 @@ public class ForEachTests :
                     .WithFieldDisplayName(expectedFieldDisplayName)
                     .WithCode(expectedCode)
                     .WithMessage(expectedMessage)
-                    .WithException(new ErrorException())
+                    .WithException(new CustomBusinessException())
                     .WithHttpStatusCode(HttpStatusCode.Created)
                     .WithDetails(expectedDetails)
                     .GreaterThan(intList[2]));
@@ -211,15 +210,15 @@ public class ForEachTests :
         
         var action = () => parentModelValidator.Validate(_model);
 
-        var error = action.ShouldThrowCrossError();
-        error.FieldName.ShouldBeNull();
-        error.FieldDisplayName.ShouldBe(expectedFieldDisplayName);
-        error.ShouldBeOfType<ErrorException>();
-        error.Code.ShouldBe(expectedCode);
-        error.Message.ShouldBe(expectedMessage);
-        error.Details.ShouldBe(expectedDetails);
-        error.PlaceholderValues.ShouldNotBeEmpty();
-        error.StatusCode.ShouldBe(expectedHttpStatusCode);
+        var exception = action.ShouldThrow<BusinessException>();
+        exception.FieldName.ShouldBeNull();
+        exception.FieldDisplayName.ShouldBe(expectedFieldDisplayName);
+        exception.ShouldBeOfType<CustomBusinessException>();
+        exception.Code.ShouldBe(expectedCode);
+        exception.Message.ShouldBe(expectedMessage);
+        exception.Details.ShouldBe(expectedDetails);
+        exception.PlaceholderValues.ShouldNotBeEmpty();
+        exception.StatusCode.ShouldBe(expectedHttpStatusCode);
     }
     
     [Theory]
@@ -244,8 +243,8 @@ public class ForEachTests :
         
         var action = () => parentModelValidator.Validate(_model);
 
-        var error = action.ShouldThrowCrossError();
-        error.Details.ShouldBeNull();
+        var exception = action.ShouldThrow<BusinessException>();
+        exception.Details.ShouldBeNull();
     }
     
     [Theory]
@@ -290,7 +289,7 @@ public class ForEachTests :
 
         var exception = await action.ShouldThrowAsync<Exception>();
 
-        if (exception is ValidationListException validationListException)
+        if (exception is BusinessListException validationListException)
         {
             validationListException.Exceptions
                 .Select(x => x.Code)
@@ -309,7 +308,7 @@ public class ForEachTests :
     }
     
     [Fact]
-    public void Throw_errors_with_inline_validation()
+    public void Throw_exception_with_inline_validation()
     {
         var expectedErrorCode = "1";
         var intList = new List<int> {100, 20, 30, 100};
@@ -328,8 +327,8 @@ public class ForEachTests :
             .Must(_commonFixture.NotBeValid);
 
 
-        var error = action.ShouldThrowCrossError();
-        error.Code.ShouldBe(expectedErrorCode);
+        var exception = action.ShouldThrow<BusinessException>();
+        exception.Code.ShouldBe(expectedErrorCode);
     }
     
     [Fact]
@@ -346,8 +345,9 @@ public class ForEachTests :
         });
         var action = () => parentModelValidator.Validate(_model);
         
-        var errors = action.ShouldThrowCrossErrors();
-        errors.Count.ShouldBe(3);
+        var exceptions = action.ShouldThrow<BusinessListException>()
+            .Exceptions;
+        exceptions.Count.ShouldBe(3);
     }
     
     [Fact]
@@ -368,9 +368,9 @@ public class ForEachTests :
             .Must(_commonFixture.ThrowException)
             .ValidateAsync();
 
-        var error = await action.ShouldThrowCrossErrorAsync<CommonCrossException.Predicate>();
+        var exception = await action.ShouldThrowAsync<CommonCrossException.Predicate>();
         
-        error.Message.ShouldBe(expectedMessage);
+        exception.Message.ShouldBe(expectedMessage);
     }
     
     [Theory]
@@ -397,12 +397,13 @@ public class ForEachTests :
 
         if (validationMode is ValidationMode.StopOnFirstError or ValidationMode.AccumulateFirstErrors)
         {
-            action.ShouldThrowCrossError();
+            action.ShouldThrow<BusinessException>();
         }
         else
         {
-            var errors = action.ShouldThrowCrossErrors();
-            errors.Count.ShouldBe(numberOfErrors!.Value);
+            var exceptions = action.ShouldThrow<BusinessListException>()
+                .Exceptions;
+            exceptions.Count.ShouldBe(numberOfErrors!.Value);
         }
     }
     
@@ -410,7 +411,7 @@ public class ForEachTests :
     [InlineData(ValidationMode.StopOnFirstError, null)]
     [InlineData(ValidationMode.AccumulateFirstErrors, null)]
     [InlineData(ValidationMode.AccumulateFirstErrorsAndAllIterationFirstErrors, 2)]
-    public async Task Asynchronous_WhenNotNull_works_inside_ForEach(ValidationMode validationMode, int? numberOfErrors)
+    public async Task Asynchronous_WhenNotNull_works_inside_ForEach(ValidationMode validationMode, int? numberOfExceptions)
     {
         _model = new ParentModelBuilder()
             .WithIntList(new() { 1, 10, 1 })
@@ -432,12 +433,13 @@ public class ForEachTests :
 
         if (validationMode is ValidationMode.StopOnFirstError or ValidationMode.AccumulateFirstErrors)
         {
-            await action.ShouldThrowCrossErrorAsync();
+            await action.ShouldThrowAsync<BusinessException>();
         }
         else
         {
-            var errors = await action.ShouldThrowCrossErrorsAsync();
-            errors.Count.ShouldBe(numberOfErrors!.Value);
+            var exceptions = (await action.ShouldThrowAsync<BusinessListException>())
+                .Exceptions;
+            exceptions.Count.ShouldBe(numberOfExceptions!.Value);
         }
     }
     
@@ -473,11 +475,12 @@ public class ForEachTests :
         });
         var action = () => parentModelValidator.Validate(_model);
         
-        var errors = action.ShouldThrowCrossErrors();
-        errors[0].FieldName.ShouldBe("IntListList[0][1]");
-        errors[1].FieldName.ShouldBe("IntListList[1][0]");
-        errors[2].FieldName.ShouldBe("NestedModelList[0].Int");
+        var exceptions = action.ShouldThrow<BusinessListException>()
+            .Exceptions;
+        exceptions[0].FieldName.ShouldBe("IntListList[0][1]");
+        exceptions[1].FieldName.ShouldBe("IntListList[1][0]");
+        exceptions[2].FieldName.ShouldBe("NestedModelList[0].Int");
     }
 
-    private class ErrorException : BusinessException;
+    private class CustomBusinessException : BusinessException;
 }

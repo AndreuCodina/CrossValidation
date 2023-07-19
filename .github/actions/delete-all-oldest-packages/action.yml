@@ -28,9 +28,9 @@ runs:
         package-type: ${{ steps.set-package-type.outputs.PACKAGE_TYPE }}
         min-versions-to-keep: ${{ steps.set-minimum-packages-to-keep.outputs.MINIMUM_PACKAGES_TO_KEEP }}
 
-    - name: Delete old CrossValidation.ShouldlyAssertions packages
+    - name: Delete old CrossValidation.SourceGenerators packages
       uses: actions/delete-package-versions@v4.1.1
       with:
-        package-name: CrossValidation.ShouldlyAssertions
+        package-name: CrossValidation.SourceGenerators
         package-type: ${{ steps.set-package-type.outputs.PACKAGE_TYPE }}
         min-versions-to-keep: ${{ steps.set-minimum-packages-to-keep.outputs.MINIMUM_PACKAGES_TO_KEEP }}

@@ -23,7 +23,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\src\CrossValidation.ShouldlyAssertions\CrossValidation.ShouldlyAssertions.csproj" />
       <ProjectReference Include="..\..\src\CrossValidation\CrossValidation.csproj" />
       <ProjectReference Include="..\CrossValidation.WebApplication\CrossValidation.WebApplication.csproj" />
     </ItemGroup>

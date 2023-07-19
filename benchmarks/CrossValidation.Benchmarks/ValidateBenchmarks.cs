@@ -50,17 +50,17 @@ public class ValidateBenchmarks
     }
     
     [Benchmark]
-    public void ModelValidator_with_error_accumulation()
+    public void ModelValidator_with_exception_accumulation()
     {
-        new ModelValidatorErrorAccumulationSuccess().Validate(_model);
+        new ModelValidatorExceptionAccumulationSuccess().Validate(_model);
     }
     
     [Benchmark]
-    public void ModelValidator_with_error_accumulation_fails()
+    public void ModelValidator_with_exception_accumulation_fails()
     {
         try
         {
-            new ModelValidatorErrorAccumulationFail().Validate(_model);
+            new ModelValidatorExceptionAccumulationFail().Validate(_model);
         }
         catch (Exception)
         {
@@ -87,7 +87,7 @@ public class ValidateBenchmarks
         }
     }
     
-    private record ModelValidatorErrorAccumulationSuccess : ModelValidator<Model>
+    private record ModelValidatorExceptionAccumulationSuccess : ModelValidator<Model>
     {
         public override void CreateValidations()
         {
@@ -98,7 +98,7 @@ public class ValidateBenchmarks
         }
     }
     
-    private record ModelValidatorErrorAccumulationFail : ModelValidator<Model>
+    private record ModelValidatorExceptionAccumulationFail : ModelValidator<Model>
     {
         public override void CreateValidations()
         {

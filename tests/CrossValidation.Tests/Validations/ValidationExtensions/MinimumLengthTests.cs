@@ -1,6 +1,5 @@
 ﻿using CrossValidation.Exceptions;
 using CrossValidation.Resources;
-using CrossValidation.ShouldlyAssertions;
 using CrossValidation.Tests.TestUtils;
 using CrossValidation.Tests.TestUtils.Builders;
 using CrossValidation.Tests.TestUtils.Models;
@@ -21,12 +20,12 @@ public class MinimumLengthTests : TestBase
     }
     
     [Fact]
-    public void Return_error_when_the_validation_fails()
+    public void Return_exception_when_the_validation_fails()
     {
         var action = () => Validate.Field(_model.String)
             .MinimumLength(_model.String.Length + 1);
 
-        var error = action.ShouldThrowCrossError<CommonCrossException.MinimumLength>();
-        error.Code.ShouldBe(nameof(ErrorResource.MinimumLength));
+        var exception = action.ShouldThrow<CommonCrossException.MinimumLength>();
+        exception.Code.ShouldBe(nameof(ErrorResource.MinimumLength));
     }
 }

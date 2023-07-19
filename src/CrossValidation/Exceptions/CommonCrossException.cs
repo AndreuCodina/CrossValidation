@@ -48,7 +48,7 @@ public static class CommonCrossException
         }
     }
 
-    public class Predicate() : BusinessException(code: nameof(ErrorResource.General));
+    public class Predicate() : BusinessException(code: nameof(ErrorResource.Generic));
     
     public class RegularExpression() : BusinessException(code: nameof(ErrorResource.RegularExpression));
     

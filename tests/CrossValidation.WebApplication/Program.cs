@@ -15,9 +15,9 @@ app.Run();
 
 public partial class Program;
 
-public class ErrorWithCodeFromCustomResx() : ResxBusinessException(ErrorResource1.Hello);
+public class ExceptionWithCodeFromCustomResx() : ResxBusinessException(ErrorResource1.Hello);
 
-public class ErrorWithCodeWithoutResxKey() : BusinessException(code: "RandomCode");
+public class ExceptionWithCodeWithoutResxKey() : BusinessException(code: "RandomCode");
 
 public partial class FrontBusinessExceptionWithPlaceholders<T>(int placeholder1, T placeholder2)
     : FrontBusinessException;

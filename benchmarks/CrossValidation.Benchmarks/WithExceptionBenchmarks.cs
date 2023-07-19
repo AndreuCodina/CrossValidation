@@ -8,7 +8,7 @@ namespace CrossValidation.Benchmarks;
 [DotTraceDiagnoser]
 [MemoryDiagnoser]
 [RankColumn]
-public class WithErrorBenchmarks
+public class WithExceptionBenchmarks
 {
     private IValidation<int> _validation = default!;
 
@@ -19,7 +19,7 @@ public class WithErrorBenchmarks
     }
     
     [Benchmark(Baseline = true)]
-    public void WithError()
+    public void WithException()
     {
         _validation
             .WithException(new BusinessException(message: "Error message"))

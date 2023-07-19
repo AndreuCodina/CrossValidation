@@ -1,6 +1,5 @@
 ﻿using CrossValidation.Exceptions;
 using CrossValidation.Resources;
-using CrossValidation.ShouldlyAssertions;
 using CrossValidation.Tests.TestUtils;
 using Shouldly;
 using Xunit;
@@ -14,8 +13,8 @@ public class BusinessExceptionTests : TestBase
     {
         Action action = () => throw new BusinessException(code: nameof(ErrorResource.NotNull));
 
-        var error = action.ShouldThrowCrossError<BusinessException>();
-        error.Code.ShouldBe(nameof(ErrorResource.NotNull));
-        error.Message.ShouldBe(ErrorResource.NotNull);
+        var exception = action.ShouldThrow<BusinessException>();
+        exception.Code.ShouldBe(nameof(ErrorResource.NotNull));
+        exception.Message.ShouldBe(ErrorResource.NotNull);
     }
 }

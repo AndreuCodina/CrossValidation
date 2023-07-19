@@ -9,7 +9,7 @@ public class NotEmptyStringValidator(string fieldValue) : Validator
         return fieldValue != "";
     }
 
-    public override BusinessException CreateError()
+    public override BusinessException CreateException()
     {
         return new CommonCrossException.NotEmptyString();
     }
