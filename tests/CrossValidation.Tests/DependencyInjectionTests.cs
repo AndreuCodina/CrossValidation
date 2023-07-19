@@ -1,8 +1,9 @@
 ﻿using System.Net;
-using System.Net.Http.Json;
+using System.Text.Json;
 using CrossValidation.DependencyInjection;
 using CrossValidation.Resources;
 using CrossValidation.Tests.TestUtils;
+using CrossValidation.Tests.TestUtils.Fixtures;
 using CrossValidation.WebApplication;
 using CrossValidation.WebApplication.Resources;
 using Shouldly;
@@ -12,6 +13,7 @@ namespace CrossValidation.Tests;
 
 public class DependencyInjectionTests :
     TestBase,
+    IClassFixture<CommonFixture>,
     IDisposable
 {
     private HttpClient _client;
@@ -300,6 +302,33 @@ public class DependencyInjectionTests :
         var error = problemDetails.Errors!.First();
         error.Message.ShouldBe(expectedMessage);
     }
+    
+    [Fact]
+    public async Task Get_placeholders_from_FrontBusinessException()
+    {
+        var expectedPlaceholders = new Dictionary<string, object?>
+        {
+            {"placeholder1", 1},
+            {"placeholder2", "value"}
+        };
+        _client = new TestApplicationFactory(services =>
+        {
+            services.AddCrossValidation(x =>
+            {
+                x.AddResxAndAssociatedCultures<ErrorResource1>();
+            });
+        }).CreateClient();
+        
+        var response = await _client.GetAsync(ApiPath.Test.Prefix + ApiPath.Test.FrontBusinessExceptionWithPlaceholders);
+        
+        response.StatusCode.ShouldBe(HttpStatusCode.UnprocessableEntity);
+        var problemDetails = await GetProblemDetailsFromResponse(response);
+        var error = problemDetails.Errors!.First();
+        error.Message.ShouldBe(null);
+        error.Placeholders!.Count.ShouldBe(2);
+        error.Placeholders!.ElementAt(0).Key.ShouldBe("placeholder1");
+        error.Placeholders!.ElementAt(1).Key.ShouldBe("placeholder2");
+    }
 
     public void Dispose()
     {
@@ -309,7 +338,8 @@ public class DependencyInjectionTests :
 
     private async Task<CrossProblemDetails> GetProblemDetailsFromResponse(HttpResponseMessage response)
     {
-        var problemDetails = await response.Content.ReadFromJsonAsync<CrossProblemDetails>();
+        var contentStream = await response.Content.ReadAsStreamAsync();
+        var problemDetails = await JsonSerializer.DeserializeAsync<CrossProblemDetails>(contentStream);
         return problemDetails!;
     }
 }

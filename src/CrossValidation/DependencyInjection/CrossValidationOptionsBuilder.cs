@@ -4,9 +4,9 @@ namespace CrossValidation.DependencyInjection;
 
 public class CrossValidationOptionsBuilder
 {
-    public CrossValidationOptionsBuilder LocalizeErrorInClient()
+    public CrossValidationOptionsBuilder LocalizeCommonErrorsInFront()
     {
-        CrossValidationOptions.LocalizeErrorInClient = true;
+        CrossValidationOptions.LocalizeCommonErrorsInFront = true;
         return this;
     }
     

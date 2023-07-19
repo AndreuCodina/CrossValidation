@@ -10,7 +10,7 @@ public static class CrossValidationOptions
     /// <summary>
     /// Generates placeholders when they are not added
     /// </summary>
-    public static bool LocalizeErrorInClient { get; set; } = SetDefaultLocalizeErrorInClient();
+    public static bool LocalizeCommonErrorsInFront { get; set; } = SetDefaultLocalizeCommonErrorsInFront();
     public static List<ResourceManager> ResourceManagers { get; set; } = SetDefaultResourceManager();
     public static bool HandleUnknownException { get; set; } = SetDefaultHandleUnknownException();
     public static string DefaultCultureCode { get; set; } = SetDefaultCultureCode();
@@ -18,7 +18,7 @@ public static class CrossValidationOptions
 
     public static void SetDefaultOptions()
     {
-        LocalizeErrorInClient = SetDefaultLocalizeErrorInClient();
+        LocalizeCommonErrorsInFront = SetDefaultLocalizeCommonErrorsInFront();
         ResourceManagers = SetDefaultResourceManager();
         HandleUnknownException = SetDefaultHandleUnknownException();
         DefaultCultureCode = SetDefaultCultureCode();
@@ -51,7 +51,7 @@ public static class CrossValidationOptions
         return message;
     }
     
-    private static bool SetDefaultLocalizeErrorInClient()
+    private static bool SetDefaultLocalizeCommonErrorsInFront()
     {
         return false;
     }

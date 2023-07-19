@@ -71,7 +71,7 @@ public class ResxBusinessExceptionSourceGenerator : IIncrementalGenerator
         }
         var baseIdentifierNameSyntax = (IdentifierNameSyntax)baseList.Types[0].Type;
         var baseClassName = baseIdentifierNameSyntax.Identifier.Text;
-        return baseClassName == "ResxBusinessException";
+        return baseClassName is "ResxBusinessException" or "FrontBusinessException";
     }
     
     private static void GenerateCode(

@@ -62,6 +62,11 @@ public static class TestEndpoints
                 .WithMessage(string.Format(ErrorResource1.UseDecimal, 3.3))
                 .Must(_ => false);
         });
+        
+        group.MapGet(ApiPath.Test.FrontBusinessExceptionWithPlaceholders, () =>
+        {
+            throw new FrontBusinessExceptionWithPlaceholders<string>(1, "value");
+        });
 
         return builder;
     }

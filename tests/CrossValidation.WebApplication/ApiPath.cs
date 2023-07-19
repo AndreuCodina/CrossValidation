@@ -14,5 +14,6 @@ public static class ApiPath
         public const string ErrorWithStatusCode = "/errorWithStatusCode";
         public const string Exception = "/exception";
         public const string UseDecimal = "/useDecimal";
+        public const string FrontBusinessExceptionWithPlaceholders = "/frontBusinessExceptionWithPlaceholders";
     }
 }

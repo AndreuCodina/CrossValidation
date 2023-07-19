@@ -118,10 +118,10 @@ public class CrossValidationMiddleware : IMiddleware
         };
 
         if (exception is FrontBusinessException
-            || (CrossValidationOptions.LocalizeErrorInClient
+            || (CrossValidationOptions.LocalizeCommonErrorsInFront
                 && exception.PlaceholderValues.Count > 0))
         {
-            var placeholders = new Dictionary<string, object>();
+            var placeholders = new Dictionary<string, object?>();
             
             foreach (var placeholder in exception.PlaceholderValues)
             {
