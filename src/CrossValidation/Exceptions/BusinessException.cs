@@ -21,15 +21,15 @@ public class BusinessException : Exception
     public Func<object>? GetFieldValue { get; set; }
     
     public BusinessException(
-        string message = "",
         string? code = null,
+        string message = "",
         HttpStatusCode statusCode = HttpStatusCode.UnprocessableEntity,
         string? details = null,
         string? fieldName = null,
         string? fieldDisplayName = null)
     {
-        FormattedMessage = GetFormattedMessage(code, message);
         Code = code;
+        FormattedMessage = GetFormattedMessage(code, message);
         StatusCode = statusCode;
         Details = details;
         FieldName = fieldName;

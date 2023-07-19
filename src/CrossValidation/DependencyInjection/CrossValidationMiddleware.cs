@@ -10,7 +10,6 @@ namespace CrossValidation.DependencyInjection;
 
 public class CrossValidationMiddleware : IMiddleware
 {
-    private bool _isExceptionHandled = false;
     private readonly ILogger<CrossValidationMiddleware> _logger;
     private readonly IHostingEnvironment _environment;
 
@@ -29,11 +28,6 @@ public class CrossValidationMiddleware : IMiddleware
         catch (Exception e)
         {
             await HandleException(e, context);
-
-            if (!_isExceptionHandled)
-            {
-                throw;
-            }
         }
     }
 
@@ -41,13 +35,13 @@ public class CrossValidationMiddleware : IMiddleware
     {
         var problemDetails = new CrossProblemDetails();
         var statusCode = HttpStatusCode.InternalServerError;
+        string? type = null;
         string? title = null;
         string? details = null;
         List<CrossProblemDetailsError> errors = new();
-
+        
         if (exception is BusinessException businessException)
         {
-            _isExceptionHandled = true;
             statusCode = businessException.StatusCode;
             title = "A validation error occurred";
             var error = CreateCrossProblemDetailsError(businessException);
@@ -68,7 +62,6 @@ public class CrossValidationMiddleware : IMiddleware
         }
         else if (exception is ValidationListException validationListException)
         {
-            _isExceptionHandled = true;
             statusCode = HttpStatusCode.UnprocessableEntity;
             title = "Several validation errors occurred";
 
@@ -79,7 +72,6 @@ public class CrossValidationMiddleware : IMiddleware
         }
         else if (exception is NonNullablePropertyIsNullException nonNullablePropertyIsNullException)
         {
-            _isExceptionHandled = true;
             statusCode = HttpStatusCode.BadRequest;
             title = "Nullability error";
             details = $"Non nullable property is null: {nonNullablePropertyIsNullException.PropertyName}";
@@ -87,7 +79,6 @@ public class CrossValidationMiddleware : IMiddleware
         else if (exception is NonNullableItemCollectionWithNullItemException
                  nonNullableItemCollectionWithNullItemException)
         {
-            _isExceptionHandled = true;
             statusCode = HttpStatusCode.BadRequest;
             title = "Nullability error";
             details = $"Non nullable item collection with null item: {nonNullableItemCollectionWithNullItemException.CollectionName}";
@@ -99,13 +90,14 @@ public class CrossValidationMiddleware : IMiddleware
                 return;
             }
             
-            _isExceptionHandled = true;
             _logger.LogError(exception, exception.Message);
-            title = "An error occurred";;
+            type = "https://datatracker.ietf.org/doc/html/rfc9110#section-15.6.1";
+            title = "An error occurred";
             problemDetails.Detail = _environment.IsDevelopment() ? exception.Message : null;
         }
 
         problemDetails.Status = (int)statusCode;
+        problemDetails.Type = type;
         problemDetails.Title = title;
         problemDetails.Detail = details;
         problemDetails.Errors = errors.Any() ? errors : null;
@@ -125,8 +117,9 @@ public class CrossValidationMiddleware : IMiddleware
             Details = exception.Details
         };
 
-        if (CrossValidationOptions.LocalizeErrorInClient
-            && exception.PlaceholderValues.Count > 0)
+        if (exception is FrontBusinessException
+            || (CrossValidationOptions.LocalizeErrorInClient
+                && exception.PlaceholderValues.Count > 0))
         {
             var placeholders = new Dictionary<string, object>();
             
