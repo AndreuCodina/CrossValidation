@@ -5,7 +5,7 @@ inputs:
   test-coverage-folder:
     description: Folder where the coverage files are located
     required: false
-    default: ${{ github.workspace }}/generated/coverage
+    default: ${{ github.workspace }}/artifacts/coverage
 
   github-token:
     description: GitHub token

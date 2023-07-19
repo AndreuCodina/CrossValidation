@@ -1,11 +1,11 @@
 # dotnet tool restore
 
-# dotnet run --project ./benchmarks/CrossValidation.Benchmarks/CrossValidation.Benchmarks.csproj --configuration Release -- --artifacts ./generated/benchmarks --filter *.MustBenchmarks.*
+# dotnet run --project ./benchmarks/CrossValidation.Benchmarks/CrossValidation.Benchmarks.csproj --configuration Release -- --artifacts ./artifacts/benchmarks --filter *.MustBenchmarks.*
 
-dotnet test --configuration Release --collect:"XPlat Code Coverage;Format=lcov" --results-directory ./generated/coverage -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Exclude="[*]CrossValidation.WebApplication*,[*]CrossValidation.Resources*"
+dotnet test --configuration Release --collect:"XPlat Code Coverage;Format=lcov" --results-directory ./artifacts/coverage -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Exclude="[*]CrossValidation.WebApplication*,[*]CrossValidation.Resources*"
 
-dotnet tool run reportgenerator -reports:"./generated/coverage/*/coverage.info" -targetdir:"./generated/coverage" -reporttypes:Html
+dotnet tool run reportgenerator -reports:"./artifacts/coverage/*/coverage.info" -targetdir:"./artifacts/coverage" -reporttypes:Html
 
-Start-Process ./generated/coverage/index.html
+Start-Process ./artifacts/coverage/index.html
 
-# Remove-Item -Recurse -Force ./generated
+# Remove-Item -Recurse -Force ./artifacts

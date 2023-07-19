@@ -34,4 +34,4 @@ jobs:
           dotnet run \
             --project ./benchmarks/CrossValidation.Benchmarks/CrossValidation.Benchmarks.csproj \
             --configuration Release \
-            -- --artifacts generated/benchmarks
+            -- --artifacts artifacts/benchmarks

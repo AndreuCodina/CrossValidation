@@ -1,25 +1,17 @@
-name: Publish NuGet package
-description: Publish NuGet package
+name: Publish NuGet packages
+description: Publish NuGet packages
 
 inputs:
   nuget-folder:
     description: Output folder for the NuGet package
     required: false
-    default: ${{ github.workspace }}/generated/nuget
+    default: ${{ github.workspace }}/artifacts/nuget
   registry-token:
     description: Registry token
     required: true
     default: ""
   package-version:
     description: Package version
-    required: true
-    default: ""
-  project:
-    description: Project
-    required: true
-    default: ""
-  project-name:
-    description: Project name
     required: true
     default: ""
   registry:
@@ -33,7 +25,7 @@ runs:
   steps:
     - name: Create package
       run: |
-        dotnet pack ${{ inputs.project }} \
+        dotnet pack \
           --configuration Release \
           --no-build \
           --output ${{ inputs.nuget-folder }} \
@@ -43,9 +35,9 @@ runs:
           -p:PublishRepositoryUrl=true
       shell: bash
 
-    - name: Push package
+    - name: Push CrossValidation package
       run: |
-        dotnet nuget push ${{ format('{0}/{1}.{2}.nupkg', inputs.nuget-folder, inputs.project-name, inputs.package-version) }} \
+        dotnet nuget push ${{ format('{0}/*.nupkg', inputs.nuget-folder) }} \
           --source ${{ inputs.registry }} \
           --api-key ${{ inputs.registry-token }}
       shell: bash
