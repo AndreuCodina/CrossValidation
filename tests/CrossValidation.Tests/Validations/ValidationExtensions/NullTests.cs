@@ -1,4 +1,4 @@
-﻿using CrossValidation.Errors;
+﻿using CrossValidation.Exceptions;
 using CrossValidation.Resources;
 using CrossValidation.ShouldlyAssertions;
 using CrossValidation.Tests.TestUtils;
@@ -53,7 +53,7 @@ public class NullTests :
         var action = () => Validate.Field(_model.NullableString)
             .Null();
 
-        var error = action.ShouldThrowCrossError<CommonCrossError.Null>();
+        var error = action.ShouldThrowCrossError<CommonCrossException.Null>();
         error.Code.ShouldBe(nameof(ErrorResource.Null));
     }
 }

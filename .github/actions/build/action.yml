@@ -10,10 +10,15 @@ runs:
       with:
         dotnet-version: "8.0.x"
 
+    - name: .NET tool restore
+      run: dotnet tool restore
+      shell: bash
+
     - name: Restore
       run: dotnet restore
       shell: bash
 
+    # Problem after introducing source generators: https://github.com/dotnet/sdk/issues/2902#issuecomment-1419352659
     - name: Build
       run: |
         dotnet build \
@@ -21,5 +26,6 @@ runs:
           --no-restore \
           -p:ContinuousIntegrationBuild=true \
           -p:Deterministic=true \
-          -p:EmbedUntrackedSources=true
+          -p:EmbedUntrackedSources=true \
+          /maxcpucount:1
       shell: bash

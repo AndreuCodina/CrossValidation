@@ -1,6 +1,5 @@
 ﻿using System.Net;
 using System.Text.Json;
-using CrossValidation.Errors;
 using CrossValidation.Exceptions;
 using CrossValidation.Utils;
 using Microsoft.AspNetCore.Hosting;
@@ -41,23 +40,26 @@ public class CrossValidationMiddleware : IMiddleware
     private async Task HandleException(Exception exception, HttpContext context)
     {
         var problemDetails = new CrossProblemDetails();
-        var httpStatusCode = HttpStatusCode.InternalServerError;
+        var statusCode = HttpStatusCode.InternalServerError;
         string? title = null;
         string? details = null;
         List<CrossProblemDetailsError> errors = new();
 
-        if (exception is CrossException crossException)
+        if (exception is BusinessException businessException)
         {
             _isExceptionHandled = true;
-            httpStatusCode = crossException.Error.HttpStatusCode ?? HttpStatusCode.UnprocessableEntity;
+            statusCode = businessException.StatusCode;
             title = "A validation error occurred";
-            var error = CreateCrossProblemDetailsError(crossException.Error);
+            var error = CreateCrossProblemDetailsError(businessException);
             
             var allErrorCustomizationsAreNotSet =
-                error.Code is null
-                && error.Message is null
-                && error.Details is null
-                && error.Placeholders is null;
+                error is
+                {
+                    Code: null,
+                    Message: null,
+                    Details: null,
+                    Placeholders: null
+                };
 
             if (!allErrorCustomizationsAreNotSet)
             {
@@ -67,10 +69,10 @@ public class CrossValidationMiddleware : IMiddleware
         else if (exception is ValidationListException validationListException)
         {
             _isExceptionHandled = true;
-            httpStatusCode = HttpStatusCode.UnprocessableEntity;
+            statusCode = HttpStatusCode.UnprocessableEntity;
             title = "Several validation errors occurred";
 
-            foreach (var error in validationListException.Errors)
+            foreach (var error in validationListException.Exceptions)
             {
                 errors.Add(CreateCrossProblemDetailsError(error));
             }
@@ -78,7 +80,7 @@ public class CrossValidationMiddleware : IMiddleware
         else if (exception is NonNullablePropertyIsNullException nonNullablePropertyIsNullException)
         {
             _isExceptionHandled = true;
-            httpStatusCode = HttpStatusCode.BadRequest;
+            statusCode = HttpStatusCode.BadRequest;
             title = "Nullability error";
             details = $"Non nullable property is null: {nonNullablePropertyIsNullException.PropertyName}";
         }
@@ -86,7 +88,7 @@ public class CrossValidationMiddleware : IMiddleware
                  nonNullableItemCollectionWithNullItemException)
         {
             _isExceptionHandled = true;
-            httpStatusCode = HttpStatusCode.BadRequest;
+            statusCode = HttpStatusCode.BadRequest;
             title = "Nullability error";
             details = $"Non nullable item collection with null item: {nonNullableItemCollectionWithNullItemException.CollectionName}";
         }
@@ -103,7 +105,7 @@ public class CrossValidationMiddleware : IMiddleware
             problemDetails.Detail = _environment.IsDevelopment() ? exception.Message : null;
         }
 
-        problemDetails.Status = (int)httpStatusCode;
+        problemDetails.Status = (int)statusCode;
         problemDetails.Title = title;
         problemDetails.Detail = details;
         problemDetails.Errors = errors.Any() ? errors : null;
@@ -114,21 +116,21 @@ public class CrossValidationMiddleware : IMiddleware
         await context.Response.WriteAsync(response);
     }
 
-    private CrossProblemDetailsError CreateCrossProblemDetailsError(ICrossError crossError)
+    private CrossProblemDetailsError CreateCrossProblemDetailsError(BusinessException exception)
     {
         var error = new CrossProblemDetailsError
         {
-            Code = crossError.Code,
-            Message = crossError.Message,
-            Details = crossError.Details
+            Code = exception.Code,
+            Message = exception.Message == "" ? null : exception.Message,
+            Details = exception.Details
         };
 
         if (CrossValidationOptions.LocalizeErrorInClient
-            && crossError.PlaceholderValues is not null)
+            && exception.PlaceholderValues.Count > 0)
         {
             var placeholders = new Dictionary<string, object>();
             
-            foreach (var placeholder in crossError.PlaceholderValues)
+            foreach (var placeholder in exception.PlaceholderValues)
             {
                 placeholders.Add(placeholder.Key, placeholder.Value);
             }

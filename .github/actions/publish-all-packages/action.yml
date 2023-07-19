@@ -35,20 +35,9 @@ runs:
       run: dotnet nuget remove source nuget.org
       shell: bash
 
-    - name: Publish CrossValidation NuGet
-      uses: ./.github/actions/publish-package
+    - name: Publish NuGet packages
+      uses: ./.github/actions/publish-packages
       with:
         registry-token: ${{ inputs.registry-token }}
         package-version: ${{ inputs.package-version }}
-        project: src/CrossValidation/CrossValidation.csproj
-        project-name: CrossValidation
-        registry: ${{ inputs.registry }}
-
-    - name: Publish CrossValidation.ShouldlyAssertions NuGet
-      uses: ./.github/actions/publish-package
-      with:
-        registry-token: ${{ inputs.registry-token }}
-        package-version: ${{ inputs.package-version }}
-        project: src/CrossValidation.ShouldlyAssertions/CrossValidation.ShouldlyAssertions.csproj
-        project-name: CrossValidation.ShouldlyAssertions
         registry: ${{ inputs.registry }}

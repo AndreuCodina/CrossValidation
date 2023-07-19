@@ -1,4 +1,4 @@
-﻿using CrossValidation.Errors;
+﻿using CrossValidation.Exceptions;
 using CrossValidation.Resources;
 using CrossValidation.ShouldlyAssertions;
 using CrossValidation.Tests.TestUtils;
@@ -34,7 +34,7 @@ public class LengthRangeTests : TestBase
         var action = () => Validate.Field(_model.String)
             .LengthRange(_model.String.Length + 1, _model.String.Length);
 
-        var error = action.ShouldThrowCrossError<CommonCrossError.LengthRange>();
+        var error = action.ShouldThrowCrossError<CommonCrossException.LengthRange>();
         
         error.Code.ShouldBe(nameof(ErrorResource.LengthRange));
     }

@@ -1,8 +1,8 @@
-using CrossValidation.Errors;
+using CrossValidation.Exceptions;
 using Shouldly;
 using Xunit;
 
-namespace CrossValidation.Tests.Errors;
+namespace CrossValidation.Tests.Exceptions;
 
 public class MessageCrossErrorTests
 {

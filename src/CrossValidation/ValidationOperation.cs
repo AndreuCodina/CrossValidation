@@ -1,5 +1,5 @@
 using System.Net;
-using CrossValidation.Errors;
+using CrossValidation.Exceptions;
 using CrossValidation.Resources;
 using CrossValidation.Validations;
 using CrossValidation.Validators;
@@ -20,15 +20,15 @@ namespace CrossValidation;
 public interface IValidationOperation
 {
     Func<object>? GetNonGenericFieldValue { get; set; }
-    Func<IValidator<ICrossError>>? Validator { get; set; }
-    Func<Task<IValidator<ICrossError>>>? AsyncValidator { get; set; }
+    Func<IValidator<BusinessException>>? Validator { get; set; }
+    Func<Task<IValidator<BusinessException>>>? AsyncValidator { get; set; }
     Action? Scope { get; set; }
     string? Code { get; set; }
-    string? Message { get; set; }
+    string Message { get; set; }
     string? Details { get; set; }
-    ICrossError? Error { get; set; }
+    BusinessException? Exception { get; set; }
     string? FieldDisplayName { get; set; }
-    HttpStatusCode? HttpStatusCode { get; set; }
+    HttpStatusCode? StatusCode { get; set; }
     Type? CrossErrorToException { get; set; }
     Func<bool>? Condition { get; set; }
     Func<Task<bool>>? AsyncCondition { get; set; }
@@ -49,9 +49,9 @@ public interface IValidationOperation
     ValueTask TraverseAsync(ValidationContext context);
     void MarkAllDescendantValidationsAsNotPendingAsync();
     ValueTask ExecuteAsync(ValidationContext context, bool useAsync);
-    void HandleError(ICrossError error, ValidationContext context);
-    void TakeCustomizationsFromInstanceError(ICrossError error, ValidationContext context);
-    void TakeCustomizationsFromError(ICrossError error, ValidationContext context);
+    void HandleException(BusinessException exception, ValidationContext context);
+    void TakeCustomizationsFromInstanceException(BusinessException exception, ValidationContext context);
+    void TakeCustomizationsFromException(BusinessException error, ValidationContext context);
     void MarkAsPendingAsyncValidation();
     void MarkAsFailed();
     
@@ -60,15 +60,15 @@ public interface IValidationOperation
 internal class ValidationOperation
 {
     public Func<object>? GetNonGenericFieldValue { get; set; }
-    public Func<IValidator<ICrossError>>? Validator { get; set; }
-    public Func<Task<IValidator<ICrossError>>>? AsyncValidator { get; set; }
+    public Func<IValidator<BusinessException>>? Validator { get; set; }
+    public Func<Task<IValidator<BusinessException>>>? AsyncValidator { get; set; }
     public Action? Scope { get; set; }
     public string? Code { get; set; }
-    public string? Message { get; set; }
+    public string Message { get; set; } = "";
     public string? Details { get; set; }
-    public ICrossError? Error { get; set; }
+    public BusinessException? Exception { get; set; }
     public string? FieldDisplayName { get; set; }
-    public HttpStatusCode? HttpStatusCode { get; set; }
+    public HttpStatusCode? StatusCode { get; set; }
     public Type? CrossErrorToException { get; set; }
     public Func<bool>? Condition { get; set; }
     public Func<Task<bool>>? AsyncCondition { get; set; }
@@ -185,7 +185,7 @@ internal class ValidationOperation
                 return;
             }
             
-            HandleError(error, context);
+            HandleException(error, context);
             MarkAsFailed();
         }
         else if (AsyncValidator is not null)
@@ -202,7 +202,7 @@ internal class ValidationOperation
                 return;
             }
             
-            HandleError(error, context);
+            HandleException(error, context);
             MarkAsFailed();
         }
         else if (Scope is not null)
@@ -213,29 +213,41 @@ internal class ValidationOperation
         HasBeenExecuted = true;
     }
 
-    public void HandleError(ICrossError error, ValidationContext context)
+    public void HandleException(BusinessException exception, ValidationContext context)
     {
-        var errorToAdd = context.Error ?? (Error ?? error);
-        AddError(errorToAdd, context);
+        var exceptionToAdd = context.Error ?? (Exception ?? exception);
+        AddException(exceptionToAdd, context);
 
         if (context is {ValidationMode: ValidationMode.StopOnFirstError})
         {
-            if (context.ErrorsCollected!.Count == 1)
+            if (context.ExceptionsCollected.Count == 1)
             {
-                throw context.ErrorsCollected[0].ToException();
+                if (CrossErrorToException is not null)
+                {
+                    throw (Exception)Activator.CreateInstance(
+                        CrossErrorToException,
+                        CreateParametrizedExceptionMessage(context.ExceptionsCollected[0]))!;
+                }
+                
+                throw context.ExceptionsCollected[0];
             }
         }
     }
     
-    public void TakeCustomizationsFromInstanceError(ICrossError error, ValidationContext context)
+    private string CreateParametrizedExceptionMessage(BusinessException exception)
+    {
+        return $"{FieldName}: {exception.Message}";
+    }
+    
+    public void TakeCustomizationsFromInstanceException(BusinessException exception, ValidationContext context)
     {
         if (GeneralizeError)
         {
             return;
         }
 
-        var codeToAdd = Code ?? error.Code;
-        var isInstanceCallerWithCodeAndWithoutMessage = Code is not null && Message is null;
+        var codeToAdd = Code ?? exception.Code;
+        var isInstanceCallerWithCodeAndWithoutMessage = Code is not null && Message == "";
         
         if (isInstanceCallerWithCodeAndWithoutMessage && codeToAdd is not null)
         {
@@ -243,19 +255,23 @@ internal class ValidationOperation
         }
         else
         {
-            Message ??= error.Message;
+            Message = Message != ""
+                ? Message
+                : exception.Message;
         }
 
         Code = codeToAdd;
     }
     
-    public void TakeCustomizationsFromError(ICrossError error, ValidationContext context)
+    public void TakeCustomizationsFromException(BusinessException exception, ValidationContext context)
     {
-        Code = context.Code ?? (error.Code ?? Code);
-        Message = context.Message ?? (error.Message ?? Message);
-        Details = context.Details ?? (error.Details ?? Details);
-        HttpStatusCode = context.HttpStatusCode ?? (error.HttpStatusCode ?? HttpStatusCode);
-        FieldDisplayName = context.FieldDisplayName ?? (error.FieldDisplayName ?? FieldDisplayName);
+        Code = context.Code ?? (exception.Code ?? Code);
+        Message = context.Message != ""
+            ? context.Message
+            : exception.Message != "" ? exception.Message : Message;
+        Details = context.Details ?? (exception.Details ?? Details);
+        StatusCode = context.StatusCode ?? exception.StatusCode;
+        FieldDisplayName = context.FieldDisplayName ?? (exception.FieldDisplayName ?? FieldDisplayName);
     }
     
     public void MarkAsPendingAsyncValidation()
@@ -278,25 +294,26 @@ internal class ValidationOperation
         }
     }
     
-    private void AddError(ICrossError error, ValidationContext context)
+    private void AddException(BusinessException exception, ValidationContext context)
     {
-        AddCustomizationsToError(error, context);
-        context.ErrorsCollected.Add(error);
+        AddCustomizationsToException(exception, context);
+        exception.AddCommonPlaceholderValues();
+        context.ExceptionsCollected.Add(exception);
     }
 
-    private void AddCustomizationsToError(ICrossError error, ValidationContext context)
+    private void AddCustomizationsToException(BusinessException exception, ValidationContext context)
     {
-        error.CrossErrorToException = CrossErrorToException;
-        error.FieldName = FieldName;
-        error.FieldDisplayName = GetFieldDisplayNameToFill(error, context);
-        error.GetFieldValue = GetNonGenericFieldValue;
-        error.Code = GetCodeToFill(error, context);
-        error.Message = GetMessageToFill(error, context);
-        error.Details = context.Details ?? (Details ?? error.Details);
-        error.HttpStatusCode = context.HttpStatusCode ?? (HttpStatusCode ?? error.HttpStatusCode);
+        exception.CrossErrorToException = CrossErrorToException;
+        exception.FieldName = FieldName;
+        exception.FieldDisplayName = GetFieldDisplayNameToFill(exception, context);
+        exception.GetFieldValue = GetNonGenericFieldValue;
+        exception.Code = GetCodeToFill(exception, context);
+        exception.FormattedMessage = GetMessageToFill(exception, context);
+        exception.Details = context.Details ?? (Details ?? exception.Details);
+        exception.StatusCode = context.StatusCode ?? (StatusCode ?? exception.StatusCode);
     }
 
-    private string? GetCodeToFill(ICrossError error, ValidationContext context)
+    private string? GetCodeToFill(BusinessException exception, ValidationContext context)
     {
         if (context.Code is not null)
         {
@@ -313,17 +330,17 @@ internal class ValidationOperation
             return nameof(ErrorResource.General);
         }
 
-        return error.Code;
+        return exception.Code;
     }
 
-    private string? GetMessageToFill(ICrossError error, ValidationContext context)
+    private string GetMessageToFill(BusinessException exception, ValidationContext context)
     {
-        if (context.Message is not null)
+        if (context.Message != "")
         {
             return context.Message;
         }
         
-        if (Message is not null)
+        if (Message != "")
         {
             return Message;
         }
@@ -338,20 +355,20 @@ internal class ValidationOperation
             return CrossValidationOptions.GetMessageFromCode(nameof(ErrorResource.General));
         }
 
-        if (error.Message is not null)
+        if (exception.Message != "")
         {
-            return error.Message;
+            return exception.Message;
         }
 
-        if (error.Code is not null)
+        if (exception.Code is not null)
         {
-            return CrossValidationOptions.GetMessageFromCode(error.Code);
+            return CrossValidationOptions.GetMessageFromCode(exception.Code);
         }
 
-        return null;
+        return "";
     }
 
-    private string? GetFieldDisplayNameToFill(ICrossError error, ValidationContext context)
+    private string? GetFieldDisplayNameToFill(BusinessException error, ValidationContext context)
     {
         if (context.FieldDisplayName is not null)
         {

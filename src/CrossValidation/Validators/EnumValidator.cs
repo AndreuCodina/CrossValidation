@@ -1,18 +1,18 @@
-﻿using CrossValidation.Errors;
+﻿using CrossValidation.Exceptions;
 
 namespace CrossValidation.Validators;
 
-public record EnumValidator<TField>(
-    TField FieldValue,
-    Type EnumType) : Validator
+public class EnumValidator<TField>(
+    TField fieldValue,
+    Type enumType) : Validator
 {
     public override bool IsValid()
     {
-        return Enum.IsDefined(EnumType, FieldValue!);
+        return Enum.IsDefined(enumType, fieldValue!);
     }
 
-    public override ICrossError CreateError()
+    public override BusinessException CreateError()
     {
-        return new CommonCrossError.Enum();
+        return new CommonCrossException.Enum();
     }
 }

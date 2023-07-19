@@ -1,34 +1,34 @@
 ﻿using System.Diagnostics;
-using CrossValidation.Errors;
+using CrossValidation.Exceptions;
 
 namespace CrossValidation.Validators;
 
-public record EnumRangeValidator<TField, TEnum>(
-    TField FieldValue,
+public class EnumRangeValidator<TField, TEnum>(
+    TField fieldValue,
     TEnum[] allowedValues) :
     Validator
     where TEnum : Enum
 {
     public override bool IsValid()
     {
-        if (!Enum.IsDefined(typeof(TEnum), FieldValue!))
+        if (!Enum.IsDefined(typeof(TEnum), fieldValue!))
         {
             return false;
         }
 
         TEnum fieldValueEnum;
 
-        if (FieldValue is Enum)
+        if (fieldValue is Enum)
         {
-            fieldValueEnum = (TEnum)(object)FieldValue!;
+            fieldValueEnum = (TEnum)(object)fieldValue!;
         }
-        else if (FieldValue is int)
+        else if (fieldValue is int)
         {
-            fieldValueEnum = (TEnum)(object)FieldValue!;
+            fieldValueEnum = (TEnum)(object)fieldValue!;
         }
-        else if (FieldValue is string)
+        else if (fieldValue is string)
         {
-            fieldValueEnum = (TEnum)Enum.Parse(typeof(TEnum), (string)(object)FieldValue!, ignoreCase: true);
+            fieldValueEnum = (TEnum)Enum.Parse(typeof(TEnum), (string)(object)fieldValue!, ignoreCase: true);
         }
         else
         {
@@ -46,8 +46,8 @@ public record EnumRangeValidator<TField, TEnum>(
         return false;
     }
 
-    public override ICrossError CreateError()
+    public override BusinessException CreateError()
     {
-        return new CommonCrossError.EnumRange();
+        return new CommonCrossException.EnumRange();
     }
 }

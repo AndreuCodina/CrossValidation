@@ -5,7 +5,7 @@ inputs:
   test-coverage-folder:
     description: Folder where the coverage files are located
     required: false
-    default: ${{ github.workspace }}/generated/coverage
+    default: ${{ github.workspace }}/artifacts/coverage
 
   github-token:
     description: GitHub token
@@ -16,8 +16,8 @@ runs:
   using: "composite"
 
   steps:
-    - name: Copy coverage to a predictable location
-      run: cp ${{ inputs.test-coverage-folder }}/*/coverage.info ${{ inputs.test-coverage-folder }}/lcov.info
+    - name: Merge test coverage files
+      run: dotnet reportgenerator "-reports:${{ inputs.test-coverage-folder }}/*/coverage.info" "-targetdir:./artifacts/coverage" "-reporttypes:lcov"
       shell: bash
 
     - name: Publish coverage to Coveralls

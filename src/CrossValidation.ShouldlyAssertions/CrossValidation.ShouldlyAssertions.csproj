@@ -5,6 +5,7 @@
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageIcon>logo.jpg</PackageIcon>
         <PackageReadmeFile>crossvalidation-shouldly-assertions-nuget-readme.md</PackageReadmeFile>
+        <IsPackable>true</IsPackable>
     </PropertyGroup>
 
     <ItemGroup>

@@ -1,16 +1,16 @@
-using CrossValidation.Errors;
+using CrossValidation.Exceptions;
 
 namespace CrossValidation.Validators;
 
-public record EmptyStringValidator(string FieldValue) : Validator
+public class EmptyStringValidator(string fieldValue) : Validator
 {
     public override bool IsValid()
     {
-        return FieldValue == "";
+        return fieldValue == "";
     }
 
-    public override ICrossError CreateError()
+    public override BusinessException CreateError()
     {
-        return new CommonCrossError.EmptyString();
+        return new CommonCrossException.EmptyString();
     }
 }

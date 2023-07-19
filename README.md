@@ -1,10 +1,55 @@
 <img alt="Logo" src="docs/logo.jpg" width="522" height="396">
 
 [![Main workflow state](https://github.com/AndreuCodina/CrossValidation/actions/workflows/main.yml/badge.svg?branch=main)](https://github.com/AndreuCodina/CrossValidation/actions/workflows/main.yml)
-[![Coverage Status](https://coveralls.io/repos/github/AndreuCodina/CrossValidation/badge.svg?branch=main&coveralls_badge_current_milliseconds=1687773756)](https://coveralls.io/github/AndreuCodina/CrossValidation?branch=main)
+[![Coverage Status](https://coveralls.io/repos/github/AndreuCodina/CrossValidation/badge.svg?branch=main&coveralls_badge_current_milliseconds=1689754760)](https://coveralls.io/github/AndreuCodina/CrossValidation?branch=main)
 [![NuGet](https://img.shields.io/nuget/v/CrossValidation?color=blue&label=nuget)](https://www.nuget.org/packages/CrossValidation)
 
 State-of-the-art .NET library to handle errors and validate data.
+
+# Example <!-- omit in toc -->
+
+Create ErrorResource.resx with the next entry:
+
+```
+EmailAlreadyExists = "The email '{email}' is already being used at {company}";
+```
+
+Create your business exception:
+
+```csharp
+public partial class EmailAlreadyExistsException(string email, string company)
+  : BusinessException(ErrorResource.EmailAlreadyExists)
+```
+
+Throw the exception:
+
+```csharp
+// Add CrossValidation
+services.AddCrossValidation(options => options.AddResx<ErrorResource>());
+app.UseCrossValidation();
+
+// Expose endpoint
+app.MapPost("/users", () => throw new EmailAlreadyExistsException("alex@gmail.com", "Microsoft"));
+```
+
+Call the endpoint and this is the response:
+
+```json
+{
+  "Errors":
+  [
+    {
+      "Code": "EmailAlreadyExists",
+      "Message": "The email 'alex@gmail.com' is already being used at Microsoft"
+    }
+  ]
+}
+```
+
+Magic! And perfomant! It doesn't use reflection.
+
+You can send the `Accept-Language` HTTP header and the message will be returned in requested language.
+
 
 # Impact of this library in your company: <!-- omit in toc -->
 
@@ -95,7 +140,7 @@ Validate.That(age)
 
 <a name="typed-errors"></a>
 ## Typed errors
-C# can't treat with errors in a proper way. Developers tend to reuse the same runtime exceptions (ArgumentException, Exception, MyServiceException...) over and over again with hardcoded messages with parameters, or reuse a general exception (AppException) that won't be logged by the global exception middleware.
+C# can't treat with errors in a proper way. Developers tend to reuse the same runtime exceptions (ArgumentException, Exception, MyServiceException...) over and over again with hardcoded messages with parameters, or reuse a general exception (AppException) that will be logged by the global exception middleware.
 
 Why AppException? Because it's a general exception that can be used in any layer of your application, and its main goal is to express we handled an **expected situation**. For example, if we try to:
   - Create an user with an age less or equal to zero
@@ -133,8 +178,10 @@ You can throw CrossException (the built-in equivalent of AppException) when you 
 ```csharp
 public class UserService
 {
-    public record UserNotFoundError() : MessageCrossError("Couldn't find the user")
-    public record NicknameNotAvailableError(string Nickname) : MessageCrossError($"'{Nickname}' is not available")
+    public class UserNotFoundException()
+      : MessageBusinessException("Couldn't find the user");
+    public class NicknameNotAvailableException(string nickname)
+      : MessageBusinessException($"'{nickname}' is not available");
 
     public void ChangeNickname(UserDto userDto)
     {
@@ -185,7 +232,7 @@ public record ModelValidator : ModelValidator<Model>
 {
     public override void CreateValidations()
     {
-        if (model.CustomerIsPreferred)
+        if (Model.CustomerIsPreferred)
         {
             Field(Model.CustomerDiscount)
                 .NotNull()

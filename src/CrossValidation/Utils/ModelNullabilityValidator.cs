@@ -72,8 +72,9 @@ internal static class ModelNullabilityValidator
         PropertyInfo property,
         object model)
     {
-        var isCollection = typeof(IEnumerable).IsAssignableFrom(property.PropertyType)
-                           && property.PropertyType != typeof(string);
+        var isCollection =
+            typeof(IEnumerable).IsAssignableFrom(property.PropertyType)
+            && property.PropertyType != typeof(string);
 
         if (isCollection)
         {
