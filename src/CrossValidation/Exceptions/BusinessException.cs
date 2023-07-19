@@ -62,18 +62,6 @@ public class BusinessException : Exception
         PlaceholderValues.Add(name, value ?? DefaultPlaceholderValue);
     }
 
-    /// <summary>
-    /// Get error constructor parameter names
-    /// </summary>
-    public IEnumerable<string> GetFieldNames()
-    {
-        return GetType()
-            .GetConstructors()
-            .Single()
-            .GetParameters()
-            .Select(x => x.Name!);
-    }
-
     public void AddCommonPlaceholderValues()
     {
         AddPlaceholderValue(FieldName, "fieldName");
