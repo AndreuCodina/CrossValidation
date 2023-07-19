@@ -1,5 +1,4 @@
 ﻿using System.Net;
-using CrossValidation.Errors;
 using CrossValidation.Exceptions;
 using CrossValidation.Validations;
 using CrossValidation.WebApplication.Resources;
@@ -14,22 +13,22 @@ public static class TestEndpoints
         
         group.MapGet(ApiPath.Test.CrossException, () =>
         {
-            throw new CrossException(new CompleteCrossError());
+            throw new BusinessException();
         });
 
         group.MapGet(ApiPath.Test.ValidationListException, () =>
         {
-            throw new ValidationListException(new List<ICrossError>());
+            throw new ValidationListException(new List<BusinessException>());
         });
 
         group.MapGet(ApiPath.Test.ErrorWithCodeFromCustomResx, () =>
         {
-            throw new ErrorWithCodeFromCustomResx().ToException();
+            throw new ErrorWithCodeFromCustomResx();
         });
 
         group.MapGet(ApiPath.Test.ErrorWithCodeWithoutResxKey, () =>
         {
-            throw new ErrorWithCodeWithoutResxKey().ToException();
+            throw new ErrorWithCodeWithoutResxKey();
         });
 
         group.MapGet(ApiPath.Test.ReplaceBuiltInCodeWithCustomResx, () =>
@@ -49,7 +48,7 @@ public static class TestEndpoints
 
         group.MapGet(ApiPath.Test.ErrorWithStatusCode, () =>
         {
-            throw new CompleteCrossError(HttpStatusCode: HttpStatusCode.Created).ToException();
+            throw new BusinessException(statusCode: HttpStatusCode.Created);
         });
 
         group.MapGet(ApiPath.Test.Exception, () =>

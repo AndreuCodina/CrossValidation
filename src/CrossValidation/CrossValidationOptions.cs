@@ -34,15 +34,15 @@ public static class CrossValidationOptions
             .ToList();
     }
     
-    public static string? GetMessageFromCode(string code)
+    public static string GetMessageFromCode(string code)
     {
-        string? message = null;
+        var message = "";
 
         foreach (var resourceManager in ResourceManagers)
         {
-            message = resourceManager.GetString(code);
+            message = resourceManager.GetString(code) ?? "";
             
-            if (message is not null)
+            if (message != "")
             {
                 break;
             }

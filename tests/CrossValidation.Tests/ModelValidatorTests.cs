@@ -1,5 +1,5 @@
 ﻿using System.Net;
-using CrossValidation.Errors;
+using CrossValidation.Exceptions;
 using CrossValidation.Resources;
 using CrossValidation.ShouldlyAssertions;
 using CrossValidation.Tests.TestUtils;
@@ -285,7 +285,7 @@ public class ModelValidatorTests :
          });
          var action = () => parentModelValidator.Validate(_model);
      
-         var error = action.ShouldThrowCrossError<CommonCrossError.NotNull>();
+         var error = action.ShouldThrowCrossError<CommonCrossException.NotNull>();
          
          error.GetFieldValue!().ShouldBe(null);
      }
@@ -358,7 +358,7 @@ public class ModelValidatorTests :
          });
          var action = () => parentModelValidator.Validate(_model);
      
-         action.ShouldThrowCrossError<CommonCrossError.NotNull>();
+         action.ShouldThrowCrossError<CommonCrossException.NotNull>();
      }
 
      [Fact]
@@ -418,12 +418,12 @@ public class ModelValidatorTests :
          var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
          {
              validator.Field(_model.NullableString)
-                 .WithError(new CustomErrorWithCode("COD123"))
+                 .WithException(new CustomExceptionWithCode("COD123"))
                  .NotNull();
          });
          var action = () => parentModelValidator.Validate(_model);
 
-         action.ShouldThrowCrossError<CustomErrorWithCode>();
+         action.ShouldThrowCrossError<CustomExceptionWithCode>();
      }
      
      [Fact]
@@ -454,7 +454,7 @@ public class ModelValidatorTests :
          });
          var action = () => parentModelValidator.Validate(_model);
          
-         var error = action.ShouldThrowCrossError<CommonCrossError.GreaterThan<int>>();
+         var error = action.ShouldThrowCrossError<CommonCrossException.GreaterThan<int>>();
          
          error.ComparisonValue.ShouldBe(comparisonValue);
          error.Code.ShouldBe("GreaterThan");
@@ -464,17 +464,17 @@ public class ModelValidatorTests :
      public void Combine_customization_with_custom_error()
      {
          var expectedMessage = "Expected message";
-         var expectedError = new CustomErrorWithCode("COD123");
+         var expectedError = new CustomExceptionWithCode("COD123");
          var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
          {
              validator.Field(_model.NullableString)
-                 .WithError(expectedError)
+                 .WithException(expectedError)
                  .WithMessage(expectedMessage)
                  .NotNull();
          });
          var action = () => parentModelValidator.Validate(_model);
          
-         var error = action.ShouldThrowCrossError<CustomErrorWithCode>();
+         var error = action.ShouldThrowCrossError<CustomExceptionWithCode>();
          
          error.Code.ShouldBe(expectedError.Code);
          error.Message.ShouldBe(expectedMessage);
@@ -484,17 +484,17 @@ public class ModelValidatorTests :
      public void CombineCustomErrorCodeWithCustomization()
      {
          var expectedMessage = "Expected message";
-         var expectedError = new CustomErrorWithCode("COD123");
+         var expectedError = new CustomExceptionWithCode("COD123");
          var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
          {
              validator.Field(_model.NullableString)
                  .WithMessage(expectedMessage)
-                 .WithError(expectedError)
+                 .WithException(expectedError)
                  .NotNull();
          });
          var action = () => parentModelValidator.Validate(_model);
          
-         var error = action.ShouldThrowCrossError<CustomErrorWithCode>();
+         var error = action.ShouldThrowCrossError<CustomExceptionWithCode>();
          
          error.Code.ShouldBe(expectedError.Code);
          error.Message.ShouldBe(expectedMessage);
@@ -508,7 +508,7 @@ public class ModelValidatorTests :
              .WithNullableInt(nullableInt)
              .Build();
          var expectedMessage = "Expected message";
-         var expectedCode = nameof(CommonCrossError.GreaterThan<int>);
+         var expectedCode = nameof(CommonCrossException.GreaterThan<int>);
          var expectedDetails = "Expected details";
          var expectedHttpStatusCode = HttpStatusCode.Accepted;
          var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
@@ -526,12 +526,12 @@ public class ModelValidatorTests :
          });
          var action = () => parentModelValidator.Validate(_model);
 
-         var error = action.ShouldThrowCrossError<CommonCrossError.GreaterThan<int>>();
+         var error = action.ShouldThrowCrossError<CommonCrossException.GreaterThan<int>>();
          
          error.Message.ShouldBe(expectedMessage);
          error.Code.ShouldBe(expectedCode);
          error.Details.ShouldBe(expectedDetails);
-         error.HttpStatusCode.ShouldBe(expectedHttpStatusCode);
+         error.StatusCode.ShouldBe(expectedHttpStatusCode);
      }
      
      [Fact]
@@ -603,8 +603,8 @@ public class ModelValidatorTests :
      [Fact]
      public void Replace_default_placeholders()
      {
-         var template = "{FieldDisplayName} is {FieldValue}";
-         var expectedMessage = $"NullableString is ";
+         var template = "{fieldDisplayName} is {fieldValue}";
+         var expectedMessage = "NullableString is ";
          var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
          {
              validator.Field(_model.NullableString)
@@ -621,7 +621,7 @@ public class ModelValidatorTests :
      [Fact]
      public void Not_replace_placeholders_not_added()
      {
-         var template = "{PlaceholderNotReplaced} is {FieldValue}";
+         var template = "{PlaceholderNotReplaced} is {fieldValue}";
          var expectedMessage = $"{{PlaceholderNotReplaced}} is {_model.NestedModel.Int}";
          var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
          {
@@ -640,7 +640,7 @@ public class ModelValidatorTests :
      public void Replace_custom_error_placeholders()
      {
          var comparisonValue = _model.NestedModel.Int;
-         var template = "{ComparisonValue} is not greater than {FieldValue}";
+         var template = "{comparisonValue} is not greater than {fieldValue}";
          var expectedMessage = $"{_model.NestedModel.Int} is not greater than {comparisonValue}";
          var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
          {
@@ -665,7 +665,7 @@ public class ModelValidatorTests :
          });
          var action = () => parentModelValidator.Validate(_model);
 
-         action.ShouldThrowCrossError<CommonCrossError.Predicate>();
+         action.ShouldThrowCrossError<CommonCrossException.Predicate>();
      }
      
      [Fact]
@@ -727,7 +727,7 @@ public class ModelValidatorTests :
          });
          var action = () => parentModelValidator.Validate(_model);
 
-         var error = action.ShouldThrowCrossError<CommonCrossError.Null>();
+         var error = action.ShouldThrowCrossError<CommonCrossException.Null>();
          
          error.Code.ShouldBe(nameof(ErrorResource.Null));
          error.Message.ShouldBe(ErrorResource.Null);
@@ -754,7 +754,7 @@ public class ModelValidatorTests :
          });
          var action = () => parentModelValidator.Validate(_model);
          
-         var error = action.ShouldThrowCrossError<CommonCrossError.GreaterThan<int>>();
+         var error = action.ShouldThrowCrossError<CommonCrossException.GreaterThan<int>>();
          
          error.Code.ShouldBe(nameof(ErrorResource.GreaterThan));
      }
@@ -762,7 +762,7 @@ public class ModelValidatorTests :
      [Fact]
      public async Task Execute_all_validators_in_a_validation_with_error_accumulation()
      {
-         var testError = new TestError();
+         var testError = new TestException();
          var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
          {
              validator.ValidationMode = ValidationMode.AccumulateFirstErrors;
@@ -770,12 +770,12 @@ public class ModelValidatorTests :
              validator.Field(_model.Int)
                  .Must(_commonFixture.BeValid)
                  .MustAsync(_commonFixture.BeValidAsync)
-                 .Must(_ => _commonFixture.NullableError())
-                 .MustAsync(_ => _commonFixture.ErrorAsync(testError));
+                 .Must(_ => _commonFixture.NullableException())
+                 .MustAsync(_ => _commonFixture.ExceptionAsync(testError));
          });
          var action = () => parentModelValidator.ValidateAsync(_model);
 
-         await action.ShouldThrowCrossErrorAsync<TestError>();
+         await action.ShouldThrowCrossErrorAsync<TestException>();
      }
      
      [Fact]
@@ -790,11 +790,11 @@ public class ModelValidatorTests :
                  .WithMessage("Unexpected message")
                  .MustAsync(_commonFixture.BeValidAsync)
                  .WithMessage(expectedMessage)
-                 .MustAsync(_ => _commonFixture.ErrorAsync());
+                 .MustAsync(_ => _commonFixture.ExceptionAsync());
          });
          var action = () => parentModelValidator.ValidateAsync(_model);
 
-         var error = await action.ShouldThrowCrossErrorAsync<TestError>();
+         var error = await action.ShouldThrowCrossErrorAsync<TestException>();
          
          error.Message.ShouldBe(expectedMessage);
      }
@@ -878,5 +878,5 @@ public class ModelValidatorTests :
          await parentModelValidator.ValidateAsync(_model);
      }
 
-     private record CustomErrorWithCode(string Code) : CompleteCrossError(Code: Code);
+     private class CustomExceptionWithCode(string code) : BusinessException(code: code);
 }

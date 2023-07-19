@@ -1,16 +1,16 @@
-﻿using CrossValidation.Errors;
+﻿using CrossValidation.Exceptions;
 
 namespace CrossValidation.Validators.LengthValidators;
 
-public record MinimumLengthValidator(string FieldValue, int Minimum) : LengthValidatorBase
+public class MinimumLengthValidator(string fieldValue, int minimum) : LengthValidatorBase
 {
     public override bool IsValid()
     {
-        return FieldValue.Length >= Minimum;
+        return fieldValue.Length >= minimum;
     }
 
-    public override ILengthError CreateError()
+    public override LengthException CreateError()
     {
-        return new CommonCrossError.MinimumLength(Minimum, GetTotalLength(FieldValue));
+        return new CommonCrossException.MinimumLength(minimum, GetTotalLength(fieldValue));
     }
 }

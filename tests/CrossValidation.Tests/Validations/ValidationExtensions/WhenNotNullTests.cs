@@ -1,6 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
-using CrossValidation.Errors;
+﻿using CrossValidation.Exceptions;
 using CrossValidation.ShouldlyAssertions;
 using CrossValidation.Tests.TestUtils;
 using CrossValidation.Tests.TestUtils.Builders;
@@ -111,7 +109,7 @@ public class WhenNotNullTests :
                 .Must(_commonFixture.BeValid))
             .NotNull();
 
-        var error = action.ShouldThrowCrossError<CommonCrossError.NotNull>();
+        var error = action.ShouldThrowCrossError<CommonCrossException.NotNull>();
         error.GetFieldValue!().ShouldNotBeOfType<int>();
         error.GetFieldValue!().ShouldBeNull();
     }
@@ -172,7 +170,7 @@ public class WhenNotNullTests :
 
         var errors = await action.ShouldThrowCrossErrorsAsync();
         errors.Count.ShouldBe(2);
-        errors[0].ShouldBeOfType<CommonCrossError.Predicate>();
+        errors[0].ShouldBeOfType<CommonCrossException.Predicate>();
         errors[0].Message.ShouldBe(expectedMessage);
     }
     
@@ -192,7 +190,7 @@ public class WhenNotNullTests :
             .Must(_commonFixture.ThrowException)
             .ValidateAsync();
         
-        var error = await action.ShouldThrowCrossErrorAsync<CommonCrossError.Predicate>();
+        var error = await action.ShouldThrowCrossErrorAsync<CommonCrossException.Predicate>();
         
         error.Message.ShouldBe(expectedMessage);
     }
@@ -216,7 +214,7 @@ public class WhenNotNullTests :
             .Must(_commonFixture.ThrowException)
             .ValidateAsync();
 
-        var error = await action.ShouldThrowCrossErrorAsync<CommonCrossError.Predicate>();
+        var error = await action.ShouldThrowCrossErrorAsync<CommonCrossException.Predicate>();
         
         error.Message.ShouldBe(expectedMessage);
     }
@@ -239,7 +237,7 @@ public class WhenNotNullTests :
             .Must(_commonFixture.ThrowException)
             .ValidateAsync();
 
-        var error = await action.ShouldThrowCrossErrorAsync<CommonCrossError.Predicate>();
+        var error = await action.ShouldThrowCrossErrorAsync<CommonCrossException.Predicate>();
         error.Message.ShouldBe(expectedMessage);
     }
     
@@ -282,7 +280,7 @@ public class WhenNotNullTests :
             .Must(_commonFixture.ThrowException)
             .ValidateAsync();
 
-        var error = await action.ShouldThrowCrossErrorAsync<CommonCrossError.Predicate>();
+        var error = await action.ShouldThrowCrossErrorAsync<CommonCrossException.Predicate>();
         error.Message.ShouldBe(expectedMessage);
     }
     
@@ -297,7 +295,7 @@ public class WhenNotNullTests :
             .Must(_commonFixture.NotBeValid)
             .ValidateAsync();
 
-        var error = await action.ShouldThrowCrossErrorAsync<CommonCrossError.Predicate>();
+        var error = await action.ShouldThrowCrossErrorAsync<CommonCrossException.Predicate>();
         
         error.Message.ShouldBe(expectedMessage);
     }

@@ -6,6 +6,8 @@
 
     <ItemGroup>
       <PackageReference Include="BenchmarkDotNet" />
+      <PackageReference Include="BenchmarkDotNet.Annotations" />
+      <PackageReference Include="BenchmarkDotNet.Diagnostics.dotTrace" />
     </ItemGroup>
 
     <ItemGroup>

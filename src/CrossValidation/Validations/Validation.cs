@@ -1,7 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.Net;
-using CrossValidation.Errors;
 using CrossValidation.Exceptions;
 using CrossValidation.Validators;
 
@@ -26,7 +25,7 @@ public interface IValidation<out TField> : IValidationOperation
     IValidation<TField> WithDetails(string details);
 
     [Pure]
-    IValidation<TField> WithError(ICrossError error);
+    IValidation<TField> WithException(BusinessException exception);
 
     [Pure]
     IValidation<TField> WithFieldDisplayName(string fieldDisplayName);
@@ -47,9 +46,9 @@ public interface IValidation<out TField> : IValidationOperation
     
     IValidation<TField> MustAsync(Func<TField, Task<bool>> condition);
 
-    IValidation<TField> Must(Func<TField, ICrossError?> condition);
+    IValidation<TField> Must(Func<TField, BusinessException?> condition);
 
-    IValidation<TField> MustAsync(Func<TField, Task<ICrossError?>> condition);
+    IValidation<TField> MustAsync(Func<TField, Task<BusinessException?>> condition);
 
     [Pure]
     TField Instance();
@@ -57,9 +56,9 @@ public interface IValidation<out TField> : IValidationOperation
     [Pure]
     TInstance Instance<TInstance>(Func<TField, TInstance> fieldToInstance);
 
-    IValidation<TField> SetValidator(Func<IValidator<ICrossError>> validator);
+    IValidation<TField> SetValidator(Func<IValidator<BusinessException>> validator);
 
-    IValidation<TField> SetAsyncValidator(Func<Task<IValidator<ICrossError>>> validator);
+    IValidation<TField> SetAsyncValidator(Func<Task<IValidator<BusinessException>>> validator);
 
     IValidation<TField> SetScope(Action scope, ScopeType type);
     
@@ -76,11 +75,11 @@ public interface IValidation<out TField> : IValidationOperation
         Type? crossErrorToException,
         string fieldName,
         ValidationContext? context,
-        ICrossError? error,
-        string? message,
+        BusinessException? exception,
+        string message,
         string? code,
         string? details,
-        HttpStatusCode? httpStatusCode,
+        HttpStatusCode? statusCode,
         string? fieldDisplayName)
     {
         var fullPath = fieldName.Contains('.')
@@ -94,11 +93,11 @@ public interface IValidation<out TField> : IValidationOperation
             context: null,
             index: null,
             parentPath: null,
-            fixedError: error,
+            fixedException: exception,
             fixedMessage: message,
             fixedCode: code,
             fixedDetails: details,
-            fixedHttpStatusCode: httpStatusCode,
+            fixedStatusCode: statusCode,
             fixedFieldDisplayName: fieldDisplayName);
     }
 
@@ -115,7 +114,7 @@ internal class Validation<TField> :
     ValidationOperation,
     IValidation<TField>
 {
-    public IValidation<TField> SetValidator(Func<IValidator<ICrossError>> validator)
+    public IValidation<TField> SetValidator(Func<IValidator<BusinessException>> validator)
     {
         if (HasFailed)
         {
@@ -134,7 +133,7 @@ internal class Validation<TField> :
         return CreateNextValidation();
     }
     
-    public IValidation<TField> SetAsyncValidator(Func<Task<IValidator<ICrossError>>> validator)
+    public IValidation<TField> SetAsyncValidator(Func<Task<IValidator<BusinessException>>> validator)
     {
         if (HasFailed)
         {
@@ -180,7 +179,9 @@ internal class Validation<TField> :
     {
         if (!HasFailed)
         {
-            Message = Context!.Message ?? message;
+            Message = Context!.Message != ""
+                ? Context.Message
+                : message;
         }
         
         return this;
@@ -196,15 +197,15 @@ internal class Validation<TField> :
         return this;
     }
 
-    public IValidation<TField> WithError(ICrossError error)
+    public IValidation<TField> WithException(BusinessException exception)
     {
         if (!HasFailed)
         {
-            var errorToAdd = Context!.Error ?? error;
-            error.CrossErrorToException = CrossErrorToException;
-            TakeCustomizationsFromError(errorToAdd, Context);
-            error.GetFieldValue = GetNonGenericFieldValue;
-            Error = errorToAdd;
+            var errorToAdd = Context!.Error ?? exception;
+            exception.CrossErrorToException = CrossErrorToException;
+            TakeCustomizationsFromException(errorToAdd, Context);
+            exception.GetFieldValue = GetNonGenericFieldValue;
+            Exception = errorToAdd;
         }
 
         return this;
@@ -224,7 +225,7 @@ internal class Validation<TField> :
     {
         if (!HasFailed)
         {
-            HttpStatusCode = Context!.HttpStatusCode ?? code;
+            StatusCode = Context!.StatusCode ?? code;
         }
         
         return this;
@@ -267,7 +268,7 @@ internal class Validation<TField> :
         });
     }
     
-    public IValidation<TField> Must(Func<TField, ICrossError?> condition)
+    public IValidation<TField> Must(Func<TField, BusinessException?> condition)
     {
         if (!HasFailed)
         {
@@ -277,10 +278,10 @@ internal class Validation<TField> :
 
                 if (error is not null)
                 {
-                    WithError(error);
+                    WithException(error);
                 }
 
-                return new ErrorPredicateValidator(() => error);
+                return new ExceptionPredicateValidator(() => error);
             };
 
             return SetValidator(predicate);
@@ -289,7 +290,7 @@ internal class Validation<TField> :
         return this;
     }
 
-    public IValidation<TField> MustAsync(Func<TField, Task<ICrossError?>> condition)
+    public IValidation<TField> MustAsync(Func<TField, Task<BusinessException?>> condition)
     {
         if (!HasFailed)
         {
@@ -299,10 +300,10 @@ internal class Validation<TField> :
                 
                 if (error is not null)
                 {
-                    WithError(error);
+                    WithException(error);
                 }
 
-                return new ErrorPredicateValidator(() => error);
+                return new ExceptionPredicateValidator(() => error);
             });
         }
 
@@ -326,11 +327,11 @@ internal class Validation<TField> :
             context: Context,
             index: Index,
             parentPath: ParentPath,
-            fixedError: Context!.Error ?? Error,
+            fixedException: Context!.Error ?? Exception,
             fixedMessage: Context!.Message ?? Message,
             fixedCode: Context!.Code ?? Code,
             fixedDetails: Context!.Details ?? Details,
-            fixedHttpStatusCode: Context!.HttpStatusCode ?? HttpStatusCode,
+            fixedStatusCode: Context!.StatusCode ?? StatusCode,
             fixedFieldDisplayName: Context!.FieldDisplayName ?? FieldDisplayName);
         nextValidation.HasFailed = HasFailed;
         nextValidation.HasPendingAsyncValidation = HasPendingAsyncValidation;
@@ -376,11 +377,11 @@ internal class Validation<TField> :
             context: oldContext,
             index: Index,
             parentPath: oldParentPath,
-            fixedError: oldContext.Error,
+            fixedException: oldContext.Error,
             fixedMessage: oldContext.Message,
             fixedCode: oldContext.Code,
             fixedDetails: oldContext.Details,
-            fixedHttpStatusCode: oldContext.HttpStatusCode,
+            fixedStatusCode: oldContext.StatusCode,
             fixedFieldDisplayName: oldContext.FieldDisplayName);
         nextValidation.FieldName = oldFieldName;
         nextValidation.HasFailed = HasFailed;
@@ -417,11 +418,11 @@ internal class Validation<TField> :
         ValidationContext? context,
         int? index,
         string? parentPath,
-        ICrossError? fixedError,
-        string? fixedMessage,
+        BusinessException? fixedException,
+        string fixedMessage,
         string? fixedCode,
         string? fixedDetails,
-        HttpStatusCode? fixedHttpStatusCode,
+        HttpStatusCode? fixedStatusCode,
         string? fixedFieldDisplayName)
     {
         if (context != null)
@@ -448,11 +449,11 @@ internal class Validation<TField> :
             FieldName = $"{parentPath}{parentPathPathSeparator}{fieldPath}";
         }
         
-        Context.Error = fixedError;
+        Context.Error = fixedException;
         Context.Message = fixedMessage;
         Context.Code = fixedCode;
         Context.Details = fixedDetails;
-        Context.HttpStatusCode = fixedHttpStatusCode;
+        Context.StatusCode = fixedStatusCode;
         Context.FieldDisplayName = fixedFieldDisplayName;
     }
 
@@ -467,13 +468,13 @@ internal class Validation<TField> :
         {
             return fieldToInstance(GetGenericFieldValue!());
         }
-        catch (CrossException e)
+        catch (BusinessException e)
         {
-            e.Error.FieldName = null;
-            e.Error.PlaceholderValues = null;
-            e.Error.CrossErrorToException = CrossErrorToException;
-            TakeCustomizationsFromInstanceError(e.Error, Context!);
-            HandleError(e.Error, Context!);
+            e.FieldName = null;
+            e.PlaceholderValues.Clear();
+            e.CrossErrorToException = CrossErrorToException;
+            TakeCustomizationsFromInstanceException(e, Context!);
+            HandleException(e, Context!);
             throw new UnreachableException();
         }
     }
@@ -493,11 +494,11 @@ internal class Validation<TField> :
             context: Context,
             index: Index,
             parentPath: ParentPath,
-            fixedError: Context!.Error,
+            fixedException: Context!.Error,
             fixedMessage: Context!.Message,
             fixedCode: Context!.Code,
             fixedDetails: Context!.Details,
-            fixedHttpStatusCode: Context!.HttpStatusCode,
+            fixedStatusCode: Context!.StatusCode,
             fixedFieldDisplayName: Context!.FieldDisplayName);
         nextValidation.HasFailed = HasFailed;
         nextValidation.HasPendingAsyncValidation = HasPendingAsyncValidation;

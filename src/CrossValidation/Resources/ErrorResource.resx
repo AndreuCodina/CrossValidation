@@ -19,10 +19,10 @@
         <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
     </resheader>
     <data name="LengthRange" xml:space="preserve">
-        <value>Must have between {Minimum} and {Maximum} caracter(s)</value>
+        <value>Must have between {minimum} and {maximum} caracter(s)</value>
     </data>
     <data name="GreaterThan" xml:space="preserve">
-        <value>Must be greater than {FieldValue}</value>
+        <value>Must be greater than {fieldValue}</value>
     </data>
     <data name="NotNull" xml:space="preserve">
         <value>Must have a value</value>
@@ -34,7 +34,7 @@
         <value>Must not have a value</value>
     </data>
     <data name="MinimumLength" xml:space="preserve">
-        <value>Must have at least {Minimum} characters</value>
+        <value>Must have at least {minimum} characters</value>
     </data>
     <data name="RegularExpression" xml:space="preserve">
         <value>The format is not valid</value>

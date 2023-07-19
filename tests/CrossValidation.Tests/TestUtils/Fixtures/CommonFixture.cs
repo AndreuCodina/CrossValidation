@@ -1,4 +1,4 @@
-﻿using CrossValidation.Errors;
+﻿using CrossValidation.Exceptions;
 using CrossValidation.Tests.TestUtils.Fixtures.Validators;
 using Moq;
 
@@ -49,31 +49,31 @@ public class CommonFixture
         return await ReturnBoolTask(false);
     }
     
-    public ICrossError? Error()
+    public BusinessException? Exception()
     {
-        ICrossError? error = new TestError();
+        BusinessException? error = new TestException();
         return error;
     }
 
-    public async Task<ICrossError?> ErrorAsync(ICrossError? error = null)
+    public async Task<BusinessException?> ExceptionAsync(BusinessException? exception = null)
     {
-        if (error is null)
+        if (exception is null)
         {
-            return await ReturnErrorTask(new TestError());
+            return await ReturnExceptionTask(new TestException());
         }
         
-        return await ReturnErrorTask(error);
+        return await ReturnExceptionTask(exception);
     }
     
-    public ICrossError? NullableError()
+    public BusinessException? NullableException()
     {
         return default;
     }
     
-    public async Task<ICrossError?> NullErrorAsync()
+    public async Task<BusinessException?> NullExceptionAsync()
     {
-        ICrossError? error = null;
-        return await ReturnErrorTask(error);
+        BusinessException? exception = null;
+        return await ReturnExceptionTask(exception);
     }
     
     public bool ThrowException<T>(T parameter)
@@ -86,8 +86,8 @@ public class CommonFixture
         return Task.FromResult(value);
     }
     
-    private Task<ICrossError?> ReturnErrorTask(ICrossError? error)
+    private Task<BusinessException?> ReturnExceptionTask(BusinessException? exception)
     {
-        return Task.FromResult(error);
+        return Task.FromResult(exception);
     }
 }

@@ -13,6 +13,6 @@ runs:
           --no-build \
           --verbosity normal \
           --collect:"XPlat Code Coverage;Format=lcov" \
-          --results-directory ./generated/coverage \
+          --results-directory ./artifacts/coverage \
           -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Exclude="[*]CrossValidation.WebApplication*,[*]CrossValidation.Resources*"
       shell: bash

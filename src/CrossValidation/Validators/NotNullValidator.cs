@@ -1,16 +1,16 @@
-﻿using CrossValidation.Errors;
+﻿using CrossValidation.Exceptions;
 
 namespace CrossValidation.Validators;
 
-public record NotNullValidator<TField>(TField? FieldValue) : Validator
+public class NotNullValidator<TField>(TField? fieldValue) : Validator
 {
     public override bool IsValid()
     {
-        return FieldValue is not null;
+        return fieldValue is not null;
     }
 
-    public override ICrossError CreateError()
+    public override BusinessException CreateError()
     {
-        return new CommonCrossError.NotNull();
+        return new CommonCrossException.NotNull();
     }
 }

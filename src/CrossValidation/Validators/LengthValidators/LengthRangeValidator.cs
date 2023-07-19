@@ -1,8 +1,8 @@
-﻿using CrossValidation.Errors;
+﻿using CrossValidation.Exceptions;
 
 namespace CrossValidation.Validators.LengthValidators;
 
-public record LengthRangeValidator(string FieldValue, int Minimum, int Maximum) : LengthValidatorBase
+public class LengthRangeValidator(string FieldValue, int Minimum, int Maximum) : LengthValidatorBase
 {
     public override bool IsValid()
     {
@@ -10,8 +10,8 @@ public record LengthRangeValidator(string FieldValue, int Minimum, int Maximum) 
                && FieldValue.Length <= Maximum;
     }
 
-    public override ILengthError CreateError()
+    public override LengthException CreateError()
     {
-        return new CommonCrossError.LengthRange(Minimum, Maximum, GetTotalLength(FieldValue));
+        return new CommonCrossException.LengthRange(Minimum, Maximum, GetTotalLength(FieldValue));
     }
 }

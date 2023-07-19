@@ -231,11 +231,11 @@ public static class ValidationExtensions
             context: validation.Context,
             index: index,
             parentPath: validation.ParentPath,
-            fixedError: validation.Context!.Error,
+            fixedException: validation.Context!.Error,
             fixedMessage: validation.Context!.Message,
             fixedCode: validation.Context!.Code,
             fixedDetails: validation.Context!.Details,
-            fixedHttpStatusCode: validation.Context!.HttpStatusCode,
+            fixedStatusCode: validation.Context!.StatusCode,
             fixedFieldDisplayName: validation.Context!.FieldDisplayName);
         scopeValidation.HasFailed = validation.HasFailed;
         scopeValidation.HasPendingAsyncValidation = validation.HasPendingAsyncValidation;

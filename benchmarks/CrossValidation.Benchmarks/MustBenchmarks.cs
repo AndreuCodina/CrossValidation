@@ -1,8 +1,10 @@
 using BenchmarkDotNet.Attributes;
-using CrossValidation.Errors;
+using BenchmarkDotNet.Diagnostics.dotTrace;
+using CrossValidation.Exceptions;
 
 namespace CrossValidation.Benchmarks;
 
+[DotTraceDiagnoser]
 [MemoryDiagnoser]
 [RankColumn]
 public class MustBenchmarks
@@ -28,7 +30,7 @@ public class MustBenchmarks
         try
         {
             Validate.That(Value)
-                .WithError(new CompleteCrossError())
+                .WithException(new BusinessException())
                 .Must(_ => CheckReturnsBoolean());
         }
         catch (Exception)
@@ -36,9 +38,9 @@ public class MustBenchmarks
         }
     }
 
-    private ICrossError CheckReturnsError()
+    private BusinessException CheckReturnsError()
     {
-        return new CompleteCrossError();
+        return new BusinessException();
     }
     
     private bool CheckReturnsBoolean()

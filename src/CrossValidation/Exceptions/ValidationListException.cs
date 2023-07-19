@@ -1,13 +1,6 @@
-﻿using CrossValidation.Errors;
+﻿namespace CrossValidation.Exceptions;
 
-namespace CrossValidation.Exceptions;
-
-public class ValidationListException : NoStackTraceException
+public class ValidationListException(List<BusinessException> errors) : Exception
 {
-    public List<ICrossError> Errors { get; }
-
-    public ValidationListException(List<ICrossError> errors)
-    {
-        Errors = errors;
-    }
+    public List<BusinessException> Exceptions => errors;
 }

@@ -1,9 +1,11 @@
 ﻿using BenchmarkDotNet.Attributes;
-using CrossValidation.Errors;
+using BenchmarkDotNet.Diagnostics.dotTrace;
+using CrossValidation.Exceptions;
 using CrossValidation.Validations;
 
 namespace CrossValidation.Benchmarks;
 
+[DotTraceDiagnoser]
 [MemoryDiagnoser]
 [RankColumn]
 public class WithErrorBenchmarks
@@ -20,7 +22,7 @@ public class WithErrorBenchmarks
     public void WithError()
     {
         _validation
-            .WithError(new CompleteCrossError(Message: "Error message"))
+            .WithException(new BusinessException(message: "Error message"))
             .Must(_ => true);
     }
 }

@@ -1,4 +1,4 @@
-﻿using CrossValidation.Errors;
+﻿using CrossValidation.Exceptions;
 using CrossValidation.Resources;
 using CrossValidation.ShouldlyAssertions;
 using CrossValidation.Tests.TestUtils;
@@ -39,7 +39,7 @@ public class EmptyTests : TestBase
         var action = () => Validate.Field(_model.String)
             .Empty();
 
-        var error = action.ShouldThrowCrossError<CommonCrossError.EmptyString>();
+        var error = action.ShouldThrowCrossError<CommonCrossException.EmptyString>();
         error.Code.ShouldBe(nameof(ErrorResource.EmptyString));
     }
     
@@ -62,7 +62,7 @@ public class EmptyTests : TestBase
         var action = () => Validate.Field(_model.IntList)
             .Empty();
 
-        var error = action.ShouldThrowCrossError<CommonCrossError.EmptyCollection>();
+        var error = action.ShouldThrowCrossError<CommonCrossException.EmptyCollection>();
         error.Code.ShouldBe(nameof(ErrorResource.EmptyCollection));
     }
 }

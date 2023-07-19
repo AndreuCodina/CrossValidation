@@ -1,10 +1,10 @@
-﻿using CrossValidation.Errors;
+﻿using CrossValidation.Exceptions;
 
 namespace CrossValidation.Validators.LengthValidators;
 
-public abstract record LengthValidatorBase : Validator<ILengthError>
+public abstract class LengthValidatorBase : Validator<LengthException>
 {
-    public int GetTotalLength(string value)
+    protected int GetTotalLength(string value)
     {
         return value.Length;
     }

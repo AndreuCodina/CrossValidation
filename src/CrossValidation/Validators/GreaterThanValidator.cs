@@ -1,20 +1,20 @@
 ﻿using System.Numerics;
-using CrossValidation.Errors;
+using CrossValidation.Exceptions;
 
 namespace CrossValidation.Validators;
 
-public record GreaterThanValidator<TField>(
-    TField FieldValue,
-    TField ComparisonValue) : Validator
+public class GreaterThanValidator<TField>(
+    TField fieldValue,
+    TField comparisonValue) : Validator
     where TField : IComparisonOperators<TField, TField, bool>
 {
     public override bool IsValid()
     {
-        return FieldValue > ComparisonValue;
+        return fieldValue > comparisonValue;
     }
 
-    public override ICrossError CreateError()
+    public override BusinessException CreateError()
     {
-        return new CommonCrossError.GreaterThan<TField>(ComparisonValue);
+        return new CommonCrossException.GreaterThan<TField>(comparisonValue);
     }
 }

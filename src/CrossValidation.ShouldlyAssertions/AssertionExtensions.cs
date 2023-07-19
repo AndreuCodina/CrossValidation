@@ -1,5 +1,4 @@
-﻿using CrossValidation.Errors;
-using CrossValidation.Exceptions;
+﻿using CrossValidation.Exceptions;
 using Shouldly;
 
 namespace CrossValidation.ShouldlyAssertions;
@@ -7,82 +6,82 @@ namespace CrossValidation.ShouldlyAssertions;
 [ShouldlyMethods]
 public static class AssertionExtensions
 {
-    public static ICrossError ShouldThrowCrossError(this Action actual, string? customMessage = null)
+    public static BusinessException ShouldThrowCrossError(this Action actual, string? customMessage = null)
     {
-        return actual.ShouldThrow<CrossException>(customMessage).Error;
+        return actual.ShouldThrow<BusinessException>(customMessage);
     }
     
-    public static async Task<ICrossError> ShouldThrowCrossErrorAsync(this Task<Action> actual, string? customMessage = null)
+    public static async Task<BusinessException> ShouldThrowCrossErrorAsync(this Task<Action> actual, string? customMessage = null)
     {
-        return (await actual.ShouldThrowAsync<CrossException>(customMessage)).Error;
+        return await actual.ShouldThrowAsync<BusinessException>(customMessage);
     }
     
-    public static ICrossError ShouldThrowCrossError(this Func<object?> actual, string? customMessage = null)
+    public static BusinessException ShouldThrowCrossError(this Func<object?> actual, string? customMessage = null)
     {
-        return actual.ShouldThrow<CrossException>(customMessage).Error;
+        return actual.ShouldThrow<BusinessException>(customMessage);
     }
     
-    public static async Task<ICrossError> ShouldThrowCrossErrorAsync(this Func<Task> actual, string? customMessage = null)
+    public static async Task<BusinessException> ShouldThrowCrossErrorAsync(this Func<Task> actual, string? customMessage = null)
     {
-        return (await actual.ShouldThrowAsync<CrossException>(customMessage)).Error;
+        return await actual.ShouldThrowAsync<BusinessException>(customMessage);
     }
     
     public static TCrossError ShouldThrowCrossError<TCrossError>(this Action actual, string? customMessage = null)
-        where TCrossError : ICrossError
+        where TCrossError : BusinessException
     {
-        var error = actual.ShouldThrow<CrossException>().Error;
+        var error = actual.ShouldThrow<BusinessException>();
         return error.ShouldBeOfType<TCrossError>(customMessage);
     }
     
     public static TCrossError ShouldThrowCrossError<TCrossError>(this Func<object?> actual, string? customMessage = null)
-        where TCrossError : ICrossError
+        where TCrossError : BusinessException
     {
-        var error = actual.ShouldThrow<CrossException>().Error;
+        var error = actual.ShouldThrow<BusinessException>();
         return error.ShouldBeOfType<TCrossError>(customMessage);
     }
     
     public static async Task<TCrossError> ShouldThrowCrossErrorAsync<TCrossError>(this Task<Action> actual, string? customMessage = null)
-        where TCrossError : ICrossError
+        where TCrossError : BusinessException
     {
-        var error = (await actual.ShouldThrowAsync<CrossException>()).Error;
+        var error = await actual.ShouldThrowAsync<BusinessException>();
         return error.ShouldBeOfType<TCrossError>(customMessage);
     }
     
     public static TCrossError ShouldThrowCrossError<TCrossError>(this Func<Task> actual, string? customMessage = null)
-        where TCrossError : ICrossError
+        where TCrossError : BusinessException
     {
-        var error = actual.ShouldThrow<CrossException>().Error;
+        var error = actual.ShouldThrow<BusinessException>();
         return error.ShouldBeOfType<TCrossError>(customMessage);
     }
     
     public static async Task<TCrossError> ShouldThrowCrossErrorAsync<TCrossError>(this Func<Task> actual, string? customMessage = null)
-        where TCrossError : ICrossError
+        where TCrossError : BusinessException
     {
-        var error = (await actual.ShouldThrowAsync<CrossException>()).Error;
+        var error = await actual.ShouldThrowAsync<BusinessException>();
         return error.ShouldBeOfType<TCrossError>(customMessage);
     }
     
-    public static List<ICrossError> ShouldThrowCrossErrors(this Action actual, string? customMessage = null)
+    public static List<BusinessException> ShouldThrowCrossErrors(this Action actual, string? customMessage = null)
     {
-        var errors = actual.ShouldThrow<ValidationListException>(customMessage).Errors;
+        var errors = actual.ShouldThrow<ValidationListException>(customMessage).Exceptions;
         return errors;
     }
     
-    public static async Task<List<ICrossError>> ShouldThrowCrossErrorsAsync(this Task<Action> actual, string? customMessage = null)
+    public static async Task<List<BusinessException>> ShouldThrowCrossErrorsAsync(this Task<Action> actual, string? customMessage = null)
     {
-        var errors = (await actual.ShouldThrowAsync<ValidationListException>(customMessage)).Errors;
+        var errors = (await actual.ShouldThrowAsync<ValidationListException>(customMessage)).Exceptions;
         return errors;
     }
     
-    public static List<ICrossError> ShouldThrowCrossErrors(this Func<object?> actual, string? customMessage = null)
+    public static List<BusinessException> ShouldThrowCrossErrors(this Func<object?> actual, string? customMessage = null)
     {
-        var errors = actual.ShouldThrow<ValidationListException>(customMessage).Errors;
+        var errors = actual.ShouldThrow<ValidationListException>(customMessage).Exceptions;
         return errors;
     }
     
-    public static async Task<List<ICrossError>> ShouldThrowCrossErrorsAsync(this Func<Task> actual, string? customMessage = null)
+    public static async Task<List<BusinessException>> ShouldThrowCrossErrorsAsync(this Func<Task> actual, string? customMessage = null)
     {
-        var errors = (await actual.ShouldThrowAsync<ValidationListException>(customMessage)).Errors;
+        var errors = (await actual.ShouldThrowAsync<ValidationListException>(customMessage)).Exceptions;
         return errors;
     }
 }

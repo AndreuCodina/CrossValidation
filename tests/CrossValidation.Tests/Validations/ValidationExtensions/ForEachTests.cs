@@ -1,5 +1,4 @@
 ﻿using System.Net;
-using CrossValidation.Errors;
 using CrossValidation.Exceptions;
 using CrossValidation.ShouldlyAssertions;
 using CrossValidation.Tests.TestUtils;
@@ -161,7 +160,7 @@ public class ForEachTests :
                     .WithFieldDisplayName(expectedFieldDisplayName)
                     .WithCode(expectedCode)
                     .WithMessage(expectedMessage)
-                    .WithError(new ErrorTest())
+                    .WithException(new ErrorException())
                     .WithHttpStatusCode(HttpStatusCode.Created)
                     .WithDetails(expectedDetails)
                     .GreaterThan(intList[2]));
@@ -172,12 +171,12 @@ public class ForEachTests :
         var error = action.ShouldThrowCrossError();
         error.FieldName.ShouldBe("IntList[2]");
         error.FieldDisplayName.ShouldBe(expectedFieldDisplayName);
-        error.ShouldBeOfType<ErrorTest>();
+        error.ShouldBeOfType<ErrorException>();
         error.Code.ShouldBe(expectedCode);
         error.Message.ShouldBe(expectedMessage);
         error.Details.ShouldBe(expectedDetails);
         error.PlaceholderValues.ShouldNotBeEmpty();
-        error.HttpStatusCode.ShouldBe(expectedHttpStatusCode);
+        error.StatusCode.ShouldBe(expectedHttpStatusCode);
     }
     
     [Theory]
@@ -204,7 +203,7 @@ public class ForEachTests :
                     .WithFieldDisplayName(expectedFieldDisplayName)
                     .WithCode(expectedCode)
                     .WithMessage(expectedMessage)
-                    .WithError(new ErrorTest())
+                    .WithException(new ErrorException())
                     .WithHttpStatusCode(HttpStatusCode.Created)
                     .WithDetails(expectedDetails)
                     .GreaterThan(intList[2]));
@@ -215,12 +214,12 @@ public class ForEachTests :
         var error = action.ShouldThrowCrossError();
         error.FieldName.ShouldBeNull();
         error.FieldDisplayName.ShouldBe(expectedFieldDisplayName);
-        error.ShouldBeOfType<ErrorTest>();
+        error.ShouldBeOfType<ErrorException>();
         error.Code.ShouldBe(expectedCode);
         error.Message.ShouldBe(expectedMessage);
         error.Details.ShouldBe(expectedDetails);
         error.PlaceholderValues.ShouldNotBeEmpty();
-        error.HttpStatusCode.ShouldBe(expectedHttpStatusCode);
+        error.StatusCode.ShouldBe(expectedHttpStatusCode);
     }
     
     [Theory]
@@ -293,15 +292,14 @@ public class ForEachTests :
 
         if (exception is ValidationListException validationListException)
         {
-            validationListException.Errors
+            validationListException.Exceptions
                 .Select(x => x.Code)
                 .SequenceEqual(expectedErrorCodes)
                 .ShouldBeTrue();
         }
-        else if (exception is CrossException crossException)
+        else if (exception is BusinessException businessException)
         {
-            crossException.Error
-                .Code
+            businessException.Code
                 .ShouldBe(expectedErrorCodes[0]);
         }
         else
@@ -370,7 +368,7 @@ public class ForEachTests :
             .Must(_commonFixture.ThrowException)
             .ValidateAsync();
 
-        var error = await action.ShouldThrowCrossErrorAsync<CommonCrossError.Predicate>();
+        var error = await action.ShouldThrowCrossErrorAsync<CommonCrossException.Predicate>();
         
         error.Message.ShouldBe(expectedMessage);
     }
@@ -481,5 +479,5 @@ public class ForEachTests :
         errors[2].FieldName.ShouldBe("NestedModelList[0].Int");
     }
 
-    private record ErrorTest : CompleteCrossError;
+    private class ErrorException : BusinessException;
 }
