@@ -1,3 +1,4 @@
+using System.Net;
 using CrossValidation.Exceptions;
 using CrossValidation.SourceGenerators.UnitTests.Resources;
 
@@ -35,4 +36,7 @@ namespace ParentNamespace
             }
         }
     }
+    
+    public partial class WithNoParametersNoMessageException()
+        : ResxBusinessException(statusCode: HttpStatusCode.Accepted);
 }

@@ -95,5 +95,9 @@ public class ResxBusinessExceptionSourceGeneratorTests
         new ParentClass<string>.ChildClass.ExceptionWithParameters<int>(1, 2)
             .Message
             .ShouldBe("Error message with 1 and 2");
+
+        new WithNoParametersNoMessageException()
+            .Message
+            .ShouldBe("");
     }
 }
