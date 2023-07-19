@@ -2,7 +2,6 @@
 
 namespace CrossValidation.Exceptions;
 
-#pragma warning disable CS9113 // Parameter is unread.
 public static class CommonCrossException
 {
     public class NotNull() : BusinessException(code: nameof(ErrorResource.NotNull));
@@ -31,6 +30,8 @@ public static class CommonCrossException
         
         public override void AddParametersAsPlaceholderValues()
         {
+            AddPlaceholderValue(minimum);
+            AddPlaceholderValue(maximum);
             AddPlaceholderValue(totalLength);
         }
     }
@@ -42,6 +43,7 @@ public static class CommonCrossException
         
         public override void AddParametersAsPlaceholderValues()
         {
+            AddPlaceholderValue(minimum);
             AddPlaceholderValue(totalLength);
         }
     }
@@ -58,4 +60,3 @@ public static class CommonCrossException
     
     public class NotEmptyCollection() : BusinessException(code: nameof(ErrorResource.NotEmptyCollection));
 }
-#pragma warning restore CS9113 // Parameter is unread.
