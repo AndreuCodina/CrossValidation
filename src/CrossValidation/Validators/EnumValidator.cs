@@ -11,7 +11,7 @@ public class EnumValidator<TField>(
         return Enum.IsDefined(enumType, fieldValue!);
     }
 
-    public override BusinessException CreateError()
+    public override BusinessException CreateException()
     {
         return new CommonCrossException.Enum();
     }

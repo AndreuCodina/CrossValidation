@@ -1,7 +1,6 @@
 ﻿using System.Net;
 using CrossValidation.Exceptions;
 using CrossValidation.Resources;
-using CrossValidation.ShouldlyAssertions;
 using CrossValidation.Tests.TestUtils;
 using CrossValidation.Tests.TestUtils.Builders;
 using CrossValidation.Tests.TestUtils.Fixtures;
@@ -53,9 +52,9 @@ public class ModelValidatorTests :
          });
          var action = () => parentModelValidator.Validate(_model);
 
-         var error = action.ShouldThrowCrossError();
+         var exception = action.ShouldThrow<BusinessException>();
          
-         error.Code.ShouldBe(nameof(ErrorResource.NotNull));
+         exception.Code.ShouldBe(nameof(ErrorResource.NotNull));
      }
 
      [Fact]
@@ -70,14 +69,14 @@ public class ModelValidatorTests :
          });
          var action = () => parentModelValidator.Validate(_model);
 
-         var error = action.ShouldThrowCrossError();
+         var exception = action.ShouldThrow<BusinessException>();
          
-         error.FieldName.ShouldBe(expectedFieldName);
-         error.GetFieldValue!().ShouldBe(expectedFieldValue);
+         exception.FieldName.ShouldBe(expectedFieldName);
+         exception.GetFieldValue!().ShouldBe(expectedFieldValue);
      }
 
      [Fact]
-     public void Set_field_information_to_the_error_when_using_a_child_model_validator()
+     public void Set_field_information_to_the_exception_when_using_a_child_model_validator()
      {
          var expectedFieldName = "NestedModel.Int";
          var expectedFieldValue = _model.NestedModel.Int;
@@ -93,10 +92,10 @@ public class ModelValidatorTests :
          });
          var action = () => parentModelValidator.Validate(_model);
 
-         var error = action.ShouldThrowCrossError();
+         var exception = action.ShouldThrow<BusinessException>();
          
-         error.FieldName.ShouldBe(expectedFieldName);
-         error.GetFieldValue!().ShouldBe(expectedFieldValue);
+         exception.FieldName.ShouldBe(expectedFieldName);
+         exception.GetFieldValue!().ShouldBe(expectedFieldValue);
      }
 
      [Fact]
@@ -113,10 +112,10 @@ public class ModelValidatorTests :
          });
          var action = () => parentModelValidator.Validate(_model);
 
-         var error = action.ShouldThrowCrossError();
+         var exception = action.ShouldThrow<BusinessException>();
          
-         error.FieldName.ShouldBe(expectedFieldName);
-         error.GetFieldValue!().ShouldBe(expectedFieldValue);
+         exception.FieldName.ShouldBe(expectedFieldName);
+         exception.GetFieldValue!().ShouldBe(expectedFieldValue);
      }
      
      [Fact]
@@ -151,9 +150,9 @@ public class ModelValidatorTests :
          });
          var action = () => parentModelValidator.Validate(_model);
 
-         var error = action.ShouldThrowCrossError();
+         var exception = action.ShouldThrow<BusinessException>();
          
-         error.Code.ShouldBe(expectedCode);
+         exception.Code.ShouldBe(expectedCode);
      }
 
      [Fact]
@@ -198,9 +197,10 @@ public class ModelValidatorTests :
          });
          var action = () => parentModelValidator.Validate(_model);
 
-         var errors = action.ShouldThrowCrossErrors();
+         var exceptions = action.ShouldThrow<BusinessListException>()
+             .Exceptions;
          
-         errors.Select(x => x.Code)
+         exceptions.Select(x => x.Code)
              .ShouldBe(expectedCodes);
      }
 
@@ -266,9 +266,9 @@ public class ModelValidatorTests :
          });
          var action = () => parentModelValidator.Validate(_model);
      
-         var error = action.ShouldThrowCrossError();
+         var exception = action.ShouldThrow<BusinessException>();
          
-         error.GetFieldValue!().ShouldBe(expectedTransformation);
+         exception.GetFieldValue!().ShouldBe(expectedTransformation);
      }
      
      [Fact]
@@ -285,9 +285,9 @@ public class ModelValidatorTests :
          });
          var action = () => parentModelValidator.Validate(_model);
      
-         var error = action.ShouldThrowCrossError<CommonCrossException.NotNull>();
+         var exception = action.ShouldThrow<CommonCrossException.NotNull>();
          
-         error.GetFieldValue!().ShouldBe(null);
+         exception.GetFieldValue!().ShouldBe(null);
      }
      
      [Fact]
@@ -313,9 +313,9 @@ public class ModelValidatorTests :
          });
          var action = () => parentModelValidator.Validate(_model);
      
-         var error = action.ShouldThrowCrossError();
+         var exception = action.ShouldThrow<BusinessException>();
          
-         error.GetFieldValue!().ShouldBe(expectedTransformation);
+         exception.GetFieldValue!().ShouldBe(expectedTransformation);
      }
      
      [Fact]
@@ -335,10 +335,10 @@ public class ModelValidatorTests :
          });
          var action = () => parentModelValidator.Validate(_model);
      
-         var error = action.ShouldThrowCrossError();
+         var exception = action.ShouldThrow<BusinessException>();
          
-         error.FieldName.ShouldBeNull();
-         error.GetFieldValue!().ShouldBe(expectedTransformation);
+         exception.FieldName.ShouldBeNull();
+         exception.GetFieldValue!().ShouldBe(expectedTransformation);
      }
      
      [Fact]
@@ -358,7 +358,7 @@ public class ModelValidatorTests :
          });
          var action = () => parentModelValidator.Validate(_model);
      
-         action.ShouldThrowCrossError<CommonCrossException.NotNull>();
+         action.ShouldThrow<CommonCrossException.NotNull>();
      }
 
      [Fact]
@@ -372,9 +372,9 @@ public class ModelValidatorTests :
          });
          var action = () => parentModelValidator.Validate(_model);
 
-         var error = action.ShouldThrowCrossError();
+         var exception = action.ShouldThrow<BusinessException>();
          
-         error.GetFieldValue!().ShouldBe(expectedFieldValue);
+         exception.GetFieldValue!().ShouldBe(expectedFieldValue);
      }
 
      [Fact]
@@ -390,9 +390,9 @@ public class ModelValidatorTests :
          });
          var action = () => parentModelValidator.Validate(_model);
 
-         var error = action.ShouldThrowCrossError();
+         var exception = action.ShouldThrow<BusinessException>();
          
-         error.Message.ShouldBe(expectedMessage);
+         exception.Message.ShouldBe(expectedMessage);
      }
 
      [Fact]
@@ -407,13 +407,13 @@ public class ModelValidatorTests :
          });
          var action = () => parentModelValidator.Validate(_model);
 
-         var error = action.ShouldThrowCrossError();
+         var exception = action.ShouldThrow<BusinessException>();
          
-         error.Code.ShouldBe(expectedCode);
+         exception.Code.ShouldBe(expectedCode);
      }
      
      [Fact]
-     public void Validator_keeps_error_customization()
+     public void Validator_keeps_exception_customization()
      {
          var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
          {
@@ -423,7 +423,7 @@ public class ModelValidatorTests :
          });
          var action = () => parentModelValidator.Validate(_model);
 
-         action.ShouldThrowCrossError<CustomExceptionWithCode>();
+         action.ShouldThrow<CustomExceptionWithCode>();
      }
      
      [Fact]
@@ -438,13 +438,13 @@ public class ModelValidatorTests :
          });
          var action = () => parentModelValidator.Validate(_model);
 
-         var error = action.ShouldThrowCrossError();
+         var exception = action.ShouldThrow<BusinessException>();
          
-         error.FieldDisplayName.ShouldBe(expectedDisplayName);
+         exception.FieldDisplayName.ShouldBe(expectedDisplayName);
      }
      
      [Fact]
-     public void Get_custom_error()
+     public void Get_custom_exception()
      {
          var comparisonValue = _model.NestedModel.Int + 1;
          var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
@@ -454,50 +454,50 @@ public class ModelValidatorTests :
          });
          var action = () => parentModelValidator.Validate(_model);
          
-         var error = action.ShouldThrowCrossError<CommonCrossException.GreaterThan<int>>();
+         var exception = action.ShouldThrow<CommonCrossException.GreaterThan<int>>();
          
-         error.ComparisonValue.ShouldBe(comparisonValue);
-         error.Code.ShouldBe("GreaterThan");
+         exception.ComparisonValue.ShouldBe(comparisonValue);
+         exception.Code.ShouldBe("GreaterThan");
      }
      
      [Fact]
      public void Combine_customization_with_custom_error()
      {
          var expectedMessage = "Expected message";
-         var expectedError = new CustomExceptionWithCode("COD123");
+         var expectedException = new CustomExceptionWithCode("COD123");
          var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
          {
              validator.Field(_model.NullableString)
-                 .WithException(expectedError)
+                 .WithException(expectedException)
                  .WithMessage(expectedMessage)
                  .NotNull();
          });
          var action = () => parentModelValidator.Validate(_model);
          
-         var error = action.ShouldThrowCrossError<CustomExceptionWithCode>();
+         var exception = action.ShouldThrow<CustomExceptionWithCode>();
          
-         error.Code.ShouldBe(expectedError.Code);
-         error.Message.ShouldBe(expectedMessage);
+         exception.Code.ShouldBe(expectedException.Code);
+         exception.Message.ShouldBe(expectedMessage);
      }
      
      [Fact]
      public void CombineCustomErrorCodeWithCustomization()
      {
          var expectedMessage = "Expected message";
-         var expectedError = new CustomExceptionWithCode("COD123");
+         var expectedException = new CustomExceptionWithCode("COD123");
          var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
          {
              validator.Field(_model.NullableString)
                  .WithMessage(expectedMessage)
-                 .WithException(expectedError)
+                 .WithException(expectedException)
                  .NotNull();
          });
          var action = () => parentModelValidator.Validate(_model);
          
-         var error = action.ShouldThrowCrossError<CustomExceptionWithCode>();
+         var exception = action.ShouldThrow<CustomExceptionWithCode>();
          
-         error.Code.ShouldBe(expectedError.Code);
-         error.Message.ShouldBe(expectedMessage);
+         exception.Code.ShouldBe(expectedException.Code);
+         exception.Message.ShouldBe(expectedMessage);
      }
 
      [Fact]
@@ -526,12 +526,12 @@ public class ModelValidatorTests :
          });
          var action = () => parentModelValidator.Validate(_model);
 
-         var error = action.ShouldThrowCrossError<CommonCrossException.GreaterThan<int>>();
+         var exception = action.ShouldThrow<CommonCrossException.GreaterThan<int>>();
          
-         error.Message.ShouldBe(expectedMessage);
-         error.Code.ShouldBe(expectedCode);
-         error.Details.ShouldBe(expectedDetails);
-         error.StatusCode.ShouldBe(expectedHttpStatusCode);
+         exception.Message.ShouldBe(expectedMessage);
+         exception.Code.ShouldBe(expectedCode);
+         exception.Details.ShouldBe(expectedDetails);
+         exception.StatusCode.ShouldBe(expectedHttpStatusCode);
      }
      
      [Fact]
@@ -551,10 +551,10 @@ public class ModelValidatorTests :
          });
          var action = () => parentModelValidator.Validate(_model);
 
-         var error = action.ShouldThrowCrossError();
+         var exception = action.ShouldThrow<BusinessException>();
          
-         error.FieldName.ShouldBe("NullableString");
-         error.FieldDisplayName.ShouldBe("NullableString");
+         exception.FieldName.ShouldBe("NullableString");
+         exception.FieldDisplayName.ShouldBe("NullableString");
      }
 
      [Fact]
@@ -574,9 +574,9 @@ public class ModelValidatorTests :
          });
          var action = () => parentModelValidator.Validate(_model);
 
-         var error = action.ShouldThrowCrossError();
+         var exception = action.ShouldThrow<BusinessException>();
          
-         error.Code.ShouldBe(expectedCode);
+         exception.Code.ShouldBe(expectedCode);
      }
 
      [Fact]
@@ -595,9 +595,9 @@ public class ModelValidatorTests :
          });
          var action = () => parentModelValidator.Validate(_model);
 
-         var error = action.ShouldThrowCrossError();
+         var exception = action.ShouldThrow<BusinessException>();
          
-         error.Code.ShouldBe(expectedCode);
+         exception.Code.ShouldBe(expectedCode);
      }
 
      [Fact]
@@ -613,9 +613,9 @@ public class ModelValidatorTests :
          });
          var action = () => parentModelValidator.Validate(_model);
 
-         var error = action.ShouldThrowCrossError();
+         var exception = action.ShouldThrow<BusinessException>();
          
-         error.Message.ShouldBe(expectedMessage);
+         exception.Message.ShouldBe(expectedMessage);
      }
      
      [Fact]
@@ -631,13 +631,13 @@ public class ModelValidatorTests :
          });
          var action = () => parentModelValidator.Validate(_model);
 
-         var error = action.ShouldThrowCrossError();
+         var exception = action.ShouldThrow<BusinessException>();
          
-         error.Message.ShouldBe(expectedMessage);
+         exception.Message.ShouldBe(expectedMessage);
      }
 
      [Fact]
-     public void Replace_custom_error_placeholders()
+     public void Replace_custom_exception_placeholders()
      {
          var comparisonValue = _model.NestedModel.Int;
          var template = "{comparisonValue} is not greater than {fieldValue}";
@@ -650,9 +650,9 @@ public class ModelValidatorTests :
          });
          var action = () => parentModelValidator.Validate(_model);
 
-         var error = action.ShouldThrowCrossError();
+         var exception = action.ShouldThrow<BusinessException>();
          
-         error.Message.ShouldBe(expectedMessage);
+         exception.Message.ShouldBe(expectedMessage);
      }
      
      [Fact]
@@ -665,11 +665,11 @@ public class ModelValidatorTests :
          });
          var action = () => parentModelValidator.Validate(_model);
 
-         action.ShouldThrowCrossError<CommonCrossException.Predicate>();
+         action.ShouldThrow<CommonCrossException.Predicate>();
      }
      
      [Fact]
-     public void Add_child_model_validator_errors_to_existing_ones()
+     public void Add_child_model_validator_exceptions_to_existing_ones()
      {
          var nestedModelValidator = _commonFixture.CreateNestedModelValidator(validator =>
          {
@@ -691,9 +691,10 @@ public class ModelValidatorTests :
          });
          var action = () => parentModelValidator.Validate(_model);
 
-         var errors = action.ShouldThrowCrossErrors();
+         var exception = action.ShouldThrow<BusinessListException>()
+             .Exceptions;
          
-         errors.Count.ShouldBe(3);
+         exception.Count.ShouldBe(3);
      }
      
      [Fact]
@@ -706,9 +707,9 @@ public class ModelValidatorTests :
          });
          var action = () => parentModelValidator.Validate(_model);
 
-         var error = action.ShouldThrowCrossError();
+         var exception = action.ShouldThrow<BusinessException>();
          
-         error.FieldName.ShouldBeNull();
+         exception.FieldName.ShouldBeNull();
      }
      
      [Fact]
@@ -727,10 +728,10 @@ public class ModelValidatorTests :
          });
          var action = () => parentModelValidator.Validate(_model);
 
-         var error = action.ShouldThrowCrossError<CommonCrossException.Null>();
+         var exception = action.ShouldThrow<CommonCrossException.Null>();
          
-         error.Code.ShouldBe(nameof(ErrorResource.Null));
-         error.Message.ShouldBe(ErrorResource.Null);
+         exception.Code.ShouldBe(nameof(ErrorResource.Null));
+         exception.Message.ShouldBe(ErrorResource.Null);
      }
      
      [Fact]
@@ -754,15 +755,15 @@ public class ModelValidatorTests :
          });
          var action = () => parentModelValidator.Validate(_model);
          
-         var error = action.ShouldThrowCrossError<CommonCrossException.GreaterThan<int>>();
+         var exception = action.ShouldThrow<CommonCrossException.GreaterThan<int>>();
          
-         error.Code.ShouldBe(nameof(ErrorResource.GreaterThan));
+         exception.Code.ShouldBe(nameof(ErrorResource.GreaterThan));
      }
      
      [Fact]
      public async Task Execute_all_validators_in_a_validation_with_error_accumulation()
      {
-         var testError = new TestException();
+         var testException = new TestException();
          var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
          {
              validator.ValidationMode = ValidationMode.AccumulateFirstErrors;
@@ -771,11 +772,11 @@ public class ModelValidatorTests :
                  .Must(_commonFixture.BeValid)
                  .MustAsync(_commonFixture.BeValidAsync)
                  .Must(_ => _commonFixture.NullableException())
-                 .MustAsync(_ => _commonFixture.ExceptionAsync(testError));
+                 .MustAsync(_ => _commonFixture.ExceptionAsync(testException));
          });
          var action = () => parentModelValidator.ValidateAsync(_model);
 
-         await action.ShouldThrowCrossErrorAsync<TestException>();
+         await action.ShouldThrowAsync<TestException>();
      }
      
      [Fact]
@@ -794,9 +795,9 @@ public class ModelValidatorTests :
          });
          var action = () => parentModelValidator.ValidateAsync(_model);
 
-         var error = await action.ShouldThrowCrossErrorAsync<TestException>();
+         var exception = await action.ShouldThrowAsync<TestException>();
          
-         error.Message.ShouldBe(expectedMessage);
+         exception.Message.ShouldBe(expectedMessage);
      }
      
      [Fact]
@@ -822,9 +823,10 @@ public class ModelValidatorTests :
          });
          var action = () => parentModelValidator.ValidateAsync(_model);
         
-         var errors = await action.ShouldThrowCrossErrorsAsync();
+         var exceptions = (await action.ShouldThrowAsync<BusinessListException>())
+             .Exceptions;
 
-         errors.Select(x => x.Code)
+         exceptions.Select(x => x.Code)
              .ShouldBe(expectedCodes);
      }
      
@@ -851,9 +853,10 @@ public class ModelValidatorTests :
          });
          var action = () => parentModelValidator.Validate(_model);
 
-         var errors = action.ShouldThrowCrossErrors();
+         var exceptions = action.ShouldThrow<BusinessListException>()
+             .Exceptions;
 
-         errors.Select(x => x.Code)
+         exceptions.Select(x => x.Code)
              .ShouldBe(expectedCodes);
      }
      

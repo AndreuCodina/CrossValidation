@@ -1,6 +1,5 @@
 ﻿using CrossValidation.Exceptions;
 using CrossValidation.Resources;
-using CrossValidation.ShouldlyAssertions;
 using CrossValidation.Tests.TestUtils;
 using CrossValidation.Tests.TestUtils.Builders;
 using CrossValidation.Tests.TestUtils.Models;
@@ -39,8 +38,8 @@ public class NotEmptyTests : TestBase
         var action = () => Validate.Field(_model.String)
             .NotEmpty();
 
-        var error = action.ShouldThrowCrossError<CommonCrossException.NotEmptyString>();
-        error.Code.ShouldBe(nameof(ErrorResource.NotEmptyString));
+        var exception = action.ShouldThrow<CommonCrossException.NotEmptyString>();
+        exception.Code.ShouldBe(nameof(ErrorResource.NotEmptyString));
     }
     
     [Fact]
@@ -62,7 +61,7 @@ public class NotEmptyTests : TestBase
         var action = () => Validate.Field(_model.IntList)
             .NotEmpty();
 
-        var error = action.ShouldThrowCrossError<CommonCrossException.NotEmptyCollection>();
-        error.Code.ShouldBe(nameof(ErrorResource.NotEmptyCollection));
+        var exception = action.ShouldThrow<CommonCrossException.NotEmptyCollection>();
+        exception.Code.ShouldBe(nameof(ErrorResource.NotEmptyCollection));
     }
 }

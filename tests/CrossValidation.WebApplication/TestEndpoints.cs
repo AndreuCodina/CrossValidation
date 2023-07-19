@@ -18,17 +18,17 @@ public static class TestEndpoints
 
         group.MapGet(ApiPath.Test.ValidationListException, () =>
         {
-            throw new ValidationListException(new List<BusinessException>());
+            throw new BusinessListException(new List<BusinessException>());
         });
 
-        group.MapGet(ApiPath.Test.ErrorWithCodeFromCustomResx, () =>
+        group.MapGet(ApiPath.Test.ExceptionWithCodeFromCustomResx, () =>
         {
-            throw new ErrorWithCodeFromCustomResx();
+            throw new ExceptionWithCodeFromCustomResx();
         });
 
-        group.MapGet(ApiPath.Test.ErrorWithCodeWithoutResxKey, () =>
+        group.MapGet(ApiPath.Test.ExceptionWithCodeWithoutResxKey, () =>
         {
-            throw new ErrorWithCodeWithoutResxKey();
+            throw new ExceptionWithCodeWithoutResxKey();
         });
 
         group.MapGet(ApiPath.Test.ReplaceBuiltInCodeWithCustomResx, () =>
@@ -46,7 +46,7 @@ public static class TestEndpoints
                 .Null();
         });
 
-        group.MapGet(ApiPath.Test.ErrorWithStatusCode, () =>
+        group.MapGet(ApiPath.Test.ExceptionWithStatusCode, () =>
         {
             throw new BusinessException(statusCode: HttpStatusCode.Created);
         });

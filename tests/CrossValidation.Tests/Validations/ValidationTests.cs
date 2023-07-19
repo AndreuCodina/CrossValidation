@@ -1,7 +1,6 @@
 ﻿using System.Net;
 using CrossValidation.Exceptions;
 using CrossValidation.Resources;
-using CrossValidation.ShouldlyAssertions;
 using CrossValidation.Tests.TestUtils;
 using CrossValidation.Tests.TestUtils.Builders;
 using CrossValidation.Tests.TestUtils.Fixtures;
@@ -31,7 +30,7 @@ public class ValidationTests :
         var action = () => Validate.That(_model.NestedModel)
             .Must(_commonFixture.NotBeValid);
 
-        action.ShouldThrowCrossError<CommonCrossException.Predicate>();
+        action.ShouldThrow<CommonCrossException.Predicate>();
     }
 
     [Fact]
@@ -40,10 +39,10 @@ public class ValidationTests :
         var action = () => Validate.Field(_model.NestedModel.Int)
             .Instance(ValueObjectFieldWithoutCustomization.Create);
 
-        var error = action.ShouldThrowCrossError<CommonCrossException.GreaterThan<int>>();
-        error.FieldName.ShouldBe("NestedModel.Int");
-        error.Code.ShouldBe(nameof(ErrorResource.GreaterThan));
-        error.Message.ShouldBe("Must be greater than 1");
+        var exception = action.ShouldThrow<CommonCrossException.GreaterThan<int>>();
+        exception.FieldName.ShouldBe("NestedModel.Int");
+        exception.Code.ShouldBe(nameof(ErrorResource.GreaterThan));
+        exception.Message.ShouldBe("Must be greater than 1");
     }
     
     [Theory]
@@ -70,12 +69,12 @@ public class ValidationTests :
         }
 
         var action = () => validation
-            .WithException(new CustomErrorWithPlaceholderValue(10))
+            .WithException(new CustomExceptionWithPlaceholder(10))
             .Instance(x => ValueObjectWithCustomization.Create(x, code: null, message: ""));
 
-        var error = action.ShouldThrowCrossError<CustomErrorWithPlaceholderValue>();
-        error.Code.ShouldBe(expectedCode);
-        error.Message.ShouldBe(expectedMessage);
+        var exception = action.ShouldThrow<CustomExceptionWithPlaceholder>();
+        exception.Code.ShouldBe(expectedCode);
+        exception.Message.ShouldBe(expectedMessage);
     }
     
     [Fact]
@@ -85,9 +84,9 @@ public class ValidationTests :
             .WithCode(nameof(ErrorResource.NotNull))
             .Instance(ValueObjectWithoutCustomization.Create);
 
-        var error = action.ShouldThrowCrossError<CommonCrossException.GreaterThan<int>>();
-        error.Code.ShouldBe(nameof(ErrorResource.NotNull));
-        error.Message.ShouldBe(ErrorResource.NotNull);
+        var exception = action.ShouldThrow<CommonCrossException.GreaterThan<int>>();
+        exception.Code.ShouldBe(nameof(ErrorResource.NotNull));
+        exception.Message.ShouldBe(ErrorResource.NotNull);
     }
     
     [Fact]
@@ -97,8 +96,8 @@ public class ValidationTests :
             .WithMessage(ErrorResource.NotNull)
             .Instance(ValueObjectWithoutCustomization.Create);
 
-        var error = action.ShouldThrowCrossError<CommonCrossException.GreaterThan<int>>();
-        error.Message.ShouldBe(ErrorResource.NotNull);
+        var exception = action.ShouldThrow<CommonCrossException.GreaterThan<int>>();
+        exception.Message.ShouldBe(ErrorResource.NotNull);
     }
 
     [Theory]
@@ -115,12 +114,12 @@ public class ValidationTests :
         var action = () => Validate.Field(_model.Int)
             .Instance(x => ValueObjectWithCustomization.Create(x, code, message));
 
-        var error = action.ShouldThrowCrossError<CommonCrossException.GreaterThan<int>>();
-        error.Code.ShouldBe(expectedCode);
-        error.Message.ShouldBe(expectedMessage);
-        error.Details.ShouldBe("Expected details");
-        error.StatusCode.ShouldBe(HttpStatusCode.Accepted);
-        error.FieldDisplayName.ShouldBe("Expected field display name");
+        var exception = action.ShouldThrow<CommonCrossException.GreaterThan<int>>();
+        exception.Code.ShouldBe(expectedCode);
+        exception.Message.ShouldBe(expectedMessage);
+        exception.Details.ShouldBe("Expected details");
+        exception.StatusCode.ShouldBe(HttpStatusCode.Accepted);
+        exception.FieldDisplayName.ShouldBe("Expected field display name");
     }
 
     [Fact]
@@ -171,8 +170,8 @@ public class ValidationTests :
             .WithMessage(expectedMessage)
             .GreaterThan(_model.NestedModel.Int);
 
-        var error = action.ShouldThrowCrossError();
-        error.Message.ShouldBe(expectedMessage);
+        var exception = action.ShouldThrow<BusinessException>();
+        exception.Message.ShouldBe(expectedMessage);
     }
     
     [Fact]
@@ -187,8 +186,8 @@ public class ValidationTests :
             .GreaterThan(_model.NestedModel.Int)
             .ValidateAsync();
 
-        var error = await action.ShouldThrowCrossErrorAsync();
-        error.Message.ShouldBe(expectedMessage);
+        var exception = await action.ShouldThrowAsync<BusinessException>();
+        exception.Message.ShouldBe(expectedMessage);
     }
 
     [Fact]
@@ -238,21 +237,21 @@ public class ValidationTests :
             .WithMessage(expectedMessage)
             .NotNull();
 
-        var error = action.ShouldThrowCrossError();
-        error.Message.ShouldBe(expectedMessage);
+        var exception = action.ShouldThrow<BusinessException>();
+        exception.Message.ShouldBe(expectedMessage);
     }
     
     [Fact]
-    public void Repeat_error_customization_applies_new_error()
+    public void Repeat_exception_customization_applies_new_exception()
     {
         var action = () => Validate.That(_model.NullableInt)
             .WithException(new CommonCrossException.NotNull())
             .WithException(new CommonCrossException.Enum())
             .Must(_commonFixture.NotBeValid);
 
-        var error = action.ShouldThrowCrossError<CommonCrossException.Enum>();
-        error.Code.ShouldBe(nameof(ErrorResource.Enum));
-        error.Message.ShouldBe(ErrorResource.Enum);
+        var exception = action.ShouldThrow<CommonCrossException.Enum>();
+        exception.Code.ShouldBe(nameof(ErrorResource.Enum));
+        exception.Message.ShouldBe(ErrorResource.Enum);
     }
     
     [Fact]
@@ -266,30 +265,30 @@ public class ValidationTests :
             .WithHttpStatusCode(HttpStatusCode.Created)
             .GreaterThan(_model.Int);
 
-        var error = action.ShouldThrowCrossError<CommonCrossException.GreaterThan<int>>();
-        error.Code.ShouldBe(nameof(ErrorResource.NotNull));
-        error.Message.ShouldBe(ErrorResource.NotNull);
-        error.Details.ShouldBe(expectedDetails);
-        error.StatusCode.ShouldBe(expectedHttpStatusCode);
+        var exception = action.ShouldThrow<CommonCrossException.GreaterThan<int>>();
+        exception.Code.ShouldBe(nameof(ErrorResource.NotNull));
+        exception.Message.ShouldBe(ErrorResource.NotNull);
+        exception.Details.ShouldBe(expectedDetails);
+        exception.StatusCode.ShouldBe(expectedHttpStatusCode);
     }
     
     [Fact]
-    public void Validators_do_not_override_error_customization()
+    public void Validators_do_not_override_exception_customization()
     {
         var expectedDetails = "Expected details";
         var action = () => Validate.That(_model.Int)
-            .WithException(new ErrorWithCustomization())
+            .WithException(new ExceptionWithCustomization())
             .GreaterThan(_model.Int);
 
-        var error = action.ShouldThrowCrossError<ErrorWithCustomization>();
-        error.Code.ShouldBe(nameof(ErrorResource.NotNull));
-        error.Message.ShouldBe(ErrorResource.NotNull);
-        error.Details.ShouldBe(expectedDetails);
-        error.StatusCode.ShouldBe(HttpStatusCode.Created);
+        var exception = action.ShouldThrow<ExceptionWithCustomization>();
+        exception.Code.ShouldBe(nameof(ErrorResource.NotNull));
+        exception.Message.ShouldBe(ErrorResource.NotNull);
+        exception.Details.ShouldBe(expectedDetails);
+        exception.StatusCode.ShouldBe(HttpStatusCode.Created);
     }
 
 #pragma warning disable CS9113 // Parameter is unread.
-    private class CustomErrorWithPlaceholderValue(int value) : BusinessException;
+    private class CustomExceptionWithPlaceholder(int value) : BusinessException;
 #pragma warning restore CS9113 // Parameter is unread.
 
     private record ValueObjectWithoutCustomization(int Value)
@@ -336,7 +335,7 @@ public class ValidationTests :
         }
     }
 
-    private class ErrorWithCustomization() : BusinessException(
+    private class ExceptionWithCustomization() : BusinessException(
         code: nameof(CommonCrossException.NotNull),
         details: "Expected details",
         statusCode: HttpStatusCode.Created);

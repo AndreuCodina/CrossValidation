@@ -9,7 +9,7 @@ public class BooleanPredicateValidator(Func<bool> predicate) : Validator
         return predicate();
     }
 
-    public override BusinessException CreateError()
+    public override BusinessException CreateException()
     {
         return new CommonCrossException.Predicate();
     }

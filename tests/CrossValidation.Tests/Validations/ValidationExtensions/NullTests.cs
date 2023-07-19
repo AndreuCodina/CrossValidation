@@ -1,6 +1,5 @@
 ﻿using CrossValidation.Exceptions;
 using CrossValidation.Resources;
-using CrossValidation.ShouldlyAssertions;
 using CrossValidation.Tests.TestUtils;
 using CrossValidation.Tests.TestUtils.Builders;
 using CrossValidation.Tests.TestUtils.Fixtures;
@@ -45,7 +44,7 @@ public class NullTests :
     }
     
     [Fact]
-    public void Return_error_when_the_validation_fails()
+    public void Throw_exception_when_the_validation_fails()
     {
         _model = new ParentModelBuilder()
             .WithNullableString("Nullable string")
@@ -53,7 +52,7 @@ public class NullTests :
         var action = () => Validate.Field(_model.NullableString)
             .Null();
 
-        var error = action.ShouldThrowCrossError<CommonCrossException.Null>();
-        error.Code.ShouldBe(nameof(ErrorResource.Null));
+        var exception = action.ShouldThrow<CommonCrossException.Null>();
+        exception.Code.ShouldBe(nameof(ErrorResource.Null));
     }
 }

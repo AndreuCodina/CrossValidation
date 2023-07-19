@@ -51,8 +51,8 @@ public class CommonFixture
     
     public BusinessException? Exception()
     {
-        BusinessException? error = new TestException();
-        return error;
+        BusinessException? exception = new TestException();
+        return exception;
     }
 
     public async Task<BusinessException?> ExceptionAsync(BusinessException? exception = null)

@@ -13,7 +13,7 @@ public class GreaterThanValidator<TField>(
         return fieldValue > comparisonValue;
     }
 
-    public override BusinessException CreateError()
+    public override BusinessException CreateException()
     {
         return new CommonCrossException.GreaterThan<TField>(comparisonValue);
     }

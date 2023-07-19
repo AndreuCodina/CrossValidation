@@ -72,7 +72,7 @@ public interface IValidation<out TField> : IValidationOperation
 
     static IValidation<TField> CreateFromFieldName(
         Func<TField>? getFieldValue,
-        Type? crossErrorToException,
+        Type? customExceptionToThrow,
         string fieldName,
         ValidationContext? context,
         BusinessException? exception,
@@ -87,7 +87,7 @@ public interface IValidation<out TField> : IValidationOperation
             : fieldName;
         return new Validation<TField>(
             getFieldValue: getFieldValue,
-            crossErrorToException: crossErrorToException,
+            customThrowToThrow: customExceptionToThrow,
             generalizeError: false,
             fieldPath: fullPath,
             context: null,
@@ -201,11 +201,11 @@ internal class Validation<TField> :
     {
         if (!HasFailed)
         {
-            var errorToAdd = Context!.Error ?? exception;
-            exception.CrossErrorToException = CrossErrorToException;
-            TakeCustomizationsFromException(errorToAdd, Context);
+            var exceptionToAdd = Context!.Exception ?? exception;
+            exception.CustomExceptionToThrow = CustomExceptionToThrow;
+            TakeCustomizationsFromException(exceptionToAdd, Context);
             exception.GetFieldValue = GetNonGenericFieldValue;
-            Exception = errorToAdd;
+            Exception = exceptionToAdd;
         }
 
         return this;
@@ -274,14 +274,14 @@ internal class Validation<TField> :
         {
             var predicate = () =>
             {
-                var error = condition(GetFieldValue());
+                var exception = condition(GetFieldValue());
 
-                if (error is not null)
+                if (exception is not null)
                 {
-                    WithException(error);
+                    WithException(exception);
                 }
 
-                return new ExceptionPredicateValidator(() => error);
+                return new ExceptionPredicateValidator(() => exception);
             };
 
             return SetValidator(predicate);
@@ -296,14 +296,14 @@ internal class Validation<TField> :
         {
             return SetAsyncValidator(async () =>
             {
-                var error = await condition(GetFieldValue());
+                var exception = await condition(GetFieldValue());
                 
-                if (error is not null)
+                if (exception is not null)
                 {
-                    WithException(error);
+                    WithException(exception);
                 }
 
-                return new ExceptionPredicateValidator(() => error);
+                return new ExceptionPredicateValidator(() => exception);
             });
         }
 
@@ -321,13 +321,13 @@ internal class Validation<TField> :
         var getFieldValueTransformed = () => transformer(GetFieldValue());
         var nextValidation = new Validation<TFieldTransformed>(
             getFieldValue: getFieldValueTransformed,
-            crossErrorToException: CrossErrorToException,
+            customThrowToThrow: CustomExceptionToThrow,
             generalizeError: false,
             fieldPath: FieldPath,
             context: Context,
             index: Index,
             parentPath: ParentPath,
-            fixedException: Context!.Error ?? Exception,
+            fixedException: Context!.Exception ?? Exception,
             fixedMessage: Context!.Message ?? Message,
             fixedCode: Context!.Code ?? Code,
             fixedDetails: Context!.Details ?? Details,
@@ -371,13 +371,13 @@ internal class Validation<TField> :
         
         var nextValidation = new Validation<TField>(
             getFieldValue: GetFieldValue,
-            crossErrorToException: CrossErrorToException,
+            customThrowToThrow: CustomExceptionToThrow,
             generalizeError: GeneralizeError,
             fieldPath: oldFieldPath,
             context: oldContext,
             index: Index,
             parentPath: oldParentPath,
-            fixedException: oldContext.Error,
+            fixedException: oldContext.Exception,
             fixedMessage: oldContext.Message,
             fixedCode: oldContext.Code,
             fixedDetails: oldContext.Details,
@@ -412,7 +412,7 @@ internal class Validation<TField> :
 
     public Validation(
         Func<TField>? getFieldValue,
-        Type? crossErrorToException,
+        Type? customThrowToThrow,
         bool generalizeError,
         string? fieldPath,
         ValidationContext? context,
@@ -437,7 +437,7 @@ internal class Validation<TField> :
         Context.ValidationTree ??= this;
         GetGenericFieldValue = getFieldValue;
         GetNonGenericFieldValue = () => getFieldValue!()!;
-        CrossErrorToException = crossErrorToException;
+        CustomExceptionToThrow = customThrowToThrow;
         GeneralizeError = generalizeError;
         Index = index;
         ParentPath = parentPath;
@@ -449,7 +449,7 @@ internal class Validation<TField> :
             FieldName = $"{parentPath}{parentPathPathSeparator}{fieldPath}";
         }
         
-        Context.Error = fixedException;
+        Context.Exception = fixedException;
         Context.Message = fixedMessage;
         Context.Code = fixedCode;
         Context.Details = fixedDetails;
@@ -472,7 +472,7 @@ internal class Validation<TField> :
         {
             e.FieldName = null;
             e.PlaceholderValues.Clear();
-            e.CrossErrorToException = CrossErrorToException;
+            e.CustomExceptionToThrow = CustomExceptionToThrow;
             TakeCustomizationsFromInstanceException(e, Context!);
             HandleException(e, Context!);
             throw new UnreachableException();
@@ -488,13 +488,13 @@ internal class Validation<TField> :
         
         var nextValidation = new Validation<TField>(
             getFieldValue: GetFieldValue,
-            crossErrorToException: CrossErrorToException,
+            customThrowToThrow: CustomExceptionToThrow,
             generalizeError: GeneralizeError,
             fieldPath: FieldPath,
             context: Context,
             index: Index,
             parentPath: ParentPath,
-            fixedException: Context!.Error,
+            fixedException: Context!.Exception,
             fixedMessage: Context!.Message,
             fixedCode: Context!.Code,
             fixedDetails: Context!.Details,

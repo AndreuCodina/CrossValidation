@@ -1,5 +1,5 @@
-﻿using CrossValidation.Resources;
-using CrossValidation.ShouldlyAssertions;
+﻿using CrossValidation.Exceptions;
+using CrossValidation.Resources;
 using CrossValidation.Tests.TestUtils;
 using CrossValidation.Tests.TestUtils.Builders;
 using CrossValidation.Tests.TestUtils.Models;
@@ -24,8 +24,8 @@ public class ErrorLocalizationTests : TestBase
         var action = () => Validate.Field(_model.NullableString)
             .NotNull();
 
-        var error = action.ShouldThrowCrossError();
-        error.Code.ShouldBe(nameof(ErrorResource.NotNull));
-        error.Message.ShouldBe(ErrorResource.NotNull);
+        var exception = action.ShouldThrow<BusinessException>();
+        exception.Code.ShouldBe(nameof(ErrorResource.NotNull));
+        exception.Message.ShouldBe(ErrorResource.NotNull);
     }
 }

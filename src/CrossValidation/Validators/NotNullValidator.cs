@@ -9,7 +9,7 @@ public class NotNullValidator<TField>(TField? fieldValue) : Validator
         return fieldValue is not null;
     }
 
-    public override BusinessException CreateError()
+    public override BusinessException CreateException()
     {
         return new CommonCrossException.NotNull();
     }

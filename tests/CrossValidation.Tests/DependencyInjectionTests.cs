@@ -62,7 +62,7 @@ public class DependencyInjectionTests :
         }).CreateClient();
         _client.DefaultRequestHeaders.Add("Accept-Language", languageCode);
         
-        var response = await _client.GetAsync(ApiPath.Test.Prefix + ApiPath.Test.ErrorWithCodeFromCustomResx);
+        var response = await _client.GetAsync(ApiPath.Test.Prefix + ApiPath.Test.ExceptionWithCodeFromCustomResx);
         
         response.StatusCode.ShouldBe(HttpStatusCode.UnprocessableEntity);
         var problemDetails = await GetProblemDetailsFromResponse(response);
@@ -89,7 +89,7 @@ public class DependencyInjectionTests :
         }).CreateClient();
         _client.DefaultRequestHeaders.Add("Accept-Language", languageCode);
         
-        var response = await _client.GetAsync(ApiPath.Test.Prefix + ApiPath.Test.ErrorWithCodeWithoutResxKey);
+        var response = await _client.GetAsync(ApiPath.Test.Prefix + ApiPath.Test.ExceptionWithCodeWithoutResxKey);
         
         response.StatusCode.ShouldBe(HttpStatusCode.UnprocessableEntity);
         var problemDetails = await GetProblemDetailsFromResponse(response);
@@ -102,7 +102,7 @@ public class DependencyInjectionTests :
     [Fact]
     public async Task Error_with_code_without_a_resx_key_have_null_message()
     {
-        var response = await _client.GetAsync(ApiPath.Test.Prefix + ApiPath.Test.ErrorWithCodeWithoutResxKey);
+        var response = await _client.GetAsync(ApiPath.Test.Prefix + ApiPath.Test.ExceptionWithCodeWithoutResxKey);
         
         response.StatusCode.ShouldBe(HttpStatusCode.UnprocessableEntity);
         var problemDetails = await GetProblemDetailsFromResponse(response);
@@ -162,7 +162,7 @@ public class DependencyInjectionTests :
     [Fact]
     public async Task Get_error_status_code()
     {
-        var response = await _client.GetAsync(ApiPath.Test.Prefix + ApiPath.Test.ErrorWithStatusCode);
+        var response = await _client.GetAsync(ApiPath.Test.Prefix + ApiPath.Test.ExceptionWithStatusCode);
         
         response.StatusCode.ShouldBe(HttpStatusCode.Created);
         var problemDetails = await GetProblemDetailsFromResponse(response);
@@ -246,7 +246,7 @@ public class DependencyInjectionTests :
         }).CreateClient();
         _client.DefaultRequestHeaders.Add("Accept-Language", languageCode);
         
-        var response = await _client.GetAsync(ApiPath.Test.Prefix + ApiPath.Test.ErrorWithCodeFromCustomResx);
+        var response = await _client.GetAsync(ApiPath.Test.Prefix + ApiPath.Test.ExceptionWithCodeFromCustomResx);
         
         response.StatusCode.ShouldBe(HttpStatusCode.UnprocessableEntity);
         var problemDetails = await GetProblemDetailsFromResponse(response);
@@ -271,7 +271,7 @@ public class DependencyInjectionTests :
         }).CreateClient();
         _client.DefaultRequestHeaders.Add("Accept-Language", languageCode);
         
-        var response = await _client.GetAsync(ApiPath.Test.Prefix + ApiPath.Test.ErrorWithCodeFromCustomResx);
+        var response = await _client.GetAsync(ApiPath.Test.Prefix + ApiPath.Test.ExceptionWithCodeFromCustomResx);
         
         response.StatusCode.ShouldBe(HttpStatusCode.UnprocessableEntity);
         var problemDetails = await GetProblemDetailsFromResponse(response);

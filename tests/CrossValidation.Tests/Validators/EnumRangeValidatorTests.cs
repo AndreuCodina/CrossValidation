@@ -1,5 +1,4 @@
 ﻿using CrossValidation.Exceptions;
-using CrossValidation.ShouldlyAssertions;
 using CrossValidation.Tests.TestUtils;
 using CrossValidation.Tests.TestUtils.Models;
 using CrossValidation.Validations;
@@ -38,17 +37,17 @@ public class EnumRangeValidatorTests : TestBase
         var enumValue = (ParentModelEnum)nonExistentColorId;
         var enumAction = () => Validate.That(enumValue)
             .Enum(ParentModelEnum.Case1);
-        enumAction.ShouldThrowCrossError();
+        enumAction.ShouldThrow<BusinessException>();
         
         var validEnumValue = ParentModelEnum.Case1;
         var validEnumAction = () => Validate.That(validEnumValue)
             .Enum(ParentModelEnum.Case2);
-        validEnumAction.ShouldThrowCrossError();
+        validEnumAction.ShouldThrow<BusinessException>();
          
         var intValue = nonExistentColorId;
         var intAction = () => Validate.That(intValue)
             .Enum(ParentModelEnum.Case1);
-        intAction.ShouldThrowCrossError();
+        intAction.ShouldThrow<BusinessException>();
          
         var stringValue = "Not valid enum value";
         var stringAction = () => Validate.That(stringValue)

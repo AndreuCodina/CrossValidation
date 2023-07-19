@@ -1,7 +1,6 @@
 ﻿using System.Net;
 using CrossValidation.Exceptions;
 using CrossValidation.Resources;
-using CrossValidation.ShouldlyAssertions;
 using CrossValidation.Tests.TestUtils;
 using CrossValidation.Tests.TestUtils.Builders;
 using CrossValidation.Tests.TestUtils.Fixtures;
@@ -30,66 +29,66 @@ public class ValidateTests :
     {
         var action = () => Validate.Must(false);
 
-        action.ShouldThrowCrossError();
+        action.ShouldThrow<BusinessException>();
     }
 
     [Fact]
-    public void ValidateMust_with_error()
+    public void ValidateMust_with_exception()
     {
         var expectedCode = nameof(ErrorResource.NotNull);
         var expectedMessage = ErrorResource.NotNull;
         var expectedDetails = "Expected details";
-        var errorForValidation = new BusinessException
+        var exceptionForValidation = new BusinessException
         {
             Code = expectedCode,
             Details = expectedDetails
         };
 
-        var action = () => Validate.Must(false, errorForValidation);
+        var action = () => Validate.Must(false, exceptionForValidation);
 
-        var error = action.ShouldThrowCrossError();
-        error.Code.ShouldBe(expectedCode);
-        error.Message.ShouldBe(expectedMessage);
-        error.Details.ShouldBe(expectedDetails);
+        var exception = action.ShouldThrow<BusinessException>();
+        exception.Code.ShouldBe(expectedCode);
+        exception.Message.ShouldBe(expectedMessage);
+        exception.Details.ShouldBe(expectedDetails);
     }
 
     [Fact]
-    public void ValidateMust_with_returned_error_fails()
+    public void ValidateMust_with_returned_exception_fails()
     {
         var expectedCode = nameof(ErrorResource.NotNull);
         var expectedMessage = ErrorResource.NotNull;
         var expectedDetails = "Expected details";
-        var errorForValidation = new TestException(code: expectedCode, details: expectedDetails);
+        var exceptionForValidation = new TestException(code: expectedCode, details: expectedDetails);
 
         var action = () => Validate.That(_model.NullableInt)
-            .Must(_ => errorForValidation);
+            .Must(_ => exceptionForValidation);
 
-        var error = action.ShouldThrowCrossError<TestException>();
-        error.Code.ShouldBe(expectedCode);
-        error.Message.ShouldBe(expectedMessage);
-        error.Details.ShouldBe(expectedDetails);
+        var exception = action.ShouldThrow<TestException>();
+        exception.Code.ShouldBe(expectedCode);
+        exception.Message.ShouldBe(expectedMessage);
+        exception.Details.ShouldBe(expectedDetails);
     }
     
     [Fact]
-    public async Task ValidateMustAsync_with_returned_error_fails()
+    public async Task ValidateMustAsync_with_returned_exception_fails()
     {
         var expectedCode = nameof(ErrorResource.NotNull);
         var expectedMessage = ErrorResource.NotNull;
         var expectedDetails = "Expected details";
-        var testError = new TestException(code: expectedCode, details: expectedDetails);
+        var testException = new TestException(code: expectedCode, details: expectedDetails);
         var action = () => Validate.That(_model.NullableInt)
-            .MustAsync(_ => _commonFixture.ExceptionAsync(testError))
+            .MustAsync(_ => _commonFixture.ExceptionAsync(testException))
             .ValidateAsync();
 
-        var error = await action.ShouldThrowCrossErrorAsync<TestException>();
+        var exception = await action.ShouldThrowAsync<TestException>();
         
-        error.Code.ShouldBe(expectedCode);
-        error.Message.ShouldBe(expectedMessage);
-        error.Details.ShouldBe(expectedDetails);
+        exception.Code.ShouldBe(expectedCode);
+        exception.Message.ShouldBe(expectedMessage);
+        exception.Details.ShouldBe(expectedDetails);
     }
     
     [Fact]
-    public void ValidateMust_with_null_returned_error_not_fails()
+    public void ValidateMust_with_null_returned_exception_not_fails()
     {
         var action = () => Validate.That(_model.NullableInt)
             .Must(_ => _commonFixture.NullableException());
@@ -98,7 +97,7 @@ public class ValidateTests :
     }
     
     [Fact]
-    public void ValidateMustAsync_with_null_returned_error_not_fails()
+    public void ValidateMustAsync_with_null_returned_exception_not_fails()
     {
         var action = () => Validate.That(_model.NullableInt)
             .MustAsync(_ => _commonFixture.NullExceptionAsync());
@@ -121,17 +120,17 @@ public class ValidateTests :
             details: expectedDetails,
             statusCode: expectedHttpStatusCode);
 
-        var error = action.ShouldThrowCrossError();
-        error.Code.ShouldBe(expectedCode);
-        error.Message.ShouldBe(expectedMessage);
-        error.Details.ShouldBe(expectedDetails);
-        error.StatusCode.ShouldBe(expectedHttpStatusCode);
+        var exception = action.ShouldThrow<BusinessException>();
+        exception.Code.ShouldBe(expectedCode);
+        exception.Message.ShouldBe(expectedMessage);
+        exception.Details.ShouldBe(expectedDetails);
+        exception.StatusCode.ShouldBe(expectedHttpStatusCode);
     }
 
     [Fact]
     public void Apply_fixed_customizations()
     {
-        var expectedError = new TestException();
+        var expectedException = new TestException();
         var expectedMessage = "Expected message";
         var expectedCode = "ExpectedCode";
         var expectedDetails = "Expected details";
@@ -139,7 +138,7 @@ public class ValidateTests :
         var expectedFieldDisplayName = "Expected field display name";
         var action = () => Validate.That(
                 _model.Int,
-                exception: expectedError,
+                exception: expectedException,
                 message: expectedMessage,
                 code: expectedCode,
                 details: expectedDetails,
@@ -153,18 +152,18 @@ public class ValidateTests :
             .WithFieldDisplayName("Unexpected field display name")
             .Must(_commonFixture.NotBeValid);
 
-        var error = action.ShouldThrowCrossError<TestException>();
-        error.Message.ShouldBe(expectedMessage);
-        error.Code.ShouldBe(expectedCode);
-        error.Details.ShouldBe(expectedDetails);
-        error.StatusCode.ShouldBe(expectedHttpStatusCode);
-        error.FieldDisplayName.ShouldBe(expectedFieldDisplayName);
+        var exception = action.ShouldThrow<TestException>();
+        exception.Message.ShouldBe(expectedMessage);
+        exception.Code.ShouldBe(expectedCode);
+        exception.Details.ShouldBe(expectedDetails);
+        exception.StatusCode.ShouldBe(expectedHttpStatusCode);
+        exception.FieldDisplayName.ShouldBe(expectedFieldDisplayName);
     }
     
     [Fact]
     public void Apply_fixed_customizations_with_transformation()
     {
-        var expectedError = new TestException();
+        var expectedException = new TestException();
         var expectedMessage = "Expected message";
         var expectedCode = "ExpectedCode";
         var expectedDetails = "Expected details";
@@ -172,7 +171,7 @@ public class ValidateTests :
         var expectedFieldDisplayName = "Expected field display name";
         var action = () => Validate.That(
                 _model.Int,
-                exception: expectedError,
+                exception: expectedException,
                 message: expectedMessage,
                 code: expectedCode,
                 details: expectedDetails,
@@ -187,18 +186,18 @@ public class ValidateTests :
             .Transform(x => x)
             .Must(_commonFixture.NotBeValid);
 
-        var error = action.ShouldThrowCrossError<TestException>();
-        error.Message.ShouldBe(expectedMessage);
-        error.Code.ShouldBe(expectedCode);
-        error.Details.ShouldBe(expectedDetails);
-        error.StatusCode.ShouldBe(expectedHttpStatusCode);
-        error.FieldDisplayName.ShouldBe(expectedFieldDisplayName);
+        var exception = action.ShouldThrow<TestException>();
+        exception.Message.ShouldBe(expectedMessage);
+        exception.Code.ShouldBe(expectedCode);
+        exception.Details.ShouldBe(expectedDetails);
+        exception.StatusCode.ShouldBe(expectedHttpStatusCode);
+        exception.FieldDisplayName.ShouldBe(expectedFieldDisplayName);
     }
     
     [Fact]
     public void Apply_fixed_customizations_with_collection_iteration()
     {
-        var expectedError = new TestException();
+        var expectedException = new TestException();
         var expectedMessage = "Expected message";
         var expectedCode = "ExpectedCode";
         var expectedDetails = "Expected details";
@@ -206,7 +205,7 @@ public class ValidateTests :
         var expectedFieldDisplayName = "Expected field display name";
         var action = () => Validate.That(
                 _model.IntList,
-                exception: expectedError,
+                exception: expectedException,
                 message: expectedMessage,
                 code: expectedCode,
                 details: expectedDetails,
@@ -222,12 +221,12 @@ public class ValidateTests :
                 .Must(_commonFixture.BeValid)
                 .Must(_commonFixture.NotBeValid));
 
-        var error = action.ShouldThrowCrossError<TestException>();
-        error.Message.ShouldBe(expectedMessage);
-        error.Code.ShouldBe(expectedCode);
-        error.Details.ShouldBe(expectedDetails);
-        error.StatusCode.ShouldBe(expectedHttpStatusCode);
-        error.FieldDisplayName.ShouldBe(expectedFieldDisplayName);
+        var exception = action.ShouldThrow<TestException>();
+        exception.Message.ShouldBe(expectedMessage);
+        exception.Code.ShouldBe(expectedCode);
+        exception.Details.ShouldBe(expectedDetails);
+        exception.StatusCode.ShouldBe(expectedHttpStatusCode);
+        exception.FieldDisplayName.ShouldBe(expectedFieldDisplayName);
     }
 
     [Theory]
@@ -255,13 +254,13 @@ public class ValidateTests :
         
         var action = () => validation.GreaterThan(_model.Int);
 
-        var error = action.ShouldThrowCrossError();
-        error.Code.ShouldBe(expectedCode);
-        error.Message.ShouldBe(expectedMessage);
+        var exception = action.ShouldThrow<BusinessException>();
+        exception.Code.ShouldBe(expectedCode);
+        exception.Message.ShouldBe(expectedMessage);
     }
 
     [Fact]
-    public void ValidateThat_does_not_generalize_error_type()
+    public void ValidateThat_does_not_generalize_exception_type()
     {
         _model = new ParentModelBuilder()
             .WithNullableInt(1)
@@ -270,7 +269,7 @@ public class ValidateTests :
         var action = () => Validate.That(_model.NullableInt)
             .Null();
 
-        action.ShouldThrowCrossError<CommonCrossException.Null>();
+        action.ShouldThrow<CommonCrossException.Null>();
     }
     
     [Fact]
@@ -327,7 +326,7 @@ public class ValidateTests :
                 .Must(_commonFixture.ThrowException))
             .ValidateAsync();
 
-        await action.ShouldThrowCrossErrorAsync<CommonCrossException.NotNull>();
+        await action.ShouldThrowAsync<CommonCrossException.NotNull>();
     }
     
     [Fact]
@@ -340,9 +339,9 @@ public class ValidateTests :
             .Must(_commonFixture.NotBeValid)
             .ValidateAsync();
 
-        var error = await action.ShouldThrowCrossErrorAsync();
+        var exception = await action.ShouldThrowAsync<BusinessException>();
         
-        error.Message.ShouldBe(expectedMessage);
+        exception.Message.ShouldBe(expectedMessage);
     }
     
     [Fact]
@@ -355,9 +354,9 @@ public class ValidateTests :
             .MustAsync(_commonFixture.BeValidAsync)
             .ValidateAsync();
 
-        var error = await action.ShouldThrowCrossErrorAsync<CommonCrossException.NotNull>();
+        var exception = await action.ShouldThrowAsync<CommonCrossException.NotNull>();
         
-        error.Message.ShouldBe(expectedMessage);
+        exception.Message.ShouldBe(expectedMessage);
     }
     
     [Fact]
@@ -371,13 +370,13 @@ public class ValidateTests :
             .Must(_commonFixture.NotBeValid)
             .ValidateAsync();
 
-        var error = await action.ShouldThrowCrossErrorAsync();
+        var exception = await action.ShouldThrowAsync<BusinessException>();
         
-        error.Message.ShouldBe(expectedMessage);
+        exception.Message.ShouldBe(expectedMessage);
     }
     
     [Fact]
-    public async Task Not_execute_predicate_returning_error_customization()
+    public async Task Not_execute_predicate_returning_exception_customization()
     {
         var expectedMessage = "Expected message";
         var action = () => Validate.That(_model.NullableString)
@@ -387,9 +386,9 @@ public class ValidateTests :
             .Must(x => new BusinessException(message: x.Substring(0)))
             .ValidateAsync();
 
-        var error = await action.ShouldThrowCrossErrorAsync<CommonCrossException.Predicate>();
+        var exception = await action.ShouldThrowAsync<CommonCrossException.Predicate>();
         
-        error.Message.ShouldBe(expectedMessage);
+        exception.Message.ShouldBe(expectedMessage);
     }
 
     private class ExceptionWithoutConstructor : Exception

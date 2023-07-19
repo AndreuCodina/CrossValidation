@@ -1,6 +1,5 @@
 ﻿using CrossValidation.Exceptions;
 using CrossValidation.Resources;
-using CrossValidation.ShouldlyAssertions;
 using CrossValidation.Tests.TestUtils;
 using CrossValidation.Tests.TestUtils.Builders;
 using CrossValidation.Tests.TestUtils.Fixtures;
@@ -75,20 +74,21 @@ public class NotNullTests :
         
         var action = () => parentModelValidator.Validate(_model);
 
-        var errors = action.ShouldThrowCrossErrors();
-        errors.Count.ShouldBe(3);
-        errors[0].ShouldBeOfType<CommonCrossException.NotNull>();
-        errors[1].ShouldBeOfType<CommonCrossException.LengthRange>();
-        errors[2].ShouldBeOfType<CommonCrossException.NotNull>();
+        var exceptions = action.ShouldThrow<BusinessListException>()
+            .Exceptions;
+        exceptions.Count.ShouldBe(3);
+        exceptions[0].ShouldBeOfType<CommonCrossException.NotNull>();
+        exceptions[1].ShouldBeOfType<CommonCrossException.LengthRange>();
+        exceptions[2].ShouldBeOfType<CommonCrossException.NotNull>();
     }
     
     [Fact]
-    public void Return_error_when_the_validation_fails()
+    public void Throw_exception_when_the_validation_fails()
     {
         var action = () => Validate.Field(_model.NullableString)
             .NotNull();
 
-        var error = action.ShouldThrowCrossError<CommonCrossException.NotNull>();
-        error.Code.ShouldBe(nameof(ErrorResource.NotNull));
+        var exception = action.ShouldThrow<CommonCrossException.NotNull>();
+        exception.Code.ShouldBe(nameof(ErrorResource.NotNull));
     }
 }

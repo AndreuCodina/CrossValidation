@@ -109,7 +109,7 @@ public abstract record ModelValidator<TModel>
             }
             else
             {
-                throw new ValidationListException(ScopeCreatorValidation.Context.ExceptionsCollected);
+                throw new BusinessListException(ScopeCreatorValidation.Context.ExceptionsCollected);
             }
         }
     }

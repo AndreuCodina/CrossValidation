@@ -9,7 +9,7 @@ public class MinimumLengthValidator(string fieldValue, int minimum) : LengthVali
         return fieldValue.Length >= minimum;
     }
 
-    public override LengthException CreateError()
+    public override LengthException CreateException()
     {
         return new CommonCrossException.MinimumLength(minimum, GetTotalLength(fieldValue));
     }

@@ -12,12 +12,12 @@ public class MustBenchmarks
     private const int Value = 1;
 
     [Benchmark]
-    public void Must_returns_error()
+    public void Must_returns_exception()
     {
         try
         {
             Validate.That(Value)
-                .Must(_ => CheckReturnsError());
+                .Must(_ => CheckReturnsException());
         }
         catch (Exception)
         {
@@ -38,7 +38,7 @@ public class MustBenchmarks
         }
     }
 
-    private BusinessException CheckReturnsError()
+    private BusinessException CheckReturnsException()
     {
         return new BusinessException();
     }

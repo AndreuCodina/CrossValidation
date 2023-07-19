@@ -12,7 +12,7 @@ public class ValidationContext
     public List<BusinessException> ExceptionsCollected { get; set; } = new();
     public ValidationMode ValidationMode { get; set; } = ValidationMode.StopOnFirstError;
     public bool IsChildContext { get; set; }
-    public BusinessException? Error { get; set; }
+    public BusinessException? Exception { get; set; }
     public string Message { get; set; } = "";
     public string? Code { get; set; }
     public string? Details { get; set; }

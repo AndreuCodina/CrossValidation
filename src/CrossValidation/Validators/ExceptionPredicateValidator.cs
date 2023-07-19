@@ -12,7 +12,7 @@ public class ExceptionPredicateValidator(Func<BusinessException?> predicate) : V
         return _error is null;
     }
 
-    public override BusinessException CreateError()
+    public override BusinessException CreateException()
     {
         return _error!;
     }

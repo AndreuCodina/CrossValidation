@@ -1,6 +1,5 @@
 ﻿using CrossValidation.Exceptions;
 using CrossValidation.Resources;
-using CrossValidation.ShouldlyAssertions;
 using CrossValidation.Tests.TestUtils;
 using CrossValidation.Tests.TestUtils.Builders;
 using CrossValidation.Tests.TestUtils.Models;
@@ -39,8 +38,8 @@ public class RegexTests : TestBase
         var action = () => Validate.Field(value)
             .Regex(pattern);
 
-        var error = action.ShouldThrowCrossError<CommonCrossException.RegularExpression>();
+        var exception = action.ShouldThrow<CommonCrossException.RegularExpression>();
         
-        error.Code.ShouldBe(nameof(ErrorResource.RegularExpression));
+        exception.Code.ShouldBe(nameof(ErrorResource.RegularExpression));
     }
 }

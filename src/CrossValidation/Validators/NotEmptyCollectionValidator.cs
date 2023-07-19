@@ -9,7 +9,7 @@ public class NotEmptyCollectionValidator<TField>(IEnumerable<TField> fieldValue)
         return fieldValue.Any();
     }
 
-    public override BusinessException CreateError()
+    public override BusinessException CreateException()
     {
         return new CommonCrossException.NotEmptyCollection();
     }

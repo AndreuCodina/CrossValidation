@@ -1,5 +1,4 @@
 ﻿using CrossValidation.Exceptions;
-using CrossValidation.ShouldlyAssertions;
 using CrossValidation.Tests.TestUtils;
 using CrossValidation.Tests.TestUtils.Builders;
 using CrossValidation.Tests.TestUtils.Fixtures;
@@ -48,15 +47,15 @@ public class WhenNotNullTests :
         var structValidationAction = () => Validate.That(_model.NullableInt)
             .WhenNotNull(x => x
                 .GreaterThan(_model.NullableInt!.Value));
-        var error = structValidationAction.ShouldThrowCrossError();
-        error.GetFieldValue!().ShouldNotBeOfType<int?>();
-        error.GetFieldValue!().ShouldBeOfType<int>();
+        var exception = structValidationAction.ShouldThrow<BusinessException>();
+        exception.GetFieldValue!().ShouldNotBeOfType<int?>();
+        exception.GetFieldValue!().ShouldBeOfType<int>();
 
         var classValidationAction = () => Validate.That(_model.NullableString)
             .WhenNotNull(x => x
                 .Must(_commonFixture.NotBeValid));
-        error = classValidationAction.ShouldThrowCrossError();
-        error.GetFieldValue!().ShouldBeOfType<string>();
+        exception = classValidationAction.ShouldThrow<BusinessException>();
+        exception.GetFieldValue!().ShouldBeOfType<string>();
     }
     
     [Fact]
@@ -83,7 +82,7 @@ public class WhenNotNullTests :
 
         var action = () => parentModelValidator.Validate(_model);
 
-        action.ShouldThrowCrossErrors();
+        action.ShouldThrow<BusinessListException>();
     }
 
     [Fact]
@@ -109,9 +108,9 @@ public class WhenNotNullTests :
                 .Must(_commonFixture.BeValid))
             .NotNull();
 
-        var error = action.ShouldThrowCrossError<CommonCrossException.NotNull>();
-        error.GetFieldValue!().ShouldNotBeOfType<int>();
-        error.GetFieldValue!().ShouldBeNull();
+        var exception = action.ShouldThrow<CommonCrossException.NotNull>();
+        exception.GetFieldValue!().ShouldNotBeOfType<int>();
+        exception.GetFieldValue!().ShouldBeNull();
     }
     
     [Fact]
@@ -135,8 +134,9 @@ public class WhenNotNullTests :
 
         var action = () => parentModelValidator.Validate(_model);
 
-        var errors = action.ShouldThrowCrossErrors();
-        errors.Count.ShouldBe(2);
+        var exceptions = action.ShouldThrow<BusinessListException>()
+            .Exceptions;
+        exceptions.Count.ShouldBe(2);
     }
     
     [Fact]
@@ -168,10 +168,11 @@ public class WhenNotNullTests :
         });
         var action = () => parentModelValidator.ValidateAsync(_model);
 
-        var errors = await action.ShouldThrowCrossErrorsAsync();
-        errors.Count.ShouldBe(2);
-        errors[0].ShouldBeOfType<CommonCrossException.Predicate>();
-        errors[0].Message.ShouldBe(expectedMessage);
+        var exceptions = (await action.ShouldThrowAsync<BusinessListException>())
+            .Exceptions;
+        exceptions.Count.ShouldBe(2);
+        exceptions[0].ShouldBeOfType<CommonCrossException.Predicate>();
+        exceptions[0].Message.ShouldBe(expectedMessage);
     }
     
     [Fact]
@@ -190,9 +191,9 @@ public class WhenNotNullTests :
             .Must(_commonFixture.ThrowException)
             .ValidateAsync();
         
-        var error = await action.ShouldThrowCrossErrorAsync<CommonCrossException.Predicate>();
+        var exception = await action.ShouldThrowAsync<CommonCrossException.Predicate>();
         
-        error.Message.ShouldBe(expectedMessage);
+        exception.Message.ShouldBe(expectedMessage);
     }
     
     [Fact]
@@ -214,9 +215,9 @@ public class WhenNotNullTests :
             .Must(_commonFixture.ThrowException)
             .ValidateAsync();
 
-        var error = await action.ShouldThrowCrossErrorAsync<CommonCrossException.Predicate>();
+        var exception = await action.ShouldThrowAsync<CommonCrossException.Predicate>();
         
-        error.Message.ShouldBe(expectedMessage);
+        exception.Message.ShouldBe(expectedMessage);
     }
     
     [Fact]
@@ -237,8 +238,8 @@ public class WhenNotNullTests :
             .Must(_commonFixture.ThrowException)
             .ValidateAsync();
 
-        var error = await action.ShouldThrowCrossErrorAsync<CommonCrossException.Predicate>();
-        error.Message.ShouldBe(expectedMessage);
+        var exception = await action.ShouldThrowAsync<CommonCrossException.Predicate>();
+        exception.Message.ShouldBe(expectedMessage);
     }
     
     [Fact]
@@ -260,7 +261,7 @@ public class WhenNotNullTests :
 
         var action = () => parentModelValidator.ValidateAsync(_model);
         
-        await action.ShouldThrowCrossErrorAsync();
+        await action.ShouldThrowAsync<BusinessException>();
     }
     
     [Fact]
@@ -280,8 +281,8 @@ public class WhenNotNullTests :
             .Must(_commonFixture.ThrowException)
             .ValidateAsync();
 
-        var error = await action.ShouldThrowCrossErrorAsync<CommonCrossException.Predicate>();
-        error.Message.ShouldBe(expectedMessage);
+        var exception = await action.ShouldThrowAsync<CommonCrossException.Predicate>();
+        exception.Message.ShouldBe(expectedMessage);
     }
     
     [Fact]
@@ -295,9 +296,9 @@ public class WhenNotNullTests :
             .Must(_commonFixture.NotBeValid)
             .ValidateAsync();
 
-        var error = await action.ShouldThrowCrossErrorAsync<CommonCrossException.Predicate>();
+        var exception = await action.ShouldThrowAsync<CommonCrossException.Predicate>();
         
-        error.Message.ShouldBe(expectedMessage);
+        exception.Message.ShouldBe(expectedMessage);
     }
     
     [Fact]
@@ -343,14 +344,14 @@ public class WhenNotNullTests :
         });
         var action = () => parentModelValidator.ValidateAsync(_model);
 
-        await action.ShouldThrowCrossErrorAsync();
+        await action.ShouldThrowAsync<BusinessException>();
     }
     
     [Theory]
     [InlineData(ValidationMode.StopOnFirstError, null)]
     [InlineData(ValidationMode.AccumulateFirstErrors, null)]
     [InlineData(ValidationMode.AccumulateFirstErrorsAndAllIterationFirstErrors, 2)]
-    public async Task ForEach_works_inside_WhenNotNull(ValidationMode validationMode, int? numberOfErrors)
+    public async Task ForEach_works_inside_WhenNotNull(ValidationMode validationMode, int? numberOfExceptions)
     {
         _model = new ParentModelBuilder()
             .WithNullableNestedModel()
@@ -372,12 +373,13 @@ public class WhenNotNullTests :
 
         if (validationMode is ValidationMode.StopOnFirstError or ValidationMode.AccumulateFirstErrors)
         {
-            await action.ShouldThrowCrossErrorAsync();
+            await action.ShouldThrowAsync<BusinessException>();
         }
         else
         {
-            var errors = await action.ShouldThrowCrossErrorsAsync();
-            errors.Count.ShouldBe(numberOfErrors!.Value);
+            var exceptions = (await action.ShouldThrowAsync<BusinessListException>())
+                .Exceptions;
+            exceptions.Count.ShouldBe(numberOfExceptions!.Value);
         }
     }
 }
