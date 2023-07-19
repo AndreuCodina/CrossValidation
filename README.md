@@ -176,12 +176,12 @@ A domain error or service error mustn't define a presentation detail (the error 
 You can throw CrossException (the built-in equivalent of AppException) when you want to return an error, but don't type it.
 
 ```csharp
-public partial class UserService
+public class UserService
 {
-    public partial class UserNotFoundException()
-      : MessageBusinessException("Couldn't find the user")
-    public partial class NicknameNotAvailableException(string nickname)
-      : MessageBusinessException($"'{nickname}' is not available")
+    public class UserNotFoundException()
+      : MessageBusinessException("Couldn't find the user");
+    public class NicknameNotAvailableException(string nickname)
+      : MessageBusinessException($"'{nickname}' is not available");
 
     public void ChangeNickname(UserDto userDto)
     {

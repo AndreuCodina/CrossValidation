@@ -4,7 +4,7 @@
 
 dotnet test --configuration Release --collect:"XPlat Code Coverage;Format=lcov" --results-directory ./artifacts/coverage -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Exclude="[*]CrossValidation.WebApplication*,[*]CrossValidation.Resources*"
 
-dotnet tool run reportgenerator -reports:"./artifacts/coverage/*/coverage.info" -targetdir:"./artifacts/coverage" -reporttypes:Html
+dotnet tool run reportgenerator -reports:"./artifacts/coverage/*/lcov.info" -targetdir:"./artifacts/coverage" -reporttypes:Html
 
 Start-Process ./artifacts/coverage/index.html
 

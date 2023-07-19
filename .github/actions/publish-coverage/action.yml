@@ -17,7 +17,7 @@ runs:
 
   steps:
     - name: Copy coverage to a predictable location
-      run: cp ${{ inputs.test-coverage-folder }}/*/coverage.info ${{ inputs.test-coverage-folder }}/lcov.info
+      run: cp ${{ inputs.test-coverage-folder }}/*/lcov.info ${{ inputs.test-coverage-folder }}/lcov.info
       shell: bash
 
     - name: Publish coverage to Coveralls
