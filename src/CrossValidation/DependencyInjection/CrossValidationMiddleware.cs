@@ -38,7 +38,7 @@ public class CrossValidationMiddleware : IMiddleware
         string? title = null;
         string? details = null;
         List<CrossProblemDetailsError> errors = new();
-
+        
         if (exception is BusinessException businessException)
         {
             statusCode = businessException.StatusCode;
@@ -114,8 +114,9 @@ public class CrossValidationMiddleware : IMiddleware
             Details = exception.Details
         };
 
-        if (CrossValidationOptions.LocalizeErrorInClient
-            && exception.PlaceholderValues.Count > 0)
+        if (exception is FrontBusinessException
+            || (CrossValidationOptions.LocalizeErrorInClient
+                && exception.PlaceholderValues.Count > 0))
         {
             var placeholders = new Dictionary<string, object>();
             
