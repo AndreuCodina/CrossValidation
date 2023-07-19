@@ -88,7 +88,7 @@ public interface IValidation<out TField> : IValidationOperation
         return new Validation<TField>(
             getFieldValue: getFieldValue,
             customThrowToThrow: customExceptionToThrow,
-            generalizeError: false,
+            doGenericError: false,
             fieldPath: fullPath,
             context: null,
             index: null,
@@ -322,7 +322,7 @@ internal class Validation<TField> :
         var nextValidation = new Validation<TFieldTransformed>(
             getFieldValue: getFieldValueTransformed,
             customThrowToThrow: CustomExceptionToThrow,
-            generalizeError: false,
+            doGenericError: false,
             fieldPath: FieldPath,
             context: Context,
             index: Index,
@@ -372,7 +372,7 @@ internal class Validation<TField> :
         var nextValidation = new Validation<TField>(
             getFieldValue: GetFieldValue,
             customThrowToThrow: CustomExceptionToThrow,
-            generalizeError: GeneralizeError,
+            doGenericError: DoGenericError,
             fieldPath: oldFieldPath,
             context: oldContext,
             index: Index,
@@ -413,7 +413,7 @@ internal class Validation<TField> :
     public Validation(
         Func<TField>? getFieldValue,
         Type? customThrowToThrow,
-        bool generalizeError,
+        bool doGenericError,
         string? fieldPath,
         ValidationContext? context,
         int? index,
@@ -438,7 +438,7 @@ internal class Validation<TField> :
         GetGenericFieldValue = getFieldValue;
         GetNonGenericFieldValue = () => getFieldValue!()!;
         CustomExceptionToThrow = customThrowToThrow;
-        GeneralizeError = generalizeError;
+        DoGenericError = doGenericError;
         Index = index;
         ParentPath = parentPath;
         FieldPath = fieldPath;
@@ -489,7 +489,7 @@ internal class Validation<TField> :
         var nextValidation = new Validation<TField>(
             getFieldValue: GetFieldValue,
             customThrowToThrow: CustomExceptionToThrow,
-            generalizeError: GeneralizeError,
+            doGenericError: DoGenericError,
             fieldPath: FieldPath,
             context: Context,
             index: Index,

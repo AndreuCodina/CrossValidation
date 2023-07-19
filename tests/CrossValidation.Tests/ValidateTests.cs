@@ -230,11 +230,11 @@ public class ValidateTests :
     }
 
     [Theory]
-    [InlineData(null, "", nameof(ErrorResource.General), "An error has occured")]
-    [InlineData(null, "Expected message", nameof(ErrorResource.General), "Expected message")]
+    [InlineData(null, "", nameof(ErrorResource.Generic), "An error has occured")]
+    [InlineData(null, "Expected message", nameof(ErrorResource.Generic), "Expected message")]
     [InlineData("RandomCode", "", "RandomCode", "")]
     [InlineData(nameof(ErrorResource.NotNull), "", nameof(ErrorResource.NotNull), "Must have a value")]
-    public void ValidateThat_does_not_generalize_customized_code_or_message(
+    public void ValidateThat_does_not_do_generic_the_customized_code_or_message(
         string? code,
         string message,
         string? expectedCode,
@@ -260,7 +260,7 @@ public class ValidateTests :
     }
 
     [Fact]
-    public void ValidateThat_does_not_generalize_exception_type()
+    public void ValidateThat_does_not_do_generic_exception_type()
     {
         _model = new ParentModelBuilder()
             .WithNullableInt(1)

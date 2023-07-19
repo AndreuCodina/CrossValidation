@@ -46,7 +46,7 @@ public class ValidationTests :
     }
     
     [Theory]
-    [InlineData(null, "Expected message", nameof(ErrorResource.General), "Expected message")]
+    [InlineData(null, "Expected message", nameof(ErrorResource.Generic), "Expected message")]
     [InlineData("ExpectedCode", "", "ExpectedCode", "")]
     [InlineData(nameof(ErrorResource.Enum), "", nameof(ErrorResource.Enum), "Must be a valid value")]
     [InlineData("ExpectedCode", "Expected message", "ExpectedCode", "Expected message")]
@@ -101,8 +101,8 @@ public class ValidationTests :
     }
 
     [Theory]
-    [InlineData(null, "", nameof(ErrorResource.General), "An error has occured")]
-    [InlineData(null, "Expected message", nameof(ErrorResource.General), "Expected message")]
+    [InlineData(null, "", nameof(ErrorResource.Generic), "An error has occured")]
+    [InlineData(null, "Expected message", nameof(ErrorResource.Generic), "Expected message")]
     [InlineData("RandomCode", "", "RandomCode", "")]
     [InlineData(nameof(ErrorResource.NotNull), "", nameof(ErrorResource.NotNull), "Must have a value")]
     public void Keep_instance_customizations(

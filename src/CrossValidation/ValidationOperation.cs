@@ -41,7 +41,7 @@ public interface IValidationOperation
     int? Index { get; set; }
     public bool IsInsideScope { get; set; }
     public IValidationOperation? ScopeCreatorValidation { get; set; }
-    public bool GeneralizeError { get; set; }
+    public bool DoGenericError { get; set; }
     public ScopeType? ScopeType { get; set; }
     public string? ParentPath { get; set; }
     public string? FieldPath { get; set; }
@@ -81,7 +81,7 @@ internal class ValidationOperation
     public int? Index { get; set; }
     public bool IsInsideScope { get; set; }
     public IValidationOperation? ScopeCreatorValidation { get; set; }
-    public bool GeneralizeError { get; set; }
+    public bool DoGenericError { get; set; }
     public ScopeType? ScopeType { get; set; }
     public string? ParentPath { get; set; }
     public string? FieldPath { get; set; }
@@ -241,7 +241,7 @@ internal class ValidationOperation
     
     public void TakeCustomizationsFromInstanceException(BusinessException exception, ValidationContext context)
     {
-        if (GeneralizeError)
+        if (DoGenericError)
         {
             return;
         }
@@ -325,9 +325,9 @@ internal class ValidationOperation
             return Code;
         }
         
-        if (GeneralizeError)
+        if (DoGenericError)
         {
-            return nameof(ErrorResource.General);
+            return nameof(ErrorResource.Generic);
         }
 
         return exception.Code;
@@ -350,9 +350,9 @@ internal class ValidationOperation
             return CrossValidationOptions.GetMessageFromCode(Code);
         }
         
-        if (GeneralizeError)
+        if (DoGenericError)
         {
-            return CrossValidationOptions.GetMessageFromCode(nameof(ErrorResource.General));
+            return CrossValidationOptions.GetMessageFromCode(nameof(ErrorResource.Generic));
         }
 
         if (exception.Message != "")

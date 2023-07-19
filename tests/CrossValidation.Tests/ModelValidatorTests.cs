@@ -713,7 +713,7 @@ public class ModelValidatorTests :
      }
      
      [Fact]
-     public void General_error_customization_is_reset_between_validations()
+     public void Error_customization_is_reset_between_validations()
      {
          _model = new ParentModelBuilder()
              .WithNullableInt(1)
@@ -735,7 +735,7 @@ public class ModelValidatorTests :
      }
      
      [Fact]
-     public void ValidateThat_with_child_model_then_validators_do_not_apply_generalization_when_they_use_ValidateField()
+     public void ValidateThat_with_child_model_then_validators_do_not_do_generic_errors_when_they_use_ValidateField()
      {
          _model = new ParentModelBuilder()
              .WithNullableInt(1)

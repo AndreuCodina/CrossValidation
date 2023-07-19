@@ -20,7 +20,7 @@ public abstract class Validate
         return new Validation<TField>(
             getFieldValue: () => field,
             customThrowToThrow: null,
-            generalizeError: true,
+            doGenericError: true,
             fieldPath: null,
             context: null,
             index: null,

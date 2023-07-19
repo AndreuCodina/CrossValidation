@@ -39,7 +39,7 @@
     <data name="RegularExpression" xml:space="preserve">
         <value>El formato no es válido</value>
     </data>
-    <data name="General" xml:space="preserve">
+    <data name="Generic" xml:space="preserve">
         <value>Ha ocurrido un error</value>
     </data>
     <data name="NotEmptyString" xml:space="preserve">
