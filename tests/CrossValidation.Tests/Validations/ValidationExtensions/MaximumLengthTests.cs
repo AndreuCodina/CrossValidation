@@ -1,4 +1,4 @@
-﻿using CrossValidation.Exceptions;
+using CrossValidation.Exceptions;
 using CrossValidation.Resources;
 using CrossValidation.Tests.TestUtils;
 using CrossValidation.Tests.TestUtils.Builders;
@@ -9,11 +9,11 @@ using Xunit;
 
 namespace CrossValidation.Tests.Validations.ValidationExtensions;
 
-public class MinimumLengthTests : TestBase
+public class MaximumLengthTests : TestBase
 {
     private ParentModel _model;
 
-    public MinimumLengthTests()
+    public MaximumLengthTests()
     {
         _model = new ParentModelBuilder()
             .Build();
@@ -23,9 +23,9 @@ public class MinimumLengthTests : TestBase
     public void Fail_when_the_length_has_not_been_met()
     {
         var action = () => Validate.Field(_model.String)
-            .MinimumLength(_model.String.Length + 1);
+            .MaximumLength(_model.String.Length - 1);
 
-        var exception = action.ShouldThrow<CommonException.MinimumLength>();
+        var exception = action.ShouldThrow<CommonException.MaximumLength>();
         exception.Code.ShouldBe(nameof(ErrorResource.MinimumLength));
     }
 }

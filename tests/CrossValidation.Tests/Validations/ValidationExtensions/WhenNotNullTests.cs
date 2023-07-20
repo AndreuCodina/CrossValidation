@@ -108,7 +108,7 @@ public class WhenNotNullTests :
                 .Must(_commonFixture.BeValid))
             .NotNull();
 
-        var exception = action.ShouldThrow<CommonCrossException.NotNull>();
+        var exception = action.ShouldThrow<CommonException.NotNull>();
         exception.GetFieldValue!().ShouldNotBeOfType<int>();
         exception.GetFieldValue!().ShouldBeNull();
     }
@@ -171,7 +171,7 @@ public class WhenNotNullTests :
         var exceptions = (await action.ShouldThrowAsync<BusinessListException>())
             .Exceptions;
         exceptions.Count.ShouldBe(2);
-        exceptions[0].ShouldBeOfType<CommonCrossException.Predicate>();
+        exceptions[0].ShouldBeOfType<CommonException.Predicate>();
         exceptions[0].Message.ShouldBe(expectedMessage);
     }
     
@@ -191,7 +191,7 @@ public class WhenNotNullTests :
             .Must(_commonFixture.ThrowException)
             .ValidateAsync();
         
-        var exception = await action.ShouldThrowAsync<CommonCrossException.Predicate>();
+        var exception = await action.ShouldThrowAsync<CommonException.Predicate>();
         
         exception.Message.ShouldBe(expectedMessage);
     }
@@ -215,7 +215,7 @@ public class WhenNotNullTests :
             .Must(_commonFixture.ThrowException)
             .ValidateAsync();
 
-        var exception = await action.ShouldThrowAsync<CommonCrossException.Predicate>();
+        var exception = await action.ShouldThrowAsync<CommonException.Predicate>();
         
         exception.Message.ShouldBe(expectedMessage);
     }
@@ -238,7 +238,7 @@ public class WhenNotNullTests :
             .Must(_commonFixture.ThrowException)
             .ValidateAsync();
 
-        var exception = await action.ShouldThrowAsync<CommonCrossException.Predicate>();
+        var exception = await action.ShouldThrowAsync<CommonException.Predicate>();
         exception.Message.ShouldBe(expectedMessage);
     }
     
@@ -281,7 +281,7 @@ public class WhenNotNullTests :
             .Must(_commonFixture.ThrowException)
             .ValidateAsync();
 
-        var exception = await action.ShouldThrowAsync<CommonCrossException.Predicate>();
+        var exception = await action.ShouldThrowAsync<CommonException.Predicate>();
         exception.Message.ShouldBe(expectedMessage);
     }
     
@@ -296,7 +296,7 @@ public class WhenNotNullTests :
             .Must(_commonFixture.NotBeValid)
             .ValidateAsync();
 
-        var exception = await action.ShouldThrowAsync<CommonCrossException.Predicate>();
+        var exception = await action.ShouldThrowAsync<CommonException.Predicate>();
         
         exception.Message.ShouldBe(expectedMessage);
     }

@@ -2,7 +2,7 @@
 
 namespace CrossValidation.Exceptions;
 
-public static class CommonCrossException
+public static class CommonException
 {
     public class NotNull() : BusinessException(code: nameof(ErrorResource.NotNull));
 
@@ -44,6 +44,18 @@ public static class CommonCrossException
         public override void AddParametersAsPlaceholderValues()
         {
             AddPlaceholderValue(minimumLength);
+            AddPlaceholderValue(totalLength);
+        }
+    }
+    
+    public class MaximumLength(int maximumLength, int totalLength)
+        : LengthException(code: nameof(ErrorResource.MinimumLength))
+    {
+        public override int TotalLength => totalLength;
+        
+        public override void AddParametersAsPlaceholderValues()
+        {
+            AddPlaceholderValue(maximumLength);
             AddPlaceholderValue(totalLength);
         }
     }

@@ -151,6 +151,13 @@ public static class ValidationExtensions
     {
         return validation.SetValidator(() => new MinimumLengthValidator(validation.GetFieldValue(), minimum));
     }
+    
+    public static IValidation<string> MaximumLength(
+        this IValidation<string> validation,
+        int maximum)
+    {
+        return validation.SetValidator(() => new MaximumLengthValidator(validation.GetFieldValue(), maximum));
+    }
 
     public static IValidation<IEnumerable<TInnerType>> ForEach<TInnerType, TReturnedField>(
         this IValidation<IEnumerable<TInnerType>> validation,

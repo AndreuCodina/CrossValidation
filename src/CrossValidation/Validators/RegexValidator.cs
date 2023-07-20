@@ -12,6 +12,6 @@ public class RegularExpressionValidator(string fieldValue, string pattern) : Val
 
     public override BusinessException CreateException()
     {
-        return new CommonCrossException.RegularExpression();
+        return new CommonException.RegularExpression();
     }
 }

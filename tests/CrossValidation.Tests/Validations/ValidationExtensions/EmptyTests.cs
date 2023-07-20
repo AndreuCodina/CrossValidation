@@ -38,7 +38,7 @@ public class EmptyTests : TestBase
         var action = () => Validate.Field(_model.String)
             .Empty();
 
-        var exception = action.ShouldThrow<CommonCrossException.EmptyString>();
+        var exception = action.ShouldThrow<CommonException.EmptyString>();
         exception.Code.ShouldBe(nameof(ErrorResource.EmptyString));
     }
     
@@ -61,7 +61,7 @@ public class EmptyTests : TestBase
         var action = () => Validate.Field(_model.IntList)
             .Empty();
 
-        var exception = action.ShouldThrow<CommonCrossException.EmptyCollection>();
+        var exception = action.ShouldThrow<CommonException.EmptyCollection>();
         exception.Code.ShouldBe(nameof(ErrorResource.EmptyCollection));
     }
 }

@@ -38,7 +38,7 @@ public class RegexTests : TestBase
         var action = () => Validate.Field(value)
             .Regex(pattern);
 
-        var exception = action.ShouldThrow<CommonCrossException.RegularExpression>();
+        var exception = action.ShouldThrow<CommonException.RegularExpression>();
         
         exception.Code.ShouldBe(nameof(ErrorResource.RegularExpression));
     }

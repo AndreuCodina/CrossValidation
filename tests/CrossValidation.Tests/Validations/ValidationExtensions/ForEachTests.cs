@@ -368,7 +368,7 @@ public class ForEachTests :
             .Must(_commonFixture.ThrowException)
             .ValidateAsync();
 
-        var exception = await action.ShouldThrowAsync<CommonCrossException.Predicate>();
+        var exception = await action.ShouldThrowAsync<CommonException.Predicate>();
         
         exception.Message.ShouldBe(expectedMessage);
     }

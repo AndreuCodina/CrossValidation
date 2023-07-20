@@ -269,7 +269,7 @@ public class ValidateTests :
         var action = () => Validate.That(_model.NullableInt)
             .Null();
 
-        action.ShouldThrow<CommonCrossException.Null>();
+        action.ShouldThrow<CommonException.Null>();
     }
     
     [Fact]
@@ -326,7 +326,7 @@ public class ValidateTests :
                 .Must(_commonFixture.ThrowException))
             .ValidateAsync();
 
-        await action.ShouldThrowAsync<CommonCrossException.NotNull>();
+        await action.ShouldThrowAsync<CommonException.NotNull>();
     }
     
     [Fact]
@@ -354,7 +354,7 @@ public class ValidateTests :
             .MustAsync(_commonFixture.BeValidAsync)
             .ValidateAsync();
 
-        var exception = await action.ShouldThrowAsync<CommonCrossException.NotNull>();
+        var exception = await action.ShouldThrowAsync<CommonException.NotNull>();
         
         exception.Message.ShouldBe(expectedMessage);
     }
@@ -386,7 +386,7 @@ public class ValidateTests :
             .Must(x => new BusinessException(message: x.Substring(0)))
             .ValidateAsync();
 
-        var exception = await action.ShouldThrowAsync<CommonCrossException.Predicate>();
+        var exception = await action.ShouldThrowAsync<CommonException.Predicate>();
         
         exception.Message.ShouldBe(expectedMessage);
     }
