@@ -69,7 +69,7 @@ public class ValidateBenchmarks
 
     private record Model(int Value);
 
-    private record ModelValidatorSuccess : ModelValidator<Model>
+    private class ModelValidatorSuccess : ModelValidator<Model>
     {
         public override void CreateValidations()
         {
@@ -78,7 +78,7 @@ public class ValidateBenchmarks
         }
     }
     
-    private record ModelValidatorFail : ModelValidator<Model>
+    private class ModelValidatorFail : ModelValidator<Model>
     {
         public override void CreateValidations()
         {
@@ -87,7 +87,7 @@ public class ValidateBenchmarks
         }
     }
     
-    private record ModelValidatorExceptionAccumulationSuccess : ModelValidator<Model>
+    private class ModelValidatorExceptionAccumulationSuccess : ModelValidator<Model>
     {
         public override void CreateValidations()
         {
@@ -98,7 +98,7 @@ public class ValidateBenchmarks
         }
     }
     
-    private record ModelValidatorExceptionAccumulationFail : ModelValidator<Model>
+    private class ModelValidatorExceptionAccumulationFail : ModelValidator<Model>
     {
         public override void CreateValidations()
         {
