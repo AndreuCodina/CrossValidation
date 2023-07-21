@@ -6,7 +6,7 @@ using CrossValidation.Validations;
 
 namespace CrossValidation;
 
-public abstract record ModelValidator<TModel>
+public abstract class ModelValidator<TModel>
 {
     internal ValidationMode _validationMode = ValidationMode.StopOnFirstError;
     internal IValidation<TModel>? ScopeCreatorValidation { private get; set; }
