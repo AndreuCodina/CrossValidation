@@ -42,6 +42,10 @@ public class ResxBusinessExceptionSourceGeneratorTests
                     {
                         internal partial class ExceptionWithParameters<T> where T : struct
                         {
+                            public int Age => age;
+                            public string Email => email;
+                            public T Generic => generic;
+                            
                             public override void AddParametersAsPlaceholderValues()
                             {
                                 AddPlaceholderValue(age);
