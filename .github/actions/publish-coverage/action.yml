@@ -6,6 +6,10 @@ inputs:
     description: Folder where the coverage files are located
     required: false
     default: ${{ github.workspace }}/artifacts/coverage
+  refresh-badge:
+    description: Refresh badge
+    required: true
+    default: "false"
 
   github-token:
     description: GitHub token
@@ -27,6 +31,7 @@ runs:
         file: ${{ inputs.test-coverage-folder }}/lcov.info
 
     - name: Refresh coverage badge in README.md
+      if: ${{ inputs.refresh-badge == "true" }}
       run: |
         current_milliseconds=$(date '+%s')
         new_value="coveralls_badge_current_milliseconds=$current_milliseconds)"
@@ -35,6 +40,7 @@ runs:
       shell: bash
 
     - name: Refresh coverage badge in README.md
+      if: ${{ inputs.refresh-badge == "true" }}
       uses: stefanzweifel/git-auto-commit-action@v4.16.0
       with:
         commit_message: Refresh coverage badge in README.md

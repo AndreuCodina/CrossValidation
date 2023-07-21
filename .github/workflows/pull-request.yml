@@ -26,4 +26,5 @@ jobs:
       - name: Publish coverage
         uses: ./.github/actions/publish-coverage
         with:
+          refresh-badge: "true"
           github-token: ${{ secrets.GITHUB_TOKEN }}
