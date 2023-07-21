@@ -9,7 +9,7 @@ namespace CrossValidation.Benchmarks;
 public class ValidateBenchmarks
 {
     private const int Value = 1;
-    private readonly Model _model = new Model(Value);
+    private readonly Model _model = new(Value);
 
     [Benchmark]
     public void ValidateThat()

@@ -19,6 +19,11 @@ jobs:
       - name: Test
         uses: ./.github/actions/test-with-coverage
 
+      - name: Publish coverage
+        uses: ./.github/actions/publish-coverage
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Set package version
         id: set-package-version
         run: echo "PACKAGE_VERSION=$(date '+%Y.%-m.%s')-commit.$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
