@@ -6,6 +6,7 @@ using CrossValidation.WebApplication.Resources;
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddCrossValidation();
 
+// Hi
 var app = builder.Build();
 app.UseCrossValidation();
 
