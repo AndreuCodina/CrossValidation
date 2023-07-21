@@ -1,7 +1,7 @@
 <img alt="Logo" src="docs/logo.jpg" width="522" height="396">
 
 [![Main workflow state](https://github.com/AndreuCodina/CrossValidation/actions/workflows/main.yml/badge.svg?branch=main)](https://github.com/AndreuCodina/CrossValidation/actions/workflows/main.yml)
-[![Coverage Status](https://coveralls.io/repos/github/AndreuCodina/CrossValidation/badge.svg?branch=main&coveralls_badge_current_milliseconds=1689797633)](https://coveralls.io/github/AndreuCodina/CrossValidation?branch=main)
+[![Coverage Status](https://coveralls.io/repos/github/AndreuCodina/CrossValidation/badge.svg?branch=main&coveralls_badge_current_milliseconds=1689919552)](https://coveralls.io/github/AndreuCodina/CrossValidation?branch=main)
 [![NuGet](https://img.shields.io/nuget/v/CrossValidation?color=blue&label=nuget)](https://www.nuget.org/packages/CrossValidation)
 
 State-of-the-art .NET library to handle errors and validate data.
