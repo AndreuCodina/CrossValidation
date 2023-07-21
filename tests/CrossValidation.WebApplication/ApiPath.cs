@@ -15,5 +15,6 @@ public static class ApiPath
         public const string Exception = "/exception";
         public const string UseDecimal = "/useDecimal";
         public const string FrontBusinessExceptionWithPlaceholders = "/frontBusinessExceptionWithPlaceholders";
+        public const string ResxBusinessException = "/resxBusinessException";
     }
 }

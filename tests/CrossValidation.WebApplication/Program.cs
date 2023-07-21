@@ -21,3 +21,10 @@ public class ExceptionWithCodeWithoutResxKey() : BusinessException(code: "Random
 
 public partial class FrontBusinessExceptionWithPlaceholders<T>(int placeholder1, T placeholder2)
     : FrontBusinessException;
+
+public static class ErrorResourceWithNoResx
+{
+    public const string Key = "Translation";
+}
+
+public partial class CustomResxBusinessException() : ResxBusinessException(ErrorResourceWithNoResx.Key);

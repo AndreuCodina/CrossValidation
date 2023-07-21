@@ -18,14 +18,14 @@ Create your business exception:
 
 ```csharp
 public partial class EmailAlreadyExistsException(string email, string company)
-  : BusinessException(ErrorResource.EmailAlreadyExists)
+  : ResxBusinessException(ErrorResource.EmailAlreadyExists)
 ```
 
 Throw the exception:
 
 ```csharp
 // Add CrossValidation
-services.AddCrossValidation(options => options.AddResx<ErrorResource>());
+services.AddCrossValidation();
 app.UseCrossValidation();
 
 // Expose endpoint

@@ -306,11 +306,6 @@ public class DependencyInjectionTests :
     [Fact]
     public async Task Get_placeholders_from_FrontBusinessException()
     {
-        var expectedPlaceholders = new Dictionary<string, object?>
-        {
-            {"placeholder1", 1},
-            {"placeholder2", "value"}
-        };
         _client = new TestApplicationFactory(services =>
         {
             services.AddCrossValidation(x =>
@@ -328,6 +323,25 @@ public class DependencyInjectionTests :
         error.Placeholders!.Count.ShouldBe(2);
         error.Placeholders!.ElementAt(0).Key.ShouldBe("placeholder1");
         error.Placeholders!.ElementAt(1).Key.ShouldBe("placeholder2");
+    }
+    
+    [Fact]
+    public async Task Get_code_from_ResxBusinessException()
+    {
+        _client = new TestApplicationFactory(services =>
+        {
+            services.AddCrossValidation(x =>
+            {
+                x.AddResxAndAssociatedCultures<ErrorResource1>();
+            });
+        }).CreateClient();
+        
+        var response = await _client.GetAsync(ApiPath.Test.Prefix + ApiPath.Test.ResxBusinessException);
+        
+        var problemDetails = await GetProblemDetailsFromResponse(response);
+        var error = problemDetails.Errors!.First();
+        error.Code.ShouldBe(nameof(ErrorResourceWithNoResx.Key));
+        error.Message.ShouldBe(ErrorResourceWithNoResx.Key);
     }
 
     public void Dispose()

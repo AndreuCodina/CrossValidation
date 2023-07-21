@@ -10,7 +10,7 @@ namespace CrossValidation.SourceGenerators.UnitTests;
 public class ResxBusinessExceptionSourceGeneratorTests
 {
     [Fact]
-    public void Generate_output()
+    public void Generate_source()
     {
         var code =
             """

@@ -67,6 +67,11 @@ public static class TestEndpoints
         {
             throw new FrontBusinessExceptionWithPlaceholders<string>(1, "value");
         });
+        
+        group.MapGet(ApiPath.Test.ResxBusinessException, () =>
+        {
+            throw new CustomResxBusinessException();
+        });
 
         return builder;
     }
