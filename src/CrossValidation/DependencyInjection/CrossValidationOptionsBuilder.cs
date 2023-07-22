@@ -64,4 +64,10 @@ public class CrossValidationOptionsBuilder
         CrossValidationOptions.SupportedCultureCodes = cultureCodes.ToList();
         return this;
     }
+
+    public CrossValidationOptionsBuilder SetPublicationUrl(string publicationUrl)
+    {
+        CrossValidationOptions.PublicationUrl = publicationUrl;
+        return this;
+    }
 }

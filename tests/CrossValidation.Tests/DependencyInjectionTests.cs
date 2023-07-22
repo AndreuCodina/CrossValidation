@@ -199,12 +199,10 @@ public class DependencyInjectionTests :
     {
         _client = new TestApplicationFactory(services =>
         {
-            services.AddCrossValidation(x =>
-            {
-                x.SetDefaultCulture("en");
-                x.SetSupportedCultures("en", "es");
-                x.AddResx<ErrorResource1>();
-            });
+            services.AddCrossValidation(options => options
+                .SetDefaultCulture("en")
+                .SetSupportedCultures("en", "es")
+                .AddResx<ErrorResource1>());
         }).CreateClient();
         
         _client.DefaultRequestHeaders.Add("Accept-Language", "es");
@@ -342,6 +340,23 @@ public class DependencyInjectionTests :
         var error = problemDetails.Errors!.First();
         error.Code.ShouldBe(nameof(ErrorResourceWithNoResx.Key));
         error.Message.ShouldBe(ErrorResourceWithNoResx.Key);
+    }
+    
+    [Fact]
+    public async Task Get_code_url()
+    {
+        _client = new TestApplicationFactory(services =>
+        {
+            services.AddCrossValidation(x => x
+                .SetPublicationUrl("https://www.backend.com"));
+        }).CreateClient();
+        
+        var response = await _client.GetAsync(ApiPath.Test.Prefix + ApiPath.Test.ResxBusinessException);
+        
+        var problemDetails = await GetProblemDetailsFromResponse(response);
+        var error = problemDetails.Errors!.First();
+        error.Code.ShouldBe(nameof(ErrorResourceWithNoResx.Key));
+        error.CodeUrl.ShouldBe("https://www.backend.com/error-codes#Key");
     }
 
     public void Dispose()

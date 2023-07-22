@@ -113,24 +113,43 @@ public class CrossValidationMiddleware : IMiddleware
         var error = new CrossProblemDetailsError
         {
             Code = exception.Code,
+            CodeUrl = GetPublicationUrl(exception),
             Message = exception.Message == "" ? null : exception.Message,
-            Details = exception.Details
+            Details = exception.Details,
+            Placeholders = GetPlaceholders(exception)
         };
 
-        if (exception is FrontBusinessException
-            || (CrossValidationOptions.LocalizeCommonErrorsInFront
-                && exception.PlaceholderValues.Count > 0))
-        {
-            var placeholders = new Dictionary<string, object?>();
-            
-            foreach (var placeholder in exception.PlaceholderValues)
-            {
-                placeholders.Add(placeholder.Key, placeholder.Value);
-            }
+        return error;
+    }
 
-            error.Placeholders = placeholders;
+    private static string? GetPublicationUrl(BusinessException exception)
+    {
+        if (exception.Code is null || CrossValidationOptions.PublicationUrl is null)
+        {
+            return null;
+        }
+        
+        return $"{CrossValidationOptions.PublicationUrl}/error-codes#{exception.Code}";
+    }
+
+    private Dictionary<string, object?>? GetPlaceholders(BusinessException exception)
+    {
+        var hasToSendPlaceholders =
+            CrossValidationOptions.LocalizeCommonErrorsInFront
+            && exception.PlaceholderValues.Count > 0;
+
+        if (exception is not FrontBusinessException && !hasToSendPlaceholders)
+        {
+            return null;
+        }
+        
+        var placeholders = new Dictionary<string, object?>();
+
+        foreach (var placeholder in exception.PlaceholderValues)
+        {
+            placeholders.Add(placeholder.Key, placeholder.Value);
         }
 
-        return error;
+        return placeholders;
     }
 }

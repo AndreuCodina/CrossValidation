@@ -15,6 +15,7 @@ public static class CrossValidationOptions
     public static bool HandleUnknownException { get; set; } = SetDefaultHandleUnknownException();
     public static string DefaultCultureCode { get; set; } = SetDefaultCultureCode();
     public static List<string> SupportedCultureCodes { get; set; } = SetDefaultSupportedCultureCodes();
+    public static string? PublicationUrl { get; set; }
 
     public static void SetDefaultOptions()
     {
@@ -23,6 +24,7 @@ public static class CrossValidationOptions
         HandleUnknownException = SetDefaultHandleUnknownException();
         DefaultCultureCode = SetDefaultCultureCode();
         SupportedCultureCodes = SetDefaultSupportedCultureCodes();
+        PublicationUrl = null;
     }
 
     public static void AddResourceManager<TResourceFile>()
