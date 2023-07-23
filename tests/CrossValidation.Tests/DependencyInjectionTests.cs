@@ -337,7 +337,7 @@ public class DependencyInjectionTests :
         {
             services.AddCrossValidation(options =>
             {
-                options.SetPublicationUrl("https://www.backend.com");
+                options.EnableErrorCodePage(publicationUrl: "https://www.backend.com");
             });
         }).CreateClient();
         
@@ -354,7 +354,8 @@ public class DependencyInjectionTests :
     {
         _client = new TestApplicationFactory(services =>
         {
-            services.AddCrossValidation();
+            services.AddCrossValidation(options => options
+                .EnableErrorCodePage());
         }).CreateClient();
         
         var response = await _client.GetAsync(ApiPath.Test.Prefix + ApiPath.Test.ResxBusinessException);

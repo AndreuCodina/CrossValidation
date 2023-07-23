@@ -129,7 +129,7 @@ public class CrossValidationMiddleware : IMiddleware
     {
         string? baseUrl = null;
         
-        if (exception.Code is null)
+        if (!CrossValidationOptions.IsErrorCodePageEnabled || exception.Code is null)
         {
             return null;
         }

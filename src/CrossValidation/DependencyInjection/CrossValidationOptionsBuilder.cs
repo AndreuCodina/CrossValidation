@@ -65,15 +65,10 @@ public class CrossValidationOptionsBuilder
         return this;
     }
 
-    public CrossValidationOptionsBuilder SetPublicationUrl(string publicationUrl)
-    {
-        CrossValidationOptions.PublicationUrl = publicationUrl;
-        return this;
-    }
-
-    public CrossValidationOptionsBuilder EnableErrorCodePage()
+    public CrossValidationOptionsBuilder EnableErrorCodePage(string? publicationUrl = null)
     {
         CrossValidationOptions.IsErrorCodePageEnabled = true;
+        CrossValidationOptions.PublicationUrl = publicationUrl;
         return this;
     }
 }
