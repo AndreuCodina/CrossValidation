@@ -37,21 +37,22 @@ public class CrossValidationMiddleware : IMiddleware
         var statusCode = HttpStatusCode.InternalServerError;
         string? type = null;
         string? title = null;
-        string? details = null;
+        string? detail = null;
         List<CrossProblemDetailsError> errors = new();
+        string? exceptionDetail = null;
         
         if (exception is BusinessException businessException)
         {
             statusCode = businessException.StatusCode;
             title = "A validation error occurred";
-            var error = CreateCrossProblemDetailsError(businessException);
+            var error = CreateCrossProblemDetailsError(businessException, context);
             
             var allErrorCustomizationsAreNotSet =
                 error is
                 {
                     Code: null,
                     Message: null,
-                    Details: null,
+                    Detail: null,
                     Placeholders: null
                 };
 
@@ -67,21 +68,21 @@ public class CrossValidationMiddleware : IMiddleware
 
             foreach (var error in validationListException.Exceptions)
             {
-                errors.Add(CreateCrossProblemDetailsError(error));
+                errors.Add(CreateCrossProblemDetailsError(error, context));
             }
         }
         else if (exception is NonNullablePropertyIsNullException nonNullablePropertyIsNullException)
         {
             statusCode = HttpStatusCode.BadRequest;
             title = "Nullability error";
-            details = $"Non nullable property is null: {nonNullablePropertyIsNullException.PropertyName}";
+            detail = $"Non nullable property is null: {nonNullablePropertyIsNullException.PropertyName}";
         }
         else if (exception is NonNullableItemCollectionWithNullItemException
                  nonNullableItemCollectionWithNullItemException)
         {
             statusCode = HttpStatusCode.BadRequest;
             title = "Nullability error";
-            details = $"Non nullable item collection with null item: {nonNullableItemCollectionWithNullItemException.CollectionName}";
+            detail = $"Non nullable item collection with null item: {nonNullableItemCollectionWithNullItemException.CollectionName}";
         }
         else
         {
@@ -93,14 +94,16 @@ public class CrossValidationMiddleware : IMiddleware
             _logger.LogError(exception, exception.Message);
             type = "https://datatracker.ietf.org/doc/html/rfc9110#section-15.6.1";
             title = "An error occurred";
-            problemDetails.Detail = _environment.IsDevelopment() ? exception.Message : null;
+            detail = _environment.IsDevelopment() ? exception.Message : null;
+            exceptionDetail = _environment.IsDevelopment() ? exception.ToString() : null;
         }
 
         problemDetails.Status = (int)statusCode;
         problemDetails.Type = type;
         problemDetails.Title = title;
-        problemDetails.Detail = details;
+        problemDetails.Detail = detail;
         problemDetails.Errors = errors.Any() ? errors : null;
+        problemDetails.ExceptionDetail = exceptionDetail;
         var response = JsonSerializer.Serialize(problemDetails);
         context.Response.StatusCode = problemDetails.Status.Value;
         context.Response.ContentType = "application/problem+json";
@@ -108,28 +111,48 @@ public class CrossValidationMiddleware : IMiddleware
         await context.Response.WriteAsync(response);
     }
 
-    private CrossProblemDetailsError CreateCrossProblemDetailsError(BusinessException exception)
+    private CrossProblemDetailsError CreateCrossProblemDetailsError(BusinessException exception, HttpContext context)
     {
         var error = new CrossProblemDetailsError
         {
             Code = exception.Code,
-            CodeUrl = GetPublicationUrl(exception),
+            CodeUrl = GetPublicationUrl(exception, context),
             Message = exception.Message == "" ? null : exception.Message,
-            Details = exception.Details,
+            Detail = exception.Details,
             Placeholders = GetPlaceholders(exception)
         };
 
         return error;
     }
 
-    private static string? GetPublicationUrl(BusinessException exception)
+    private string? GetPublicationUrl(BusinessException exception, HttpContext context)
     {
-        if (exception.Code is null || CrossValidationOptions.PublicationUrl is null)
+        string? baseUrl = null;
+        
+        if (exception.Code is null)
+        {
+            return null;
+        }
+
+        if (CrossValidationOptions.PublicationUrl is not null)
+        {
+            baseUrl = CrossValidationOptions.PublicationUrl;
+        }
+        else if (_environment.IsDevelopment())
+        {
+            var protocol = context.Request.IsHttps ? "https" : "http";
+            var host = context.Request.Host.Value;
+            var port = context.Request.Host.Port is not null
+                ? $":{context.Request.Host.Port.Value}"
+                : null;
+            baseUrl = $"{protocol}://{host}{port}";
+        }
+        else
         {
             return null;
         }
         
-        return $"{CrossValidationOptions.PublicationUrl}/error-codes#{exception.Code}";
+        return $"{baseUrl}/error-codes#{exception.Code}";
     }
 
     private Dictionary<string, object?>? GetPlaceholders(BusinessException exception)

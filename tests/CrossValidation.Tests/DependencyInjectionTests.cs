@@ -53,11 +53,11 @@ public class DependencyInjectionTests :
     {
         _client = new TestApplicationFactory(services =>
         {
-            services.AddCrossValidation(x =>
+            services.AddCrossValidation(options =>
             {
-                x.SetDefaultCulture("en");
-                x.SetSupportedCultures("en", "es");
-                x.AddResx<ErrorResource1>();
+                options.SetDefaultCulture("en");
+                options.SetSupportedCultures("en", "es");
+                options.AddResx<ErrorResource1>();
             });
         }).CreateClient();
         _client.DefaultRequestHeaders.Add("Accept-Language", languageCode);
@@ -80,11 +80,11 @@ public class DependencyInjectionTests :
     {
         _client = new TestApplicationFactory(services =>
         {
-            services.AddCrossValidation(x =>
+            services.AddCrossValidation(options =>
             {
-                x.SetDefaultCulture("en");
-                x.SetSupportedCultures("en", "es");
-                x.AddResx<ErrorResource1>();
+                options.SetDefaultCulture("en");
+                options.SetSupportedCultures("en", "es");
+                options.AddResx<ErrorResource1>();
             });
         }).CreateClient();
         _client.DefaultRequestHeaders.Add("Accept-Language", languageCode);
@@ -119,11 +119,11 @@ public class DependencyInjectionTests :
     {
         _client = new TestApplicationFactory(services =>
         {
-            services.AddCrossValidation(x =>
+            services.AddCrossValidation(options =>
             {
-                x.SetDefaultCulture("en");
-                x.SetSupportedCultures("en", "es");
-                x.AddResx<ErrorResource1>();
+                options.SetDefaultCulture("en");
+                options.SetSupportedCultures("en", "es");
+                options.AddResx<ErrorResource1>();
             });
         }).CreateClient();
         
@@ -144,8 +144,8 @@ public class DependencyInjectionTests :
     {
         _client = new TestApplicationFactory(services =>
         {
-            services.AddCrossValidation(x =>
-                x.AddResx<ErrorResource1>());
+            services.AddCrossValidation(options =>
+                options.AddResx<ErrorResource1>());
         }).CreateClient();
         _client.DefaultRequestHeaders.Add("Accept-Language", "fr");
         
@@ -239,8 +239,8 @@ public class DependencyInjectionTests :
     {
         _client = new TestApplicationFactory(services =>
         {
-            services.AddCrossValidation(x =>
-                x.AddResxAndAssociatedCultures<ErrorResource1>());
+            services.AddCrossValidation(options =>
+                options.AddResxAndAssociatedCultures<ErrorResource1>());
         }).CreateClient();
         _client.DefaultRequestHeaders.Add("Accept-Language", languageCode);
         
@@ -261,10 +261,10 @@ public class DependencyInjectionTests :
     {
         _client = new TestApplicationFactory(services =>
         {
-            services.AddCrossValidation(x =>
+            services.AddCrossValidation(options =>
             {
-                x.AddResxAndAssociatedCultures<ErrorResource1>();
-                x.AddResxAndAssociatedCultures<ErrorResource2>();
+                options.AddResxAndAssociatedCultures<ErrorResource1>();
+                options.AddResxAndAssociatedCultures<ErrorResource2>();
             });
         }).CreateClient();
         _client.DefaultRequestHeaders.Add("Accept-Language", languageCode);
@@ -286,9 +286,9 @@ public class DependencyInjectionTests :
     {
         _client = new TestApplicationFactory(services =>
         {
-            services.AddCrossValidation(x =>
+            services.AddCrossValidation(options =>
             {
-                x.AddResxAndAssociatedCultures<ErrorResource1>();
+                options.AddResxAndAssociatedCultures<ErrorResource1>();
             });
         }).CreateClient();
         _client.DefaultRequestHeaders.Add("Accept-Language", languageCode);
@@ -306,9 +306,9 @@ public class DependencyInjectionTests :
     {
         _client = new TestApplicationFactory(services =>
         {
-            services.AddCrossValidation(x =>
+            services.AddCrossValidation(options =>
             {
-                x.AddResxAndAssociatedCultures<ErrorResource1>();
+                options.AddResxAndAssociatedCultures<ErrorResource1>();
             });
         }).CreateClient();
         
@@ -328,9 +328,9 @@ public class DependencyInjectionTests :
     {
         _client = new TestApplicationFactory(services =>
         {
-            services.AddCrossValidation(x =>
+            services.AddCrossValidation(options =>
             {
-                x.AddResxAndAssociatedCultures<ErrorResource1>();
+                options.AddResxAndAssociatedCultures<ErrorResource1>();
             });
         }).CreateClient();
         
@@ -343,12 +343,14 @@ public class DependencyInjectionTests :
     }
     
     [Fact]
-    public async Task Get_code_url()
+    public async Task Get_code_url_when_publication_url_is_specified()
     {
         _client = new TestApplicationFactory(services =>
         {
-            services.AddCrossValidation(x => x
-                .SetPublicationUrl("https://www.backend.com"));
+            services.AddCrossValidation(options =>
+            {
+                options.SetPublicationUrl("https://www.backend.com");
+            });
         }).CreateClient();
         
         var response = await _client.GetAsync(ApiPath.Test.Prefix + ApiPath.Test.ResxBusinessException);
@@ -357,6 +359,22 @@ public class DependencyInjectionTests :
         var error = problemDetails.Errors!.First();
         error.Code.ShouldBe(nameof(ErrorResourceWithNoResx.Key));
         error.CodeUrl.ShouldBe("https://www.backend.com/error-codes#Key");
+    }
+    
+    [Fact]
+    public async Task Get_code_url_when_publication_url_is_specified_and_environment_is_development()
+    {
+        _client = new TestApplicationFactory(services =>
+        {
+            services.AddCrossValidation();
+        }).CreateClient();
+        
+        var response = await _client.GetAsync(ApiPath.Test.Prefix + ApiPath.Test.ResxBusinessException);
+        
+        var problemDetails = await GetProblemDetailsFromResponse(response);
+        var error = problemDetails.Errors!.First();
+        error.Code.ShouldBe(nameof(ErrorResourceWithNoResx.Key));
+        error.CodeUrl.ShouldBe("http://localhost/error-codes#Key");
     }
 
     public void Dispose()

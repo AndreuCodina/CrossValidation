@@ -9,4 +9,5 @@ public class CrossProblemDetails
     public string? Detail { get; set; }
     public string? Instance { get; set; }
     public IEnumerable<CrossProblemDetailsError>? Errors { get; set; }
+    public string? ExceptionDetail { get; set; }
 }
