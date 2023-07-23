@@ -33,18 +33,6 @@ public class DependencyInjectionTests :
         
         response.StatusCode.ShouldBe(expectedStatusCode);
     }
-
-    [Fact]
-    public async Task Get_trace_id_sent()
-    {
-        var expectedTraceId = "Trace1";
-        _client.DefaultRequestHeaders.Add("X-Trace-Id", expectedTraceId);
-        
-        var response = await _client.GetAsync(ApiPath.Test.Prefix + ApiPath.Test.CrossException);
-    
-        response.Headers.TryGetValues("X-Trace-Id", out var headers);
-        headers!.First().ShouldBe(expectedTraceId);
-    }
     
     [Theory]
     [InlineData("en", "Hello")]
@@ -358,7 +346,7 @@ public class DependencyInjectionTests :
         var problemDetails = await GetProblemDetailsFromResponse(response);
         var error = problemDetails.Errors!.First();
         error.Code.ShouldBe(nameof(ErrorResourceWithNoResx.Key));
-        error.CodeUrl.ShouldBe("https://www.backend.com/error-codes#Key");
+        error.CodeUrl.ShouldBe($"https://www.backend.com{CrossValidationOptions.ErrorCodePagePath}#Key");
     }
     
     [Fact]
@@ -374,7 +362,30 @@ public class DependencyInjectionTests :
         var problemDetails = await GetProblemDetailsFromResponse(response);
         var error = problemDetails.Errors!.First();
         error.Code.ShouldBe(nameof(ErrorResourceWithNoResx.Key));
-        error.CodeUrl.ShouldBe("http://localhost/error-codes#Key");
+        error.CodeUrl.ShouldBe($"http://localhost{CrossValidationOptions.ErrorCodePagePath}#Key");
+    }
+    
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task Get_error_code_page_when_it_is_enabled(bool isEnabled)
+    {
+        _client = new TestApplicationFactory(services =>
+        {
+            services.AddCrossValidation(options =>
+            {
+                if (isEnabled)
+                {
+                    options.EnableErrorCodePage();
+                }
+            });
+        }).CreateClient();
+        
+        var response = await _client.GetAsync(CrossValidationOptions.ErrorCodePagePath);
+
+        var body = await response.Content.ReadAsStringAsync();
+
+        AssertGet_error_code_page_when_it_is_enabled(isEnabled, body);
     }
 
     public void Dispose()
@@ -388,5 +399,17 @@ public class DependencyInjectionTests :
         var contentStream = await response.Content.ReadAsStreamAsync();
         var problemDetails = await JsonSerializer.DeserializeAsync<CrossProblemDetails>(contentStream);
         return problemDetails!;
+    }
+    
+    private void AssertGet_error_code_page_when_it_is_enabled(bool isEnabled, string body)
+    {
+        if (isEnabled)
+        {
+            body.ShouldNotBeEmpty();
+        }
+        else
+        {
+            body.ShouldBeEmpty();
+        }
     }
 }

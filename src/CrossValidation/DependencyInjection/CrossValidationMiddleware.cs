@@ -4,6 +4,7 @@ using CrossValidation.Exceptions;
 using CrossValidation.Utils;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 namespace CrossValidation.DependencyInjection;
@@ -11,9 +12,9 @@ namespace CrossValidation.DependencyInjection;
 public class CrossValidationMiddleware : IMiddleware
 {
     private readonly ILogger<CrossValidationMiddleware> _logger;
-    private readonly IHostingEnvironment _environment;
+    private readonly IWebHostEnvironment _environment;
 
-    public CrossValidationMiddleware(ILoggerFactory loggerFactory, IHostingEnvironment environment)
+    public CrossValidationMiddleware(ILoggerFactory loggerFactory, IWebHostEnvironment environment)
     {
         _logger = loggerFactory.CreateLogger<CrossValidationMiddleware>();
         _environment = environment;
@@ -107,7 +108,6 @@ public class CrossValidationMiddleware : IMiddleware
         var response = JsonSerializer.Serialize(problemDetails);
         context.Response.StatusCode = problemDetails.Status.Value;
         context.Response.ContentType = "application/problem+json";
-        context.Response.Headers.Add("X-Trace-Id", context.Request.Headers["X-Trace-Id"]);
         await context.Response.WriteAsync(response);
     }
 
@@ -152,7 +152,7 @@ public class CrossValidationMiddleware : IMiddleware
             return null;
         }
         
-        return $"{baseUrl}/error-codes#{exception.Code}";
+        return $"{baseUrl}{CrossValidationOptions.ErrorCodePagePath}#{exception.Code}";
     }
 
     private Dictionary<string, object?>? GetPlaceholders(BusinessException exception)

@@ -70,4 +70,10 @@ public class CrossValidationOptionsBuilder
         CrossValidationOptions.PublicationUrl = publicationUrl;
         return this;
     }
+
+    public CrossValidationOptionsBuilder EnableErrorCodePage()
+    {
+        CrossValidationOptions.IsErrorCodePageEnabled = true;
+        return this;
+    }
 }

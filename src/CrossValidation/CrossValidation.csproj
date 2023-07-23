@@ -33,11 +33,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="Microsoft.AspNetCore.Hosting.Abstractions" />
-      <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" />
-      <PackageReference Include="Microsoft.AspNetCore.Localization" />
-      <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
-      <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
       <PackageReference Include="Microsoft.SourceLink.GitHub" />
     </ItemGroup>
 
@@ -45,8 +40,7 @@
         <None Include="..\..\docs\logo.jpg" Pack="true" Visible="false" PackagePath="" />
         <None Include="..\..\docs\crossvalidation-nuget-readme.md" Visible="false" Pack="true" PackagePath="" />
     </ItemGroup>
-
-
+    
     <ItemGroup>
       <ProjectReference 
               Include="..\CrossValidation.SourceGenerators\CrossValidation.SourceGenerators.csproj"
@@ -55,6 +49,9 @@
       />
     </ItemGroup>
 
-
+    <ItemGroup>
+        <!-- https://learn.microsoft.com/en-us/aspnet/core/fundamentals/target-aspnetcore -->
+        <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    </ItemGroup>
 
 </Project>
