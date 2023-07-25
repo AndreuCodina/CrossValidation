@@ -301,7 +301,7 @@ public class ResxBusinessExceptionSourceGenerator : IIncrementalGenerator
         code.AppendLine("}");
     }
     
-    static ParentClassInformation? GetParentClass(BaseTypeDeclarationSyntax typeSyntax)
+    private static ParentClassInformation? GetParentClass(BaseTypeDeclarationSyntax typeSyntax)
     {
         TypeDeclarationSyntax? parentSyntax = typeSyntax.Parent as TypeDeclarationSyntax;
         ParentClassInformation? parentClassInfo = null;
