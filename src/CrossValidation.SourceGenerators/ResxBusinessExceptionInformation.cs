@@ -3,10 +3,10 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace CrossValidation.SourceGenerators;
 
-public readonly struct ExtractedResxBusinessExceptionSyntax(
+public readonly struct ResxBusinessExceptionInformation(
     ClassDeclarationSyntax classSyntax,
     ITypeSymbol symbol)
 {
-    public ClassDeclarationSyntax ClassSyntax { get; } = classSyntax;
-    public ITypeSymbol Symbol { get; } = symbol;
+    public ClassDeclarationSyntax ClassSyntax => classSyntax;
+    public ITypeSymbol Symbol => symbol;
 }

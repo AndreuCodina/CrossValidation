@@ -11,17 +11,17 @@ public class ResxBusinessExceptionSourceGenerator : IIncrementalGenerator
 {
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        var businessExceptionSyntaxes = context.SyntaxProvider
+        var businessExceptions = context.SyntaxProvider
             .CreateSyntaxProvider(
-                predicate: static (syntaxNode, _) => IsResxBusinessException(syntaxNode),
-                transform: GetResxBusinessExceptionOrNull)
+                predicate: static (syntaxNode, _) => IsTargetForGeneration(syntaxNode),
+                transform: GetTargetForGeneration)
             .Where(static syntax => syntax is not null)
             .Select(static (syntax, _) => syntax!.Value)
             .Collect();
-        context.RegisterSourceOutput(businessExceptionSyntaxes, GenerateCode);
+        context.RegisterSourceOutput(businessExceptions, Execute);
     }
 
-    private static ExtractedResxBusinessExceptionSyntax? GetResxBusinessExceptionOrNull(
+    private static ResxBusinessExceptionInformation? GetTargetForGeneration(
         GeneratorSyntaxContext context,
         CancellationToken cancellationToken)
     {
@@ -45,10 +45,10 @@ public class ResxBusinessExceptionSourceGenerator : IIncrementalGenerator
         if (attributeContainingTypeSymbol is null) return null;
         
         cancellationToken.ThrowIfCancellationRequested();
-        return new ExtractedResxBusinessExceptionSyntax(classSyntax, symbol);
+        return new ResxBusinessExceptionInformation(classSyntax, symbol);
     }
 
-    private static bool IsResxBusinessException(SyntaxNode syntaxNode)
+    private static bool IsTargetForGeneration(SyntaxNode syntaxNode)
     {
         if (syntaxNode is not ClassDeclarationSyntax classSyntax)
         {
@@ -69,30 +69,30 @@ public class ResxBusinessExceptionSourceGenerator : IIncrementalGenerator
         {
             return false;
         }
+        
         var baseIdentifierNameSyntax = (IdentifierNameSyntax)baseList.Types[0].Type;
         var baseClassName = baseIdentifierNameSyntax.Identifier.Text;
         return baseClassName is "ResxBusinessException" or "FrontBusinessException";
     }
     
-    private static void GenerateCode(
+    private static void Execute(
         SourceProductionContext context,
-        ImmutableArray<ExtractedResxBusinessExceptionSyntax> enumerations)
+        ImmutableArray<ResxBusinessExceptionInformation> businessExceptions)
     {
-        if (enumerations.IsDefaultOrEmpty)
+        if (businessExceptions.IsDefaultOrEmpty)
         {
             return;
         }
 
-        foreach (var extractedResxBusinessExceptionSyntax in enumerations)
+        foreach (var businessException in businessExceptions)
         {
-            var typeNamespace = extractedResxBusinessExceptionSyntax.Symbol.ContainingNamespace.IsGlobalNamespace
+            var typeNamespace = businessException.Symbol.ContainingNamespace.IsGlobalNamespace
                 ? null
-                : $"{extractedResxBusinessExceptionSyntax.Symbol.ContainingNamespace}.";
-            var parentClass = GetParentClass(extractedResxBusinessExceptionSyntax.ClassSyntax);
+                : $"{businessException.Symbol.ContainingNamespace}.";
+            var parentClass = GetParentClass(businessException.ClassSyntax);
             var classPath = GetClassPath(parentClass);
-            var code = CreateCode(extractedResxBusinessExceptionSyntax, parentClass);
-
-            context.AddSource($"{typeNamespace}{classPath}.{extractedResxBusinessExceptionSyntax.Symbol.Name}.generated.cs", code);
+            var code = CreateCode(businessException, parentClass);
+            context.AddSource($"{typeNamespace}{classPath}.{businessException.Symbol.Name}.generated.cs", code);
         }
     }
 
@@ -121,20 +121,15 @@ public class ResxBusinessExceptionSourceGenerator : IIncrementalGenerator
     }
 
     private static string CreateCode(
-        ExtractedResxBusinessExceptionSyntax extractedResxBusinessExceptionSyntax,
+        ResxBusinessExceptionInformation resxBusinessExceptionInformation,
         ParentClassInformation? parentClass)
     {
-        var @namespace = extractedResxBusinessExceptionSyntax.Symbol.ContainingNamespace.IsGlobalNamespace
+        var @namespace = resxBusinessExceptionInformation.Symbol.ContainingNamespace.IsGlobalNamespace
             ? null
-            : extractedResxBusinessExceptionSyntax.Symbol.ContainingNamespace.ToString();
-        var modifiers = extractedResxBusinessExceptionSyntax.ClassSyntax.Modifiers.ToString();
-        var classNameWithRestrictions =
-            extractedResxBusinessExceptionSyntax.ClassSyntax.Identifier.ToString()
-            + extractedResxBusinessExceptionSyntax.ClassSyntax.TypeParameterList
-            + " "
-            + extractedResxBusinessExceptionSyntax.ClassSyntax.ConstraintClauses.ToString();
+            : resxBusinessExceptionInformation.Symbol.ContainingNamespace.ToString();
+        var modifiers = resxBusinessExceptionInformation.ClassSyntax.Modifiers.ToString();
         var numberOfParentClasses = 0;
-        var constructorParameterList = extractedResxBusinessExceptionSyntax
+        var constructorParameterList = resxBusinessExceptionInformation
             .ClassSyntax
             .ChildNodes()
             .FirstOrDefault(x => x.IsKind(SyntaxKind.ParameterList));
@@ -150,7 +145,7 @@ public class ResxBusinessExceptionSourceGenerator : IIncrementalGenerator
         GenerateDirectivesStart(code);
         GenerateNamespacesStart(code, @namespace);
         GenerateParentClassesStart(code, parentClass, ref numberOfParentClasses);
-        GenerateClassStart(code, modifiers, classNameWithRestrictions);
+        GenerateClassStart(code, modifiers, resxBusinessExceptionInformation);
         GenerateProperties(code, constructorParameters);
         GenerateAddParametersAsPlaceholderValuesMethod(code, constructorParameterNames);
         GenerateClassEnd(code);
@@ -158,6 +153,11 @@ public class ResxBusinessExceptionSourceGenerator : IIncrementalGenerator
         GenerateNamespacesEnd(code, @namespace);
         GenerateDirectivesEnd(code);
         return code.ToString();
+    }
+
+    private static string GetClassNameWithRestrictions(ClassDeclarationSyntax classDeclarationSyntax)
+    {
+        return $"{classDeclarationSyntax.Identifier.ToString()}{classDeclarationSyntax.TypeParameterList} {classDeclarationSyntax.ConstraintClauses.ToString()}";
     }
 
     private static void GenerateAddParametersAsPlaceholderValuesMethod(StringBuilder code, string[]? constructorParameterNames)
@@ -189,8 +189,12 @@ public class ResxBusinessExceptionSourceGenerator : IIncrementalGenerator
         code.AppendLine("}");
     }
 
-    private static void GenerateClassStart(StringBuilder code, string modifiers, string classNameWithRestrictions)
+    private static void GenerateClassStart(
+        StringBuilder code,
+        string modifiers,
+        ResxBusinessExceptionInformation resxBusinessExceptionInformation)
     {
+        var classNameWithRestrictions = GetClassNameWithRestrictions(resxBusinessExceptionInformation.ClassSyntax);
         code.AppendLine(
             $$"""
               {{modifiers}} class {{classNameWithRestrictions}}
@@ -296,12 +300,8 @@ public class ResxBusinessExceptionSourceGenerator : IIncrementalGenerator
                 modifiers: parentSyntax.Modifiers.ToString(),
                 structureType: parentSyntax.Keyword.ValueText,
                 name: parentSyntax.Identifier.ToString(),
-                nameWithRestrictions:
-                    parentSyntax.Identifier.ToString()
-                    + parentSyntax.TypeParameterList
-                    + " "
-                    + parentSyntax.ConstraintClauses.ToString());
-
+                genericDeclaration: parentSyntax.TypeParameterList?.ToString(),
+                constraints: parentSyntax.ConstraintClauses.ToString());
             parentSyntax = parentSyntax.Parent as TypeDeclarationSyntax;
         }
 
