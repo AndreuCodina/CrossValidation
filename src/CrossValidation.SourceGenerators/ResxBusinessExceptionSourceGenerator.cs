@@ -226,26 +226,6 @@ public class ResxBusinessExceptionSourceGenerator : IIncrementalGenerator
         }
     }
 
-    private static string GenerateAddParametersAsPlaceholderValuesBody(string[]? constructorParameterNames)
-    {
-        if (constructorParameterNames is null)
-        {
-            return "";
-        }
-        
-        var stringBuilder = new StringBuilder();
-        
-        foreach (var constructorParameterName in constructorParameterNames)
-        {
-            stringBuilder.AppendLine(
-                $$"""
-                  AddPlaceholderValue({{constructorParameterName}});
-                  """);
-        }
-
-        return stringBuilder.ToString();
-    }
-
     private static void GenerateParentClassesEnd(StringBuilder code, int numberOfParentClasses)
     {
 
