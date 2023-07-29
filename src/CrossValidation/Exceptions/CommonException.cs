@@ -49,7 +49,7 @@ public static class CommonException
     }
     
     public class MaximumLength(int maximumLength, int totalLength)
-        : LengthException(code: nameof(ErrorResource.MinimumLength))
+        : LengthException(code: nameof(ErrorResource.MaximumLength))
     {
         public override int TotalLength => totalLength;
         

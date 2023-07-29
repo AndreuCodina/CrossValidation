@@ -26,6 +26,6 @@ public class MaximumLengthTests : TestBase
             .MaximumLength(_model.String.Length - 1);
 
         var exception = action.ShouldThrow<CommonException.MaximumLength>();
-        exception.Code.ShouldBe(nameof(ErrorResource.MinimumLength));
+        exception.Code.ShouldBe(nameof(ErrorResource.MaximumLength));
     }
 }

@@ -116,5 +116,11 @@ namespace CrossValidation.Resources {
                 return ResourceManager.GetString("NotEmptyCollection", resourceCulture);
             }
         }
+        
+        public static string MaximumLength {
+            get {
+                return ResourceManager.GetString("MaximumLength", resourceCulture);
+            }
+        }
     }
 }
