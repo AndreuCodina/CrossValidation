@@ -119,6 +119,7 @@ public class CrossValidationMiddleware : IMiddleware
             CodeUrl = GetPublicationUrl(exception, context),
             Message = exception.Message == "" ? null : exception.Message,
             Detail = exception.Details,
+            FieldName = exception.FieldName,
             Placeholders = GetPlaceholders(exception)
         };
 
