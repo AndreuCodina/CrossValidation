@@ -34,7 +34,7 @@
         <value>No debe tener un valor</value>
     </data>
     <data name="MinimumLength" xml:space="preserve">
-        <value>Debe tener al menos {minimumLength} caracteres</value>
+        <value>Debe tener al menos {minimumLength} caracter(es)</value>
     </data>
     <data name="RegularExpression" xml:space="preserve">
         <value>El formato no es válido</value>
