@@ -38,7 +38,7 @@ public class NotEmptyTests : TestBase
         var action = () => Validate.Field(_model.String)
             .NotEmpty();
 
-        var exception = action.ShouldThrow<CommonException.NotEmptyString>();
+        var exception = action.ShouldThrow<CommonException.NotEmptyStringException>();
         exception.Code.ShouldBe(nameof(ErrorResource.NotEmptyString));
     }
     
@@ -61,7 +61,7 @@ public class NotEmptyTests : TestBase
         var action = () => Validate.Field(_model.IntList)
             .NotEmpty();
 
-        var exception = action.ShouldThrow<CommonException.NotEmptyCollection>();
+        var exception = action.ShouldThrow<CommonException.NotEmptyCollectionException>();
         exception.Code.ShouldBe(nameof(ErrorResource.NotEmptyCollection));
     }
 }

@@ -1,6 +1,6 @@
 ﻿using CrossValidation.Exceptions;
 
-namespace CrossValidation.Validators.LengthValidators;
+namespace CrossValidation.Validators.StringValidators;
 
 public class LengthRangeValidator(string FieldValue, int Minimum, int Maximum) : LengthValidatorBase
 {
@@ -12,6 +12,6 @@ public class LengthRangeValidator(string FieldValue, int Minimum, int Maximum) :
 
     public override LengthException CreateException()
     {
-        return new CommonException.LengthRange(Minimum, Maximum, GetTotalLength(FieldValue));
+        return new CommonException.LengthRangeException(Minimum, Maximum, GetTotalLength(FieldValue));
     }
 }

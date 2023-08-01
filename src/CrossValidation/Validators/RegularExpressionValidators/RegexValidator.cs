@@ -1,7 +1,7 @@
 ﻿using System.Text.RegularExpressions;
 using CrossValidation.Exceptions;
 
-namespace CrossValidation.Validators;
+namespace CrossValidation.Validators.RegularExpressionValidators;
 
 public class RegularExpressionValidator(string fieldValue, string pattern) : Validator
 {
@@ -12,6 +12,6 @@ public class RegularExpressionValidator(string fieldValue, string pattern) : Val
 
     public override BusinessException CreateException()
     {
-        return new CommonException.RegularExpression();
+        return new CommonException.RegularExpressionException();
     }
 }

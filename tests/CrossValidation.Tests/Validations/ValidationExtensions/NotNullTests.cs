@@ -77,9 +77,9 @@ public class NotNullTests :
         var exceptions = action.ShouldThrow<BusinessListException>()
             .Exceptions;
         exceptions.Count.ShouldBe(3);
-        exceptions[0].ShouldBeOfType<CommonException.NotNull>();
-        exceptions[1].ShouldBeOfType<CommonException.LengthRange>();
-        exceptions[2].ShouldBeOfType<CommonException.NotNull>();
+        exceptions[0].ShouldBeOfType<CommonException.NotNullException>();
+        exceptions[1].ShouldBeOfType<CommonException.LengthRangeException>();
+        exceptions[2].ShouldBeOfType<CommonException.NotNullException>();
     }
     
     [Fact]
@@ -88,7 +88,7 @@ public class NotNullTests :
         var action = () => Validate.Field(_model.NullableString)
             .NotNull();
 
-        var exception = action.ShouldThrow<CommonException.NotNull>();
+        var exception = action.ShouldThrow<CommonException.NotNullException>();
         exception.Code.ShouldBe(nameof(ErrorResource.NotNull));
     }
 }

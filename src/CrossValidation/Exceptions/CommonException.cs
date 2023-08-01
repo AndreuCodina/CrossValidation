@@ -4,11 +4,11 @@ namespace CrossValidation.Exceptions;
 
 public static class CommonException
 {
-    public class NotNull() : BusinessException(code: nameof(ErrorResource.NotNull));
+    public class NotNullException() : BusinessException(code: nameof(ErrorResource.NotNull));
 
-    public class Null() : BusinessException(code: nameof(ErrorResource.Null));
+    public class NullException() : BusinessException(code: nameof(ErrorResource.Null));
 
-    public class GreaterThan<TField>(TField comparisonValue) :
+    public class GreaterThanException<TField>(TField comparisonValue) :
         BusinessException(code: nameof(ErrorResource.GreaterThan))
     {
         public TField ComparisonValue => comparisonValue;
@@ -19,11 +19,11 @@ public static class CommonException
         }
     }
 
-    public class Enum() : BusinessException(code: nameof(ErrorResource.Enum));
+    public class EnumException() : BusinessException(code: nameof(ErrorResource.Enum));
 
-    public class EnumRange() : BusinessException(code: nameof(ErrorResource.Enum));
+    public class EnumRangeException() : BusinessException(code: nameof(ErrorResource.Enum));
 
-    public class LengthRange(int minimumLength, int maximumLength, int totalLength) :
+    public class LengthRangeException(int minimumLength, int maximumLength, int totalLength) :
         LengthException(code: nameof(ErrorResource.LengthRange))
     {
         public override int TotalLength => totalLength;
@@ -36,7 +36,7 @@ public static class CommonException
         }
     }
 
-    public class MinimumLength(int minimumLength, int totalLength)
+    public class MinimumLengthException(int minimumLength, int totalLength)
         : LengthException(code: nameof(ErrorResource.MinimumLength))
     {
         public override int TotalLength => totalLength;
@@ -48,7 +48,7 @@ public static class CommonException
         }
     }
     
-    public class MaximumLength(int maximumLength, int totalLength)
+    public class MaximumLengthException(int maximumLength, int totalLength)
         : LengthException(code: nameof(ErrorResource.MaximumLength))
     {
         public override int TotalLength => totalLength;
@@ -60,15 +60,19 @@ public static class CommonException
         }
     }
 
-    public class Predicate() : BusinessException(code: nameof(ErrorResource.Generic));
+    public class PredicateException() : BusinessException(code: nameof(ErrorResource.Generic));
     
-    public class RegularExpression() : BusinessException(code: nameof(ErrorResource.RegularExpression));
+    public class RegularExpressionException() : BusinessException(code: nameof(ErrorResource.RegularExpression));
     
-    public class EmptyString() : BusinessException(code: nameof(ErrorResource.EmptyString));
+    public class EmptyStringException() : BusinessException(code: nameof(ErrorResource.EmptyString));
     
-    public class NotEmptyString() : BusinessException(code: nameof(ErrorResource.NotEmptyString));
+    public class NotEmptyStringException() : BusinessException(code: nameof(ErrorResource.NotEmptyString));
     
-    public class EmptyCollection() : BusinessException(code: nameof(ErrorResource.EmptyCollection));
+    public class EmptyCollectionException() : BusinessException(code: nameof(ErrorResource.EmptyCollection));
     
-    public class NotEmptyCollection() : BusinessException(code: nameof(ErrorResource.NotEmptyCollection));
+    public class NotEmptyCollectionException() : BusinessException(code: nameof(ErrorResource.NotEmptyCollection));
+    
+    public class TrueBooleanException() : BusinessException(code: nameof(ErrorResource.Generic));
+    
+    public class FalseBooleanException() : BusinessException(code: nameof(ErrorResource.Generic));
 }

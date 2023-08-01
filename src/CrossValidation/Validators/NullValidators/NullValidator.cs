@@ -1,6 +1,6 @@
 ﻿using CrossValidation.Exceptions;
 
-namespace CrossValidation.Validators;
+namespace CrossValidation.Validators.NullValidators;
 
 public class NullValidator<TField>(TField? fieldValue) : Validator
 {
@@ -11,6 +11,6 @@ public class NullValidator<TField>(TField? fieldValue) : Validator
 
     public override BusinessException CreateException()
     {
-        return new CommonException.Null();
+        return new CommonException.NullException();
     }
 }

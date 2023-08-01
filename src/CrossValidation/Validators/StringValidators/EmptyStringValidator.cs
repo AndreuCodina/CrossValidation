@@ -1,6 +1,6 @@
 using CrossValidation.Exceptions;
 
-namespace CrossValidation.Validators;
+namespace CrossValidation.Validators.StringValidators;
 
 public class EmptyStringValidator(string fieldValue) : Validator
 {
@@ -11,6 +11,6 @@ public class EmptyStringValidator(string fieldValue) : Validator
 
     public override BusinessException CreateException()
     {
-        return new CommonException.EmptyString();
+        return new CommonException.EmptyStringException();
     }
 }

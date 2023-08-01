@@ -1,6 +1,6 @@
 using CrossValidation.Exceptions;
 
-namespace CrossValidation.Validators;
+namespace CrossValidation.Validators.CollectionValidators;
 
 public class NotEmptyCollectionValidator<TField>(IEnumerable<TField> fieldValue) : Validator
 {
@@ -11,6 +11,6 @@ public class NotEmptyCollectionValidator<TField>(IEnumerable<TField> fieldValue)
 
     public override BusinessException CreateException()
     {
-        return new CommonException.NotEmptyCollection();
+        return new CommonException.NotEmptyCollectionException();
     }
 }

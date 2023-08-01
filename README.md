@@ -1,7 +1,7 @@
 <img alt="Logo" src="docs/logo.jpg" width="522" height="396">
 
 [![Main workflow state](https://github.com/AndreuCodina/CrossValidation/actions/workflows/main.yml/badge.svg?branch=main)](https://github.com/AndreuCodina/CrossValidation/actions/workflows/main.yml)
-[![Coverage Status](https://coveralls.io/repos/github/AndreuCodina/CrossValidation/badge.svg?branch=main&coveralls_badge_current_milliseconds=1690310108)](https://coveralls.io/github/AndreuCodina/CrossValidation?branch=main)
+[![Coverage Status](https://coveralls.io/repos/github/AndreuCodina/CrossValidation/badge.svg?branch=main&coveralls_badge_current_milliseconds=1690924304)](https://coveralls.io/github/AndreuCodina/CrossValidation?branch=main)
 [![NuGet](https://img.shields.io/nuget/v/CrossValidation?color=blue&label=nuget)](https://www.nuget.org/packages/CrossValidation)
 
 State-of-the-art .NET library to handle errors and validate data.
@@ -160,10 +160,10 @@ An **unexpected situation** is, for example, when you:
 Our goal is to stop using general exceptions with raw strings. Our errors will have correct types since now. That receives the name of typed error in C#.
 
 ```csharp
-public record UserServiceError
+public class UserServiceException
 {
-    public record UserNotFoundError : UserServiceError;
-    public record NicknameNotAvailableError(string Nickname) : UserServiceError;
+    public record UserNotFoundException : UserServiceException;
+    public record NicknameNotAvailableException(string Nickname) : UserServiceException;
 }
 ```
 
@@ -186,10 +186,10 @@ public class UserService
     public void ChangeNickname(UserDto userDto)
     {
         var user = _context.Users.FirstOrDefault(x => x.Id == userDto.Id);
-        Validate.Must(user != null, new UserNotFoundError());
+        Validate.Must(user != null, new UserNotFoundException());
     
         var isNicknameAvailable = _context.Users.Any(x => x.Nickname != userDto.Nickname);
-        Validate.Must(isNicknameAvailable, new NicknameNotAvailableError(userDto.Nickname))
+        Validate.Must(isNicknameAvailable, new NicknameNotAvailableException(userDto.Nickname))
     
         user.Nickname = userDto.Nickname;
         _context.Update(user);

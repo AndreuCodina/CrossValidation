@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace CrossValidation.Tests.TestUtils.Models;
+﻿namespace CrossValidation.Tests.TestUtils.Models;
 
 public class ParentModel
 {
@@ -19,4 +16,6 @@ public class ParentModel
     public required int Int { get; set; }
     public required int? NullableInt { get; set; }
     public required ParentModelEnum Enum { get; set; }
+    public required bool TrueBoolean { get; set; }
+    public required bool FalseBoolean { get; set; }
 }

@@ -30,7 +30,7 @@ public class ValidationTests :
         var action = () => Validate.That(_model.NestedModel)
             .Must(_commonFixture.NotBeValid);
 
-        action.ShouldThrow<CommonException.Predicate>();
+        action.ShouldThrow<CommonException.PredicateException>();
     }
 
     [Fact]
@@ -39,7 +39,7 @@ public class ValidationTests :
         var action = () => Validate.Field(_model.NestedModel.Int)
             .Instance(ValueObjectFieldWithoutCustomization.Create);
 
-        var exception = action.ShouldThrow<CommonException.GreaterThan<int>>();
+        var exception = action.ShouldThrow<CommonException.GreaterThanException<int>>();
         exception.FieldName.ShouldBe("NestedModel.Int");
         exception.Code.ShouldBe(nameof(ErrorResource.GreaterThan));
         exception.Message.ShouldBe("Must be greater than 1");
@@ -84,7 +84,7 @@ public class ValidationTests :
             .WithCode(nameof(ErrorResource.NotNull))
             .Instance(ValueObjectWithoutCustomization.Create);
 
-        var exception = action.ShouldThrow<CommonException.GreaterThan<int>>();
+        var exception = action.ShouldThrow<CommonException.GreaterThanException<int>>();
         exception.Code.ShouldBe(nameof(ErrorResource.NotNull));
         exception.Message.ShouldBe(ErrorResource.NotNull);
     }
@@ -96,7 +96,7 @@ public class ValidationTests :
             .WithMessage(ErrorResource.NotNull)
             .Instance(ValueObjectWithoutCustomization.Create);
 
-        var exception = action.ShouldThrow<CommonException.GreaterThan<int>>();
+        var exception = action.ShouldThrow<CommonException.GreaterThanException<int>>();
         exception.Message.ShouldBe(ErrorResource.NotNull);
     }
 
@@ -114,7 +114,7 @@ public class ValidationTests :
         var action = () => Validate.Field(_model.Int)
             .Instance(x => ValueObjectWithCustomization.Create(x, code, message));
 
-        var exception = action.ShouldThrow<CommonException.GreaterThan<int>>();
+        var exception = action.ShouldThrow<CommonException.GreaterThanException<int>>();
         exception.Code.ShouldBe(expectedCode);
         exception.Message.ShouldBe(expectedMessage);
         exception.Details.ShouldBe("Expected details");
@@ -245,11 +245,11 @@ public class ValidationTests :
     public void Repeat_exception_customization_applies_new_exception()
     {
         var action = () => Validate.That(_model.NullableInt)
-            .WithException(new CommonException.NotNull())
-            .WithException(new CommonException.Enum())
+            .WithException(new CommonException.NotNullException())
+            .WithException(new CommonException.EnumException())
             .Must(_commonFixture.NotBeValid);
 
-        var exception = action.ShouldThrow<CommonException.Enum>();
+        var exception = action.ShouldThrow<CommonException.EnumException>();
         exception.Code.ShouldBe(nameof(ErrorResource.Enum));
         exception.Message.ShouldBe(ErrorResource.Enum);
     }
@@ -265,7 +265,7 @@ public class ValidationTests :
             .WithHttpStatusCode(HttpStatusCode.Created)
             .GreaterThan(_model.Int);
 
-        var exception = action.ShouldThrow<CommonException.GreaterThan<int>>();
+        var exception = action.ShouldThrow<CommonException.GreaterThanException<int>>();
         exception.Code.ShouldBe(nameof(ErrorResource.NotNull));
         exception.Message.ShouldBe(ErrorResource.NotNull);
         exception.Details.ShouldBe(expectedDetails);
@@ -336,7 +336,7 @@ public class ValidationTests :
     }
 
     private class ExceptionWithCustomization() : BusinessException(
-        code: nameof(CommonException.NotNull),
+        code: nameof(ErrorResource.NotNull),
         details: "Expected details",
         statusCode: HttpStatusCode.Created);
 }

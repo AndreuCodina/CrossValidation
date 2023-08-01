@@ -33,7 +33,7 @@ public class LengthRangeTests : TestBase
         var action = () => Validate.Field(_model.String)
             .LengthRange(_model.String.Length + 1, _model.String.Length);
 
-        var exception = action.ShouldThrow<CommonException.LengthRange>();
+        var exception = action.ShouldThrow<CommonException.LengthRangeException>();
         
         exception.Code.ShouldBe(nameof(ErrorResource.LengthRange));
     }

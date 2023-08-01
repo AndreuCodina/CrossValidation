@@ -1,6 +1,6 @@
 ﻿using CrossValidation.Exceptions;
 
-namespace CrossValidation.Validators;
+namespace CrossValidation.Validators.PredicateValidators;
 
 public class BooleanPredicateValidator(Func<bool> predicate) : Validator
 {
@@ -11,6 +11,6 @@ public class BooleanPredicateValidator(Func<bool> predicate) : Validator
 
     public override BusinessException CreateException()
     {
-        return new CommonException.Predicate();
+        return new CommonException.PredicateException();
     }
 }

@@ -1,6 +1,6 @@
 ﻿using CrossValidation.Exceptions;
 
-namespace CrossValidation.Validators;
+namespace CrossValidation.Validators.EnumValidators;
 
 public class EnumValidator<TField>(
     TField fieldValue,
@@ -13,6 +13,6 @@ public class EnumValidator<TField>(
 
     public override BusinessException CreateException()
     {
-        return new CommonException.Enum();
+        return new CommonException.EnumException();
     }
 }

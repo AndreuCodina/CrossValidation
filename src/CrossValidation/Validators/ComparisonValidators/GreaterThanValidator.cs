@@ -1,7 +1,7 @@
 ﻿using System.Numerics;
 using CrossValidation.Exceptions;
 
-namespace CrossValidation.Validators;
+namespace CrossValidation.Validators.ComparisonValidators;
 
 public class GreaterThanValidator<TField>(
     TField fieldValue,
@@ -15,6 +15,6 @@ public class GreaterThanValidator<TField>(
 
     public override BusinessException CreateException()
     {
-        return new CommonException.GreaterThan<TField>(comparisonValue);
+        return new CommonException.GreaterThanException<TField>(comparisonValue);
     }
 }

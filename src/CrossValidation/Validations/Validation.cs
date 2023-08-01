@@ -3,6 +3,7 @@ using System.Diagnostics.Contracts;
 using System.Net;
 using CrossValidation.Exceptions;
 using CrossValidation.Validators;
+using CrossValidation.Validators.PredicateValidators;
 
 namespace CrossValidation.Validations;
 

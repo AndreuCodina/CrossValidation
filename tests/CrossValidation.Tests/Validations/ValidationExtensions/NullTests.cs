@@ -52,7 +52,7 @@ public class NullTests :
         var action = () => Validate.Field(_model.NullableString)
             .Null();
 
-        var exception = action.ShouldThrow<CommonException.Null>();
+        var exception = action.ShouldThrow<CommonException.NullException>();
         exception.Code.ShouldBe(nameof(ErrorResource.Null));
     }
 }
