@@ -1,6 +1,6 @@
 using CrossValidation.Exceptions;
 
-namespace CrossValidation.Validators.LengthValidators;
+namespace CrossValidation.Validators.StringValidators;
 
 public class MaximumLengthValidator(string fieldValue, int maximum) : LengthValidatorBase
 {
