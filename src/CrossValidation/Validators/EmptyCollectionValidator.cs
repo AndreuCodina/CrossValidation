@@ -11,6 +11,6 @@ public class EmptyCollectionValidator<TField>(IEnumerable<TField> fieldValue) : 
 
     public override BusinessException CreateException()
     {
-        return new CommonException.EmptyCollection();
+        return new CommonException.EmptyCollectionException();
     }
 }

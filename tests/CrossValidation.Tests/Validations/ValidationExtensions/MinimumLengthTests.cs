@@ -25,7 +25,7 @@ public class MinimumLengthTests : TestBase
         var action = () => Validate.Field(_model.String)
             .MinimumLength(_model.String.Length + 1);
 
-        var exception = action.ShouldThrow<CommonException.MinimumLength>();
+        var exception = action.ShouldThrow<CommonException.MinimumLengthException>();
         exception.Code.ShouldBe(nameof(ErrorResource.MinimumLength));
     }
 }

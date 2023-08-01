@@ -11,6 +11,6 @@ public class MaximumLengthValidator(string fieldValue, int maximum) : LengthVali
 
     public override LengthException CreateException()
     {
-        return new CommonException.MaximumLength(maximum, GetTotalLength(fieldValue));
+        return new CommonException.MaximumLengthException(maximum, GetTotalLength(fieldValue));
     }
 }

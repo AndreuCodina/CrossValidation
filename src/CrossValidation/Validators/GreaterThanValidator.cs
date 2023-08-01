@@ -15,6 +15,6 @@ public class GreaterThanValidator<TField>(
 
     public override BusinessException CreateException()
     {
-        return new CommonException.GreaterThan<TField>(comparisonValue);
+        return new CommonException.GreaterThanException<TField>(comparisonValue);
     }
 }

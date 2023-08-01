@@ -11,6 +11,6 @@ public class MinimumLengthValidator(string fieldValue, int minimum) : LengthVali
 
     public override LengthException CreateException()
     {
-        return new CommonException.MinimumLength(minimum, GetTotalLength(fieldValue));
+        return new CommonException.MinimumLengthException(minimum, GetTotalLength(fieldValue));
     }
 }

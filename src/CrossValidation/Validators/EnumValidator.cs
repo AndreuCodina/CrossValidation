@@ -13,6 +13,6 @@ public class EnumValidator<TField>(
 
     public override BusinessException CreateException()
     {
-        return new CommonException.Enum();
+        return new CommonException.EnumException();
     }
 }

@@ -38,7 +38,9 @@ public class ParentModelBuilder
             },
             Int = 1,
             NullableInt = _nullableInt,
-            Enum = ParentModelEnum.Case1
+            Enum = ParentModelEnum.Case1,
+            TrueBoolean = true,
+            FalseBoolean = false
         };
 
         return model;

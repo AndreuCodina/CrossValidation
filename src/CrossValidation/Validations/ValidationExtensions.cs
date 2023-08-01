@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 using CrossValidation.Validators;
+using CrossValidation.Validators.BooleanValidators;
 using CrossValidation.Validators.LengthValidators;
 
 namespace CrossValidation.Validations;
@@ -222,6 +223,16 @@ public static class ValidationExtensions
     public static IValidation<IEnumerable<TField>> NotEmpty<TField>(this IValidation<IEnumerable<TField>> validation)
     {
         return validation.SetValidator(() => new NotEmptyCollectionValidator<TField>(validation.GetFieldValue()));
+    }
+
+    public static IValidation<bool> True(this IValidation<bool> validation)
+    {
+        return validation.SetValidator(() => new TrueBooleanValidator(validation.GetFieldValue()));
+    }
+    
+    public static IValidation<bool> False(this IValidation<bool> validation)
+    {
+        return validation.SetValidator(() => new FalseBooleanValidator(validation.GetFieldValue()));
     }
 
     internal static IValidation<TDependentField> CreateScopeValidation<TField, TDependentField>(
