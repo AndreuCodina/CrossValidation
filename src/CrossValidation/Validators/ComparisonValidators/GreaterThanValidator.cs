@@ -1,7 +1,7 @@
 ﻿using System.Numerics;
 using CrossValidation.Exceptions;
 
-namespace CrossValidation.Validators;
+namespace CrossValidation.Validators.ComparisonValidators;
 
 public class GreaterThanValidator<TField>(
     TField fieldValue,

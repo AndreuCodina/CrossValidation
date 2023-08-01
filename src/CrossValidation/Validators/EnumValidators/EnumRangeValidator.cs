@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using CrossValidation.Exceptions;
 
-namespace CrossValidation.Validators;
+namespace CrossValidation.Validators.EnumValidators;
 
 public class EnumRangeValidator<TField, TEnum>(
     TField fieldValue,

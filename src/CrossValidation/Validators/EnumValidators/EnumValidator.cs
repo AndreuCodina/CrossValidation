@@ -1,6 +1,6 @@
 ﻿using CrossValidation.Exceptions;
 
-namespace CrossValidation.Validators;
+namespace CrossValidation.Validators.EnumValidators;
 
 public class EnumValidator<TField>(
     TField fieldValue,

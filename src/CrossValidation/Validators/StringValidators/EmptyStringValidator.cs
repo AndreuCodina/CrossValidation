@@ -1,6 +1,6 @@
 using CrossValidation.Exceptions;
 
-namespace CrossValidation.Validators;
+namespace CrossValidation.Validators.StringValidators;
 
 public class EmptyStringValidator(string fieldValue) : Validator
 {

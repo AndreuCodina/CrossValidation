@@ -1,6 +1,6 @@
 ﻿using CrossValidation.Exceptions;
 
-namespace CrossValidation.Validators;
+namespace CrossValidation.Validators.PredicateValidators;
 
 public class BooleanPredicateValidator(Func<bool> predicate) : Validator
 {

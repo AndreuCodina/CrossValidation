@@ -1,6 +1,6 @@
 using CrossValidation.Exceptions;
 
-namespace CrossValidation.Validators;
+namespace CrossValidation.Validators.CollectionValidators;
 
 public class NotEmptyCollectionValidator<TField>(IEnumerable<TField> fieldValue) : Validator
 {

@@ -1,6 +1,6 @@
 ﻿using CrossValidation.Exceptions;
 
-namespace CrossValidation.Validators;
+namespace CrossValidation.Validators.NullValidators;
 
 public class NotNullValidator<TField>(TField? fieldValue) : Validator
 {
