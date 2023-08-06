@@ -207,7 +207,7 @@ Sharing exceptions must be an exceptional case and, as I show in my book, it cau
 So, the service can be tested this way:
 
 ```csharp
-var action () => userService.ChangeNickname(userDto);
+var action = () => userService.ChangeNickname(userDto);
 
 action.Should()
     .Throw<UserService.NotAvailableNicknameException>();
@@ -216,7 +216,7 @@ action.Should()
 What happens when you create an interface because you rely on mocking? Then you just move the exeptions to the interface:
 
 ```csharp
-var action () => userService.ChangeNickname(userDto);
+var action = () => userService.ChangeNickname(userDto);
 
 action.Should()
     .Throw<IUserService.NotAvailableNicknameException>();
