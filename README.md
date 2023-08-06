@@ -71,6 +71,7 @@ You can send the `Accept-Language` HTTP header and the message will be returned 
 - [Inline syntax](#inline-syntax)
 - [Unified syntax](#unified-syntax)
 - [Typed errors](#typed-errors)
+- [Alternative typed error syntax](#alternative-typed-error-syntax)
 - [Model validation](#model-validation)
 - [Collect several typed errors](#collect-several-typed-errors)
 - [Conditions](#conditions)
@@ -157,19 +158,16 @@ An **unexpected situation** is, for example, when you:
 
 ... or when you call a RESTful service and the HTTP library throws an unauthorized exception. Yes, the same error can be exceptional or not. It depends on the context, but C# doesn't have different error mechanisms (failure channel and defect channel, Result and panic, checked and unchecked...). In those programming languages we simply have real typed errors, and if cannot recover us from a situation, we throw an exception or convert a typed error into an exception.
 
-Our goal is to stop using general exceptions with raw strings. Our errors will have correct types since now. That receives the name of typed error in C#.
+Our goal is to stop using general exceptions with raw strings. Our errors will have correct types since now. That receives the name of typed error in C#. For example, these are the errors for UserService class:
 
 ```csharp
-public class UserServiceException
-{
-    public record UserNotFoundException : UserServiceException;
-    public record NicknameNotAvailableException(string Nickname) : UserServiceException;
-}
+public class UserNotFoundException : Exception;
+public class NicknameNotAvailableException(string Nickname) : Exception;
 ```
 
-But not all UserService errors are validation errors.
+But not all UserService exceptions are validation errors.
 
-Furthermore, C# doesn't have exhaustiveness to pattern match what's the exact UserServiceError we threw and convert it, for example, to a different HTTP status code or create a ProblemDetails with an error message for the validation errors we have in the closed hierarchy. So we have to customize the validation error in the definition (we have to inherit from ValidationError).
+Furthermore, C# doesn't have exhaustiveness to pattern match what's the exact UserServiceException we threw and convert it, for example, to a different HTTP status code or create a ProblemDetails with an error message for the validation errors we have in the closed hierarchy. So we have to customize the validation error in the definition (we have to inherit from ValidationError).
 
 A domain error or service error mustn't define a presentation detail (the error message to show in the frontend), but we can't pattern match with exhaustiveness in the upper-layer.
 
@@ -180,14 +178,19 @@ public class UserService
 {
     public class UserNotFoundException()
       : MessageBusinessException("Couldn't find the user");
+    
     public class NicknameNotAvailableException(string nickname)
       : MessageBusinessException($"'{nickname}' is not available");
-
+    
     public void ChangeNickname(UserDto userDto)
     {
         var user = _context.Users.FirstOrDefault(x => x.Id == userDto.Id);
-        Validate.Must(user != null, new UserNotFoundException());
-    
+        
+        if (user is null)
+        {
+            throw new UserNotFoundException();
+        }
+        
         var isNicknameAvailable = _context.Users.Any(x => x.Nickname != userDto.Nickname);
         Validate.Must(isNicknameAvailable, new NicknameNotAvailableException(userDto.Nickname))
     
@@ -195,10 +198,22 @@ public class UserService
         _context.Update(user);
         _context.SaveChanges();
     }
-}
 ```
 
-This can be refactored to this:
+So, when you want to handle exceptions in your business logic or test them, you simply reference those exceptions related to your service, instead of referencing an exception in a folder with hundreds of them, and having faith the service will throw that exception (good luck with the refactorings), or even worse, you'll potentially share this exception with more services.
+
+Sharing exceptions must be an exceptional case, but this is only a guideline. You're free to develop software like 40 years ago.
+
+So, the service can be tested this way:
+
+```csharp
+var action () => userService.ChangeNickname(userDto);
+
+action.Should()
+    .Throw<UserService.NicknameNotAvailableException>();
+```
+
+The service can be refactored to this:
 
 ```csharp
 public class UserService
@@ -206,7 +221,7 @@ public class UserService
     public void ChangeNickname(UserDto userDto)
     {
         var user = GetUser(userDto.Id);
-        CheckNicknameIsAvailable(userDto.Nickname)
+        EnsureNicknameIsAvailable(userDto.Nickname)
         
         user.Nickname = userDto.Nickname;
         _context.Update(user);
@@ -214,6 +229,43 @@ public class UserService
     }
 }
 ```
+
+<a name="alternative-typed-error-syntax"></a>
+## Alternative typed error syntax
+
+C# doesn't have a proper syntax to declare exceptions near to the service class, so that's the reason I prefer the syntax above. But alternatively, you could use another syntax to isolate the exceptions related to the service class, creating a hierarchy:
+
+```csharp
+public class UserServiceException
+{
+    public class UserNotFoundException()
+      : MessageBusinessException("Couldn't find the user");
+    
+    public class NicknameNotAvailableException(string nickname)
+      : MessageBusinessException($"'{nickname}' is not available");
+}
+
+public class UserService
+{
+    public void ChangeNickname(UserDto userDto)
+    {
+        var user = _context.Users.FirstOrDefault(x => x.Id == userDto.Id);
+        
+        if (user is null)
+        {
+            throw new UserServiceException.UserNotFoundException();
+        }
+        
+        var isNicknameAvailable = _context.Users.Any(x => x.Nickname != userDto.Nickname);
+        Validate.Must(isNicknameAvailable, new UserServiceException.NicknameNotAvailableException(userDto.Nickname))
+    
+        user.Nickname = userDto.Nickname;
+        _context.Update(user);
+        _context.SaveChanges();
+    }
+```
+
+But in my opinion this is even worse given the way C# is designed.
 
 <a name="model-validation"></a>
 ## Model validation
@@ -228,7 +280,7 @@ You can create a ValidationException with an error or with a list of errors. The
 You can add conditional rules.
 
 ```csharp
-public record ModelValidator : ModelValidator<Model>
+public class ModelValidator : ModelValidator<Model>
 {
     public override void CreateValidations()
     {
