@@ -89,7 +89,7 @@ public interface IValidation<out TField> : IValidationOperation
         return new Validation<TField>(
             getFieldValue: getFieldValue,
             customThrowToThrow: customExceptionToThrow,
-            doGenericError: false,
+            createGenericError: false,
             fieldPath: fullPath,
             context: null,
             index: null,
@@ -323,7 +323,7 @@ internal class Validation<TField> :
         var nextValidation = new Validation<TFieldTransformed>(
             getFieldValue: getFieldValueTransformed,
             customThrowToThrow: CustomExceptionToThrow,
-            doGenericError: false,
+            createGenericError: false,
             fieldPath: FieldPath,
             context: Context,
             index: Index,
@@ -373,7 +373,7 @@ internal class Validation<TField> :
         var nextValidation = new Validation<TField>(
             getFieldValue: GetFieldValue,
             customThrowToThrow: CustomExceptionToThrow,
-            doGenericError: DoGenericError,
+            createGenericError: CreateGenericError,
             fieldPath: oldFieldPath,
             context: oldContext,
             index: Index,
@@ -414,7 +414,7 @@ internal class Validation<TField> :
     public Validation(
         Func<TField>? getFieldValue,
         Type? customThrowToThrow,
-        bool doGenericError,
+        bool createGenericError,
         string? fieldPath,
         ValidationContext? context,
         int? index,
@@ -439,7 +439,7 @@ internal class Validation<TField> :
         GetGenericFieldValue = getFieldValue;
         GetNonGenericFieldValue = () => getFieldValue!()!;
         CustomExceptionToThrow = customThrowToThrow;
-        DoGenericError = doGenericError;
+        CreateGenericError = createGenericError;
         Index = index;
         ParentPath = parentPath;
         FieldPath = fieldPath;
@@ -490,7 +490,7 @@ internal class Validation<TField> :
         var nextValidation = new Validation<TField>(
             getFieldValue: GetFieldValue,
             customThrowToThrow: CustomExceptionToThrow,
-            doGenericError: DoGenericError,
+            createGenericError: CreateGenericError,
             fieldPath: FieldPath,
             context: Context,
             index: Index,

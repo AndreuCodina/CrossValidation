@@ -48,7 +48,7 @@ public abstract class ModelValidator<TModel>
             index: null,
             fieldPathToOverride: null);
         scopeValidation.HasFailed = false;
-        scopeValidation.DoGenericError = false;
+        scopeValidation.CreateGenericError = false;
         return scopeValidation;
     }
 
@@ -68,7 +68,7 @@ public abstract class ModelValidator<TModel>
             index: null,
             fieldPathToOverride: null);
         scopeValidation.HasFailed = false;
-        scopeValidation.DoGenericError = true;
+        scopeValidation.CreateGenericError = true;
         return scopeValidation;
     }
 

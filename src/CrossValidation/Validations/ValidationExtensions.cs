@@ -248,7 +248,7 @@ public static class ValidationExtensions
         var scopeValidation = new Validation<TDependentField>(
             getFieldValue: getFieldValue,
             customThrowToThrow: validation.CustomExceptionToThrow,
-            doGenericError: validation.DoGenericError,
+            createGenericError: validation.CreateGenericError,
             fieldPath: fieldPathToOverride ?? validation.FieldPath,
             context: validation.Context,
             index: index,
