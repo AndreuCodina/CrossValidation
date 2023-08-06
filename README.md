@@ -161,8 +161,8 @@ An **unexpected situation** is, for example, when you:
 Our goal is to stop using general exceptions with raw strings. Our errors will have correct types since now. That receives the name of typed error in C#. For example, these are the errors for UserService class:
 
 ```csharp
-public class UserNotFoundException : Exception;
-public class NicknameNotAvailableException(string Nickname) : Exception;
+public class NotFoundUserException : Exception;
+public class NotAvailableNicknameException(string nickname) : Exception;
 ```
 
 But not all UserService exceptions are validation errors.
@@ -171,38 +171,38 @@ Furthermore, C# doesn't have exhaustiveness to pattern match what's the exact Us
 
 A domain error or service error mustn't define a presentation detail (the error message to show in the frontend), but we can't pattern match with exhaustiveness in the upper-layer.
 
-You can throw CrossException (the built-in equivalent of AppException) when you want to return an error, but don't type it.
+You can throw BusinessException (the built-in equivalent of AppException) when you want to return an error, but don't type it.
 
 ```csharp
-public class UserService
+public class UserService(DatabaseContext context)
 {
-    public class UserNotFoundException()
+    public class NotFoundUserException()
       : MessageBusinessException("Couldn't find the user");
     
-    public class NicknameNotAvailableException(string nickname)
+    public class NotAvailableNicknameException(string nickname)
       : MessageBusinessException($"'{nickname}' is not available");
     
     public void ChangeNickname(UserDto userDto)
     {
-        var user = _context.Users.FirstOrDefault(x => x.Id == userDto.Id);
+        var user = context.Users.FirstOrDefault(x => x.Id == userDto.Id);
         
         if (user is null)
         {
-            throw new UserNotFoundException();
+            throw new NotFoundUserException();
         }
         
-        var isNicknameAvailable = _context.Users.Any(x => x.Nickname != userDto.Nickname);
-        Validate.Must(isNicknameAvailable, new NicknameNotAvailableException(userDto.Nickname))
+        var isNicknameAvailable = context.Users.Any(x => x.Nickname != userDto.Nickname);
+        Validate.Must(isNicknameAvailable, new NotAvailableNicknameException(userDto.Nickname))
     
         user.Nickname = userDto.Nickname;
-        _context.Update(user);
-        _context.SaveChanges();
+        context.Users.Update(user);
+        context.SaveChanges();
     }
 ```
 
 So, when you want to handle exceptions in your business logic or test them, you simply reference those exceptions related to your service, instead of referencing an exception in a folder with hundreds of them, and having faith the service will throw that exception (good luck with the refactorings), or even worse, you'll potentially share this exception with more services.
 
-Sharing exceptions must be an exceptional case, but this is only a guideline. You're free to develop software like 40 years ago.
+Sharing exceptions must be an exceptional case, but this is only a guideline. You're free to develop software in a poor way.
 
 So, the service can be tested this way:
 
@@ -210,22 +210,22 @@ So, the service can be tested this way:
 var action () => userService.ChangeNickname(userDto);
 
 action.Should()
-    .Throw<UserService.NicknameNotAvailableException>();
+    .Throw<UserService.NotAvailableNicknameException>();
 ```
 
 The service can be refactored to this:
 
 ```csharp
-public class UserService
+public class UserService(DatabaseContext context)
 {  
     public void ChangeNickname(UserDto userDto)
     {
         var user = GetUser(userDto.Id);
-        EnsureNicknameIsAvailable(userDto.Nickname)
+        EnsureAvailableNickname(userDto.Nickname)
         
         user.Nickname = userDto.Nickname;
-        _context.Update(user);
-        _context.SaveChanges();
+        context.Users.Update(user);
+        context.SaveChanges();
     }
 }
 ```
@@ -238,30 +238,30 @@ C# doesn't have a proper syntax to declare exceptions near to the service class,
 ```csharp
 public class UserServiceException
 {
-    public class UserNotFoundException()
+    public class NotFoundUserException()
       : MessageBusinessException("Couldn't find the user");
     
-    public class NicknameNotAvailableException(string nickname)
+    public class NotAvailableNicknameException(string nickname)
       : MessageBusinessException($"'{nickname}' is not available");
 }
 
-public class UserService
+public class UserService(DatabaseContext context)
 {
     public void ChangeNickname(UserDto userDto)
     {
-        var user = _context.Users.FirstOrDefault(x => x.Id == userDto.Id);
+        var user = context.Users.FirstOrDefault(x => x.Id == userDto.Id);
         
         if (user is null)
         {
-            throw new UserServiceException.UserNotFoundException();
+            throw new UserServiceException.NotFoundUserException();
         }
         
-        var isNicknameAvailable = _context.Users.Any(x => x.Nickname != userDto.Nickname);
-        Validate.Must(isNicknameAvailable, new UserServiceException.NicknameNotAvailableException(userDto.Nickname))
+        var isNicknameAvailable = context.Users.Any(x => x.Nickname != userDto.Nickname);
+        Validate.Must(isNicknameAvailable, new UserServiceException.NotAvailableNicknameException(userDto.Nickname))
     
         user.Nickname = userDto.Nickname;
-        _context.Update(user);
-        _context.SaveChanges();
+        context.Users.Update(user);
+        context.SaveChanges();
     }
 ```
 
