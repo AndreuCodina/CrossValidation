@@ -345,9 +345,6 @@ internal class Validation<TField> :
 
     public IValidation<TField> SetModelValidator<TChildModel>(ModelValidator<TChildModel> validator)
     {
-        // var foo = validator.fiel
-        // var isSameModel = validator.Model == validator.ScopeCreatorValidation.FieldValue;
-            
         validator.ScopeCreatorValidation = (IValidation<TChildModel>?)this;
         var oldContext = Context!;
         Context = Context!.CloneForChildModelValidator();
