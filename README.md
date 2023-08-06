@@ -71,7 +71,10 @@ You can send the `Accept-Language` HTTP header and the message will be returned 
 - [Inline syntax](#inline-syntax)
 - [Unified syntax](#unified-syntax)
 - [Typed errors](#typed-errors)
-- [Alternative typed error syntax](#alternative-typed-error-syntax)
+  - [#1 Hierarchy inside the service class](#1-hierarchy-inside-the-service-class)
+  - [#2 Hierarchy outside the service class](#2-hierarchy-outside-the-service-class)
+  - [#3 No hierarchy inside the service class](#3-no-hierarchy-inside-the-service-class)
+  - [Note](#note)
 - [Model validation](#model-validation)
 - [Collect several typed errors](#collect-several-typed-errors)
 - [Conditions](#conditions)
@@ -81,6 +84,7 @@ You can send the `Accept-Language` HTTP header and the message will be returned 
   - [Model transformation](#model-transformation)
 - [Context switching with Value Objects](#context-switching-with-value-objects)
 - [Instantiate Value Objects](#instantiate-value-objects)
+- [Naming](#naming)
 
 <a name="inline-syntax"></a>
 ## Inline syntax
@@ -141,46 +145,46 @@ Validate.That(age)
 
 <a name="typed-errors"></a>
 ## Typed errors
-C# can't treat with errors in a proper way. Developers tend to reuse the same runtime exceptions (ArgumentException, Exception, MyServiceException...) over and over again with hardcoded messages with parameters, or reuse a general exception (AppException) that will be logged by the global exception middleware.
+C# can't treat with errors in a proper way. Developers tend to reuse the same runtime exceptions (ArgumentException, Exception, MyServiceException...) over and over again with hardcoded messages with parameters, or reuse a <ins>general exception</ins> (usually named `BusinessException`, AppException or DomainException).
 
-Why AppException? Because it's a general exception that can be used in any layer of your application, and its main goal is to express we handled an **expected situation**. For example, if we try to:
-  - Create an user with an age less or equal to zero
-  - Activate an account and the link to do it has expired
-  - Update an user and it doesn't exist in the database
-  - Process a request and the token is not valid because the user is not administrator (unauthorized)
+This general exception `BusinessException` can be used in any layer of your application, and its main goal is to express we handled an **expected error** (the name is too long, the email hasn't an allowed provider, you tried to sign up with a used email, etc.), and therefore the global exception middleware will generate a custom HTTP response for the frontend. If the middleware doesn't detect an exception of type `BusinessException` or anyone inheriting from it, it'll consider it an **unexpected error** (null reference, network error, access to an array item out of bounds) and it'll be logged to be inspected later by developers. 
 
-Depending on the project you have worked, AppException will have a unique response such as inform the user, or do nothing, but it'll never log AppException because it's not an exceptional error to be solved by the developers.
+Once we've understood how exceptions are used in enterprise applications, we can start to speak about how to organize exceptions.
 
-An **unexpected situation** is, for example, when you:
-  - Execute a SQL query and the database is down, then you have a network error
-  - Access to an array item out of bounds
-  - A null reference exception.
+> Object-oriented developers tend to think "our application of millions of lines of code has exceptions, and we have a folder with thousands of exceptions that we can reuse".
 
-... or when you call a RESTful service and the HTTP library throws an unauthorized exception. Yes, the same error can be exceptional or not. It depends on the context, but C# doesn't have different error mechanisms (failure channel and defect channel, Result and panic, checked and unchecked...). In those programming languages we simply have real typed errors, and if cannot recover us from a situation, we throw an exception or convert a typed error into an exception.
+Now we have a considerable design flaw. This is a code smell. Basically, you don't organize exceptions.
 
-Our goal is to stop using general exceptions with raw strings. Our errors will have correct types since now. That receives the name of typed error in C#. For example, these are the errors for UserService class:
+So, how can we organize our expected exceptions? Declaring them where they belong. Let's show several examples:
+
+- If you have the Product domain entity and you try to create a product, you can have an exception because you're a seller with a bad reputation.
+- If you have the User application service and you try to change your nickname, you can have an exception because the nickname is not available.
+
+We'll continue the example with **UserService**, and we'll define two exceptions:
 
 ```csharp
-public class NotFoundUserException : Exception;
-public class NotAvailableNicknameException(string nickname) : Exception;
+public class NotFoundUserException : BusinessException;
+public class NotAvailableNicknameException(string nickname) : BusinessException;
 ```
 
-But not all UserService exceptions are validation errors.
+Now we have two typed exceptions instead of using a general exception as BusinessException.
 
-Furthermore, C# doesn't have exhaustiveness to pattern match what's the exact UserServiceException we threw and convert it, for example, to a different HTTP status code or create a ProblemDetails with an error message for the validation errors we have in the closed hierarchy. So we have to customize the validation exception in the definition (we have to inherit from BusinessException).
+So, how do we "attach" a group of exceptions to a class, in this case **UserService**? We can't do it in a proper way in C#, but we have some approaches.<br>And regarding to testing, we have to test those group of exceptions in **UserServiceTests**, not others from the black hole folder called _Exceptions_.
 
-A domain error or service error mustn't define a presentation detail (the error message to show in the frontend), but we can't pattern match with exhaustiveness in the upper-layer.
-
-You can throw BusinessException (the built-in equivalent of AppException) when you want to return an error, but don't type it.
+<a name="hierarchy-inside-the-service-class"></a>
+### #1 Hierarchy inside the service class
 
 ```csharp
 public class UserService(DatabaseContext context)
 {
-    public class NotFoundUserException()
-      : MessageBusinessException("Couldn't find the user");
-    
-    public class NotAvailableNicknameException(string nickname)
-      : MessageBusinessException($"'{nickname}' is not available");
+    public class Exception
+    {
+        public class NotFoundUserException()
+            : BusinessException("Couldn't find the user");
+        
+        public class NotAvailableNicknameException(string nickname)
+            : BusinessException($"'{nickname}' is not available");
+    }
     
     public void ChangeNickname(UserDto userDto)
     {
@@ -188,11 +192,11 @@ public class UserService(DatabaseContext context)
         
         if (user is null)
         {
-            throw new NotFoundUserException();
+            throw new Exception.NotFoundUserException();
         }
         
         var isNicknameAvailable = context.Users.Any(x => x.Nickname != userDto.Nickname);
-        Validate.Must(isNicknameAvailable, new NotAvailableNicknameException(userDto.Nickname))
+        Validate.Must(isNicknameAvailable, new Exception.NotAvailableNicknameException(userDto.Nickname))
     
         user.Nickname = userDto.Nickname;
         context.Users.Update(user);
@@ -200,9 +204,9 @@ public class UserService(DatabaseContext context)
     }
 ```
 
-So, when you want to handle exceptions in your business logic or test them, you simply reference those exceptions related to your service, instead of referencing an exception in a folder with thousands of them, and instead of having faith that the service will throw that exception (good luck with the refactorings). But this could be even worse because you'll potentially share exceptions with more services.
+So, when you want to handle exceptions in your business logic or test them, you simply reference those exceptions related to your service, instead of referencing an exception in a folder with thousands of them, and instead of having faith that the service will throw that exception (good luck with refactorings).
 
-Sharing exceptions must be an exceptional case and, as I show in my book, it causes a lot of problems as the codebase grows. But this is only a guideline, the option of developing software poorly is always open.
+Sharing exceptions must be an exceptional case, and, as I show in my book, it causes a lot of problems as the codebase grows.
 
 So, the service can be tested this way:
 
@@ -210,50 +214,31 @@ So, the service can be tested this way:
 var action = () => userService.ChangeNickname(userDto);
 
 action.Should()
-    .Throw<UserService.NotAvailableNicknameException>();
+    .Throw<UserService.Exception.NotAvailableNicknameException>();
 ```
 
-What happens when you create an interface because you rely on mocking? Then you just move the exeptions to the interface:
+What happens when you create an interface because you rely on mocking? Then you just move the exceptions to the interface:
 
 ```csharp
 var action = () => userService.ChangeNickname(userDto);
 
 action.Should()
-    .Throw<IUserService.NotAvailableNicknameException>();
+    .Throw<IUserService.Exception.NotAvailableNicknameException>();
 ```
 
-This could be strange to see for first time in C# (in part because we have a convention to name interfaces), but it's absolutely common in other languages.
+<a name="hierarchy-outside-the-service-class"></a>
+### #2 Hierarchy outside the service class
 
-The service can be refactored to this:
-
-```csharp
-public class UserService(DatabaseContext context)
-{  
-    public void ChangeNickname(UserDto userDto)
-    {
-        var user = GetUser(userDto.Id);
-        EnsureAvailableNickname(userDto.Nickname)
-        
-        user.Nickname = userDto.Nickname;
-        context.Users.Update(user);
-        context.SaveChanges();
-    }
-}
-```
-
-<a name="alternative-typed-error-syntax"></a>
-## Alternative typed error syntax
-
-C# doesn't have a proper syntax to declare exceptions near to the service class, so that's the reason I prefer the syntax above. But alternatively, you could use another syntax to isolate the exceptions related to the service class, creating a hierarchy:
+You create it in _UserService.cs_.
 
 ```csharp
 public class UserServiceException
 {
     public class NotFoundUserException()
-      : MessageBusinessException("Couldn't find the user");
+      : BusinessException("Couldn't find the user");
     
     public class NotAvailableNicknameException(string nickname)
-      : MessageBusinessException($"'{nickname}' is not available");
+      : BusinessException($"'{nickname}' is not available");
 }
 
 public class UserService(DatabaseContext context)
@@ -276,7 +261,57 @@ public class UserService(DatabaseContext context)
     }
 ```
 
-But in my opinion this is even worse given the way C# is designed.
+It can be tested this way:
+
+```csharp
+var action = () => userService.ChangeNickname(userDto);
+
+action.Should()
+    .Throw<UserServiceException.NotAvailableNicknameException>();
+```
+
+<a name="no-hierarchy-inside-the-service-class"></a>
+### #3 No hierarchy inside the service class
+
+```csharp
+public class UserService(DatabaseContext context)
+{
+    public class NotFoundUserException()
+      : BusinessException("Couldn't find the user");
+    
+    public class NotAvailableNicknameException(string nickname)
+      : BusinessException($"'{nickname}' is not available");
+    
+    public void ChangeNickname(UserDto userDto)
+    {
+        var user = context.Users.FirstOrDefault(x => x.Id == userDto.Id);
+        
+        if (user is null)
+        {
+            throw new NotFoundUserException();
+        }
+        
+        var isNicknameAvailable = context.Users.Any(x => x.Nickname != userDto.Nickname);
+        Validate.Must(isNicknameAvailable, new NotAvailableNicknameException(userDto.Nickname))
+    
+        user.Nickname = userDto.Nickname;
+        context.Users.Update(user);
+        context.SaveChanges();
+    }
+```
+
+It can be tested this way:
+
+```csharp
+var action = () => userService.ChangeNickname(userDto);
+
+action.Should()
+    .Throw<UserService.NotAvailableNicknameException>();
+```
+
+### Note
+
+You could use `using static` to have a better usage, but the purpose of creating this library was to provide a pragmatic and transparent error handling approach.
 
 <a name="model-validation"></a>
 ## Model validation
