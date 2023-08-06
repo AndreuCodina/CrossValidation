@@ -167,7 +167,7 @@ public class NotAvailableNicknameException(string nickname) : Exception;
 
 But not all UserService exceptions are validation errors.
 
-Furthermore, C# doesn't have exhaustiveness to pattern match what's the exact UserServiceException we threw and convert it, for example, to a different HTTP status code or create a ProblemDetails with an error message for the validation errors we have in the closed hierarchy. So we have to customize the validation error in the definition (we have to inherit from ValidationError).
+Furthermore, C# doesn't have exhaustiveness to pattern match what's the exact UserServiceException we threw and convert it, for example, to a different HTTP status code or create a ProblemDetails with an error message for the validation errors we have in the closed hierarchy. So we have to customize the validation exception in the definition (we have to inherit from BusinessException).
 
 A domain error or service error mustn't define a presentation detail (the error message to show in the frontend), but we can't pattern match with exhaustiveness in the upper-layer.
 
@@ -200,9 +200,9 @@ public class UserService(DatabaseContext context)
     }
 ```
 
-So, when you want to handle exceptions in your business logic or test them, you simply reference those exceptions related to your service, instead of referencing an exception in a folder with hundreds of them, and having faith the service will throw that exception (good luck with the refactorings), or even worse, you'll potentially share this exception with more services.
+So, when you want to handle exceptions in your business logic or test them, you simply reference those exceptions related to your service, instead of referencing an exception in a folder with thousands of them, and instead of having faith that the service will throw that exception (good luck with the refactorings). But this could be even worse because you'll potentially share exceptions with more services.
 
-Sharing exceptions must be an exceptional case, but this is only a guideline. You're free to develop software in a poor way.
+Sharing exceptions must be an exceptional case and, as I show in my book, it causes a lot of problems as the codebase grows. But this is only a guideline, the option of developing software poorly is always open.
 
 So, the service can be tested this way:
 
@@ -212,6 +212,17 @@ var action () => userService.ChangeNickname(userDto);
 action.Should()
     .Throw<UserService.NotAvailableNicknameException>();
 ```
+
+What happens when you create an interface because you rely on mocking? Then you just move the exeptions to the interface:
+
+```csharp
+var action () => userService.ChangeNickname(userDto);
+
+action.Should()
+    .Throw<IUserService.NotAvailableNicknameException>();
+```
+
+This could be strange to see for first time in C# (in part because we have a convention to name interfaces), but it's absolutely common in other languages.
 
 The service can be refactored to this:
 
@@ -438,3 +449,8 @@ var email = request.Email.Map(UserEmail.Create);
 
 var emails = request.Emails?.Select(UserEmail.Create);
 ```
+
+<a name="naming"></a>
+## Naming
+
+The name "CrossValidation" comes from the ability to validate data in different contexts, and the ability to switch the validation context.
