@@ -1,7 +1,7 @@
 <img alt="Logo" src="docs/logo.jpg" width="522" height="396">
 
 [![Main workflow state](https://github.com/AndreuCodina/CrossValidation/actions/workflows/main.yml/badge.svg?branch=main)](https://github.com/AndreuCodina/CrossValidation/actions/workflows/main.yml)
-[![Coverage Status](https://coveralls.io/repos/github/AndreuCodina/CrossValidation/badge.svg?branch=main&coveralls_badge_current_milliseconds=1690924304)](https://coveralls.io/github/AndreuCodina/CrossValidation?branch=main)
+[![Coverage Status](https://coveralls.io/repos/github/AndreuCodina/CrossValidation/badge.svg?branch=main&coveralls_badge_current_milliseconds=1691315453)](https://coveralls.io/github/AndreuCodina/CrossValidation?branch=main)
 [![NuGet](https://img.shields.io/nuget/v/CrossValidation?color=blue&label=nuget)](https://www.nuget.org/packages/CrossValidation)
 
 State-of-the-art .NET library to handle errors and validate data.
@@ -71,6 +71,7 @@ You can send the `Accept-Language` HTTP header and the message will be returned 
 - [Inline syntax](#inline-syntax)
 - [Unified syntax](#unified-syntax)
 - [Typed errors](#typed-errors)
+- [Alternative typed error syntax](#alternative-typed-error-syntax)
 - [Model validation](#model-validation)
 - [Collect several typed errors](#collect-several-typed-errors)
 - [Conditions](#conditions)
@@ -157,63 +158,125 @@ An **unexpected situation** is, for example, when you:
 
 ... or when you call a RESTful service and the HTTP library throws an unauthorized exception. Yes, the same error can be exceptional or not. It depends on the context, but C# doesn't have different error mechanisms (failure channel and defect channel, Result and panic, checked and unchecked...). In those programming languages we simply have real typed errors, and if cannot recover us from a situation, we throw an exception or convert a typed error into an exception.
 
-Our goal is to stop using general exceptions with raw strings. Our errors will have correct types since now. That receives the name of typed error in C#.
+Our goal is to stop using general exceptions with raw strings. Our errors will have correct types since now. That receives the name of typed error in C#. For example, these are the errors for UserService class:
 
 ```csharp
-public class UserServiceException
-{
-    public record UserNotFoundException : UserServiceException;
-    public record NicknameNotAvailableException(string Nickname) : UserServiceException;
-}
+public class NotFoundUserException : Exception;
+public class NotAvailableNicknameException(string nickname) : Exception;
 ```
 
-But not all UserService errors are validation errors.
+But not all UserService exceptions are validation errors.
 
-Furthermore, C# doesn't have exhaustiveness to pattern match what's the exact UserServiceError we threw and convert it, for example, to a different HTTP status code or create a ProblemDetails with an error message for the validation errors we have in the closed hierarchy. So we have to customize the validation error in the definition (we have to inherit from ValidationError).
+Furthermore, C# doesn't have exhaustiveness to pattern match what's the exact UserServiceException we threw and convert it, for example, to a different HTTP status code or create a ProblemDetails with an error message for the validation errors we have in the closed hierarchy. So we have to customize the validation exception in the definition (we have to inherit from BusinessException).
 
 A domain error or service error mustn't define a presentation detail (the error message to show in the frontend), but we can't pattern match with exhaustiveness in the upper-layer.
 
-You can throw CrossException (the built-in equivalent of AppException) when you want to return an error, but don't type it.
+You can throw BusinessException (the built-in equivalent of AppException) when you want to return an error, but don't type it.
 
 ```csharp
-public class UserService
+public class UserService(DatabaseContext context)
 {
-    public class UserNotFoundException()
+    public class NotFoundUserException()
       : MessageBusinessException("Couldn't find the user");
-    public class NicknameNotAvailableException(string nickname)
+    
+    public class NotAvailableNicknameException(string nickname)
       : MessageBusinessException($"'{nickname}' is not available");
-
+    
     public void ChangeNickname(UserDto userDto)
     {
-        var user = _context.Users.FirstOrDefault(x => x.Id == userDto.Id);
-        Validate.Must(user != null, new UserNotFoundException());
-    
-        var isNicknameAvailable = _context.Users.Any(x => x.Nickname != userDto.Nickname);
-        Validate.Must(isNicknameAvailable, new NicknameNotAvailableException(userDto.Nickname))
+        var user = context.Users.FirstOrDefault(x => x.Id == userDto.Id);
+        
+        if (user is null)
+        {
+            throw new NotFoundUserException();
+        }
+        
+        var isNicknameAvailable = context.Users.Any(x => x.Nickname != userDto.Nickname);
+        Validate.Must(isNicknameAvailable, new NotAvailableNicknameException(userDto.Nickname))
     
         user.Nickname = userDto.Nickname;
-        _context.Update(user);
-        _context.SaveChanges();
+        context.Users.Update(user);
+        context.SaveChanges();
     }
-}
 ```
 
-This can be refactored to this:
+So, when you want to handle exceptions in your business logic or test them, you simply reference those exceptions related to your service, instead of referencing an exception in a folder with thousands of them, and instead of having faith that the service will throw that exception (good luck with the refactorings). But this could be even worse because you'll potentially share exceptions with more services.
+
+Sharing exceptions must be an exceptional case and, as I show in my book, it causes a lot of problems as the codebase grows. But this is only a guideline, the option of developing software poorly is always open.
+
+So, the service can be tested this way:
 
 ```csharp
-public class UserService
+var action = () => userService.ChangeNickname(userDto);
+
+action.Should()
+    .Throw<UserService.NotAvailableNicknameException>();
+```
+
+What happens when you create an interface because you rely on mocking? Then you just move the exeptions to the interface:
+
+```csharp
+var action = () => userService.ChangeNickname(userDto);
+
+action.Should()
+    .Throw<IUserService.NotAvailableNicknameException>();
+```
+
+This could be strange to see for first time in C# (in part because we have a convention to name interfaces), but it's absolutely common in other languages.
+
+The service can be refactored to this:
+
+```csharp
+public class UserService(DatabaseContext context)
 {  
     public void ChangeNickname(UserDto userDto)
     {
         var user = GetUser(userDto.Id);
-        CheckNicknameIsAvailable(userDto.Nickname)
+        EnsureAvailableNickname(userDto.Nickname)
         
         user.Nickname = userDto.Nickname;
-        _context.Update(user);
-        _context.SaveChanges();
+        context.Users.Update(user);
+        context.SaveChanges();
     }
 }
 ```
+
+<a name="alternative-typed-error-syntax"></a>
+## Alternative typed error syntax
+
+C# doesn't have a proper syntax to declare exceptions near to the service class, so that's the reason I prefer the syntax above. But alternatively, you could use another syntax to isolate the exceptions related to the service class, creating a hierarchy:
+
+```csharp
+public class UserServiceException
+{
+    public class NotFoundUserException()
+      : MessageBusinessException("Couldn't find the user");
+    
+    public class NotAvailableNicknameException(string nickname)
+      : MessageBusinessException($"'{nickname}' is not available");
+}
+
+public class UserService(DatabaseContext context)
+{
+    public void ChangeNickname(UserDto userDto)
+    {
+        var user = context.Users.FirstOrDefault(x => x.Id == userDto.Id);
+        
+        if (user is null)
+        {
+            throw new UserServiceException.NotFoundUserException();
+        }
+        
+        var isNicknameAvailable = context.Users.Any(x => x.Nickname != userDto.Nickname);
+        Validate.Must(isNicknameAvailable, new UserServiceException.NotAvailableNicknameException(userDto.Nickname))
+    
+        user.Nickname = userDto.Nickname;
+        context.Users.Update(user);
+        context.SaveChanges();
+    }
+```
+
+But in my opinion this is even worse given the way C# is designed.
 
 <a name="model-validation"></a>
 ## Model validation
@@ -228,7 +291,7 @@ You can create a ValidationException with an error or with a list of errors. The
 You can add conditional rules.
 
 ```csharp
-public record ModelValidator : ModelValidator<Model>
+public class ModelValidator : ModelValidator<Model>
 {
     public override void CreateValidations()
     {
@@ -386,3 +449,8 @@ var email = request.Email.Map(UserEmail.Create);
 
 var emails = request.Emails?.Select(UserEmail.Create);
 ```
+
+<a name="naming"></a>
+## Naming
+
+The name "CrossValidation" comes from the ability to validate data in different contexts, and the ability to switch the validation context.
