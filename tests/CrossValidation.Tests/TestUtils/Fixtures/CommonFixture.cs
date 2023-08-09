@@ -1,6 +1,6 @@
 ﻿using CrossValidation.Exceptions;
 using CrossValidation.Tests.TestUtils.Fixtures.Validators;
-using Moq;
+using NSubstitute;
 
 namespace CrossValidation.Tests.TestUtils.Fixtures;
 
@@ -8,25 +8,19 @@ public class CommonFixture
 {
     public ParentModelValidator CreateParentModelValidator(Action<ParentModelValidator> validator)
     {
-        var validatorMock = new Mock<ParentModelValidator>()
-        {
-            CallBase = true
-        };
-        validatorMock.Setup(x => x.CreateValidations())
-            .Callback(() => validator(validatorMock.Object));
-        return validatorMock.Object;
+        var modelValidator = Substitute.ForPartsOf<ParentModelValidator>();
+        modelValidator.When(x => x.CreateValidations())
+            .Do(_ => validator(modelValidator));
+        return modelValidator;
     }
 
     public NestedModelValidator CreateNestedModelValidator(
         Action<NestedModelValidator> validator)
     {
-        var validatorMock = new Mock<NestedModelValidator>()
-        {
-            CallBase = true
-        };
-        validatorMock.Setup(x => x.CreateValidations())
-            .Callback(() => validator(validatorMock.Object));
-        return validatorMock.Object;
+        var modelValidator = Substitute.ForPartsOf<NestedModelValidator>();
+        modelValidator.When(x => x.CreateValidations())
+            .Do(_ => validator(modelValidator));
+        return modelValidator;
     }
 
     public bool BeValid<T>(T parameter)
