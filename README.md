@@ -195,7 +195,7 @@ public class UserService(DatabaseContext context)
             throw new Exception.NotFoundUserException();
         }
         
-        var isNicknameAvailable = context.Users.Any(x => x.Nickname != userDto.Nickname);
+        var isNicknameAvailable = !context.Users.Any(x => x.Nickname == userDto.Nickname);
         Validate.Must(isNicknameAvailable, new Exception.NotAvailableNicknameException(userDto.Nickname))
     
         user.Nickname = userDto.Nickname;
@@ -216,6 +216,8 @@ var action = () => userService.ChangeNickname(userDto);
 action.Should()
     .Throw<UserService.Exception.NotAvailableNicknameException>();
 ```
+
+This could be strange to see for first time in C# (in part because we have a convention to name interfaces), but it's absolutely common in other languages.
 
 What happens when you create an interface because you rely on mocking? Then you just move the exceptions to the interface:
 
@@ -252,7 +254,7 @@ public class UserService(DatabaseContext context)
             throw new UserServiceException.NotFoundUserException();
         }
         
-        var isNicknameAvailable = context.Users.Any(x => x.Nickname != userDto.Nickname);
+        var isNicknameAvailable = !context.Users.Any(x => x.Nickname == userDto.Nickname);
         Validate.Must(isNicknameAvailable, new UserServiceException.NotAvailableNicknameException(userDto.Nickname))
     
         user.Nickname = userDto.Nickname;
@@ -291,7 +293,7 @@ public class UserService(DatabaseContext context)
             throw new NotFoundUserException();
         }
         
-        var isNicknameAvailable = context.Users.Any(x => x.Nickname != userDto.Nickname);
+        var isNicknameAvailable = !context.Users.Any(x => x.Nickname == userDto.Nickname);
         Validate.Must(isNicknameAvailable, new NotAvailableNicknameException(userDto.Nickname))
     
         user.Nickname = userDto.Nickname;
@@ -311,7 +313,7 @@ action.Should()
 
 ### Note
 
-You could use `using static` to have a better usage, but the purpose of creating this library was to provide a pragmatic and transparent error handling approach.
+You could use `using static` to have a better usage, but my goal is to provide guidelines for a pragmatic and transparent error handling approach.
 
 <a name="model-validation"></a>
 ## Model validation
