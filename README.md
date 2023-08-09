@@ -217,8 +217,6 @@ action.Should()
     .Throw<UserService.Exception.NotAvailableNicknameException>();
 ```
 
-This could be strange to see for first time in C# (in part because we have a convention to name interfaces), but it's absolutely common in other languages.
-
 What happens when you create an interface because you rely on mocking? Then you just move the exceptions to the interface:
 
 ```csharp
@@ -227,6 +225,8 @@ var action = () => userService.ChangeNickname(userDto);
 action.Should()
     .Throw<IUserService.Exception.NotAvailableNicknameException>();
 ```
+
+This could be strange to see for first time in C# (in part because we have a convention to name interfaces), but it's absolutely common in other languages.
 
 <a name="hierarchy-outside-the-service-class"></a>
 ### #2 Hierarchy outside the service class
