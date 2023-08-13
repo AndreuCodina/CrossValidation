@@ -238,7 +238,7 @@ public static class ValidationExtensions
     {
         return validation.SetValidator(() => new FalseBooleanValidator(validation.GetFieldValue()));
     }
-
+    
     public static void Apply<TField>(
         this IValidation<TField> validation,
         Action<IValidation<TField>> applyFunction)
@@ -246,11 +246,11 @@ public static class ValidationExtensions
         applyFunction(validation);
     }
     
-    public static void Apply<TOriginalField, TResultField>(
+    public static IValidation<TResultField> Apply<TOriginalField, TResultField>(
         this IValidation<TOriginalField> validation,
         Func<IValidation<TOriginalField>, IValidation<TResultField>> applyFunction)
     {
-        applyFunction(validation);
+        return applyFunction(validation);
     }
 
     internal static IValidation<TDependentField> CreateScopeValidation<TField, TDependentField>(
