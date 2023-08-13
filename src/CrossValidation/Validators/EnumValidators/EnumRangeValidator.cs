@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using CrossValidation.Exceptions;
 
 namespace CrossValidation.Validators.EnumValidators;
@@ -16,19 +17,19 @@ public class EnumRangeValidator<TField, TEnum>(
             return false;
         }
 
-        TEnum fieldValueEnum;
+        TEnum fieldValueEnumCase;
 
-        if (fieldValue is Enum)
+        if (fieldValue is Enum fieldValueEnum)
         {
-            fieldValueEnum = (TEnum)(object)fieldValue!;
+            fieldValueEnumCase = (TEnum)fieldValueEnum;
         }
-        else if (fieldValue is int)
+        else if (fieldValue is int fieldValueInt)
         {
-            fieldValueEnum = (TEnum)(object)fieldValue!;
+            fieldValueEnumCase = Unsafe.As<int, TEnum>(ref fieldValueInt);
         }
-        else if (fieldValue is string)
+        else if (fieldValue is string fieldValueString)
         {
-            fieldValueEnum = (TEnum)Enum.Parse(typeof(TEnum), (string)(object)fieldValue!, ignoreCase: true);
+            fieldValueEnumCase = (TEnum)Enum.Parse(typeof(TEnum), fieldValueString, ignoreCase: true);
         }
         else
         {
@@ -37,7 +38,7 @@ public class EnumRangeValidator<TField, TEnum>(
         
         foreach (var allowedValue in allowedValues)
         {
-            if (allowedValue.CompareTo(fieldValueEnum) == 0)
+            if (allowedValue.CompareTo(fieldValueEnumCase) == 0)
             {
                 return true;
             }

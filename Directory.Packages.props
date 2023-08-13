@@ -6,6 +6,8 @@
     <PackageVersion Include="BenchmarkDotNet.Annotations" Version="0.13.7" />
     <PackageVersion Include="BenchmarkDotNet.Diagnostics.dotTrace" Version="0.13.7" />
     <PackageVersion Include="Bogus" Version="34.0.2" />
+    <PackageVersion Include="FluentAssertions" Version="6.11.0" />
+    <PackageVersion Include="FluentAssertions.Analyzers" Version="0.21.0" />
     <PackageVersion Include="Microsoft.AspNetCore.Mvc.Testing" Version="7.0.10" />
     <PackageVersion Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.4" />
     <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="4.6.0" />
