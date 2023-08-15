@@ -24,7 +24,11 @@ public class ExceptionWithCodeFromCustomResx() : ResxBusinessException(ErrorReso
 
 public class ExceptionWithCodeWithoutResxKey() : BusinessException(code: "RandomCode");
 
-public partial class FrontBusinessExceptionWithPlaceholders<T>(int placeholder1, T placeholder2)
+public partial class FrontBusinessExceptionWithPlaceholders<T>(
+    int placeholder1,
+    T placeholder2,
+    string? placeholder3,
+    string placeholder4)
     : FrontBusinessException;
 
 public static class ErrorResourceWithNoResx
