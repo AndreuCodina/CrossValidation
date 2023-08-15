@@ -1,7 +1,5 @@
-using CrossValidation;
 using CrossValidation.DependencyInjection;
 using CrossValidation.Exceptions;
-using CrossValidation.Validations;
 using CrossValidation.WebApplication;
 using CrossValidation.WebApplication.Resources;
 
@@ -10,14 +8,7 @@ builder.Services.AddCrossValidation();
 
 var app = builder.Build();
 app.UseCrossValidation();
-
 app.UseTestEndpoints();
-app.MapGet("/tests", () =>
-{
-    string? nullString = null;
-    Validate.Field(nullString)
-        .NotNull();
-});
 app.Run();
 
 public partial class Program;
