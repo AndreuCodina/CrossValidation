@@ -35,7 +35,7 @@ public class CrossValidationMiddleware : IMiddleware
     private async Task HandleException(Exception exception, HttpContext context)
     {
         var problemDetails = new CrossProblemDetails();
-        HttpStatusCode? statusCode = HttpStatusCode.InternalServerError;
+        var statusCode = HttpStatusCode.InternalServerError;
         string? type = null;
         string? title = null;
         string? detail = null;
