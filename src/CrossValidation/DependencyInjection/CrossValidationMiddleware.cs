@@ -29,11 +29,6 @@ public class CrossValidationMiddleware : IMiddleware
         catch (Exception e)
         {
             await HandleException(e, context);
-
-            // if (_isExceptionNotHandled)
-            // {
-            //     throw; // Se we can add another exception middleware after this one
-            // }
         }
     }
 
