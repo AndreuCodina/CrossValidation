@@ -306,9 +306,11 @@ public class DependencyInjectionTests :
         var problemDetails = await GetProblemDetailsFromResponse(response);
         var error = problemDetails.Errors!.First();
         error.Message.ShouldBe(null);
-        error.Placeholders!.Count.ShouldBe(2);
+        error.Placeholders!.Count.ShouldBe(4);
         error.Placeholders!.ElementAt(0).Key.ShouldBe("placeholder1");
         error.Placeholders!.ElementAt(1).Key.ShouldBe("placeholder2");
+        error.Placeholders!.ElementAt(2).Key.ShouldBe("placeholder3");
+        error.Placeholders!.ElementAt(3).Key.ShouldBe("placeholder4");
     }
     
     [Fact]
