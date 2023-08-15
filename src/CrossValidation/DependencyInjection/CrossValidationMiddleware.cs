@@ -13,6 +13,7 @@ public class CrossValidationMiddleware : IMiddleware
 {
     private readonly ILogger<CrossValidationMiddleware> _logger;
     private readonly IWebHostEnvironment _environment;
+    private bool _isExceptionNotHandled = false;
 
     public CrossValidationMiddleware(ILoggerFactory loggerFactory, IWebHostEnvironment environment)
     {
@@ -29,13 +30,18 @@ public class CrossValidationMiddleware : IMiddleware
         catch (Exception e)
         {
             await HandleException(e, context);
+
+            if (_isExceptionNotHandled)
+            {
+                throw; // Se we can add another exception middleware after this one
+            }
         }
     }
 
     private async Task HandleException(Exception exception, HttpContext context)
     {
         var problemDetails = new CrossProblemDetails();
-        var statusCode = HttpStatusCode.InternalServerError;
+        HttpStatusCode? statusCode = null;
         string? type = null;
         string? title = null;
         string? detail = null;
@@ -89,11 +95,13 @@ public class CrossValidationMiddleware : IMiddleware
         {
             if (!CrossValidationOptions.HandleUnknownException)
             {
+                _isExceptionNotHandled = true;
                 return;
             }
             
             _logger.LogError(exception, exception.Message);
-            type = "https://datatracker.ietf.org/doc/html/rfc9110#section-15.6.1";
+            statusCode = _environment.IsDevelopment() ? HttpStatusCode.InternalServerError : HttpStatusCode.BadRequest;
+            type = _environment.IsDevelopment() ? "https://datatracker.ietf.org/doc/html/rfc9110#section-15.6.1" : null;
             title = "An error occurred";
             detail = _environment.IsDevelopment() ? exception.Message : null;
             exceptionDetail = _environment.IsDevelopment() ? exception.ToString() : null;

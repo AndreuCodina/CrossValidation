@@ -92,12 +92,13 @@ internal class ValidationOperation
         bool StopExecution()
         {
             var isModelValidator = ScopeType is not null && ScopeType is Validations.ScopeType.ModelValidator;
-            var stopForEach = (ScopeType is not null && ScopeType is Validations.ScopeType.ForEach && context.ValidationMode is not ValidationMode.AccumulateFirstErrorsAndAllIterationFirstErrors);
+            var stopForEach = (ScopeType is not null && ScopeType is Validations.ScopeType.ForEach && context.ValidationMode is not ValidationMode.AccumulateFirstErrorRelatedToFieldAndFirstErrorOfAllIterations);
             var stopWhenNotNull = (ScopeType is not null && ScopeType is Validations.ScopeType.WhenNotNull);
             return HasFailed
                     && (!IsScopeCreator || stopForEach || stopWhenNotNull)
                     && !isModelValidator;
         }
+        
         if (StopExecution())
         {
             return;

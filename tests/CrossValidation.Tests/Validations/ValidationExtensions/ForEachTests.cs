@@ -45,7 +45,7 @@ public class ForEachTests :
     
     [Theory]
     [InlineData(ValidationMode.StopOnFirstError)]
-    [InlineData(ValidationMode.AccumulateFirstErrors)]
+    [InlineData(ValidationMode.AccumulateFirstErrorRelatedToField)]
     public void Execute_validators_for_all_item_collection_fails(ValidationMode validationMode)
     {
         _model = new ParentModelBuilder()
@@ -70,8 +70,8 @@ public class ForEachTests :
     
     [Theory]
     [InlineData(ValidationMode.StopOnFirstError)]
-    [InlineData(ValidationMode.AccumulateFirstErrors)]
-    [InlineData(ValidationMode.AccumulateFirstErrorsAndAllIterationFirstErrors)]
+    [InlineData(ValidationMode.AccumulateFirstErrorRelatedToField)]
+    [InlineData(ValidationMode.AccumulateFirstErrorRelatedToFieldAndFirstErrorOfAllIterations)]
     public void Keep_field_name_when_the_field_is_transformed_in_a_collection(ValidationMode validationMode)
     {
         _model = new ParentModelBuilder()
@@ -96,8 +96,8 @@ public class ForEachTests :
     
     [Theory]
     [InlineData(ValidationMode.StopOnFirstError)]
-    [InlineData(ValidationMode.AccumulateFirstErrors)]
-    [InlineData(ValidationMode.AccumulateFirstErrorsAndAllIterationFirstErrors)]
+    [InlineData(ValidationMode.AccumulateFirstErrorRelatedToField)]
+    [InlineData(ValidationMode.AccumulateFirstErrorRelatedToFieldAndFirstErrorOfAllIterations)]
     public void Index_is_represented_in_field_name_when_iterate_collection(ValidationMode validationMode)
     {
         _model = new ParentModelBuilder()
@@ -135,8 +135,8 @@ public class ForEachTests :
     
     [Theory]
     [InlineData(ValidationMode.StopOnFirstError)]
-    [InlineData(ValidationMode.AccumulateFirstErrors)]
-    [InlineData(ValidationMode.AccumulateFirstErrorsAndAllIterationFirstErrors)]
+    [InlineData(ValidationMode.AccumulateFirstErrorRelatedToField)]
+    [InlineData(ValidationMode.AccumulateFirstErrorRelatedToFieldAndFirstErrorOfAllIterations)]
     public void Field_keep_settings_with_error_accumulation(ValidationMode validationMode)
     {
         var expectedFieldDisplayName = "Expected field display name";
@@ -180,8 +180,8 @@ public class ForEachTests :
     
     [Theory]
     [InlineData(ValidationMode.StopOnFirstError)]
-    [InlineData(ValidationMode.AccumulateFirstErrors)]
-    [InlineData(ValidationMode.AccumulateFirstErrorsAndAllIterationFirstErrors)]
+    [InlineData(ValidationMode.AccumulateFirstErrorRelatedToField)]
+    [InlineData(ValidationMode.AccumulateFirstErrorRelatedToFieldAndFirstErrorOfAllIterations)]
     public void That_keeps_customizations_with_error_accumulation(ValidationMode validationMode)
     {
         var expectedFieldDisplayName = "Expected field display name";
@@ -223,8 +223,8 @@ public class ForEachTests :
     
     [Theory]
     [InlineData(ValidationMode.StopOnFirstError)]
-    [InlineData(ValidationMode.AccumulateFirstErrors)]
-    [InlineData(ValidationMode.AccumulateFirstErrorsAndAllIterationFirstErrors)]
+    [InlineData(ValidationMode.AccumulateFirstErrorRelatedToField)]
+    [InlineData(ValidationMode.AccumulateFirstErrorRelatedToFieldAndFirstErrorOfAllIterations)]
     public void Do_not_take_previous_customizations(ValidationMode validationMode)
     {
         var intList = new List<int> {1};
@@ -252,10 +252,10 @@ public class ForEachTests :
         ValidationMode.StopOnFirstError,
         new[] {"1"})]
     [InlineData(
-        ValidationMode.AccumulateFirstErrors,
+        ValidationMode.AccumulateFirstErrorRelatedToField,
         new[] {"1", "3"})]
     [InlineData(
-        ValidationMode.AccumulateFirstErrorsAndAllIterationFirstErrors,
+        ValidationMode.AccumulateFirstErrorRelatedToFieldAndFirstErrorOfAllIterations,
         new[] {"1", "2", "3"})]
     public async Task Throw_errors_with_model_validator(
         ValidationMode validationMode,
@@ -336,7 +336,7 @@ public class ForEachTests :
     {
         var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
         {
-            validator.ValidationMode = ValidationMode.AccumulateFirstErrorsAndAllIterationFirstErrors;
+            validator.ValidationMode = ValidationMode.AccumulateFirstErrorRelatedToFieldAndFirstErrorOfAllIterations;
 
             validator.Field(_model.IntListList)
                 .ForEach(x => x
@@ -375,8 +375,8 @@ public class ForEachTests :
     
     [Theory]
     [InlineData(ValidationMode.StopOnFirstError, null)]
-    [InlineData(ValidationMode.AccumulateFirstErrors, null)]
-    [InlineData(ValidationMode.AccumulateFirstErrorsAndAllIterationFirstErrors, 2)]
+    [InlineData(ValidationMode.AccumulateFirstErrorRelatedToField, null)]
+    [InlineData(ValidationMode.AccumulateFirstErrorRelatedToFieldAndFirstErrorOfAllIterations, 2)]
     public void Synchronous_WhenNotNull_works_inside_ForEach(ValidationMode validationMode, int? numberOfErrors)
     {
         _model = new ParentModelBuilder()
@@ -395,7 +395,7 @@ public class ForEachTests :
         });
         var action = () => parentModelValidator.Validate(_model);
 
-        if (validationMode is ValidationMode.StopOnFirstError or ValidationMode.AccumulateFirstErrors)
+        if (validationMode is ValidationMode.StopOnFirstError or ValidationMode.AccumulateFirstErrorRelatedToField)
         {
             action.ShouldThrow<BusinessException>();
         }
@@ -409,8 +409,8 @@ public class ForEachTests :
     
     [Theory]
     [InlineData(ValidationMode.StopOnFirstError, null)]
-    [InlineData(ValidationMode.AccumulateFirstErrors, null)]
-    [InlineData(ValidationMode.AccumulateFirstErrorsAndAllIterationFirstErrors, 2)]
+    [InlineData(ValidationMode.AccumulateFirstErrorRelatedToField, null)]
+    [InlineData(ValidationMode.AccumulateFirstErrorRelatedToFieldAndFirstErrorOfAllIterations, 2)]
     public async Task Asynchronous_WhenNotNull_works_inside_ForEach(ValidationMode validationMode, int? numberOfExceptions)
     {
         _model = new ParentModelBuilder()
@@ -431,7 +431,7 @@ public class ForEachTests :
         });
         var action = () => parentModelValidator.ValidateAsync(_model);
 
-        if (validationMode is ValidationMode.StopOnFirstError or ValidationMode.AccumulateFirstErrors)
+        if (validationMode is ValidationMode.StopOnFirstError or ValidationMode.AccumulateFirstErrorRelatedToField)
         {
             await action.ShouldThrowAsync<BusinessException>();
         }
@@ -462,7 +462,7 @@ public class ForEachTests :
         });
         var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
         {
-            validator.ValidationMode = ValidationMode.AccumulateFirstErrorsAndAllIterationFirstErrors;
+            validator.ValidationMode = ValidationMode.AccumulateFirstErrorRelatedToFieldAndFirstErrorOfAllIterations;
 
             validator.Field(_model.IntListList)
                 .ForEach(x => x

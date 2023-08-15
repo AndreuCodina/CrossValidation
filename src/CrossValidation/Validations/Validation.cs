@@ -345,10 +345,15 @@ internal class Validation<TField> :
 
     public IValidation<TField> SetModelValidator<TChildModel>(ModelValidator<TChildModel> validator)
     {
+        if (HasFailed)
+        {
+            return IValidation<TField>.CreateFailed();
+        }
+        
         validator.ScopeCreatorValidation = (IValidation<TChildModel>?)this;
         var oldContext = Context!;
         Context = Context!.CloneForChildModelValidator();
-        validator._validationMode = Context.ValidationMode;
+        validator.SetInternalValidationMode(Context.ValidationMode);
         var oldParentPath = ParentPath;
         var oldFieldPath = FieldPath;
         var oldFieldName = FieldName;
