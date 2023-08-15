@@ -65,7 +65,7 @@ public static class TestEndpoints
         
         group.MapGet(ApiPath.Test.FrontBusinessExceptionWithPlaceholders, () =>
         {
-            throw new FrontBusinessExceptionWithPlaceholders<string>(1, "genericValue", "stringValue1", "stringValue2");
+            throw new FrontBusinessExceptionWithPlaceholders<string>(1, "genericValue");//, "stringValue1", "stringValue2");
         });
         
         group.MapGet(ApiPath.Test.ResxBusinessException, () =>

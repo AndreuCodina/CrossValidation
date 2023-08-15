@@ -35,7 +35,7 @@ public class CrossValidationMiddleware : IMiddleware
     private async Task HandleException(Exception exception, HttpContext context)
     {
         var problemDetails = new CrossProblemDetails();
-        HttpStatusCode? statusCode = null;
+        HttpStatusCode? statusCode = HttpStatusCode.InternalServerError;
         string? type = null;
         string? title = null;
         string? detail = null;
@@ -93,7 +93,6 @@ public class CrossValidationMiddleware : IMiddleware
             }
             
             _logger.LogError(exception, exception.Message);
-            statusCode = HttpStatusCode.InternalServerError;
             type = "https://datatracker.ietf.org/doc/html/rfc9110#section-15.6.1";
             title = "An error occurred";
             detail = _environment.IsDevelopment() ? exception.Message : null;

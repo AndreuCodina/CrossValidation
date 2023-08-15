@@ -26,9 +26,9 @@ public class ExceptionWithCodeWithoutResxKey() : BusinessException(code: "Random
 
 public partial class FrontBusinessExceptionWithPlaceholders<T>(
     int placeholder1,
-    T placeholder2,
-    string? placeholder3,
-    string placeholder4)
+    T placeholder2)
+    // string? placeholder3,
+    // string placeholder4)
     : FrontBusinessException;
 
 public static class ErrorResourceWithNoResx
