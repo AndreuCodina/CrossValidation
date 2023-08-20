@@ -16,7 +16,7 @@ public static class TestEndpoints
             throw new BusinessException();
         });
 
-        group.MapGet(ApiPath.Test.ValidationListException, () =>
+        group.MapGet(ApiPath.Test.BusinessListException, () =>
         {
             throw new BusinessListException(new List<BusinessException>());
         });

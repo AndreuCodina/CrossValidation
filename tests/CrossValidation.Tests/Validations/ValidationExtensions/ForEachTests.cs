@@ -289,9 +289,9 @@ public class ForEachTests :
 
         var exception = await action.ShouldThrowAsync<Exception>();
 
-        if (exception is BusinessListException validationListException)
+        if (exception is BusinessListException businessListException)
         {
-            validationListException.Exceptions
+            businessListException.Exceptions
                 .Select(x => x.Code)
                 .SequenceEqual(expectedErrorCodes)
                 .ShouldBeTrue();

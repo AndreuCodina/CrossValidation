@@ -6,7 +6,7 @@ public static class ApiPath
     {
         public const string Prefix = "/tests";
         public const string CrossException = "/crossException";
-        public const string ValidationListException = "/validationListException";
+        public const string BusinessListException = "/validationListException";
         public const string ExceptionWithCodeFromCustomResx = "/exceptionWithCodeFromCustomResx";
         public const string ExceptionWithCodeWithoutResxKey = "/exceptionWithCodeWithoutResxKey";
         public const string ReplaceBuiltInCodeWithCustomResx = "/replaceBuiltInCodeWithCustomResx";
