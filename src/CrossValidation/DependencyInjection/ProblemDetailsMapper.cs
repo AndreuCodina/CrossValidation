@@ -8,8 +8,8 @@ internal class ProblemDetailsMapper(ProblemDetails problemDetails)
 {
     public void Map(BusinessException businessException)
     {
+        SetStatusDetails(problemDetails, businessException.StatusCode);
         var errors = new List<CrossProblemDetailsError>();
-        problemDetails.Status = (int)businessException.StatusCode;
         var error = CreateCrossProblemDetailsError(businessException);
         var allErrorCustomizationsAreNotSet =
             error is
@@ -30,8 +30,8 @@ internal class ProblemDetailsMapper(ProblemDetails problemDetails)
     
     public void Map(BusinessListException businessListException)
     {
+        SetStatusDetails(problemDetails, HttpStatusCode.UnprocessableEntity);
         var errors = new List<CrossProblemDetailsError>();
-        problemDetails.Status = (int)HttpStatusCode.UnprocessableEntity;
 
         foreach (var error in businessListException.Exceptions)
         {
@@ -51,7 +51,7 @@ internal class ProblemDetailsMapper(ProblemDetails problemDetails)
         // TODO: Add traceId
     }
     
-    private static CrossProblemDetailsError CreateCrossProblemDetailsError(BusinessException exception)
+    private CrossProblemDetailsError CreateCrossProblemDetailsError(BusinessException exception)
     {
         var error = new CrossProblemDetailsError
         {
@@ -66,7 +66,7 @@ internal class ProblemDetailsMapper(ProblemDetails problemDetails)
         return error;
     }
 
-    private static Dictionary<string, object?>? GetPlaceholders(BusinessException exception)
+    private Dictionary<string, object?>? GetPlaceholders(BusinessException exception)
     {
         var hasToSendPlaceholders =
             CrossValidationOptions.LocalizeCommonErrorsInFront
@@ -85,6 +85,11 @@ internal class ProblemDetailsMapper(ProblemDetails problemDetails)
         }
 
         return placeholders;
+    }
+
+    private void SetStatusDetails(ProblemDetails problemDetails, HttpStatusCode statusCode)
+    {
+        CrossValidationProblemDetailsDefaults.Apply(problemDetails, statusCode);
     }
     
     // private string? GetPublicationUrl(BusinessException exception, HttpContext context)

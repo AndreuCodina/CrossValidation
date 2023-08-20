@@ -9,11 +9,18 @@ builder.Services.AddCrossValidation();
 var app = builder.Build();
 app.UseCrossValidation();
 app.UseTestEndpoints();
+
+// Por qué no obtengo el "exception" en el Problem Details de Postman??
+app.MapGet("/foo", () =>
+{
+    throw new Exception("foo");
+});
+
 app.Run();
 
 public partial class Program;
 
-public class ExceptionWithCodeFromCustomResx() : ResxBusinessException(ErrorResource1.Hello);
+public class ResxBusinessExceptionWithCodeFromCustomResx() : ResxBusinessException(ErrorResource1.Hello);
 
 public class ExceptionWithCodeWithoutResxKey() : BusinessException(code: "RandomCode");
 

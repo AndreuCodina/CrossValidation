@@ -13,10 +13,10 @@ public static class CrossValidationBuilderExtensions
 {
     public static IApplicationBuilder UseCrossValidation(this WebApplication app)
     {
+        app.UseCustomRequestLocalization();
+        // app.UseGlobalExceptionMiddleware();
         app.UseExceptionHandler();
         app.UseStatusCodePages();
-        // app.UseGlobalExceptionMiddleware();
-        app.UseCustomRequestLocalization();
         AddErrorCodePage(app);
         return app;
     }

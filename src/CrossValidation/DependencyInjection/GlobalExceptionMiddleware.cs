@@ -24,8 +24,10 @@ internal class GlobalExceptionMiddleware : IMiddleware
             if (e is not BusinessException or BusinessListException)
             {
                 HandleUnexpectedException(e, context);
+                // throw;
             }
 
+            // context.Response.StatusCode = 404;
             throw;
         }
     }

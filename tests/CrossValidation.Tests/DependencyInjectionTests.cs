@@ -6,8 +6,12 @@ using CrossValidation.Tests.TestUtils;
 using CrossValidation.Tests.TestUtils.Fixtures;
 using CrossValidation.WebApplication;
 using CrossValidation.WebApplication.Resources;
+using FluentAssertions;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc.Testing;
 using Shouldly;
 using Xunit;
+using Environment = CrossValidation.Tests.TestUtils.Environment;
 
 namespace CrossValidation.Tests;
 
@@ -16,17 +20,18 @@ public class DependencyInjectionTests :
     IClassFixture<CommonFixture>,
     IDisposable
 {
+    private WebApplicationFactory<Program> _testWebApplicationFactory;
     private HttpClient _client;
 
     public DependencyInjectionTests()
     {
-        var factory = new TestApplicationFactory();
-        _client = factory.CreateClient();
+        _testWebApplicationFactory = new TestWebApplicationFactory();
+        _client = _testWebApplicationFactory.CreateClient();
     }
     
     [Theory]
-    [InlineData(ApiPath.Test.Prefix + ApiPath.Test.CrossException, HttpStatusCode.UnprocessableEntity)]
-    [InlineData(ApiPath.Test.Prefix + ApiPath.Test.BusinessListException, HttpStatusCode.UnprocessableEntity)]
+    [InlineData(EndpointPath.Test.Prefix + EndpointPath.Test.BusinessException, HttpStatusCode.UnprocessableEntity)]
+    [InlineData(EndpointPath.Test.Prefix + EndpointPath.Test.BusinessListException, HttpStatusCode.UnprocessableEntity)]
     public async Task Get_http_status_code(string endpoint, HttpStatusCode expectedStatusCode)
     {
         var response = await _client.GetAsync(endpoint);
@@ -39,7 +44,7 @@ public class DependencyInjectionTests :
     [InlineData("es", "Hola")]
     public async Task Get_message_from_custom_resx(string languageCode, string expectedMessage)
     {
-        _client = new TestApplicationFactory(services =>
+        _testWebApplicationFactory = new TestWebApplicationFactory(services =>
         {
             services.AddCrossValidation(options =>
             {
@@ -47,10 +52,11 @@ public class DependencyInjectionTests :
                 options.SetSupportedCultures("en", "es");
                 options.AddResx<ErrorResource1>();
             });
-        }).CreateClient();
+        });
+        _client = _testWebApplicationFactory.CreateClient();
         _client.DefaultRequestHeaders.Add("Accept-Language", languageCode);
         
-        var response = await _client.GetAsync(ApiPath.Test.Prefix + ApiPath.Test.ExceptionWithCodeFromCustomResx);
+        var response = await _client.GetAsync(EndpointPath.Test.Prefix + EndpointPath.Test.ResxBusinessExceptionWithCodeFromCustomResx);
         
         response.StatusCode.ShouldBe(HttpStatusCode.UnprocessableEntity);
         var problemDetails = await GetProblemDetailsFromResponse(response);
@@ -66,7 +72,7 @@ public class DependencyInjectionTests :
     public async Task Not_get_message_from_custom_resx_or_built_in_resx_when_the_code_is_not_key_of_any_resx(
         string languageCode)
     {
-        _client = new TestApplicationFactory(services =>
+        _testWebApplicationFactory = new TestWebApplicationFactory(services =>
         {
             services.AddCrossValidation(options =>
             {
@@ -74,10 +80,11 @@ public class DependencyInjectionTests :
                 options.SetSupportedCultures("en", "es");
                 options.AddResx<ErrorResource1>();
             });
-        }).CreateClient();
+        });
+        _client = _testWebApplicationFactory.CreateClient();
         _client.DefaultRequestHeaders.Add("Accept-Language", languageCode);
         
-        var response = await _client.GetAsync(ApiPath.Test.Prefix + ApiPath.Test.ExceptionWithCodeWithoutResxKey);
+        var response = await _client.GetAsync(EndpointPath.Test.Prefix + EndpointPath.Test.ExceptionWithCodeWithoutResxKey);
         
         response.StatusCode.ShouldBe(HttpStatusCode.UnprocessableEntity);
         var problemDetails = await GetProblemDetailsFromResponse(response);
@@ -90,7 +97,7 @@ public class DependencyInjectionTests :
     [Fact]
     public async Task Error_with_code_without_a_resx_key_have_null_message()
     {
-        var response = await _client.GetAsync(ApiPath.Test.Prefix + ApiPath.Test.ExceptionWithCodeWithoutResxKey);
+        var response = await _client.GetAsync(EndpointPath.Test.Prefix + EndpointPath.Test.ExceptionWithCodeWithoutResxKey);
         
         response.StatusCode.ShouldBe(HttpStatusCode.UnprocessableEntity);
         var problemDetails = await GetProblemDetailsFromResponse(response);
@@ -105,7 +112,7 @@ public class DependencyInjectionTests :
     [InlineData("es", "NotNull reemplazado")]
     public async Task Get_replaced_message_when_built_in_code_is_replaced_with_custom_resx(string languageCode, string expectedMessage)
     {
-        _client = new TestApplicationFactory(services =>
+        _testWebApplicationFactory = new TestWebApplicationFactory(services =>
         {
             services.AddCrossValidation(options =>
             {
@@ -113,11 +120,12 @@ public class DependencyInjectionTests :
                 options.SetSupportedCultures("en", "es");
                 options.AddResx<ErrorResource1>();
             });
-        }).CreateClient();
+        });
+        _client = _testWebApplicationFactory.CreateClient();
         
         _client.DefaultRequestHeaders.Add("Accept-Language", languageCode);
         
-        var response = await _client.GetAsync(ApiPath.Test.Prefix + ApiPath.Test.ReplaceBuiltInCodeWithCustomResx);
+        var response = await _client.GetAsync(EndpointPath.Test.Prefix + EndpointPath.Test.ReplaceBuiltInCodeWithCustomResx);
         
         response.StatusCode.ShouldBe(HttpStatusCode.UnprocessableEntity);
         var problemDetails = await GetProblemDetailsFromResponse(response);
@@ -130,14 +138,15 @@ public class DependencyInjectionTests :
     [Fact]
     public async Task Get_default_culture_message_when_the_culture_provided_is_not_present()
     {
-        _client = new TestApplicationFactory(services =>
+        _testWebApplicationFactory = new TestWebApplicationFactory(services =>
         {
             services.AddCrossValidation(options =>
                 options.AddResx<ErrorResource1>());
-        }).CreateClient();
+        });
+        _client = _testWebApplicationFactory.CreateClient();
         _client.DefaultRequestHeaders.Add("Accept-Language", "fr");
         
-        var response = await _client.GetAsync(ApiPath.Test.Prefix + ApiPath.Test.DefaultCultureMessage);
+        var response = await _client.GetAsync(EndpointPath.Test.Prefix + EndpointPath.Test.DefaultCultureMessage);
         
         response.StatusCode.ShouldBe(HttpStatusCode.UnprocessableEntity);
         var problemDetails = await GetProblemDetailsFromResponse(response);
@@ -148,9 +157,9 @@ public class DependencyInjectionTests :
     }
     
     [Fact]
-    public async Task Get_error_status_code()
+    public async Task Get_exception_status_code()
     {
-        var response = await _client.GetAsync(ApiPath.Test.Prefix + ApiPath.Test.ExceptionWithStatusCode);
+        var response = await _client.GetAsync(EndpointPath.Test.Prefix + EndpointPath.Test.BusinessExceptionWithStatusCodeWithMapping);
         
         response.StatusCode.ShouldBe(HttpStatusCode.Created);
         var problemDetails = await GetProblemDetailsFromResponse(response);
@@ -158,21 +167,11 @@ public class DependencyInjectionTests :
     }
     
     [Fact]
-    public async Task Handle_unknown_exception()
-    {
-        var response = await _client.GetAsync(ApiPath.Test.Prefix + ApiPath.Test.Exception);
-        
-        response.StatusCode.ShouldBe(HttpStatusCode.InternalServerError);
-        var problemDetails = await GetProblemDetailsFromResponse(response);
-        problemDetails.ShouldNotBeNull();
-    }
-    
-    [Fact]
     public async Task Get_message_in_default_culture_when_a_built_in_language_is_requested_but_not_customized()
     {
         _client.DefaultRequestHeaders.Add("Accept-Language", "es");
         
-        var response = await _client.GetAsync(ApiPath.Test.Prefix + ApiPath.Test.DefaultCultureMessage);
+        var response = await _client.GetAsync(EndpointPath.Test.Prefix + EndpointPath.Test.DefaultCultureMessage);
         
         response.StatusCode.ShouldBe(HttpStatusCode.UnprocessableEntity);
         var problemDetails = await GetProblemDetailsFromResponse(response);
@@ -185,17 +184,18 @@ public class DependencyInjectionTests :
     [Fact]
     public async Task Get_message_in_requested_culture_when_a_built_in_language_is_requested_and_customized()
     {
-        _client = new TestApplicationFactory(services =>
+        _testWebApplicationFactory = new TestWebApplicationFactory(services =>
         {
             services.AddCrossValidation(options => options
                 .SetDefaultCulture("en")
                 .SetSupportedCultures("en", "es")
                 .AddResx<ErrorResource1>());
-        }).CreateClient();
+        });
+        _client = _testWebApplicationFactory.CreateClient();
         
         _client.DefaultRequestHeaders.Add("Accept-Language", "es");
         
-        var response = await _client.GetAsync(ApiPath.Test.Prefix + ApiPath.Test.DefaultCultureMessage);
+        var response = await _client.GetAsync(EndpointPath.Test.Prefix + EndpointPath.Test.DefaultCultureMessage);
         
         response.StatusCode.ShouldBe(HttpStatusCode.UnprocessableEntity);
         var problemDetails = await GetProblemDetailsFromResponse(response);
@@ -210,7 +210,7 @@ public class DependencyInjectionTests :
     {
         _client.DefaultRequestHeaders.Add("Accept-Language", "en-IE");
         
-        var response = await _client.GetAsync(ApiPath.Test.Prefix + ApiPath.Test.DefaultCultureMessage);
+        var response = await _client.GetAsync(EndpointPath.Test.Prefix + EndpointPath.Test.DefaultCultureMessage);
         
         response.StatusCode.ShouldBe(HttpStatusCode.UnprocessableEntity);
         var problemDetails = await GetProblemDetailsFromResponse(response);
@@ -225,14 +225,15 @@ public class DependencyInjectionTests :
     [InlineData("es", "Hola")]
     public async Task Get_message_from_resx_associated_culture(string languageCode, string expectedMessage)
     {
-        _client = new TestApplicationFactory(services =>
+        _testWebApplicationFactory = new TestWebApplicationFactory(services =>
         {
             services.AddCrossValidation(options =>
                 options.AddResxAndAssociatedCultures<ErrorResource1>());
-        }).CreateClient();
+        });
+        _client = _testWebApplicationFactory.CreateClient();
         _client.DefaultRequestHeaders.Add("Accept-Language", languageCode);
         
-        var response = await _client.GetAsync(ApiPath.Test.Prefix + ApiPath.Test.ExceptionWithCodeFromCustomResx);
+        var response = await _client.GetAsync(EndpointPath.Test.Prefix + EndpointPath.Test.ResxBusinessExceptionWithCodeFromCustomResx);
         
         response.StatusCode.ShouldBe(HttpStatusCode.UnprocessableEntity);
         var problemDetails = await GetProblemDetailsFromResponse(response);
@@ -247,17 +248,18 @@ public class DependencyInjectionTests :
     [InlineData("es", "Hola")]
     public async Task Get_message_from_resx_when_several_resx_and_associated_cultures_are_added(string languageCode, string expectedMessage)
     {
-        _client = new TestApplicationFactory(services =>
+        _testWebApplicationFactory = new TestWebApplicationFactory(services =>
         {
             services.AddCrossValidation(options =>
             {
                 options.AddResxAndAssociatedCultures<ErrorResource1>();
                 options.AddResxAndAssociatedCultures<ErrorResource2>();
             });
-        }).CreateClient();
+        });
+        _client = _testWebApplicationFactory.CreateClient();
         _client.DefaultRequestHeaders.Add("Accept-Language", languageCode);
         
-        var response = await _client.GetAsync(ApiPath.Test.Prefix + ApiPath.Test.ExceptionWithCodeFromCustomResx);
+        var response = await _client.GetAsync(EndpointPath.Test.Prefix + EndpointPath.Test.ResxBusinessExceptionWithCodeFromCustomResx);
         
         response.StatusCode.ShouldBe(HttpStatusCode.UnprocessableEntity);
         var problemDetails = await GetProblemDetailsFromResponse(response);
@@ -272,16 +274,17 @@ public class DependencyInjectionTests :
     [InlineData("es", "El valor es 3,3")]
     public async Task Get_message_with_decimal(string languageCode, string expectedMessage)
     {
-        _client = new TestApplicationFactory(services =>
+        _testWebApplicationFactory = new TestWebApplicationFactory(services =>
         {
             services.AddCrossValidation(options =>
             {
                 options.AddResxAndAssociatedCultures<ErrorResource1>();
             });
-        }).CreateClient();
+        });
+        _client = _testWebApplicationFactory.CreateClient();
         _client.DefaultRequestHeaders.Add("Accept-Language", languageCode);
         
-        var response = await _client.GetAsync(ApiPath.Test.Prefix + ApiPath.Test.UseDecimal);
+        var response = await _client.GetAsync(EndpointPath.Test.Prefix + EndpointPath.Test.UseDecimal);
         
         response.StatusCode.ShouldBe(HttpStatusCode.UnprocessableEntity);
         var problemDetails = await GetProblemDetailsFromResponse(response);
@@ -292,15 +295,16 @@ public class DependencyInjectionTests :
     [Fact]
     public async Task Get_placeholders_from_FrontBusinessException()
     {
-        _client = new TestApplicationFactory(services =>
+        _testWebApplicationFactory = new TestWebApplicationFactory(services =>
         {
             services.AddCrossValidation(options =>
             {
                 options.AddResxAndAssociatedCultures<ErrorResource1>();
             });
-        }).CreateClient();
+        });
+        _client = _testWebApplicationFactory.CreateClient();
         
-        var response = await _client.GetAsync(ApiPath.Test.Prefix + ApiPath.Test.FrontBusinessExceptionWithPlaceholders);
+        var response = await _client.GetAsync(EndpointPath.Test.Prefix + EndpointPath.Test.FrontBusinessExceptionWithPlaceholders);
         
         response.StatusCode.ShouldBe(HttpStatusCode.UnprocessableEntity);
         var problemDetails = await GetProblemDetailsFromResponse(response);
@@ -316,15 +320,16 @@ public class DependencyInjectionTests :
     [Fact]
     public async Task Get_code_from_ResxBusinessException()
     {
-        _client = new TestApplicationFactory(services =>
+        _testWebApplicationFactory = new TestWebApplicationFactory(services =>
         {
             services.AddCrossValidation(options =>
             {
                 options.AddResxAndAssociatedCultures<ErrorResource1>();
             });
-        }).CreateClient();
+        });
+        _client = _testWebApplicationFactory.CreateClient();
         
-        var response = await _client.GetAsync(ApiPath.Test.Prefix + ApiPath.Test.ResxBusinessException);
+        var response = await _client.GetAsync(EndpointPath.Test.Prefix + EndpointPath.Test.ResxBusinessException);
         
         var problemDetails = await GetProblemDetailsFromResponse(response);
         var error = problemDetails.Errors!.First();
@@ -335,15 +340,16 @@ public class DependencyInjectionTests :
     [Fact(Skip = "TODO")]
     public async Task Get_code_url_when_publication_url_is_specified()
     {
-        _client = new TestApplicationFactory(services =>
+        _testWebApplicationFactory = new TestWebApplicationFactory(services =>
         {
             services.AddCrossValidation(options =>
             {
                 options.EnableErrorCodePage(publicationUrl: "https://www.backend.com");
             });
-        }).CreateClient();
+        });
+        _client = _testWebApplicationFactory.CreateClient();
         
-        var response = await _client.GetAsync(ApiPath.Test.Prefix + ApiPath.Test.ResxBusinessException);
+        var response = await _client.GetAsync(EndpointPath.Test.Prefix + EndpointPath.Test.ResxBusinessException);
         
         var problemDetails = await GetProblemDetailsFromResponse(response);
         var error = problemDetails.Errors!.First();
@@ -354,13 +360,14 @@ public class DependencyInjectionTests :
     [Fact(Skip = "TODO")]
     public async Task Get_code_url_when_publication_url_is_specified_and_environment_is_development()
     {
-        _client = new TestApplicationFactory(services =>
+        _testWebApplicationFactory = new TestWebApplicationFactory(services =>
         {
             services.AddCrossValidation(options => options
                 .EnableErrorCodePage());
-        }).CreateClient();
+        });
+        _client = _testWebApplicationFactory.CreateClient();
         
-        var response = await _client.GetAsync(ApiPath.Test.Prefix + ApiPath.Test.ResxBusinessException);
+        var response = await _client.GetAsync(EndpointPath.Test.Prefix + EndpointPath.Test.ResxBusinessException);
         
         var problemDetails = await GetProblemDetailsFromResponse(response);
         var error = problemDetails.Errors!.First();
@@ -373,7 +380,7 @@ public class DependencyInjectionTests :
     [InlineData(true)]
     public async Task Get_error_code_page_when_it_is_enabled(bool isEnabled)
     {
-        _client = new TestApplicationFactory(services =>
+        _testWebApplicationFactory = new TestWebApplicationFactory(services =>
         {
             services.AddCrossValidation(options =>
             {
@@ -382,7 +389,8 @@ public class DependencyInjectionTests :
                     options.EnableErrorCodePage();
                 }
             });
-        }).CreateClient();
+        });
+        _client = _testWebApplicationFactory.CreateClient();
         
         var response = await _client.GetAsync(CrossValidationOptions.ErrorCodePagePath);
 
@@ -390,6 +398,105 @@ public class DependencyInjectionTests :
 
         AssertGet_error_code_page_when_it_is_enabled(isEnabled, body);
     }
+    
+    [Theory]
+    [InlineData(
+        EndpointPath.Test.ErrorStatusCodeWithEmptyBody,
+        HttpStatusCode.NotFound,
+        "Not Found",
+        "https://tools.ietf.org/html/rfc9110#section-15.5.5")]
+    [InlineData(
+        EndpointPath.Test.UnexpectedException,
+        HttpStatusCode.InternalServerError,
+        "An error occurred while processing your request.",
+        "https://tools.ietf.org/html/rfc9110#section-15.6.1")]
+    [InlineData(
+        EndpointPath.Test.BusinessException,
+        HttpStatusCode.UnprocessableEntity,
+        "Unprocessable Entity",
+        "https://tools.ietf.org/html/rfc4918#section-11.2")]
+    [InlineData(
+        EndpointPath.Test.BusinessExceptionWithStatusCodeWithMapping,
+        HttpStatusCode.Created,
+        "Created",
+        null)]
+    [InlineData( // 450
+        EndpointPath.Test.BusinessExceptionWithStatusCodeWithNoMapping,
+        HttpStatusCode.PaymentRequired,
+        null,
+        null)]
+    [InlineData(
+        EndpointPath.Test.BusinessExceptionWithErrorStatusCode,
+        HttpStatusCode.GatewayTimeout,
+        "Gateway Timeout",
+        "https://tools.ietf.org/html/rfc9110#section-15.6.5")]
+    [InlineData(
+        EndpointPath.Test.BusinessListException,
+        HttpStatusCode.UnprocessableEntity,
+        "Unprocessable Entity",
+        "https://tools.ietf.org/html/rfc4918#section-11.2")]
+    public async Task Get_problem_details_with_status_details_when_return_error_status_code(
+        string endpointPath,
+        HttpStatusCode expectedStatusCode,
+        string? expectedTitle,
+        string? expectedType)
+    {
+        async Task Test(string environment)
+        {
+            _testWebApplicationFactory = new TestWebApplicationFactory(services =>
+            {
+                services.AddCrossValidation(options => options
+                    .EnableErrorCodePage());
+            }).WithWebHostBuilder(builder => builder.UseEnvironment(environment));
+            _client = _testWebApplicationFactory.CreateClient();
+        
+            var response = await _client.GetAsync(EndpointPath.Test.Prefix + endpointPath);
+        
+            var problemDetails = await GetProblemDetailsFromResponse(response);
+            problemDetails.Status
+                .Should()
+                .Be((int)expectedStatusCode);
+            problemDetails.Title
+                .Should()
+                .Be(expectedTitle);
+            problemDetails.Type
+                .Should()
+                .Be(expectedType);
+        }
+
+        await Test(Environment.Development);
+        await Test(Environment.Production);
+    }
+    
+    // TODO 1: In Development with unexpected exception, return detailed body
+    // TODO 2: In Development with business exception, return a custom body, but with status details added
+    
+    // [Fact]
+    // public async Task Get_problem_details_with_unexpected_exception()
+    // {
+    //     var response = await _client.GetAsync(EndpointPath.Test.Prefix + EndpointPath.Test.ExceptionWithCodeWithoutResxKey);
+    //     
+    //     var problemDetails = await GetProblemDetailsFromResponse(response);
+    //     problemDetails.Status
+    //         .Should()
+    //         .Be((int)HttpStatusCode.InternalServerError);
+    //     problemDetails.Title
+    //         .Should()
+    //         .Be("System.Exception");
+    //     problemDetails.Type
+    //         .Should()
+    //         .NotBeNullOrEmpty();
+    // }
+    
+    // [Fact]
+    // public async Task Handle_unknown_exception()
+    // {
+    //     var response = await _client.GetAsync(ApiPath.Test.Prefix + ApiPath.Test.Exception);
+    //     
+    //     response.StatusCode.ShouldBe(HttpStatusCode.InternalServerError);
+    //     var problemDetails = await GetProblemDetailsFromResponse(response);
+    //     problemDetails.ShouldNotBeNull();
+    // }
 
     public void Dispose()
     {
@@ -418,5 +525,13 @@ public class DependencyInjectionTests :
         {
             body.ShouldBeEmpty();
         }
+    }
+
+    private static IEnumerable<object[]> Data()
+    {
+        return new[]
+        {
+            new object[] { 1, 2, 3 },
+        };
     }
 }
