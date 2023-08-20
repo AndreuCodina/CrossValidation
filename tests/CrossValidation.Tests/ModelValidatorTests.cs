@@ -511,18 +511,18 @@ public class ModelValidatorTests :
          var expectedMessage = "Expected message";
          var expectedCode = nameof(ErrorResource.GreaterThan);
          var expectedDetails = "Expected details";
-         var expectedHttpStatusCode = HttpStatusCode.Accepted;
+         var expectedHttpStatusCode = (int)HttpStatusCode.Accepted;
          var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
          {
              validator.Field(_model.NullableInt)
                  .WithCode(new Bogus.Faker().Lorem.Word())
                  .WithMessage(new Bogus.Faker().Lorem.Word())
                  .WithDetails(new Bogus.Faker().Lorem.Word())
-                 .WithHttpStatusCode(HttpStatusCode.Created)
+                 .WithStatusCode(HttpStatusCode.Created)
                  .NotNull()
                  .WithMessage(expectedMessage)
                  .WithDetails(expectedDetails)
-                 .WithHttpStatusCode(expectedHttpStatusCode)
+                 .WithStatusCode(expectedHttpStatusCode)
                  .GreaterThan(nullableInt.Value);
          });
          var action = () => parentModelValidator.Validate(_model);

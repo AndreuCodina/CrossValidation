@@ -30,7 +30,7 @@ internal class ProblemDetailsMapper(ProblemDetails problemDetails)
     
     public void Map(BusinessListException businessListException)
     {
-        SetStatusDetails(problemDetails, HttpStatusCode.UnprocessableEntity);
+        SetStatusDetails(problemDetails, (int)HttpStatusCode.UnprocessableEntity);
         var errors = new List<CrossProblemDetailsError>();
 
         foreach (var error in businessListException.Exceptions)
@@ -87,7 +87,7 @@ internal class ProblemDetailsMapper(ProblemDetails problemDetails)
         return placeholders;
     }
 
-    private void SetStatusDetails(ProblemDetails problemDetails, HttpStatusCode statusCode)
+    private void SetStatusDetails(ProblemDetails problemDetails, int statusCode)
     {
         CrossValidationProblemDetailsDefaults.Apply(problemDetails, statusCode);
     }

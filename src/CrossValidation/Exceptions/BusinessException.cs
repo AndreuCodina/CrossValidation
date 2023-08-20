@@ -12,7 +12,7 @@ public class BusinessException : Exception
     public override string Message => FormattedMessage;
     public string? Code { get; set;  } 
     public string FormattedMessage { get; set; } = "";
-    public HttpStatusCode StatusCode { get; set; }
+    public int StatusCode { get; set; }
     public string? Details { get; set; }
     public string? FieldName { get; set; }
     public string? FieldDisplayName { get; set; }
@@ -25,12 +25,26 @@ public class BusinessException : Exception
         string message = "",
         HttpStatusCode statusCode = HttpStatusCode.UnprocessableEntity,
         string? details = null,
+        int statusCodeInt = (int)HttpStatusCode.UnprocessableEntity,
         string? fieldName = null,
         string? fieldDisplayName = null)
     {
         Code = code;
         FormattedMessage = GetFormattedMessage(code, message);
-        StatusCode = statusCode;
+
+        if (statusCode is not HttpStatusCode.UnprocessableEntity)
+        {
+            StatusCode = (int)statusCode;
+        }
+        else if (statusCodeInt != (int)HttpStatusCode.UnprocessableEntity)
+        {
+            StatusCode = statusCodeInt;
+        }
+        else
+        {
+            StatusCode = (int)statusCode;
+        }
+        
         Details = details;
         FieldName = fieldName;
         FieldDisplayName = fieldDisplayName;

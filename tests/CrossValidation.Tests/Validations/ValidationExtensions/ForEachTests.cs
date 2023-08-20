@@ -140,7 +140,7 @@ public class ForEachTests :
     public void Field_keep_settings_with_error_accumulation(ValidationMode validationMode)
     {
         var expectedFieldDisplayName = "Expected field display name";
-        var expectedHttpStatusCode = HttpStatusCode.Created;
+        var expectedHttpStatusCode = (int)HttpStatusCode.Created;
         var expectedCode = "ExpectedCode";
         var expectedMessage = "Expected message";
         var expectedDetails = "Expected details";
@@ -160,7 +160,7 @@ public class ForEachTests :
                     .WithCode(expectedCode)
                     .WithMessage(expectedMessage)
                     .WithException(new CustomBusinessException())
-                    .WithHttpStatusCode(HttpStatusCode.Created)
+                    .WithStatusCode(HttpStatusCode.Created)
                     .WithDetails(expectedDetails)
                     .GreaterThan(intList[2]));
         });
@@ -185,7 +185,7 @@ public class ForEachTests :
     public void That_keeps_customizations_with_error_accumulation(ValidationMode validationMode)
     {
         var expectedFieldDisplayName = "Expected field display name";
-        var expectedHttpStatusCode = HttpStatusCode.Created;
+        var expectedHttpStatusCode = (int)HttpStatusCode.Created;
         var expectedCode = "ExpectedCode";
         var expectedMessage = "Expected message";
         var expectedDetails = "Expected details";
@@ -203,7 +203,7 @@ public class ForEachTests :
                     .WithCode(expectedCode)
                     .WithMessage(expectedMessage)
                     .WithException(new CustomBusinessException())
-                    .WithHttpStatusCode(HttpStatusCode.Created)
+                    .WithStatusCode(HttpStatusCode.Created)
                     .WithDetails(expectedDetails)
                     .GreaterThan(intList[2]));
         });

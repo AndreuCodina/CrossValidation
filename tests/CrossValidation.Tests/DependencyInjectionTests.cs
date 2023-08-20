@@ -402,42 +402,42 @@ public class DependencyInjectionTests :
     [Theory]
     [InlineData(
         EndpointPath.Test.ErrorStatusCodeWithEmptyBody,
-        HttpStatusCode.NotFound,
+        (int)HttpStatusCode.NotFound,
         "Not Found",
         "https://tools.ietf.org/html/rfc9110#section-15.5.5")]
     [InlineData(
         EndpointPath.Test.UnexpectedException,
-        HttpStatusCode.InternalServerError,
+        (int)HttpStatusCode.InternalServerError,
         "An error occurred while processing your request.",
         "https://tools.ietf.org/html/rfc9110#section-15.6.1")]
     [InlineData(
         EndpointPath.Test.BusinessException,
-        HttpStatusCode.UnprocessableEntity,
+        (int)HttpStatusCode.UnprocessableEntity,
         "Unprocessable Entity",
         "https://tools.ietf.org/html/rfc4918#section-11.2")]
     [InlineData(
         EndpointPath.Test.BusinessExceptionWithStatusCodeWithMapping,
-        HttpStatusCode.Created,
+        (int)HttpStatusCode.Created,
         "Created",
         null)]
-    [InlineData( // 450
+    [InlineData(
         EndpointPath.Test.BusinessExceptionWithStatusCodeWithNoMapping,
-        HttpStatusCode.PaymentRequired,
+        450,
         null,
         null)]
     [InlineData(
         EndpointPath.Test.BusinessExceptionWithErrorStatusCode,
-        HttpStatusCode.GatewayTimeout,
+        (int)HttpStatusCode.GatewayTimeout,
         "Gateway Timeout",
         "https://tools.ietf.org/html/rfc9110#section-15.6.5")]
     [InlineData(
         EndpointPath.Test.BusinessListException,
-        HttpStatusCode.UnprocessableEntity,
+        (int)HttpStatusCode.UnprocessableEntity,
         "Unprocessable Entity",
         "https://tools.ietf.org/html/rfc4918#section-11.2")]
     public async Task Get_problem_details_with_status_details_when_return_error_status_code(
         string endpointPath,
-        HttpStatusCode expectedStatusCode,
+        int expectedStatusCode,
         string? expectedTitle,
         string? expectedType)
     {
@@ -455,7 +455,7 @@ public class DependencyInjectionTests :
             var problemDetails = await GetProblemDetailsFromResponse(response);
             problemDetails.Status
                 .Should()
-                .Be((int)expectedStatusCode);
+                .Be(expectedStatusCode);
             problemDetails.Title
                 .Should()
                 .Be(expectedTitle);

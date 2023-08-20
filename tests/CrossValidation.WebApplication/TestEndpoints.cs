@@ -53,7 +53,7 @@ public static class TestEndpoints
         
         group.MapGet(EndpointPath.Test.BusinessExceptionWithStatusCodeWithNoMapping, () =>
         {
-            throw new BusinessException(statusCode: HttpStatusCode.PaymentRequired);
+            throw new BusinessException(statusCodeInt: 450);
         });
         
         group.MapGet(EndpointPath.Test.BusinessExceptionWithErrorStatusCode, () =>

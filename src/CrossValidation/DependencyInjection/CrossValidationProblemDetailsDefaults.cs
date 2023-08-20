@@ -1,4 +1,3 @@
-using System.Net;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
 
@@ -105,20 +104,20 @@ internal static class CrossValidationProblemDetailsDefaults
         ),
     };
 
-    public static void Apply(ProblemDetails problemDetails, HttpStatusCode statusCode)
+    public static void Apply(ProblemDetails problemDetails, int statusCode)
     {
         problemDetails.Title = null;
         problemDetails.Type = null;
-        problemDetails.Status = (int)statusCode;
+        problemDetails.Status = statusCode;
         
-        if (Defaults.TryGetValue((int)statusCode, out var defaults))
+        if (Defaults.TryGetValue(statusCode, out var defaults))
         {
             problemDetails.Title ??= defaults.Title;
             problemDetails.Type ??= defaults.Type;
         }
         else if (problemDetails.Title is null)
         {
-            var reasonPhrase = ReasonPhrases.GetReasonPhrase((int)statusCode);
+            var reasonPhrase = ReasonPhrases.GetReasonPhrase(statusCode);
             if (!string.IsNullOrEmpty(reasonPhrase))
             {
                 problemDetails.Title = reasonPhrase;

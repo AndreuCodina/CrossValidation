@@ -118,7 +118,7 @@ public class ValidationTests :
         exception.Code.ShouldBe(expectedCode);
         exception.Message.ShouldBe(expectedMessage);
         exception.Details.ShouldBe("Expected details");
-        exception.StatusCode.ShouldBe(HttpStatusCode.Accepted);
+        exception.StatusCode.ShouldBe((int)HttpStatusCode.Accepted);
         exception.FieldDisplayName.ShouldBe("Expected field display name");
     }
 
@@ -258,11 +258,11 @@ public class ValidationTests :
     public void Customizations_not_be_overriden_by_validator()
     {
         var expectedDetails = "Expected details";
-        var expectedHttpStatusCode = HttpStatusCode.Created;
+        var expectedHttpStatusCode = (int)HttpStatusCode.Created;
         var action = () => Validate.That(_model.Int)
             .WithCode(nameof(ErrorResource.NotNull))
             .WithDetails(expectedDetails)
-            .WithHttpStatusCode(HttpStatusCode.Created)
+            .WithStatusCode(HttpStatusCode.Created)
             .GreaterThan(_model.Int);
 
         var exception = action.ShouldThrow<CommonException.GreaterThanException<int>>();
@@ -284,7 +284,7 @@ public class ValidationTests :
         exception.Code.ShouldBe(nameof(ErrorResource.NotNull));
         exception.Message.ShouldBe(ErrorResource.NotNull);
         exception.Details.ShouldBe(expectedDetails);
-        exception.StatusCode.ShouldBe(HttpStatusCode.Created);
+        exception.StatusCode.ShouldBe((int)HttpStatusCode.Created);
     }
 
 #pragma warning disable CS9113 // Parameter is unread.
@@ -328,7 +328,7 @@ public class ValidationTests :
                 
             validation
                 .WithDetails("Expected details")
-                .WithHttpStatusCode(HttpStatusCode.Accepted)
+                .WithStatusCode(HttpStatusCode.Accepted)
                 .WithFieldDisplayName("Expected field display name")
                 .GreaterThan(value + 1);
             return new(value);
