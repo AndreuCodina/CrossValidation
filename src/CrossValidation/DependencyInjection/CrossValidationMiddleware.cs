@@ -1,7 +1,6 @@
 ﻿using System.Net;
 using System.Text.Json;
 using CrossValidation.Exceptions;
-using CrossValidation.Utils;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Hosting;
@@ -71,19 +70,6 @@ public class CrossValidationMiddleware : IMiddleware
             {
                 errors.Add(CreateCrossProblemDetailsError(error, context));
             }
-        }
-        else if (exception is NonNullablePropertyIsNullException nonNullablePropertyIsNullException)
-        {
-            statusCode = HttpStatusCode.BadRequest;
-            title = "Nullability error";
-            detail = $"Non nullable property is null: {nonNullablePropertyIsNullException.PropertyName}";
-        }
-        else if (exception is NonNullableItemCollectionWithNullItemException
-                 nonNullableItemCollectionWithNullItemException)
-        {
-            statusCode = HttpStatusCode.BadRequest;
-            title = "Nullability error";
-            detail = $"Non nullable item collection with null item: {nonNullableItemCollectionWithNullItemException.CollectionName}";
         }
         else
         {

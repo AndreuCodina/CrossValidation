@@ -1,16 +1,27 @@
 ﻿using System.Collections;
+using System.Net;
 using System.Reflection;
+using CrossValidation.Exceptions;
 
 namespace CrossValidation.Utils;
 
-public class NonNullablePropertyIsNullException : Exception
+public class ModelNullabilityValidatorException
 {
-    public required string PropertyName { get; set; }
-}
+    public class NonNullablePropertyIsNullException(string propertyName)
+        : BusinessException(
+            statusCode: HttpStatusCode.BadRequest,
+            details: $"Non nullable item collection with null item: {propertyName}")
+    {
+        public string PropertyName => propertyName;
+    }
 
-public class NonNullableItemCollectionWithNullItemException : Exception
-{
-    public required string CollectionName { get; set; }
+    public class NonNullableItemCollectionWithNullItemException(string collectionName)
+        : BusinessException(
+            statusCode: HttpStatusCode.BadRequest,
+            details: $"Non nullable item collection with null item: {collectionName}")
+    {
+        public string CollectionName => collectionName;
+    }
 }
 
 internal static class ModelNullabilityValidator
@@ -60,10 +71,7 @@ internal static class ModelNullabilityValidator
 
         if (isNonNullableProperty)
         {
-            throw new NonNullablePropertyIsNullException
-            {
-                PropertyName = property.Name
-            };
+            throw new ModelNullabilityValidatorException.NonNullablePropertyIsNullException(property.Name);
         }
     }
 
@@ -86,10 +94,7 @@ internal static class ModelNullabilityValidator
                 if (item is null &&
                     nullabilityInfo.GenericTypeArguments[0].WriteState is not NullabilityState.Nullable)
                 {
-                    throw new NonNullableItemCollectionWithNullItemException
-                    {
-                        CollectionName = property.Name
-                    };
+                    throw new ModelNullabilityValidatorException.NonNullableItemCollectionWithNullItemException(property.Name);
                 }
             }
         }
