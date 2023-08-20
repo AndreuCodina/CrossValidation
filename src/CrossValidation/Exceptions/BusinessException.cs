@@ -42,7 +42,7 @@ public class BusinessException : Exception
         }
         else
         {
-            StatusCode = (int)statusCode;
+            StatusCode = (int)HttpStatusCode.UnprocessableEntity;
         }
         
         Details = details;
