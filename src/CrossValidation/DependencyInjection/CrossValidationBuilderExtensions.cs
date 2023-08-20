@@ -15,8 +15,8 @@ public static class CrossValidationBuilderExtensions
     {
         app.UseExceptionHandler();
         app.UseStatusCodePages();
-        app.UseGlobalExceptionMiddleware()
-            .UseCustomRequestLocalization();
+        // app.UseGlobalExceptionMiddleware();
+        app.UseCustomRequestLocalization();
         AddErrorCodePage(app);
         return app;
     }
