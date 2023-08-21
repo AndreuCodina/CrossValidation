@@ -9,7 +9,7 @@ internal class ProblemDetailsMapper(ProblemDetails problemDetails)
     public void Map(BusinessException businessException)
     {
         SetStatusDetails(problemDetails, businessException.StatusCode);
-        var errors = new List<CrossProblemDetailsError>();
+        var errors = new List<CrossValidationProblemDetailsError>();
         var error = CreateCrossProblemDetailsError(businessException);
         var allErrorCustomizationsAreNotSet =
             error is
@@ -31,7 +31,7 @@ internal class ProblemDetailsMapper(ProblemDetails problemDetails)
     public void Map(BusinessListException businessListException)
     {
         SetStatusDetails(problemDetails, (int)HttpStatusCode.UnprocessableEntity);
-        var errors = new List<CrossProblemDetailsError>();
+        var errors = new List<CrossValidationProblemDetailsError>();
 
         foreach (var error in businessListException.Exceptions)
         {
@@ -41,7 +41,7 @@ internal class ProblemDetailsMapper(ProblemDetails problemDetails)
         AddExtensions(problemDetails, errors);
     }
 
-    private static void AddExtensions(ProblemDetails problemDetails, List<CrossProblemDetailsError> errors)
+    private static void AddExtensions(ProblemDetails problemDetails, List<CrossValidationProblemDetailsError> errors)
     {
         if (errors.Count > 0)
         {
@@ -51,9 +51,9 @@ internal class ProblemDetailsMapper(ProblemDetails problemDetails)
         // TODO: Add traceId
     }
     
-    private CrossProblemDetailsError CreateCrossProblemDetailsError(BusinessException exception)
+    private CrossValidationProblemDetailsError CreateCrossProblemDetailsError(BusinessException exception)
     {
-        var error = new CrossProblemDetailsError
+        var error = new CrossValidationProblemDetailsError
         {
             Code = exception.Code,
             CodeUrl = null,

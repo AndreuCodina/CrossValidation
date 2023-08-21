@@ -21,20 +21,15 @@ internal class GlobalExceptionMiddleware : IMiddleware
         }
         catch (Exception e)
         {
-            if (e is not BusinessException or BusinessListException)
-            {
-                HandleUnexpectedException(e, context);
-                // throw;
-            }
-
-            // context.Response.StatusCode = 404;
+            HandleUnexpectedException(e, context);
             throw;
         }
     }
 
     private void HandleUnexpectedException(Exception exception, HttpContext context)
     {
-        if (!CrossValidationOptions.HandleUnknownException)
+        if (CrossValidationOptions.HandleUnknownException
+            && exception is BusinessException or BusinessListException)
         {
             return;
         }

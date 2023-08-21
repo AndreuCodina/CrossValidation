@@ -1,6 +1,6 @@
 ﻿namespace CrossValidation.DependencyInjection;
 
-public class CrossProblemDetailsError
+public class CrossValidationProblemDetailsError
 {
     public required string? Code { get; set; }
     public required string? CodeUrl { get; set; }

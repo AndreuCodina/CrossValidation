@@ -468,35 +468,41 @@ public class DependencyInjectionTests :
         await Test(Environment.Production);
     }
     
-    // TODO 1: In Development with unexpected exception, return detailed body
-    // TODO 2: In Development with business exception, return a custom body, but with status details added
-    
-    // [Fact]
-    // public async Task Get_problem_details_with_unexpected_exception()
-    // {
-    //     var response = await _client.GetAsync(EndpointPath.Test.Prefix + EndpointPath.Test.ExceptionWithCodeWithoutResxKey);
-    //     
-    //     var problemDetails = await GetProblemDetailsFromResponse(response);
-    //     problemDetails.Status
-    //         .Should()
-    //         .Be((int)HttpStatusCode.InternalServerError);
-    //     problemDetails.Title
-    //         .Should()
-    //         .Be("System.Exception");
-    //     problemDetails.Type
-    //         .Should()
-    //         .NotBeNullOrEmpty();
-    // }
-    
-    // [Fact]
-    // public async Task Handle_unknown_exception()
-    // {
-    //     var response = await _client.GetAsync(ApiPath.Test.Prefix + ApiPath.Test.Exception);
-    //     
-    //     response.StatusCode.ShouldBe(HttpStatusCode.InternalServerError);
-    //     var problemDetails = await GetProblemDetailsFromResponse(response);
-    //     problemDetails.ShouldNotBeNull();
-    // }
+    [Theory]
+    [InlineData(EndpointPath.Test.BusinessException)]
+    [InlineData(EndpointPath.Test.UnexpectedException)]
+    public async Task Get_problem_details_with_exception_extension(string endpointPath)
+    {
+        async Task Test(string environment)
+        {
+            _testWebApplicationFactory = new TestWebApplicationFactory(services =>
+            {
+                services.AddCrossValidation(options => options
+                    .EnableErrorCodePage());
+            }).WithWebHostBuilder(builder => builder.UseEnvironment(environment));
+            _client = _testWebApplicationFactory.CreateClient();
+        
+            var response = await _client.GetAsync(EndpointPath.Test.Prefix + endpointPath);
+        
+            var problemDetails = await GetProblemDetailsFromResponse(response);
+
+            if (environment == Environment.Development)
+            {
+                problemDetails.Exception
+                    .Should()
+                    .NotBeNull();
+            }
+            else
+            {
+                problemDetails.Exception
+                    .Should()
+                    .BeNull();
+            }
+        }
+
+        await Test(Environment.Development);
+        await Test(Environment.Production);
+    }
 
     public void Dispose()
     {
@@ -504,14 +510,14 @@ public class DependencyInjectionTests :
         CrossValidationOptions.SetDefaultOptions();
     }
 
-    private async Task<CrossProblemDetails> GetProblemDetailsFromResponse(HttpResponseMessage response)
+    private async Task<CrossValidationProblemDetails> GetProblemDetailsFromResponse(HttpResponseMessage response)
     {
         var jsonSerializerOptions = new JsonSerializerOptions
         {
             PropertyNameCaseInsensitive = true
         };
         var contentStream = await response.Content.ReadAsStreamAsync();
-        var problemDetails = await JsonSerializer.DeserializeAsync<CrossProblemDetails>(contentStream, jsonSerializerOptions);
+        var problemDetails = await JsonSerializer.DeserializeAsync<CrossValidationProblemDetails>(contentStream, jsonSerializerOptions);
         return problemDetails!;
     }
     
@@ -525,13 +531,5 @@ public class DependencyInjectionTests :
         {
             body.ShouldBeEmpty();
         }
-    }
-
-    private static IEnumerable<object[]> Data()
-    {
-        return new[]
-        {
-            new object[] { 1, 2, 3 },
-        };
     }
 }

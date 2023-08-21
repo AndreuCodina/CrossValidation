@@ -115,13 +115,11 @@ internal static class CrossValidationProblemDetailsDefaults
             problemDetails.Title ??= defaults.Title;
             problemDetails.Type ??= defaults.Type;
         }
-        else if (problemDetails.Title is null)
+        
+        var reasonPhrase = ReasonPhrases.GetReasonPhrase(statusCode);
+        if (!string.IsNullOrEmpty(reasonPhrase))
         {
-            var reasonPhrase = ReasonPhrases.GetReasonPhrase(statusCode);
-            if (!string.IsNullOrEmpty(reasonPhrase))
-            {
-                problemDetails.Title = reasonPhrase;
-            }
+            problemDetails.Title = reasonPhrase;
         }
     }
 }
