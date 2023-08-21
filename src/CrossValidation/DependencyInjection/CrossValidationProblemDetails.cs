@@ -10,4 +10,5 @@ public class CrossValidationProblemDetails
     public string? Instance { get; set; }
     public IEnumerable<CrossValidationProblemDetailsError>? Errors { get; set; }
     public CrossValidationProblemDetailsException? Exception { get; set; }
+    public required string TraceId { get; set; }
 }

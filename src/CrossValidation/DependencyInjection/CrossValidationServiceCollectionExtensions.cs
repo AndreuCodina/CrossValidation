@@ -7,6 +7,7 @@ namespace CrossValidation.DependencyInjection;
 
 public static class CrossValidationServiceCollectionExtensions
 {
+    private const string TraceIdHeaderKey = "X-Trace-Id";
     private static IHostEnvironment _environment = default!;
     
     public static IServiceCollection AddCrossValidation(
@@ -32,26 +33,39 @@ public static class CrossValidationServiceCollectionExtensions
                     mapper.Map(businessListException);
                     context.HttpContext.Response.StatusCode = (int)context.ProblemDetails.Status!;
                 }
-                
-                if (context.Exception is not null)
-                {
-                    AddExceptionExtension(context);
-                }
+
+
+                AddExceptionExtension(context);
+                AddTraceIdExtension(context);
             });
         services.AddTransient<GlobalExceptionMiddleware>();
         return services;
     }
 
+    private static void AddTraceIdExtension(ProblemDetailsContext context)
+    {
+        var hasTraceIdHeaders = context.HttpContext.Request.Headers.TryGetValue(
+            TraceIdHeaderKey, out var correlationIds);
+        var traceId = hasTraceIdHeaders
+            ? correlationIds.FirstOrDefault()
+            : Guid.NewGuid().ToString();
+        context.HttpContext
+            .Response
+            .Headers
+            .Append(TraceIdHeaderKey, traceId);
+        context.ProblemDetails.Extensions.Add("traceId", traceId);
+    }
+
     private static void AddExceptionExtension(ProblemDetailsContext context)
     {
-        if (!_environment.IsDevelopment())
+        if (context.Exception is null || !_environment.IsDevelopment())
         {
             return;
         }
 
         var exceptionExtension = new CrossValidationProblemDetailsException
         {
-            Details = context.Exception?.ToString(),
+            Details = context.Exception.ToString(),
             Headers = context.HttpContext
                 .Request
                 .Headers

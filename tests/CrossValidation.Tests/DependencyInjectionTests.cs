@@ -486,22 +486,87 @@ public class DependencyInjectionTests :
         
             var problemDetails = await GetProblemDetailsFromResponse(response);
 
-            if (environment == Environment.Development)
+            void AssertExceptionExtensionInDevelopment()
             {
+                if (environment != Environment.Development)
+                {
+                    return;
+                }
+                
                 problemDetails.Exception
                     .Should()
                     .NotBeNull();
+                problemDetails.Exception!
+                    .Details
+                    .Should()
+                    .NotBeNull();
+                problemDetails.Exception!
+                    .Headers
+                    .Should()
+                    .NotBeNullOrEmpty();
+                problemDetails.Exception!
+                    .Path
+                    .Should()
+                    .NotBeNull();
             }
-            else
+
+            void AssertExceptionExtensionInProduction()
             {
+                if (environment != Environment.Production)
+                {
+                    return;
+                }
+                
                 problemDetails.Exception
                     .Should()
                     .BeNull();
             }
+            
+            AssertExceptionExtensionInDevelopment();
+            AssertExceptionExtensionInProduction();
         }
 
         await Test(Environment.Development);
         await Test(Environment.Production);
+    }
+    
+    [Theory]
+    [InlineData(EndpointPath.Test.BusinessException)]
+    [InlineData(EndpointPath.Test.UnexpectedException)]
+    public async Task Get_new_trace_id_when_is_not_sent_from_the_client(string endpointPath)
+    {
+        var response = await _client.GetAsync(EndpointPath.Test.Prefix + endpointPath);
+        
+        var correlationIdHeader = response.Headers
+            .GetValues("X-Trace-Id")
+            .FirstOrDefault();
+        correlationIdHeader.Should()
+            .NotBeNullOrEmpty();
+        var problemDetails = await GetProblemDetailsFromResponse(response);
+        problemDetails.TraceId
+            .Should()
+            .NotBeNull();
+    }
+    
+    [Theory]
+    [InlineData(EndpointPath.Test.BusinessException)]
+    [InlineData(EndpointPath.Test.UnexpectedException)]
+    public async Task Get_sent_trace_id(string endpointPath)
+    {
+        var expectedTraceId = Guid.NewGuid().ToString();
+        _client.DefaultRequestHeaders.Add("X-Trace-Id", expectedTraceId);
+        
+        var response = await _client.GetAsync(EndpointPath.Test.Prefix + endpointPath);
+        
+        var correlationIdHeader = response.Headers
+            .GetValues("X-Trace-Id")
+            .FirstOrDefault();
+        correlationIdHeader.Should()
+            .Be(expectedTraceId);
+        var problemDetails = await GetProblemDetailsFromResponse(response);
+        problemDetails.TraceId
+            .Should()
+            .Be(expectedTraceId);
     }
 
     public void Dispose()
