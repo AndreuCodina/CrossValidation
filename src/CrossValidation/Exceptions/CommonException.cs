@@ -29,6 +29,17 @@ public static class CommonException
             AddPlaceholderValue(comparisonValue);
         }
     }
+    
+    public class LessThanException<TField>(TField comparisonValue) :
+        BusinessException(code: nameof(ErrorResource.LessThan))
+    {
+        public TField ComparisonValue => comparisonValue;
+        
+        public override void AddParametersAsPlaceholderValues()
+        {
+            AddPlaceholderValue(comparisonValue);
+        }
+    }
 
     public class EnumException() : BusinessException(code: nameof(ErrorResource.Enum));
 

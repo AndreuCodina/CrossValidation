@@ -42,7 +42,7 @@ public class ValidationTests :
         var exception = action.ShouldThrow<CommonException.GreaterThanException<int>>();
         exception.FieldName.ShouldBe("NestedModel.Int");
         exception.Code.ShouldBe(nameof(ErrorResource.GreaterThan));
-        exception.Message.ShouldBe("Must be greater than 1");
+        exception.Message.ShouldBe("Must be greater than 2");
     }
     
     [Theory]

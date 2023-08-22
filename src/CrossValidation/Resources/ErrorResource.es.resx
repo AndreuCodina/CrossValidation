@@ -22,7 +22,7 @@
         <value>Debe tener entre {minimumLength} y {maximumLength} caracter(es)</value>
     </data>
     <data name="GreaterThan" xml:space="preserve">
-        <value>Debe ser mayor que {fieldValue}</value>
+        <value>Debe ser mayor que {comparisonValue}</value>
     </data>
     <data name="NotNull" xml:space="preserve">
         <value>Debe tener un valor</value>
@@ -58,6 +58,9 @@
         <value>No debe tener más de {maximumLength} caracter(es)</value>
     </data>
     <data name="GreaterThanOrEqual" xml:space="preserve">
-        <value>Debe ser mayor o igual que {fieldValue}</value>
+        <value>Debe ser mayor o igual que {comparisonValue}</value>
+    </data>
+    <data name="LessThan" xml:space="preserve">
+        <value>Debe ser menor que {comparisonValue}</value>
     </data>
 </root>
