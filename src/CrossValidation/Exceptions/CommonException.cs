@@ -81,6 +81,8 @@ public static partial class CommonException
     public class LengthRangeException(int minimumLength, int maximumLength, int totalLength) :
         LengthException(code: nameof(ErrorResource.LengthRange))
     {
+        public int MinimumLength => minimumLength;
+        public int MaximumLength => maximumLength;
         public override int TotalLength => totalLength;
         
         public override void AddParametersAsPlaceholderValues()
@@ -94,6 +96,7 @@ public static partial class CommonException
     public class MinimumLengthException(int minimumLength, int totalLength)
         : LengthException(code: nameof(ErrorResource.MinimumLength))
     {
+        public int MinimumLength => minimumLength;
         public override int TotalLength => totalLength;
         
         public override void AddParametersAsPlaceholderValues()
@@ -106,6 +109,7 @@ public static partial class CommonException
     public class MaximumLengthException(int maximumLength, int totalLength)
         : LengthException(code: nameof(ErrorResource.MaximumLength))
     {
+        public int MaximumLength => maximumLength;
         public override int TotalLength => totalLength;
         
         public override void AddParametersAsPlaceholderValues()

@@ -2,16 +2,25 @@
 
 namespace CrossValidation.Validators.StringValidators;
 
-public class LengthRangeValidator(string FieldValue, int Minimum, int Maximum) : LengthValidatorBase
+public class LengthRangeValidator(string fieldValue, int minimum, int maximum) : LengthValidatorBase
 {
     public override bool IsValid()
     {
-        return FieldValue.Length >= Minimum
-               && FieldValue.Length <= Maximum;
+        if (minimum > maximum)
+        {
+            throw new ArgumentException("The minimum length cannot be greater than the maximum length");
+        }
+        else if (maximum < minimum)
+        {
+            throw new ArgumentException("The maximum length cannot be less than the minimum length");
+        }
+
+        return fieldValue.Length >= minimum
+               && fieldValue.Length <= maximum;
     }
 
     public override LengthException CreateException()
     {
-        return new CommonException.LengthRangeException(Minimum, Maximum, GetTotalLength(FieldValue));
+        return new CommonException.LengthRangeException(minimum, maximum, fieldValue.Length);
     }
 }

@@ -4,14 +4,14 @@ using CrossValidation.Tests.TestUtils;
 using CrossValidation.Tests.TestUtils.Builders;
 using CrossValidation.Tests.TestUtils.Models;
 using CrossValidation.Validations;
-using Shouldly;
+using FluentAssertions;
 using Xunit;
 
 namespace CrossValidation.Tests.Validations.ValidationExtensions;
 
 public class MinimumLengthTests : TestBase
 {
-    private ParentModel _model;
+    private readonly ParentModel _model;
 
     public MinimumLengthTests()
     {
@@ -19,13 +19,37 @@ public class MinimumLengthTests : TestBase
             .Build();
     }
     
-    [Fact]
-    public void Fail_when_the_length_has_not_been_met()
+    [Theory]
+    [InlineData("word", 4)]
+    [InlineData("word", 3)]
+    public void Validate_value_is_not_less_than_maximum_value(string value, int minimumLength)
     {
-        var action = () => Validate.Field(_model.String)
-            .MinimumLength(_model.String.Length + 1);
+        var action = () => Validate.Field(value)
+            .MinimumLength(minimumLength);
 
-        var exception = action.ShouldThrow<CommonException.MinimumLengthException>();
-        exception.Code.ShouldBe(nameof(ErrorResource.MinimumLength));
+        action.Should()
+            .NotThrow();
+    }
+    
+    [Fact]
+    public void Fail_when_the_minimum_length_has_not_been_met()
+    {
+        var expectedMinimumLength = _model.String.Length + 1;
+        
+        var action = () => Validate.Field(_model.String)
+            .MinimumLength(expectedMinimumLength);
+
+        var exception = action.Should()
+            .Throw<CommonException.MinimumLengthException>()
+            .Which;
+        exception.Code
+            .Should()
+            .Be(nameof(ErrorResource.MinimumLength));
+        exception.MinimumLength
+            .Should()
+            .Be(expectedMinimumLength);
+        exception.TotalLength
+            .Should()
+            .Be(_model.String.Length);
     }
 }

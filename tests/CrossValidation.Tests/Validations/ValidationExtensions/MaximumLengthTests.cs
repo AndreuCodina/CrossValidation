@@ -4,7 +4,7 @@ using CrossValidation.Tests.TestUtils;
 using CrossValidation.Tests.TestUtils.Builders;
 using CrossValidation.Tests.TestUtils.Models;
 using CrossValidation.Validations;
-using Shouldly;
+using FluentAssertions;
 using Xunit;
 
 namespace CrossValidation.Tests.Validations.ValidationExtensions;
@@ -18,14 +18,38 @@ public class MaximumLengthTests : TestBase
         _model = new ParentModelBuilder()
             .Build();
     }
+
+    [Theory]
+    [InlineData("word", 4)]
+    [InlineData("word", 5)]
+    public void Validate_value_is_not_greater_than_maximum_value(string value, int maximumLength)
+    {
+        var action = () => Validate.Field(value)
+            .MaximumLength(maximumLength);
+
+        action.Should()
+            .NotThrow();
+    }
     
     [Fact]
-    public void Fail_when_the_length_has_not_been_met()
+    public void Fail_when_the_minimum_length_has_not_been_met()
     {
+        var expectedMaximumLength = _model.String.Length - 1;
+        
         var action = () => Validate.Field(_model.String)
-            .MaximumLength(_model.String.Length - 1);
+            .MaximumLength(expectedMaximumLength);
 
-        var exception = action.ShouldThrow<CommonException.MaximumLengthException>();
-        exception.Code.ShouldBe(nameof(ErrorResource.MaximumLength));
+        var exception = action.Should()
+            .Throw<CommonException.MaximumLengthException>()
+            .Which;
+        exception.Code
+            .Should()
+            .Be(nameof(ErrorResource.MaximumLength));
+        exception.MaximumLength
+            .Should()
+            .Be(expectedMaximumLength);
+        exception.TotalLength
+            .Should()
+            .Be(_model.String.Length);
     }
 }
