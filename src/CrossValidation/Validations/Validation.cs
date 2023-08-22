@@ -32,7 +32,10 @@ public interface IValidation<out TField> : IValidationOperation
     IValidation<TField> WithFieldDisplayName(string fieldDisplayName);
     
     [Pure]
-    IValidation<TField> WithHttpStatusCode(HttpStatusCode code);
+    IValidation<TField> WithStatusCode(HttpStatusCode code);
+    
+    [Pure]
+    IValidation<TField> WithStatusCode(int code);
 
     [Pure]
     IValidation<TField> When(Func<bool> condition);
@@ -80,7 +83,7 @@ public interface IValidation<out TField> : IValidationOperation
         string message,
         string? code,
         string? details,
-        HttpStatusCode? statusCode,
+        int? statusCode,
         string? fieldDisplayName)
     {
         var fullPath = fieldName.Contains('.')
@@ -222,11 +225,35 @@ internal class Validation<TField> :
         return this;
     }
 
-    public IValidation<TField> WithHttpStatusCode(HttpStatusCode code)
+    public IValidation<TField> WithStatusCode(HttpStatusCode code)
     {
         if (!HasFailed)
         {
-            StatusCode = Context!.StatusCode ?? code;
+            if (Context!.StatusCode is not null)
+            {
+                StatusCode = Context.StatusCode;
+            }
+            else
+            {
+                StatusCode = (int)code;
+            }
+        }
+        
+        return this;
+    }
+    
+    public IValidation<TField> WithStatusCode(int code)
+    {
+        if (!HasFailed)
+        {
+            if (Context!.StatusCode is not null)
+            {
+                StatusCode = Context.StatusCode;
+            }
+            else
+            {
+                StatusCode = code;
+            }
         }
         
         return this;
@@ -345,10 +372,15 @@ internal class Validation<TField> :
 
     public IValidation<TField> SetModelValidator<TChildModel>(ModelValidator<TChildModel> validator)
     {
+        if (HasFailed)
+        {
+            return IValidation<TField>.CreateFailed();
+        }
+        
         validator.ScopeCreatorValidation = (IValidation<TChildModel>?)this;
         var oldContext = Context!;
         Context = Context!.CloneForChildModelValidator();
-        validator._validationMode = Context.ValidationMode;
+        validator.SetInternalValidationMode(Context.ValidationMode);
         var oldParentPath = ParentPath;
         var oldFieldPath = FieldPath;
         var oldFieldName = FieldName;
@@ -423,7 +455,7 @@ internal class Validation<TField> :
         string fixedMessage,
         string? fixedCode,
         string? fixedDetails,
-        HttpStatusCode? fixedStatusCode,
+        int? fixedStatusCode,
         string? fixedFieldDisplayName)
     {
         if (context != null)

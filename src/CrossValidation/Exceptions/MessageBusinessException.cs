@@ -5,8 +5,10 @@ namespace CrossValidation.Exceptions;
 public class MessageBusinessException(
     string message = "",
     HttpStatusCode statusCode = HttpStatusCode.UnprocessableEntity,
-    string? details = null)
+    string? details = null,
+    int statusCodeInt = (int)HttpStatusCode.UnprocessableEntity)
     : BusinessException(
         message: message,
         statusCode: statusCode,
-        details: details);
+        details: details,
+        statusCodeInt: statusCodeInt);

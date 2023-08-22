@@ -8,7 +8,7 @@ namespace CrossValidation;
 
 public abstract class ModelValidator<TModel>
 {
-    internal ValidationMode _validationMode = ValidationMode.StopOnFirstError;
+    private ValidationMode _validationMode = ValidationMode.StopOnFirstError;
     internal IValidation<TModel>? ScopeCreatorValidation { private get; set; }
     public TModel Model { get; set; } = default!;
 
@@ -38,6 +38,8 @@ public abstract class ModelValidator<TModel>
         string? fieldDisplayName = null,
         [CallerArgumentExpression(nameof(field))] string fieldName = default!)
     {
+        // if ()
+        
         var fieldPath = fieldName.Contains('.')
             ? fieldName.Substring(fieldName.IndexOf('.') + 1)
             : fieldName;
@@ -112,5 +114,10 @@ public abstract class ModelValidator<TModel>
                 throw new BusinessListException(ScopeCreatorValidation.Context.ExceptionsCollected);
             }
         }
+    }
+
+    internal void SetInternalValidationMode(ValidationMode validationMode)
+    {
+        _validationMode = validationMode;
     }
 }

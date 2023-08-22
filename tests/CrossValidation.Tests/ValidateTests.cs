@@ -111,14 +111,14 @@ public class ValidateTests :
         var expectedMessage = "Expected message";
         var expectedCode = "ExpectedCode";
         var expectedDetails = "Expected details";
-        var expectedHttpStatusCode = HttpStatusCode.Created;
+        var expectedHttpStatusCode = (int)HttpStatusCode.Created;
 
         var action = () => Validate.Must(
             false,
             message: expectedMessage,
             code: expectedCode,
             details: expectedDetails,
-            statusCode: expectedHttpStatusCode);
+            statusCodeInt: expectedHttpStatusCode);
 
         var exception = action.ShouldThrow<BusinessException>();
         exception.Code.ShouldBe(expectedCode);
@@ -134,7 +134,7 @@ public class ValidateTests :
         var expectedMessage = "Expected message";
         var expectedCode = "ExpectedCode";
         var expectedDetails = "Expected details";
-        var expectedHttpStatusCode = HttpStatusCode.Created;
+        var expectedHttpStatusCode = (int)HttpStatusCode.Created;
         var expectedFieldDisplayName = "Expected field display name";
         var action = () => Validate.That(
                 _model.Int,
@@ -142,13 +142,13 @@ public class ValidateTests :
                 message: expectedMessage,
                 code: expectedCode,
                 details: expectedDetails,
-                statusCode: expectedHttpStatusCode,
+                statusCodeInt: expectedHttpStatusCode,
                 fieldDisplayName: expectedFieldDisplayName)
             .WithException(new BusinessException())
             .WithMessage("Unexpected message")
             .WithCode("UnexpectedCode")
             .WithDetails("Unexpected details")
-            .WithHttpStatusCode(HttpStatusCode.Accepted)
+            .WithStatusCode(HttpStatusCode.Accepted)
             .WithFieldDisplayName("Unexpected field display name")
             .Must(_commonFixture.NotBeValid);
 
@@ -167,7 +167,7 @@ public class ValidateTests :
         var expectedMessage = "Expected message";
         var expectedCode = "ExpectedCode";
         var expectedDetails = "Expected details";
-        var expectedHttpStatusCode = HttpStatusCode.Created;
+        var expectedHttpStatusCode = (int)HttpStatusCode.Created;
         var expectedFieldDisplayName = "Expected field display name";
         var action = () => Validate.That(
                 _model.Int,
@@ -175,13 +175,13 @@ public class ValidateTests :
                 message: expectedMessage,
                 code: expectedCode,
                 details: expectedDetails,
-                statusCode: expectedHttpStatusCode,
+                statusCodeInt: expectedHttpStatusCode,
                 fieldDisplayName: expectedFieldDisplayName)
             .WithException(new BusinessException())
             .WithMessage("Unexpected message")
             .WithCode("UnexpectedCode")
             .WithDetails("Unexpected details")
-            .WithHttpStatusCode(HttpStatusCode.Accepted)
+            .WithStatusCode(HttpStatusCode.Accepted)
             .WithFieldDisplayName("Unexpected field display name")
             .Transform(x => x)
             .Must(_commonFixture.NotBeValid);
@@ -201,7 +201,7 @@ public class ValidateTests :
         var expectedMessage = "Expected message";
         var expectedCode = "ExpectedCode";
         var expectedDetails = "Expected details";
-        var expectedHttpStatusCode = HttpStatusCode.Created;
+        var expectedHttpStatusCode = (int)HttpStatusCode.Created;
         var expectedFieldDisplayName = "Expected field display name";
         var action = () => Validate.That(
                 _model.IntList,
@@ -209,13 +209,13 @@ public class ValidateTests :
                 message: expectedMessage,
                 code: expectedCode,
                 details: expectedDetails,
-                statusCode: expectedHttpStatusCode,
+                statusCodeInt: expectedHttpStatusCode,
                 fieldDisplayName: expectedFieldDisplayName)
             .WithException(new BusinessException())
             .WithMessage("Unexpected message")
             .WithCode("UnexpectedCode")
             .WithDetails("Unexpected details")
-            .WithHttpStatusCode(HttpStatusCode.Accepted)
+            .WithStatusCode(HttpStatusCode.Accepted)
             .WithFieldDisplayName("Unexpected field display name")
             .ForEach(x => x
                 .Must(_commonFixture.BeValid)
