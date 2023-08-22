@@ -186,12 +186,20 @@ public static class ValidationExtensions
             .Transform(x => (TEnum)System.Enum.Parse(typeof(TEnum), x, ignoreCase: true));
     }
 
-    public static IValidation<string> LengthRange(
+    public static IValidation<string> InclusiveLengthRange(
         this IValidation<string> validation,
         int minimum,
         int maximum)
     {
-        return validation.SetValidator(() => new LengthRangeValidator(validation.GetFieldValue(), minimum, maximum));
+        return validation.SetValidator(() => new InclusiveLengthRangeValidator(validation.GetFieldValue(), minimum, maximum));
+    }
+    
+    public static IValidation<string> ExclusiveLengthRange(
+        this IValidation<string> validation,
+        int minimum,
+        int maximum)
+    {
+        return validation.SetValidator(() => new ExclusiveLengthRangeValidator(validation.GetFieldValue(), minimum, maximum));
     }
 
     public static IValidation<string> MinimumLength(

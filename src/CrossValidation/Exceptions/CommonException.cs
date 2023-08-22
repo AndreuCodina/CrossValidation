@@ -78,8 +78,23 @@ public static partial class CommonException
 
     public class EnumRangeException() : BusinessException(code: nameof(ErrorResource.Enum));
 
-    public class LengthRangeException(int minimumLength, int maximumLength, int totalLength)
-        : BusinessException(code: nameof(ErrorResource.LengthRange))
+    public class InclusiveLengthRangeException(int minimumLength, int maximumLength, int totalLength)
+        : BusinessException(code: nameof(ErrorResource.InclusiveLengthRange))
+    {
+        public int MinimumLength => minimumLength;
+        public int MaximumLength => maximumLength;
+        public int TotalLength => totalLength;
+        
+        public override void AddParametersAsPlaceholderValues()
+        {
+            AddPlaceholderValue(minimumLength);
+            AddPlaceholderValue(maximumLength);
+            AddPlaceholderValue(totalLength);
+        }
+    }
+    
+    public class ExclusiveLengthRangeException(int minimumLength, int maximumLength, int totalLength)
+        : BusinessException(code: nameof(ErrorResource.ExclusiveLengthRange))
     {
         public int MinimumLength => minimumLength;
         public int MaximumLength => maximumLength;

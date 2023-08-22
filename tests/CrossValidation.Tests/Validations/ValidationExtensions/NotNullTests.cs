@@ -68,7 +68,7 @@ public class NotNullTests :
 
             validator.Field(_model.NullableString)
                 .NotNull()
-                .LengthRange(int.MaxValue, int.MaxValue);
+                .InclusiveLengthRange(int.MaxValue, int.MaxValue);
 
             validator.Field(_model.NullableInt)
                 .NotNull();
@@ -80,7 +80,7 @@ public class NotNullTests :
             .Exceptions;
         exceptions.Count.ShouldBe(3);
         exceptions[0].ShouldBeOfType<CommonException.NotNullException>();
-        exceptions[1].ShouldBeOfType<CommonException.LengthRangeException>();
+        exceptions[1].ShouldBeOfType<CommonException.InclusiveLengthRangeException>();
         exceptions[2].ShouldBeOfType<CommonException.NotNullException>();
     }
     
