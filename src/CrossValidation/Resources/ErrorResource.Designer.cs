@@ -152,5 +152,11 @@ namespace CrossValidation.Resources {
                 return ResourceManager.GetString("NotEqual", resourceCulture);
             }
         }
+        
+        public static string ExclusiveLengthRange {
+            get {
+                return ResourceManager.GetString("ExclusiveLengthRange", resourceCulture);
+            }
+        }
     }
 }

@@ -2,7 +2,7 @@
 
 namespace CrossValidation.Validators.StringValidators;
 
-public class InclusiveLengthRangeValidator(string fieldValue, int minimum, int maximum)
+public class ExclusiveLengthRangeValidator(string fieldValue, int minimum, int maximum)
     : LengthRangeValidator(minimum, maximum)
 {
     private readonly string _fieldValue = fieldValue;
@@ -11,12 +11,12 @@ public class InclusiveLengthRangeValidator(string fieldValue, int minimum, int m
 
     public override bool IsValid()
     {
-        return _fieldValue.Length >= _minimum
-               && _fieldValue.Length <= _maximum;
+        return _fieldValue.Length > _minimum
+               && _fieldValue.Length < _maximum;
     }
 
     public override BusinessException CreateException()
     {
-        return new CommonException.InclusiveLengthRangeException(_minimum, _maximum, _fieldValue.Length);
+        return new CommonException.ExclusiveLengthRangeException(_minimum, _maximum, _fieldValue.Length);
     }
 }

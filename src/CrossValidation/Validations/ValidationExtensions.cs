@@ -193,6 +193,14 @@ public static class ValidationExtensions
     {
         return validation.SetValidator(() => new InclusiveLengthRangeValidator(validation.GetFieldValue(), minimum, maximum));
     }
+    
+    public static IValidation<string> ExclusiveLengthRange(
+        this IValidation<string> validation,
+        int minimum,
+        int maximum)
+    {
+        return validation.SetValidator(() => new ExclusiveLengthRangeValidator(validation.GetFieldValue(), minimum, maximum));
+    }
 
     public static IValidation<string> MinimumLength(
         this IValidation<string> validation,

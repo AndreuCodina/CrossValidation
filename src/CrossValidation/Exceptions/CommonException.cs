@@ -92,6 +92,21 @@ public static partial class CommonException
             AddPlaceholderValue(totalLength);
         }
     }
+    
+    public class ExclusiveLengthRangeException(int minimumLength, int maximumLength, int totalLength)
+        : BusinessException(code: nameof(ErrorResource.ExclusiveLengthRange))
+    {
+        public int MinimumLength => minimumLength;
+        public int MaximumLength => maximumLength;
+        public int TotalLength => totalLength;
+        
+        public override void AddParametersAsPlaceholderValues()
+        {
+            AddPlaceholderValue(minimumLength);
+            AddPlaceholderValue(maximumLength);
+            AddPlaceholderValue(totalLength);
+        }
+    }
 
     public class MinimumLengthException(int minimumLength, int totalLength)
         : BusinessException(code: nameof(ErrorResource.MinimumLength))

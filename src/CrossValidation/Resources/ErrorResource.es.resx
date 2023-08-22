@@ -72,4 +72,7 @@
     <data name="NotEqual" xml:space="preserve">
         <value>No debe ser igual que {comparisonValue}</value>
     </data>
+    <data name="ExclusiveLengthRange" xml:space="preserve">
+        <value>Debe tener entre {minimumLength} y {maximumLength} caracter(es) (exclusivo)</value>
+    </data>
 </root>
