@@ -67,7 +67,7 @@ public class WhenNotNullTests :
             .Build();
         var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
         {
-            validator.ValidationMode = ValidationMode.AccumulateFirstErrors;
+            validator.ValidationMode = ValidationMode.AccumulateFirstErrorRelatedToField;
             
             var structValidationAction = validator.Field(_model.NullableInt)
                 .WhenNotNull(x => x
@@ -122,7 +122,7 @@ public class WhenNotNullTests :
          
         var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
         {
-            validator.ValidationMode = ValidationMode.AccumulateFirstErrors;
+            validator.ValidationMode = ValidationMode.AccumulateFirstErrorRelatedToField;
 
             validator.Field(_model.NullableInt)
                 .WhenNotNull(x => x
@@ -154,7 +154,7 @@ public class WhenNotNullTests :
 
         var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
         {
-            validator.ValidationMode = ValidationMode.AccumulateFirstErrors;
+            validator.ValidationMode = ValidationMode.AccumulateFirstErrorRelatedToField;
 
             validator.Field(_model.NullableInt)
                 .WithMessage(expectedMessage)
@@ -251,7 +251,7 @@ public class WhenNotNullTests :
         
         var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
         {
-            validator.ValidationMode = ValidationMode.AccumulateFirstErrors;
+            validator.ValidationMode = ValidationMode.AccumulateFirstErrorRelatedToField;
 
             validator.Field(_model.NullableInt)
                 .WhenNotNull(x => x
@@ -320,8 +320,8 @@ public class WhenNotNullTests :
 
     [Theory]
     [InlineData(ValidationMode.StopOnFirstError)]
-    [InlineData(ValidationMode.AccumulateFirstErrors)]
-    [InlineData(ValidationMode.AccumulateFirstErrorsAndAllIterationFirstErrors)]
+    [InlineData(ValidationMode.AccumulateFirstErrorRelatedToField)]
+    [InlineData(ValidationMode.AccumulateFirstErrorRelatedToFieldAndFirstErrorOfAllIterations)]
     public async Task Stop_executing_nested_failed_scope_with_previous_scope_with_pending_asynchronous_validation(
         ValidationMode validationMode)
     {
@@ -349,8 +349,8 @@ public class WhenNotNullTests :
     
     [Theory]
     [InlineData(ValidationMode.StopOnFirstError, null)]
-    [InlineData(ValidationMode.AccumulateFirstErrors, null)]
-    [InlineData(ValidationMode.AccumulateFirstErrorsAndAllIterationFirstErrors, 2)]
+    [InlineData(ValidationMode.AccumulateFirstErrorRelatedToField, null)]
+    [InlineData(ValidationMode.AccumulateFirstErrorRelatedToFieldAndFirstErrorOfAllIterations, 2)]
     public async Task ForEach_works_inside_WhenNotNull(ValidationMode validationMode, int? numberOfExceptions)
     {
         _model = new ParentModelBuilder()
@@ -371,7 +371,7 @@ public class WhenNotNullTests :
         });
         var action = () => parentModelValidator.ValidateAsync(_model);
 
-        if (validationMode is ValidationMode.StopOnFirstError or ValidationMode.AccumulateFirstErrors)
+        if (validationMode is ValidationMode.StopOnFirstError or ValidationMode.AccumulateFirstErrorRelatedToField)
         {
             await action.ShouldThrowAsync<BusinessException>();
         }

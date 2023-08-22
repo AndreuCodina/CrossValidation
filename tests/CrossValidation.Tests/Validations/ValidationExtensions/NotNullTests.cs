@@ -58,7 +58,7 @@ public class NotNullTests :
             .Build();
         var parentModelValidator = _commonFixture.CreateParentModelValidator(validator =>
         {
-            validator.ValidationMode = ValidationMode.AccumulateFirstErrors;
+            validator.ValidationMode = ValidationMode.AccumulateFirstErrorRelatedToField;
 
             validator.Field(_model.NullableInt)
                 .NotNull()

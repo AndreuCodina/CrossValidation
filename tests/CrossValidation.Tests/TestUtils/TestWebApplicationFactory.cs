@@ -1,15 +1,14 @@
-﻿using System;
-using Microsoft.AspNetCore.Hosting;
+﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace CrossValidation.Tests.TestUtils;
 
-public class TestApplicationFactory : WebApplicationFactory<Program>
+public class TestWebApplicationFactory : WebApplicationFactory<Program>
 {
     private readonly Action<IServiceCollection>? _services;
 
-    public TestApplicationFactory(Action<IServiceCollection>? services = null)
+    public TestWebApplicationFactory(Action<IServiceCollection>? services = null)
     {
         _services = services;
     }
