@@ -2,7 +2,7 @@
 
 namespace CrossValidation.Exceptions;
 
-public static class CommonException
+public static partial class CommonException
 {
     public class NotNullException() : BusinessException(code: nameof(ErrorResource.NotNull));
 
@@ -54,6 +54,17 @@ public static class CommonException
     
     public class EqualException<TField>(TField comparisonValue) :
         BusinessException(code: nameof(ErrorResource.Equal))
+    {
+        public TField ComparisonValue => comparisonValue;
+        
+        public override void AddParametersAsPlaceholderValues()
+        {
+            AddPlaceholderValue(comparisonValue);
+        }
+    }
+    
+    public class NotEqualException<TField>(TField comparisonValue) :
+        BusinessException(code: nameof(ErrorResource.NotEqual))
     {
         public TField ComparisonValue => comparisonValue;
         

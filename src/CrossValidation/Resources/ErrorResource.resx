@@ -69,4 +69,7 @@
     <data name="Equal" xml:space="preserve">
         <value>Must be equal to {comparisonValue}</value>
     </data>
+    <data name="NotEqual" xml:space="preserve">
+        <value>Must not be equal to {comparisonValue}</value>
+    </data>
 </root>
