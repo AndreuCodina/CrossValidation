@@ -2,15 +2,15 @@
 
 namespace CrossValidation.Validators.StringValidators;
 
-public class MinimumLengthValidator(string fieldValue, int minimum) : LengthValidatorBase
+public class MinimumLengthValidator(string fieldValue, int minimum) : Validator
 {
     public override bool IsValid()
     {
         return fieldValue.Length >= minimum;
     }
 
-    public override LengthException CreateException()
+    public override BusinessException CreateException()
     {
-        return new CommonException.MinimumLengthException(minimum, GetTotalLength(fieldValue));
+        return new CommonException.MinimumLengthException(minimum, fieldValue.Length);
     }
 }

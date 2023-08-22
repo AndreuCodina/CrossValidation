@@ -19,8 +19,8 @@ namespace CrossValidation;
 public interface IValidationOperation
 {
     Func<object>? GetNonGenericFieldValue { get; set; }
-    Func<IValidator<BusinessException>>? Validator { get; set; }
-    Func<Task<IValidator<BusinessException>>>? AsyncValidator { get; set; }
+    Func<Validator>? Validator { get; set; }
+    Func<Task<Validator>>? AsyncValidator { get; set; }
     Action? Scope { get; set; }
     string? Code { get; set; }
     string Message { get; set; }
@@ -59,8 +59,8 @@ public interface IValidationOperation
 internal class ValidationOperation
 {
     public Func<object>? GetNonGenericFieldValue { get; set; }
-    public Func<IValidator<BusinessException>>? Validator { get; set; }
-    public Func<Task<IValidator<BusinessException>>>? AsyncValidator { get; set; }
+    public Func<Validator>? Validator { get; set; }
+    public Func<Task<Validator>>? AsyncValidator { get; set; }
     public Action? Scope { get; set; }
     public string? Code { get; set; }
     public string Message { get; set; } = "";

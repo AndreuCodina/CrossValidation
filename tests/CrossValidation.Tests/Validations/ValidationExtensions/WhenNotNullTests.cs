@@ -166,6 +166,7 @@ public class WhenNotNullTests :
             validator.Field(_model.Int)
                 .Must(_commonFixture.NotBeValid);
         });
+        
         var action = () => parentModelValidator.ValidateAsync(_model);
 
         var exceptions = (await action.ShouldThrowAsync<BusinessListException>())
@@ -182,6 +183,7 @@ public class WhenNotNullTests :
             .WithNullableInt(1)
             .Build();
         var expectedMessage = "Expected message";
+        
         var action = () => Validate.That(_model.NullableInt)
             .MustAsync(_commonFixture.BeValidAsync)
             .WhenNotNull(x => x
@@ -192,7 +194,6 @@ public class WhenNotNullTests :
             .ValidateAsync();
         
         var exception = await action.ShouldThrowAsync<CommonException.PredicateException>();
-        
         exception.Message.ShouldBe(expectedMessage);
     }
     
@@ -202,8 +203,8 @@ public class WhenNotNullTests :
         _model = new ParentModelBuilder()
             .WithNullableInt(1)
             .Build();
-        
         var expectedMessage = "Expected message";
+        
         var action = () => Validate.That(_model.NullableInt)
             .MustAsync(_commonFixture.BeValidAsync)
             .WhenNotNull(x => x
@@ -216,7 +217,6 @@ public class WhenNotNullTests :
             .ValidateAsync();
 
         var exception = await action.ShouldThrowAsync<CommonException.PredicateException>();
-        
         exception.Message.ShouldBe(expectedMessage);
     }
     
@@ -227,6 +227,7 @@ public class WhenNotNullTests :
             .WithNullableInt(1)
             .Build();
         var expectedMessage = "Expected message";
+        
         var action = () => Validate.That(_model.NullableInt)
             .MustAsync(_commonFixture.BeValidAsync)
             .WhenNotNull(x => x
@@ -270,7 +271,6 @@ public class WhenNotNullTests :
         _model = new ParentModelBuilder()
             .WithNullableInt(1)
             .Build();
-        
         var expectedMessage = "Expected message";
 
         var action = () => Validate.That(_model.NullableInt)
@@ -289,6 +289,7 @@ public class WhenNotNullTests :
     public async Task WhenNotNull_should_not_execute_scope_if_the_nullable_condition_is_not_met()
     {
         var expectedMessage = "Expected message";
+        
         var action = () => Validate.That(_model.NullableInt)
             .MustAsync(_commonFixture.BeValidAsync)
             .WhenNotNull<int, int>(_ => throw new Exception())
@@ -297,7 +298,6 @@ public class WhenNotNullTests :
             .ValidateAsync();
 
         var exception = await action.ShouldThrowAsync<CommonException.PredicateException>();
-        
         exception.Message.ShouldBe(expectedMessage);
     }
     
@@ -307,6 +307,7 @@ public class WhenNotNullTests :
         _model = new ParentModelBuilder()
             .WithNullableInt(1)
             .Build();
+        
         var action = () => Validate.That(_model.NullableInt)
             .WhenAsync(_commonFixture.BeValidAsync)
             .WhenNotNull(x => x
@@ -342,6 +343,7 @@ public class WhenNotNullTests :
                     .Must(_commonFixture.ThrowException))
                 .Must(_commonFixture.ThrowException);
         });
+        
         var action = () => parentModelValidator.ValidateAsync(_model);
 
         await action.ShouldThrowAsync<BusinessException>();
@@ -369,6 +371,7 @@ public class WhenNotNullTests :
                     .Must(_commonFixture.ThrowException))
                 .Must(_commonFixture.ThrowException);
         });
+        
         var action = () => parentModelValidator.ValidateAsync(_model);
 
         if (validationMode is ValidationMode.StopOnFirstError or ValidationMode.AccumulateFirstErrorRelatedToField)

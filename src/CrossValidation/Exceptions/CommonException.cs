@@ -2,7 +2,7 @@
 
 namespace CrossValidation.Exceptions;
 
-public static class CommonException
+public static partial class CommonException
 {
     public class NotNullException() : BusinessException(code: nameof(ErrorResource.NotNull));
 
@@ -18,15 +18,72 @@ public static class CommonException
             AddPlaceholderValue(comparisonValue);
         }
     }
+    
+    public class GreaterThanOrEqualException<TField>(TField comparisonValue)
+        : BusinessException(code: nameof(ErrorResource.GreaterThanOrEqual))
+    {
+        public TField ComparisonValue => comparisonValue;
+        
+        public override void AddParametersAsPlaceholderValues()
+        {
+            AddPlaceholderValue(comparisonValue);
+        }
+    }
+    
+    public class LessThanException<TField>(TField comparisonValue)
+        : BusinessException(code: nameof(ErrorResource.LessThan))
+    {
+        public TField ComparisonValue => comparisonValue;
+        
+        public override void AddParametersAsPlaceholderValues()
+        {
+            AddPlaceholderValue(comparisonValue);
+        }
+    }
+    
+    public class LessThanOrEqualException<TField>(TField comparisonValue)
+        : BusinessException(code: nameof(ErrorResource.LessThanOrEqual))
+    {
+        public TField ComparisonValue => comparisonValue;
+        
+        public override void AddParametersAsPlaceholderValues()
+        {
+            AddPlaceholderValue(comparisonValue);
+        }
+    }
+    
+    public class EqualException<TField>(TField comparisonValue)
+        : BusinessException(code: nameof(ErrorResource.Equal))
+    {
+        public TField ComparisonValue => comparisonValue;
+        
+        public override void AddParametersAsPlaceholderValues()
+        {
+            AddPlaceholderValue(comparisonValue);
+        }
+    }
+    
+    public class NotEqualException<TField>(TField comparisonValue)
+        : BusinessException(code: nameof(ErrorResource.NotEqual))
+    {
+        public TField ComparisonValue => comparisonValue;
+        
+        public override void AddParametersAsPlaceholderValues()
+        {
+            AddPlaceholderValue(comparisonValue);
+        }
+    }
 
     public class EnumException() : BusinessException(code: nameof(ErrorResource.Enum));
 
     public class EnumRangeException() : BusinessException(code: nameof(ErrorResource.Enum));
 
-    public class LengthRangeException(int minimumLength, int maximumLength, int totalLength) :
-        LengthException(code: nameof(ErrorResource.LengthRange))
+    public class LengthRangeException(int minimumLength, int maximumLength, int totalLength)
+        : BusinessException(code: nameof(ErrorResource.LengthRange))
     {
-        public override int TotalLength => totalLength;
+        public int MinimumLength => minimumLength;
+        public int MaximumLength => maximumLength;
+        public int TotalLength => totalLength;
         
         public override void AddParametersAsPlaceholderValues()
         {
@@ -37,9 +94,10 @@ public static class CommonException
     }
 
     public class MinimumLengthException(int minimumLength, int totalLength)
-        : LengthException(code: nameof(ErrorResource.MinimumLength))
+        : BusinessException(code: nameof(ErrorResource.MinimumLength))
     {
-        public override int TotalLength => totalLength;
+        public int MinimumLength => minimumLength;
+        public int TotalLength => totalLength;
         
         public override void AddParametersAsPlaceholderValues()
         {
@@ -49,9 +107,10 @@ public static class CommonException
     }
     
     public class MaximumLengthException(int maximumLength, int totalLength)
-        : LengthException(code: nameof(ErrorResource.MaximumLength))
+        : BusinessException(code: nameof(ErrorResource.MaximumLength))
     {
-        public override int TotalLength => totalLength;
+        public int MaximumLength => maximumLength;
+        public int TotalLength => totalLength;
         
         public override void AddParametersAsPlaceholderValues()
         {

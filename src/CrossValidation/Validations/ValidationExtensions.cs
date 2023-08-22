@@ -88,6 +88,51 @@ public static class ValidationExtensions
         return validation.SetValidator(() =>
             new GreaterThanValidator<TField>(validation.GetFieldValue(), valueToCompare));
     }
+    
+    public static IValidation<TField> GreaterThanOrEqual<TField>(
+        this IValidation<TField> validation,
+        TField valueToCompare)
+        where TField : IComparable<TField>
+    {
+        return validation.SetValidator(() =>
+            new GreaterThanOrEqualValidator<TField>(validation.GetFieldValue(), valueToCompare));
+    }
+    
+    public static IValidation<TField> LessThan<TField>(
+        this IValidation<TField> validation,
+        TField valueToCompare)
+        where TField : IComparable<TField>
+    {
+        return validation.SetValidator(() =>
+            new LessThanValidator<TField>(validation.GetFieldValue(), valueToCompare));
+    }
+    
+    public static IValidation<TField> LessThanOrEqual<TField>(
+        this IValidation<TField> validation,
+        TField valueToCompare)
+        where TField : IComparable<TField>
+    {
+        return validation.SetValidator(() =>
+            new LessThanOrEqualValidator<TField>(validation.GetFieldValue(), valueToCompare));
+    }
+    
+    public static IValidation<TField> Equal<TField>(
+        this IValidation<TField> validation,
+        TField valueToCompare)
+        where TField : IEquatable<TField>
+    {
+        return validation.SetValidator(() =>
+            new EqualValidator<TField>(validation.GetFieldValue(), valueToCompare));
+    }
+    
+    public static IValidation<TField> NotEqual<TField>(
+        this IValidation<TField> validation,
+        TField valueToCompare)
+        where TField : IEquatable<TField>
+    {
+        return validation.SetValidator(() =>
+            new NotEqualValidator<TField>(validation.GetFieldValue(), valueToCompare));
+    }
 
     public static IValidation<TField> Enum<TField>(
         this IValidation<TField> validation)

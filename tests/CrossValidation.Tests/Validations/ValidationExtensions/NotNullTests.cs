@@ -33,6 +33,7 @@ public class NotNullTests :
         var action = () => Validate.That(_model.NullableInt)
             .NotNull()
             .GreaterThan(_model.NullableInt!.Value - 1);
+        
         action.ShouldNotThrow();
     }
     
@@ -46,6 +47,7 @@ public class NotNullTests :
         var action = () => Validate.That(_model.NullableString)
             .NotNull()
             .Must(_commonFixture.BeValid);
+        
         action.ShouldNotThrow();
     }
     

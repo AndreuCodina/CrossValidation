@@ -38,6 +38,7 @@ public class ModelValidatorTests :
              validator.Field(_model.NullableString)
                  .NotNull();
          });
+         
          var action = () => parentModelValidator.Validate(_model);
 
          action.ShouldNotThrow();
@@ -51,6 +52,7 @@ public class ModelValidatorTests :
              validator.Field(_model.NullableString)
                  .NotNull();
          });
+         
          var action = () => parentModelValidator.Validate(_model);
 
          var exception = action.ShouldThrow<BusinessException>();
@@ -68,10 +70,10 @@ public class ModelValidatorTests :
              validator.Field(_model.NestedModel.Int)
                  .GreaterThan(_model.NestedModel.Int);
          });
+         
          var action = () => parentModelValidator.Validate(_model);
 
          var exception = action.ShouldThrow<BusinessException>();
-         
          exception.FieldName.ShouldBe(expectedFieldName);
          exception.GetFieldValue!().ShouldBe(expectedFieldValue);
      }
@@ -91,10 +93,10 @@ public class ModelValidatorTests :
              validator.Field(_model.NestedModel)
                  .SetModelValidator(nestedModelValidator);
          });
+         
          var action = () => parentModelValidator.Validate(_model);
 
          var exception = action.ShouldThrow<BusinessException>();
-         
          exception.FieldName.ShouldBe(expectedFieldName);
          exception.GetFieldValue!().ShouldBe(expectedFieldValue);
      }

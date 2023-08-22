@@ -2,15 +2,15 @@ using CrossValidation.Exceptions;
 
 namespace CrossValidation.Validators.StringValidators;
 
-public class MaximumLengthValidator(string fieldValue, int maximum) : LengthValidatorBase
+public class MaximumLengthValidator(string fieldValue, int maximum) : Validator
 {
     public override bool IsValid()
     {
         return fieldValue.Length <= maximum;
     }
 
-    public override LengthException CreateException()
+    public override BusinessException CreateException()
     {
-        return new CommonException.MaximumLengthException(maximum, GetTotalLength(fieldValue));
+        return new CommonException.MaximumLengthException(maximum, fieldValue.Length);
     }
 }

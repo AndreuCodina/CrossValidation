@@ -42,7 +42,7 @@ public class ValidationTests :
         var exception = action.ShouldThrow<CommonException.GreaterThanException<int>>();
         exception.FieldName.ShouldBe("NestedModel.Int");
         exception.Code.ShouldBe(nameof(ErrorResource.GreaterThan));
-        exception.Message.ShouldBe("Must be greater than 1");
+        exception.Message.ShouldBe("Must be greater than 2");
     }
     
     [Theory]
@@ -178,6 +178,7 @@ public class ValidationTests :
     public async Task Validate_validator_with_async_conditional_execution()
     {
         var expectedMessage = "TrueCase";
+        
         var action = () => Validate.That(_model.NestedModel.Int)
             .WhenAsync(_commonFixture.NotBeValidAsync)
             .GreaterThan(_model.NestedModel.Int + 1)
@@ -259,6 +260,7 @@ public class ValidationTests :
     {
         var expectedDetails = "Expected details";
         var expectedHttpStatusCode = (int)HttpStatusCode.Created;
+        
         var action = () => Validate.That(_model.Int)
             .WithCode(nameof(ErrorResource.NotNull))
             .WithDetails(expectedDetails)
@@ -276,6 +278,7 @@ public class ValidationTests :
     public void Exception_customizations_not_be_overriden_by_validator()
     {
         var expectedDetails = "Expected details";
+        
         var action = () => Validate.That(_model.Int)
             .WithException(new ExceptionWithCustomization())
             .GreaterThan(_model.Int);

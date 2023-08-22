@@ -24,6 +24,7 @@ public class RegexTests : TestBase
     {
         var value = "name";
         var pattern = "[a-z]";
+        
         var action = () => Validate.Field(value)
             .Regex(pattern);
 
@@ -35,11 +36,11 @@ public class RegexTests : TestBase
     {
         var value = "1";
         var pattern = "[a-z]";
+        
         var action = () => Validate.Field(value)
             .Regex(pattern);
 
         var exception = action.ShouldThrow<CommonException.RegularExpressionException>();
-        
         exception.Code.ShouldBe(nameof(ErrorResource.RegularExpression));
     }
 }

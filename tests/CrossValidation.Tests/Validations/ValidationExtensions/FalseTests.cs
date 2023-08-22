@@ -35,7 +35,6 @@ public class FalseTests : TestBase
             .False();
 
         var exception = action.ShouldThrow<CommonException.FalseBooleanException>();
-        
         exception.Code.ShouldBe(nameof(ErrorResource.Generic));
     }
 }
