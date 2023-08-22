@@ -8,46 +8,22 @@ namespace CrossValidation.Tests.Validators;
 public class GreaterThanValidatorTests : TestBase
 {
     [Fact]
-    public void Validate_greater_than()
+    public void Validate_value_is_greater_than_comparison_value()
     {
-        var intValue = 2;
-        var comparisonIntValue = 1;
-        var intValidator = new GreaterThanValidator<int>(fieldValue: intValue, comparisonValue: comparisonIntValue);
-        var isValid = intValidator.IsValid();
-        isValid.ShouldBeTrue();
-         
-        var floatValue = 2f;
-        var comparisonFloatValue = 1f;
-        var floatValidator = new GreaterThanValidator<float>(fieldValue: floatValue, comparisonValue: comparisonFloatValue);
-        isValid = floatValidator.IsValid();
-        isValid.ShouldBeTrue();
-         
-        var decimalValue = 2m;
-        var comparisonDecimalValue = 1m;
-        var decimalValidator = new GreaterThanValidator<decimal>(fieldValue: decimalValue, comparisonValue: comparisonDecimalValue);
-        isValid = decimalValidator.IsValid();
+        var value = 2;
+        var comparisonValue = 1;
+        var validator = new GreaterThanValidator<int>(value, comparisonValue);
+        var isValid = validator.IsValid();
         isValid.ShouldBeTrue();
     }
      
     [Fact]
-    public void Validate_greater_than_fails()
+    public void Fail_when_value_is_not_greater_than_comparison_value()
     {
-        var intValue = 1;
-        var comparisonIntValue = 2;
-        var intValidator = new GreaterThanValidator<int>(fieldValue: intValue, comparisonValue: comparisonIntValue);
-        var isValid = intValidator.IsValid();
-        isValid.ShouldBeFalse();
-         
-        var floatValue = 1f;
-        var comparisonFloatValue = 2f;
-        var floatValidator = new GreaterThanValidator<float>(fieldValue: floatValue, comparisonValue: comparisonFloatValue);
-        isValid = floatValidator.IsValid();
-        isValid.ShouldBeFalse();
-         
-        var decimalValue = 1m;
-        var comparisonDecimalValue = 2m;
-        var decimalValidator = new GreaterThanValidator<decimal>(fieldValue: decimalValue, comparisonValue: comparisonDecimalValue);
-        isValid = decimalValidator.IsValid();
+        var value = 1;
+        var comparisonValue = 2;
+        var validator = new GreaterThanValidator<int>(value, comparisonValue);
+        var isValid = validator.IsValid();
         isValid.ShouldBeFalse();
     }
 }

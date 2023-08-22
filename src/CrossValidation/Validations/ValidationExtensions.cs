@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using System.Numerics;
 using CrossValidation.Validators.BooleanValidators;
 using CrossValidation.Validators.CollectionValidators;
 using CrossValidation.Validators.ComparisonValidators;
@@ -84,7 +83,7 @@ public static class ValidationExtensions
     public static IValidation<TField> GreaterThan<TField>(
         this IValidation<TField> validation,
         TField valueToCompare)
-        where TField : IComparisonOperators<TField, TField, bool>
+        where TField : IComparable<TField>
     {
         return validation.SetValidator(() =>
             new GreaterThanValidator<TField>(validation.GetFieldValue(), valueToCompare));
