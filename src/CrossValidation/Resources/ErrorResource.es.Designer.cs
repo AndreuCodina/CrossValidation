@@ -134,5 +134,11 @@ namespace CrossValidation.Resources {
                 return ResourceManager.GetString("LessThan", resourceCulture);
             }
         }
+        
+        internal static string LessThanOrEqual {
+            get {
+                return ResourceManager.GetString("LessThanOrEqual", resourceCulture);
+            }
+        }
     }
 }
