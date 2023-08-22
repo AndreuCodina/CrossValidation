@@ -11,7 +11,7 @@ public class MessageBusinessExceptionTests
     public void Instantiate_exception()
     {
         var expectedMessage = "Expected message with 1";
-        var expectedStatusCode = HttpStatusCode.BadRequest;
+        var expectedStatusCode = (int)HttpStatusCode.BadRequest;
         var expectedDetails = "Expected details";
         
         var exception = new CustomMessageBusinessException(1);

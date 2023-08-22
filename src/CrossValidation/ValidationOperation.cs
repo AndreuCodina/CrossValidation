@@ -1,4 +1,3 @@
-using System.Net;
 using CrossValidation.Exceptions;
 using CrossValidation.Resources;
 using CrossValidation.Validations;
@@ -28,7 +27,7 @@ public interface IValidationOperation
     string? Details { get; set; }
     BusinessException? Exception { get; set; }
     string? FieldDisplayName { get; set; }
-    HttpStatusCode? StatusCode { get; set; }
+    int? StatusCode { get; set; }
     Type? CustomExceptionToThrow { get; set; }
     Func<bool>? Condition { get; set; }
     Func<Task<bool>>? AsyncCondition { get; set; }
@@ -68,7 +67,7 @@ internal class ValidationOperation
     public string? Details { get; set; }
     public BusinessException? Exception { get; set; }
     public string? FieldDisplayName { get; set; }
-    public HttpStatusCode? StatusCode { get; set; }
+    public int? StatusCode { get; set; }
     public Type? CustomExceptionToThrow { get; set; }
     public Func<bool>? Condition { get; set; }
     public Func<Task<bool>>? AsyncCondition { get; set; }
@@ -92,12 +91,13 @@ internal class ValidationOperation
         bool StopExecution()
         {
             var isModelValidator = ScopeType is not null && ScopeType is Validations.ScopeType.ModelValidator;
-            var stopForEach = (ScopeType is not null && ScopeType is Validations.ScopeType.ForEach && context.ValidationMode is not ValidationMode.AccumulateFirstErrorsAndAllIterationFirstErrors);
+            var stopForEach = (ScopeType is not null && ScopeType is Validations.ScopeType.ForEach && context.ValidationMode is not ValidationMode.AccumulateFirstErrorRelatedToFieldAndFirstErrorOfAllIterations);
             var stopWhenNotNull = (ScopeType is not null && ScopeType is Validations.ScopeType.WhenNotNull);
             return HasFailed
                     && (!IsScopeCreator || stopForEach || stopWhenNotNull)
                     && !isModelValidator;
         }
+        
         if (StopExecution())
         {
             return;
@@ -270,7 +270,16 @@ internal class ValidationOperation
             ? context.Message
             : exception.Message != "" ? exception.Message : Message;
         Details = context.Details ?? (exception.Details ?? Details);
-        StatusCode = context.StatusCode ?? exception.StatusCode;
+
+        if (context.StatusCode is not null)
+        {
+            StatusCode = (int)context.StatusCode;
+        }
+        else
+        {
+            StatusCode = exception.StatusCode;
+        }
+        
         FieldDisplayName = context.FieldDisplayName ?? (exception.FieldDisplayName ?? FieldDisplayName);
     }
     
@@ -310,7 +319,19 @@ internal class ValidationOperation
         exception.Code = GetCodeToFill(exception, context);
         exception.FormattedMessage = GetMessageToFill(exception, context);
         exception.Details = context.Details ?? (Details ?? exception.Details);
-        exception.StatusCode = context.StatusCode ?? (StatusCode ?? exception.StatusCode);
+
+        if (context.StatusCode is not null)
+        {
+            exception.StatusCode = context.StatusCode.Value;
+        }
+        else if (StatusCode is not null)
+        {
+            exception.StatusCode = StatusCode.Value;
+        }
+        else
+        {
+            exception.StatusCode = exception.StatusCode;
+        }
     }
 
     private string? GetCodeToFill(BusinessException exception, ValidationContext context)
