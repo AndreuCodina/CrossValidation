@@ -55,4 +55,17 @@ public class LengthRangeTests : TestBase
             .Should()
             .Be(value.Length);
     }
+    
+    [Theory]
+    [InlineData(-1, 10)]
+    [InlineData(10, -1)]
+    [InlineData(10, 1)]
+    public void Fail_when_minimum_argument_preconditions_are_not_met(int minimumLength, int maximumLength)
+    {
+        var action = () => Validate.Field(_model.String)
+            .LengthRange(minimumLength, maximumLength);
+
+        action.Should()
+            .Throw<ArgumentException>();
+    }
 }

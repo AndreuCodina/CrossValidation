@@ -6,13 +6,17 @@ public class LengthRangeValidator(string fieldValue, int minimum, int maximum) :
 {
     public override bool IsValid()
     {
-        if (minimum > maximum)
+        if (minimum < 0)
+        {
+            throw new ArgumentException("The minimum length cannot be less than zero");
+        }
+        else if (maximum < 0)
+        {
+            throw new ArgumentException("The maximum length cannot be less than zero");
+        }
+        else if (minimum > maximum)
         {
             throw new ArgumentException("The minimum length cannot be greater than the maximum length");
-        }
-        else if (maximum < minimum)
-        {
-            throw new ArgumentException("The maximum length cannot be less than the minimum length");
         }
 
         return fieldValue.Length >= minimum
