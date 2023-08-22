@@ -47,8 +47,6 @@ internal class ProblemDetailsMapper(ProblemDetails problemDetails)
         {
             problemDetails.Extensions.Add("errors", errors);
         }
-
-        // TODO: Add traceId
     }
     
     private CrossValidationProblemDetailsError CreateCrossProblemDetailsError(BusinessException exception)
