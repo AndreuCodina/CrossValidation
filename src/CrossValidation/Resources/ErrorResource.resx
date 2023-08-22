@@ -66,4 +66,7 @@
     <data name="LessThanOrEqual" xml:space="preserve">
         <value>Must be less than or equal to {comparisonValue}</value>
     </data>
+    <data name="Equal" xml:space="preserve">
+        <value>Must be equal to {comparisonValue}</value>
+    </data>
 </root>
