@@ -1,16 +1,15 @@
-﻿using System.Numerics;
-using CrossValidation.Exceptions;
+﻿using CrossValidation.Exceptions;
 
 namespace CrossValidation.Validators.ComparisonValidators;
 
 public class GreaterThanValidator<TField>(
     TField fieldValue,
     TField comparisonValue) : Validator
-    where TField : IComparisonOperators<TField, TField, bool>
+    where TField : IComparable<TField>
 {
     public override bool IsValid()
     {
-        return fieldValue > comparisonValue;
+        return fieldValue.CompareTo(comparisonValue) > 0;
     }
 
     public override BusinessException CreateException()
