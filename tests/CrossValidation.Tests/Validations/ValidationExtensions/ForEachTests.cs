@@ -343,6 +343,7 @@ public class ForEachTests :
                     .ForEach(x => x
                         .Must(x => x >= 2)));
         });
+        
         var action = () => parentModelValidator.Validate(_model);
         
         var exceptions = action.ShouldThrow<BusinessListException>()
@@ -358,6 +359,7 @@ public class ForEachTests :
         _model = new ParentModelBuilder()
             .WithIntList(expectedIntList)
             .Build();
+        
         var action = () => Validate.That(_model.IntList)
             .ForEach(x => x
                 .MustAsync(_commonFixture.BeValidAsync)
@@ -369,7 +371,6 @@ public class ForEachTests :
             .ValidateAsync();
 
         var exception = await action.ShouldThrowAsync<CommonException.PredicateException>();
-        
         exception.Message.ShouldBe(expectedMessage);
     }
     
@@ -393,6 +394,7 @@ public class ForEachTests :
                         .Must(x => x > 1)))
                 .Must(_commonFixture.ThrowException);
         });
+        
         var action = () => parentModelValidator.Validate(_model);
 
         if (validationMode is ValidationMode.StopOnFirstError or ValidationMode.AccumulateFirstErrorRelatedToField)

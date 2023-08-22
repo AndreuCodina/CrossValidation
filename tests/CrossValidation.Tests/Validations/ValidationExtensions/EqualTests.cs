@@ -3,7 +3,6 @@ using CrossValidation.Resources;
 using CrossValidation.Tests.TestUtils;
 using CrossValidation.Validations;
 using FluentAssertions;
-using Shouldly;
 using Xunit;
 
 namespace CrossValidation.Tests.Validations.ValidationExtensions;
@@ -15,6 +14,7 @@ public class EqualTests : TestBase
     {
         var value = 1;
         var comparisonValue = 1;
+        
         var action = () => Validate.Field(value)
             .Equal(comparisonValue);
 
@@ -27,13 +27,18 @@ public class EqualTests : TestBase
     {
         var value = 1;
         var comparisonValue = 2;
+        
         var action = () => Validate.Field(value)
             .Equal(comparisonValue);
         
-        action.Should()
+        var exception = action.Should()
             .Throw<CommonException.EqualException<int>>()
-            .And
-            .Code
-            .ShouldBe(nameof(ErrorResource.Equal));
+            .Which;
+        exception.Code
+            .Should()
+            .Be(nameof(ErrorResource.Equal));
+        exception.ComparisonValue
+            .Should()
+            .Be(comparisonValue);
     }
 }

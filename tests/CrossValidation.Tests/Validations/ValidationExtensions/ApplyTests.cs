@@ -27,6 +27,7 @@ public class ApplyTests : TestBase
                 .NotNull()
                 .MinimumLength(10);
         }
+        
         var action = () => Validate.Field(_model.NullableString)
             .Apply(ApplyValidations);
 
@@ -43,6 +44,7 @@ public class ApplyTests : TestBase
                 .NotNull()
                 .MinimumLength(10);
         }
+        
         var action = () => Validate.Field(_model.NullableString)
             .Apply(ApplyValidations);
 

@@ -76,12 +76,12 @@ public class ValidateTests :
         var expectedMessage = ErrorResource.NotNull;
         var expectedDetails = "Expected details";
         var testException = new TestException(code: expectedCode, details: expectedDetails);
+        
         var action = () => Validate.That(_model.NullableInt)
             .MustAsync(_ => _commonFixture.ExceptionAsync(testException))
             .ValidateAsync();
 
         var exception = await action.ShouldThrowAsync<TestException>();
-        
         exception.Code.ShouldBe(expectedCode);
         exception.Message.ShouldBe(expectedMessage);
         exception.Details.ShouldBe(expectedDetails);
@@ -136,6 +136,7 @@ public class ValidateTests :
         var expectedDetails = "Expected details";
         var expectedHttpStatusCode = (int)HttpStatusCode.Created;
         var expectedFieldDisplayName = "Expected field display name";
+        
         var action = () => Validate.That(
                 _model.Int,
                 exception: expectedException,
@@ -169,6 +170,7 @@ public class ValidateTests :
         var expectedDetails = "Expected details";
         var expectedHttpStatusCode = (int)HttpStatusCode.Created;
         var expectedFieldDisplayName = "Expected field display name";
+        
         var action = () => Validate.That(
                 _model.Int,
                 exception: expectedException,
@@ -203,6 +205,7 @@ public class ValidateTests :
         var expectedDetails = "Expected details";
         var expectedHttpStatusCode = (int)HttpStatusCode.Created;
         var expectedFieldDisplayName = "Expected field display name";
+        
         var action = () => Validate.That(
                 _model.IntList,
                 exception: expectedException,

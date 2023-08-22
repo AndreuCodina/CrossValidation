@@ -3,7 +3,6 @@ using CrossValidation.Resources;
 using CrossValidation.Tests.TestUtils;
 using CrossValidation.Validations;
 using FluentAssertions;
-using Shouldly;
 using Xunit;
 
 namespace CrossValidation.Tests.Validations.ValidationExtensions;
@@ -27,13 +26,18 @@ public class LessThanOrEqualTests : TestBase
     {
         var value = 2;
         var comparisonValue = 1;
+        
         var action = () => Validate.Field(value)
             .LessThanOrEqual(comparisonValue);
 
-        action.Should()
+        var exception = action.Should()
             .Throw<CommonException.LessThanOrEqualException<int>>()
-            .And
-            .Code
-            .ShouldBe(nameof(ErrorResource.LessThanOrEqual));
+            .Which;
+        exception.Code
+            .Should()
+            .Be(nameof(ErrorResource.LessThanOrEqual));
+        exception.ComparisonValue
+            .Should()
+            .Be(comparisonValue);
     }
 }

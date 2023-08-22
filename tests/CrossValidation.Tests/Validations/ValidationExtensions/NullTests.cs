@@ -49,6 +49,7 @@ public class NullTests :
         _model = new ParentModelBuilder()
             .WithNullableString("Nullable string")
             .Build();
+        
         var action = () => Validate.Field(_model.NullableString)
             .Null();
 

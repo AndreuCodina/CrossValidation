@@ -3,7 +3,6 @@ using CrossValidation.Resources;
 using CrossValidation.Tests.TestUtils;
 using CrossValidation.Validations;
 using FluentAssertions;
-using Shouldly;
 using Xunit;
 
 namespace CrossValidation.Tests.Validations.ValidationExtensions;
@@ -15,6 +14,7 @@ public class GreaterThanTests : TestBase
     {
         var value = 2;
         var comparisonValue = 1;
+        
         var action = () => Validate.Field(value)
             .GreaterThan(comparisonValue);
 
@@ -27,13 +27,18 @@ public class GreaterThanTests : TestBase
     {
         var value = 1;
         var comparisonValue = 1;
+        
         var action = () => Validate.Field(value)
             .GreaterThan(comparisonValue);
         
-        action.Should()
+        var exception = action.Should()
             .Throw<CommonException.GreaterThanException<int>>()
-            .And
-            .Code
-            .ShouldBe(nameof(ErrorResource.GreaterThan));
+            .Which;
+        exception.Code
+            .Should()
+            .Be(nameof(ErrorResource.GreaterThan));
+        exception.ComparisonValue
+            .Should()
+            .Be(comparisonValue);
     }
 }
