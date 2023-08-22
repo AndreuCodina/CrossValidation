@@ -1,5 +1,4 @@
-﻿using System.Net;
-using CrossValidation.Exceptions;
+﻿using CrossValidation.Exceptions;
 
 namespace CrossValidation;
 
@@ -16,7 +15,7 @@ public class ValidationContext
     public string Message { get; set; } = "";
     public string? Code { get; set; }
     public string? Details { get; set; }
-    public HttpStatusCode? StatusCode { get; set; }
+    public int? StatusCode { get; set; }
     public string? FieldDisplayName { get; set; }
 
     public ValidationContext CloneForChildModelValidator()

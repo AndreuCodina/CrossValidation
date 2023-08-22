@@ -13,8 +13,10 @@ public static class CrossValidationBuilderExtensions
 {
     public static IApplicationBuilder UseCrossValidation(this WebApplication app)
     {
-        app.UseCustomMiddleware()
-            .UseCustomRequestLocalization();
+        app.UseCustomRequestLocalization();
+        // app.UseGlobalExceptionMiddleware();
+        app.UseExceptionHandler();
+        app.UseStatusCodePages();
         AddErrorCodePage(app);
         return app;
     }
@@ -76,9 +78,9 @@ public static class CrossValidationBuilderExtensions
         return TypedResults.Content(html.ToString(), MediaTypeNames.Text.Html);
     }
 
-    private static IApplicationBuilder UseCustomMiddleware(this IApplicationBuilder app)
+    private static IApplicationBuilder UseGlobalExceptionMiddleware(this IApplicationBuilder app)
     {
-        app.UseMiddleware<CrossValidationMiddleware>();
+        app.UseMiddleware<GlobalExceptionMiddleware>();
         return app;
     }
     

@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using CrossValidation.Tests.TestUtils;
+﻿using CrossValidation.Tests.TestUtils;
 using CrossValidation.Tests.TestUtils.Builders;
 using CrossValidation.Tests.TestUtils.Fixtures;
 using CrossValidation.Tests.TestUtils.Models;
@@ -34,7 +32,7 @@ public class ModelNullabilityValidatorTests :
 
         var action = () => Validate.ModelNullability(_model);
 
-        var exception = action.ShouldThrow<NonNullablePropertyIsNullException>();
+        var exception = action.ShouldThrow<ModelNullabilityValidatorException.NonNullablePropertyIsNullException>();
         exception.PropertyName.ShouldBe(expectedPropertyName);
     }
     
@@ -49,7 +47,7 @@ public class ModelNullabilityValidatorTests :
 
         var action = () => Validate.ModelNullability(_model);
 
-        var exception = action.ShouldThrow<NonNullablePropertyIsNullException>();
+        var exception = action.ShouldThrow<ModelNullabilityValidatorException.NonNullablePropertyIsNullException>();
         exception.PropertyName.ShouldBe(expectedPropertyName);
     }
 
@@ -64,7 +62,7 @@ public class ModelNullabilityValidatorTests :
 
         var action = () => Validate.ModelNullability(_model);
 
-        var exception = action.ShouldThrow<NonNullableItemCollectionWithNullItemException>();
+        var exception = action.ShouldThrow<ModelNullabilityValidatorException.NonNullableItemCollectionWithNullItemException>();
         exception.CollectionName.ShouldBe(expectedCollectionName);
     }
 

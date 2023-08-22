@@ -9,36 +9,36 @@ public static class TestEndpoints
 {
     public static IEndpointRouteBuilder UseTestEndpoints(this IEndpointRouteBuilder builder)
     {
-        var group = builder.MapGroup(ApiPath.Test.Prefix);
+        var group = builder.MapGroup(EndpointPath.Test.Prefix);
         
-        group.MapGet(ApiPath.Test.CrossException, () =>
+        group.MapGet(EndpointPath.Test.BusinessException, () =>
         {
             throw new BusinessException();
         });
 
-        group.MapGet(ApiPath.Test.ValidationListException, () =>
+        group.MapGet(EndpointPath.Test.BusinessListException, () =>
         {
             throw new BusinessListException(new List<BusinessException>());
         });
 
-        group.MapGet(ApiPath.Test.ExceptionWithCodeFromCustomResx, () =>
+        group.MapGet(EndpointPath.Test.ResxBusinessExceptionWithCodeFromCustomResx, () =>
         {
-            throw new ExceptionWithCodeFromCustomResx();
+            throw new ResxBusinessExceptionWithCodeFromCustomResx();
         });
 
-        group.MapGet(ApiPath.Test.ExceptionWithCodeWithoutResxKey, () =>
+        group.MapGet(EndpointPath.Test.ExceptionWithCodeWithoutResxKey, () =>
         {
             throw new ExceptionWithCodeWithoutResxKey();
         });
 
-        group.MapGet(ApiPath.Test.ReplaceBuiltInCodeWithCustomResx, () =>
+        group.MapGet(EndpointPath.Test.ReplaceBuiltInCodeWithCustomResx, () =>
         {
             var model = new Model();
             Validate.Field(model.NullableString)
                 .NotNull();
         });
 
-        group.MapGet(ApiPath.Test.DefaultCultureMessage, () =>
+        group.MapGet(EndpointPath.Test.DefaultCultureMessage, () =>
         {
             var model = new Model();
             model.NullableString = "";
@@ -46,31 +46,46 @@ public static class TestEndpoints
                 .Null();
         });
 
-        group.MapGet(ApiPath.Test.ExceptionWithStatusCode, () =>
+        group.MapGet(EndpointPath.Test.BusinessExceptionWithStatusCodeWithMapping, () =>
         {
             throw new BusinessException(statusCode: HttpStatusCode.Created);
         });
+        
+        group.MapGet(EndpointPath.Test.BusinessExceptionWithStatusCodeWithNoMapping, () =>
+        {
+            throw new BusinessException(statusCodeInt: 450);
+        });
+        
+        group.MapGet(EndpointPath.Test.BusinessExceptionWithErrorStatusCode, () =>
+        {
+            throw new BusinessException(statusCode: HttpStatusCode.GatewayTimeout);
+        });
 
-        group.MapGet(ApiPath.Test.Exception, () =>
+        group.MapGet(EndpointPath.Test.UnexpectedException, () =>
         {
             throw new Exception();
         });
         
-        group.MapGet(ApiPath.Test.UseDecimal, () =>
+        group.MapGet(EndpointPath.Test.UseDecimal, () =>
         {
             Validate.That("")
                 .WithMessage(string.Format(ErrorResource1.UseDecimal, 3.3))
                 .Must(_ => false);
         });
         
-        group.MapGet(ApiPath.Test.FrontBusinessExceptionWithPlaceholders, () =>
+        group.MapGet(EndpointPath.Test.FrontBusinessExceptionWithPlaceholders, () =>
         {
-            throw new FrontBusinessExceptionWithPlaceholders<string>(1, "value");
+            throw new FrontBusinessExceptionWithPlaceholders<string>(1, "genericValue", "stringValue1", "stringValue2");
         });
         
-        group.MapGet(ApiPath.Test.ResxBusinessException, () =>
+        group.MapGet(EndpointPath.Test.ResxBusinessException, () =>
         {
             throw new CustomResxBusinessException();
+        });
+        
+        group.MapGet(EndpointPath.Test.ErrorStatusCodeWithEmptyBody, () =>
+        {
+            return TypedResults.NotFound();
         });
 
         return builder;

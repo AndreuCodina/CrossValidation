@@ -15,6 +15,7 @@ public abstract class Validate
         string? code = null,
         string? details = null,
         HttpStatusCode? statusCode = null,
+        int? statusCodeInt = null,
         string? fieldDisplayName = null)
     {
         return new Validation<TField>(
@@ -29,7 +30,7 @@ public abstract class Validate
             fixedMessage: message,
             fixedCode: code,
             fixedDetails: details,
-            fixedStatusCode: statusCode,
+            fixedStatusCode: statusCode is not null ? (int)statusCode : statusCodeInt,
             fixedFieldDisplayName: fieldDisplayName);
     }
     
@@ -40,6 +41,7 @@ public abstract class Validate
         string? code = null,
         string? details = null,
         HttpStatusCode? statusCode = null,
+        int? statusCodeInt = null,
         string? fieldDisplayName = null,
         [CallerArgumentExpression(nameof(field))] string fieldName = default!)
     {
@@ -52,7 +54,7 @@ public abstract class Validate
             message: message,
             code: code,
             details: details,
-            statusCode: statusCode,
+            statusCode: statusCode is not null ? (int)statusCode : statusCodeInt,
             fieldDisplayName: fieldDisplayName);
     }
 
@@ -66,14 +68,15 @@ public abstract class Validate
         string message = "",
         string? code = null,
         string? details = null,
-        HttpStatusCode? statusCode = null)
+        HttpStatusCode? statusCode = null,
+        int? statusCodeInt = null)
     {
         InternalMust(
             condition,
             message: message,
             code: code,
             details: details,
-            statusCode: statusCode);
+            statusCode: statusCode is not null ? (int)statusCode : statusCodeInt);
     }
     
     private static void InternalMust(
@@ -82,7 +85,7 @@ public abstract class Validate
         string message = "",
         string? code = null,
         string? details = null,
-        HttpStatusCode? statusCode = null)
+        int? statusCode = null)
     {
         if (!condition)
         {
@@ -117,7 +120,7 @@ public abstract class Validate
         
             if (statusCode is not null)
             {
-                validation = validation.WithHttpStatusCode(statusCode.Value);
+                validation = validation.WithStatusCode(statusCode.Value);
             }
         
             validation.Must(_ => false);
@@ -161,6 +164,7 @@ public abstract class Validate<TException>
         string? code = null,
         string? details = null,
         HttpStatusCode? statusCode = null,
+        int? statusCodeInt = null,
         string? fieldDisplayName = null,
         [CallerArgumentExpression(nameof(field))] string fieldName = default!)
     {
@@ -173,7 +177,7 @@ public abstract class Validate<TException>
             message: message,
             code: code,
             details: details,
-            statusCode: statusCode,
+            statusCode: statusCode is not null ? (int)statusCode : statusCodeInt,
             fieldDisplayName: fieldDisplayName);
     }
 }
