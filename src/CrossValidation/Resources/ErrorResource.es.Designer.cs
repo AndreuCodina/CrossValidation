@@ -122,5 +122,11 @@ namespace CrossValidation.Resources {
                 return ResourceManager.GetString("MaximumLength", resourceCulture);
             }
         }
+        
+        internal static string GreaterThanOrEqual {
+            get {
+                return ResourceManager.GetString("GreaterThanOrEqual", resourceCulture);
+            }
+        }
     }
 }

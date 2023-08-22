@@ -21,7 +21,7 @@ public class GreaterThanValidatorTests : TestBase
     public void Fail_when_value_is_not_greater_than_comparison_value()
     {
         var value = 1;
-        var comparisonValue = 2;
+        var comparisonValue = 1;
         var validator = new GreaterThanValidator<int>(value, comparisonValue);
         var isValid = validator.IsValid();
         isValid.ShouldBeFalse();

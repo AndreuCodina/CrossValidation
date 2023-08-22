@@ -18,6 +18,17 @@ public static class CommonException
             AddPlaceholderValue(comparisonValue);
         }
     }
+    
+    public class GreaterThanOrEqualException<TField>(TField comparisonValue) :
+        BusinessException(code: nameof(ErrorResource.GreaterThanOrEqual))
+    {
+        public TField ComparisonValue => comparisonValue;
+        
+        public override void AddParametersAsPlaceholderValues()
+        {
+            AddPlaceholderValue(comparisonValue);
+        }
+    }
 
     public class EnumException() : BusinessException(code: nameof(ErrorResource.Enum));
 

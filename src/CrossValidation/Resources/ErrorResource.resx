@@ -57,4 +57,7 @@
     <data name="MaximumLength" xml:space="preserve">
         <value>Must have no more than {maximumLength} characters(s)</value>
     </data>
+    <data name="GreaterThanOrEqual" xml:space="preserve">
+        <value>Must be greater than or equal to {fieldValue}</value>
+    </data>
 </root>

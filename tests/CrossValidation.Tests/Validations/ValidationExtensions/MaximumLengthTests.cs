@@ -11,7 +11,7 @@ namespace CrossValidation.Tests.Validations.ValidationExtensions;
 
 public class MaximumLengthTests : TestBase
 {
-    private ParentModel _model;
+    private readonly ParentModel _model;
 
     public MaximumLengthTests()
     {
@@ -26,6 +26,7 @@ public class MaximumLengthTests : TestBase
             .MaximumLength(_model.String.Length - 1);
 
         var exception = action.ShouldThrow<CommonException.MaximumLengthException>();
+        
         exception.Code.ShouldBe(nameof(ErrorResource.MaximumLength));
     }
 }
