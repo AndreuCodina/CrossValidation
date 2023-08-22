@@ -2,7 +2,7 @@
 
 namespace CrossValidation.Validators.StringValidators;
 
-public class LengthRangeValidator(string fieldValue, int minimum, int maximum) : LengthValidatorBase
+public class LengthRangeValidator(string fieldValue, int minimum, int maximum) : Validator
 {
     public override bool IsValid()
     {
@@ -19,7 +19,7 @@ public class LengthRangeValidator(string fieldValue, int minimum, int maximum) :
                && fieldValue.Length <= maximum;
     }
 
-    public override LengthException CreateException()
+    public override BusinessException CreateException()
     {
         return new CommonException.LengthRangeException(minimum, maximum, fieldValue.Length);
     }

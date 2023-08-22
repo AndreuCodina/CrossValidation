@@ -60,9 +60,9 @@ public interface IValidation<out TField> : IValidationOperation
     [Pure]
     TInstance Instance<TInstance>(Func<TField, TInstance> fieldToInstance);
 
-    IValidation<TField> SetValidator(Func<IValidator<BusinessException>> validator);
+    IValidation<TField> SetValidator(Func<Validator> validator);
 
-    IValidation<TField> SetAsyncValidator(Func<Task<IValidator<BusinessException>>> validator);
+    IValidation<TField> SetAsyncValidator(Func<Task<Validator>> validator);
 
     IValidation<TField> SetScope(Action scope, ScopeType type);
     
@@ -118,7 +118,7 @@ internal class Validation<TField> :
     ValidationOperation,
     IValidation<TField>
 {
-    public IValidation<TField> SetValidator(Func<IValidator<BusinessException>> validator)
+    public IValidation<TField> SetValidator(Func<Validator> validator)
     {
         if (HasFailed)
         {
@@ -137,7 +137,7 @@ internal class Validation<TField> :
         return CreateNextValidation();
     }
     
-    public IValidation<TField> SetAsyncValidator(Func<Task<IValidator<BusinessException>>> validator)
+    public IValidation<TField> SetAsyncValidator(Func<Task<Validator>> validator)
     {
         if (HasFailed)
         {

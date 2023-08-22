@@ -19,8 +19,8 @@ public static partial class CommonException
         }
     }
     
-    public class GreaterThanOrEqualException<TField>(TField comparisonValue) :
-        BusinessException(code: nameof(ErrorResource.GreaterThanOrEqual))
+    public class GreaterThanOrEqualException<TField>(TField comparisonValue)
+        : BusinessException(code: nameof(ErrorResource.GreaterThanOrEqual))
     {
         public TField ComparisonValue => comparisonValue;
         
@@ -30,8 +30,8 @@ public static partial class CommonException
         }
     }
     
-    public class LessThanException<TField>(TField comparisonValue) :
-        BusinessException(code: nameof(ErrorResource.LessThan))
+    public class LessThanException<TField>(TField comparisonValue)
+        : BusinessException(code: nameof(ErrorResource.LessThan))
     {
         public TField ComparisonValue => comparisonValue;
         
@@ -41,8 +41,8 @@ public static partial class CommonException
         }
     }
     
-    public class LessThanOrEqualException<TField>(TField comparisonValue) :
-        BusinessException(code: nameof(ErrorResource.LessThanOrEqual))
+    public class LessThanOrEqualException<TField>(TField comparisonValue)
+        : BusinessException(code: nameof(ErrorResource.LessThanOrEqual))
     {
         public TField ComparisonValue => comparisonValue;
         
@@ -52,8 +52,8 @@ public static partial class CommonException
         }
     }
     
-    public class EqualException<TField>(TField comparisonValue) :
-        BusinessException(code: nameof(ErrorResource.Equal))
+    public class EqualException<TField>(TField comparisonValue)
+        : BusinessException(code: nameof(ErrorResource.Equal))
     {
         public TField ComparisonValue => comparisonValue;
         
@@ -63,8 +63,8 @@ public static partial class CommonException
         }
     }
     
-    public class NotEqualException<TField>(TField comparisonValue) :
-        BusinessException(code: nameof(ErrorResource.NotEqual))
+    public class NotEqualException<TField>(TField comparisonValue)
+        : BusinessException(code: nameof(ErrorResource.NotEqual))
     {
         public TField ComparisonValue => comparisonValue;
         
@@ -78,12 +78,12 @@ public static partial class CommonException
 
     public class EnumRangeException() : BusinessException(code: nameof(ErrorResource.Enum));
 
-    public class LengthRangeException(int minimumLength, int maximumLength, int totalLength) :
-        LengthException(code: nameof(ErrorResource.LengthRange))
+    public class LengthRangeException(int minimumLength, int maximumLength, int totalLength)
+        : BusinessException(code: nameof(ErrorResource.LengthRange))
     {
         public int MinimumLength => minimumLength;
         public int MaximumLength => maximumLength;
-        public override int TotalLength => totalLength;
+        public int TotalLength => totalLength;
         
         public override void AddParametersAsPlaceholderValues()
         {
@@ -94,10 +94,10 @@ public static partial class CommonException
     }
 
     public class MinimumLengthException(int minimumLength, int totalLength)
-        : LengthException(code: nameof(ErrorResource.MinimumLength))
+        : BusinessException(code: nameof(ErrorResource.MinimumLength))
     {
         public int MinimumLength => minimumLength;
-        public override int TotalLength => totalLength;
+        public int TotalLength => totalLength;
         
         public override void AddParametersAsPlaceholderValues()
         {
@@ -107,10 +107,10 @@ public static partial class CommonException
     }
     
     public class MaximumLengthException(int maximumLength, int totalLength)
-        : LengthException(code: nameof(ErrorResource.MaximumLength))
+        : BusinessException(code: nameof(ErrorResource.MaximumLength))
     {
         public int MaximumLength => maximumLength;
-        public override int TotalLength => totalLength;
+        public int TotalLength => totalLength;
         
         public override void AddParametersAsPlaceholderValues()
         {
