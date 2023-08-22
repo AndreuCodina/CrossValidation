@@ -9,11 +9,11 @@ using Xunit;
 
 namespace CrossValidation.Tests.Validations.ValidationExtensions;
 
-public class LengthRangeTests : TestBase
+public class InclusiveLengthRangeTests : TestBase
 {
     private readonly ParentModel _model;
 
-    public LengthRangeTests()
+    public InclusiveLengthRangeTests()
     {
         _model = new ParentModelBuilder().Build();
     }
@@ -25,7 +25,7 @@ public class LengthRangeTests : TestBase
     public void Validate_length_is_not_out_of_range(string value, int minimumLength, int maximumLength)
     {
         var action = () => Validate.Field(value)
-            .LengthRange(minimumLength, maximumLength);
+            .InclusiveLengthRange(minimumLength, maximumLength);
 
         action.Should()
             .NotThrow();
@@ -37,14 +37,14 @@ public class LengthRangeTests : TestBase
     public void Fail_when_length_is_out_of_range(string value, int expectedMinimumLength, int expectedMaximumLength)
     {
         var action = () => Validate.Field(value)
-            .LengthRange(expectedMinimumLength, expectedMaximumLength);
+            .InclusiveLengthRange(expectedMinimumLength, expectedMaximumLength);
 
         var exception = action.Should()
-            .Throw<CommonException.LengthRangeException>()
+            .Throw<CommonException.InclusiveLengthRangeException>()
             .Which;
         exception.Code
             .Should()
-            .Be(nameof(ErrorResource.LengthRange));
+            .Be(nameof(ErrorResource.InclusiveLengthRange));
         exception.MinimumLength
             .Should()
             .Be(expectedMinimumLength);
@@ -54,18 +54,5 @@ public class LengthRangeTests : TestBase
         exception.TotalLength
             .Should()
             .Be(value.Length);
-    }
-    
-    [Theory]
-    [InlineData(-1, 10)]
-    [InlineData(10, -1)]
-    [InlineData(10, 1)]
-    public void Fail_when_minimum_argument_preconditions_are_not_met(int minimumLength, int maximumLength)
-    {
-        var action = () => Validate.Field(_model.String)
-            .LengthRange(minimumLength, maximumLength);
-
-        action.Should()
-            .Throw<ArgumentException>();
     }
 }

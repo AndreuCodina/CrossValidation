@@ -45,9 +45,9 @@ namespace CrossValidation.Resources {
             }
         }
         
-        internal static string LengthRange {
+        internal static string InclusiveLengthRange {
             get {
-                return ResourceManager.GetString("LengthRange", resourceCulture);
+                return ResourceManager.GetString("InclusiveLengthRange", resourceCulture);
             }
         }
         

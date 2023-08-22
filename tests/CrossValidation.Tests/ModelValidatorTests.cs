@@ -355,7 +355,7 @@ public class ModelValidatorTests :
                  .NotNull()
                  .Transform(x => x + 1)
                  .Transform(x => x.ToString())
-                 .LengthRange(0, 10)
+                 .InclusiveLengthRange(0, 10)
                  .Transform(int.Parse)
                  .GreaterThan(int.MaxValue);
          });
