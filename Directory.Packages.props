@@ -10,8 +10,8 @@
     <PackageVersion Include="FluentAssertions.Analyzers" Version="0.22.0" />
     <PackageVersion Include="Microsoft.AspNetCore.Mvc.Testing" Version="7.0.10" />
     <PackageVersion Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.4" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.7.1" />
     <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="4.7.0" />
-    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.7.0" />
     <PackageVersion Include="NSubstitute" Version="5.0.0" />
     <PackageVersion Include="NSubstitute.Analyzers.CSharp" Version="1.0.16" />
     <PackageVersion Include="Shouldly" Version="4.2.1" />
