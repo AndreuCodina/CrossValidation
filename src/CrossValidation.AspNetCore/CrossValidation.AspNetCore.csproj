@@ -13,6 +13,11 @@
     </ItemGroup>
 
     <ItemGroup>
+        <None Include="..\..\docs\logo.jpg" Pack="true" Visible="false" PackagePath="" />
+        <None Include="..\..\docs\crossvalidation-nuget-readme.md" Visible="false" Pack="true" PackagePath="" />
+    </ItemGroup>
+
+    <ItemGroup>
         <!-- https://learn.microsoft.com/en-us/aspnet/core/fundamentals/target-aspnetcore -->
         <FrameworkReference Include="Microsoft.AspNetCore.App" />
     </ItemGroup>
