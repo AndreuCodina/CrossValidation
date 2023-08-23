@@ -181,8 +181,8 @@ public static class ValidationExtensions
         params TEnum[] allowedValues)
         where TEnum : Enum
     {
-        return validation.SetValidator(
-                () => new EnumRangeValidator<string, TEnum>(validation.GetFieldValue(), allowedValues))
+        return validation.SetValidator(() =>
+                new EnumRangeValidator<string, TEnum>(validation.GetFieldValue(), allowedValues))
             .Transform(x => (TEnum)System.Enum.Parse(typeof(TEnum), x, ignoreCase: true));
     }
 
@@ -303,6 +303,29 @@ public static class ValidationExtensions
         Func<IValidation<TOriginalField>, IValidation<TResultField>> applyFunction)
     {
         return applyFunction(validation);
+    }
+    
+    public static IValidation<IEnumerable<TField>> MinimumItems<TField>(
+        this IValidation<IEnumerable<TField>> validation,
+        int minimum)
+    {
+        return validation.SetValidator(() =>
+            new MinimumItemsValidator<TField>(validation.GetFieldValue(), minimum));
+    }
+    
+    public static IValidation<IEnumerable<TField>> MaximumItems<TField>(
+        this IValidation<IEnumerable<TField>> validation,
+        int maximum)
+    {
+        return validation.SetValidator(() =>
+            new MaximumItemsValidator<TField>(validation.GetFieldValue(), maximum));
+    }
+    
+    public static IValidation<IEnumerable<TField>> UniqueItems<TField>(
+        this IValidation<IEnumerable<TField>> validation)
+    {
+        return validation.SetValidator(() =>
+            new UniqueItemsValidator<TField>(validation.GetFieldValue()));
     }
 
     internal static IValidation<TDependentField> CreateScopeValidation<TField, TDependentField>(

@@ -75,4 +75,13 @@
     <data name="ExclusiveLengthRange" xml:space="preserve">
         <value>Debe tener entre {minimumLength} y {maximumLength} caracter(es) (exclusivo)</value>
     </data>
+    <data name="MaximumItems" xml:space="preserve">
+        <value>Debe haber máximo {maximumItems} elementos</value>
+    </data>
+    <data name="MinimumItems" xml:space="preserve">
+        <value>Debe haber mínimo {minimumItems} elementos</value>
+    </data>
+    <data name="UniqueItems" xml:space="preserve">
+        <value>Los elementos deben ser únicos</value>
+    </data>
 </root>
