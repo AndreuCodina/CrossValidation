@@ -19,23 +19,44 @@ public class MinimumItemsTests : TestBase
     }
 
     [Theory]
-    [InlineData(2)]
-    [InlineData(1)]
-    public void Validate_collection_has_required_minimum_items(int minimumItems)
+    [InlineData(2, true, false)]
+    [InlineData(2, false, true)]
+    [InlineData(1, true, false)]
+    [InlineData(1, false, true)]
+    public void Validate_collection_has_required_minimum_items(
+        int minimumItems,
+        bool isCollection,
+        bool isEnumerable)
     {
         _model = new ParentModelBuilder()
             .WithIntList(new List<int> { 1, 2 })
             .Build();
+
+        IEnumerable<int>? fieldValue = null;
+
+        if (isCollection)
+        {
+            fieldValue = _model.IntList;
+        }
+        else if (isEnumerable)
+        {
+            fieldValue = _model.IntList
+                .Select(x => x);
+        }
         
-        var action = () => Validate.Field(_model.IntList)
+        var action = () => Validate.Field(fieldValue!)
             .MinimumItems(minimumItems);
 
         action.Should()
             .NotThrow();
     }
      
-    [Fact]
-    public void Fail_when_collection_has_not_required_minimum_items()
+    [Theory]
+    [InlineData(true, false)]
+    [InlineData(false, true)]
+    public void Fail_when_collection_has_not_required_minimum_items(
+        bool isCollection,
+        bool isEnumerable)
     {
         var expectedIntList = new List<int> { 1, 2 };
         var expectedMinimumItems = 3;
@@ -43,7 +64,19 @@ public class MinimumItemsTests : TestBase
             .WithIntList(expectedIntList)
             .Build();
         
-        var action = () => Validate.Field(_model.IntList)
+        IEnumerable<int>? fieldValue = null;
+
+        if (isCollection)
+        {
+            fieldValue = _model.IntList;
+        }
+        else if (isEnumerable)
+        {
+            fieldValue = _model.IntList
+                .Select(x => x);
+        }
+        
+        var action = () => Validate.Field(fieldValue!)
             .MinimumItems(expectedMinimumItems);
         
         var exception = action.Should()
@@ -58,18 +91,5 @@ public class MinimumItemsTests : TestBase
         exception.TotalItems
             .Should()
             .Be(expectedIntList.Count);
-    }
-    
-    [Fact]
-    public void Fail_when_enumerable_has_not_required_minimum_items()
-    {
-        var expectedEnumerable = new List<int> { 1, 2 }.AsEnumerable();
-        var expectedMinimumItems = 3;
-        
-        var action = () => Validate.Field(expectedEnumerable)
-            .MinimumItems(expectedMinimumItems);
-
-        action.Should()
-            .Throw<CommonException.MinimumItemsException>();
     }
 }
