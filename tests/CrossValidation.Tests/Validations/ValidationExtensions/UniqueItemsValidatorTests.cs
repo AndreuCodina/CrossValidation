@@ -18,11 +18,12 @@ public class UniqueItemsValidatorTests : TestBase
         _model = new ParentModelBuilder().Build();
     }
 
-    [Fact]
-    public void Validate_collection_has_unique_items()
+    [Theory]
+    [MemberData(nameof(CollectionsWithUniqueItems))]
+    public void Validate_collection_has_unique_items(List<int> intList)
     {
         _model = new ParentModelBuilder()
-            .WithIntList(new List<int> { 1, 2 })
+            .WithIntList(intList)
             .Build();
         
         var action = () => Validate.Field(_model.IntList)
@@ -50,9 +51,12 @@ public class UniqueItemsValidatorTests : TestBase
             .Be(nameof(ErrorResource.UniqueItems));
     }
     
-    public static IEnumerable<object[]> CollectionsWithUniqueItems()
+    public static List<object[]> CollectionsWithUniqueItems()
     {
-        yield return new object[] { new List<int> { 1, 2 } };
-        yield return new object[] { new List<int>() };
+        return new()
+        {
+            new object[] { new List<int> { 1, 2 } },
+            new object[] { new List<int>() }
+        };
     }
 }
