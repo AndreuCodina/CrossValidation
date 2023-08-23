@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Localization;
 
-namespace CrossValidation.AspNetCore.DependencyInjection;
+namespace CrossValidation.AspNetCore;
 
 public static class CrossValidationBuilderExtensions
 {

@@ -1,6 +1,6 @@
 ﻿using System.Globalization;
 
-namespace CrossValidation.AspNetCore.DependencyInjection;
+namespace CrossValidation.AspNetCore;
 
 public class CrossValidationOptionsBuilder
 {

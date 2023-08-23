@@ -1,7 +1,7 @@
 using CrossValidation.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 
-namespace CrossValidation.AspNetCore.DependencyInjection;
+namespace CrossValidation.AspNetCore;
 
 public static class BusinessExceptionExtensions
 {
