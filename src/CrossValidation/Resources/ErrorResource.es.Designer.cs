@@ -158,5 +158,17 @@ namespace CrossValidation.Resources {
                 return ResourceManager.GetString("ExclusiveLengthRange", resourceCulture);
             }
         }
+        
+        internal static string MaximumItems {
+            get {
+                return ResourceManager.GetString("MaximumItems", resourceCulture);
+            }
+        }
+        
+        internal static string MinimumItems {
+            get {
+                return ResourceManager.GetString("MinimumItems", resourceCulture);
+            }
+        }
     }
 }

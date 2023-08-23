@@ -149,4 +149,30 @@ public static partial class CommonException
     public class TrueBooleanException() : BusinessException(code: nameof(ErrorResource.Generic));
     
     public class FalseBooleanException() : BusinessException(code: nameof(ErrorResource.Generic));
+
+    public class MinimumItemsException(int minimumItems, int totalItems)
+        : BusinessException(code: nameof(ErrorResource.MinimumItems))
+    {
+        public int MinimumItems => minimumItems;
+        public int TotalItems => totalItems;
+        
+        public override void AddParametersAsPlaceholderValues()
+        {
+            AddPlaceholderValue(minimumItems);
+            AddPlaceholderValue(totalItems);
+        }
+    }
+
+    public class MaximumItemsException(int maximumItems, int totalItems)
+        : BusinessException(code: nameof(ErrorResource.MaximumItems))
+    {
+        public int MaximumItems => maximumItems;
+        public int TotalItems => totalItems;
+        
+        public override void AddParametersAsPlaceholderValues()
+        {
+            AddPlaceholderValue(maximumItems);
+            AddPlaceholderValue(totalItems);
+        }
+    }
 }
