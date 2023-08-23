@@ -5,13 +5,16 @@ namespace CrossValidation.Validators.CollectionValidators;
 public class MinimumItemsValidator<TField>(IEnumerable<TField> fieldValue, int minimumItems)
     : CollectionValidator<TField>(fieldValue)
 {
+    private int _totalItems;
+
     public override bool IsValid()
     {
-        return TotalItems >= minimumItems;
+        _totalItems = GetTotalItems();
+        return _totalItems >= minimumItems;
     }
 
     public override BusinessException CreateException()
     {
-        throw new CommonException.MinimumItemsException(minimumItems, TotalItems);
+        throw new CommonException.MinimumItemsException(minimumItems, _totalItems);
     }
 }

@@ -2,14 +2,19 @@ namespace CrossValidation.Validators;
 
 public abstract class CollectionValidator<TField> : Validator
 {
+    private readonly IEnumerable<TField> _fieldValue;
+
     protected CollectionValidator(IEnumerable<TField> fieldValue)
     {
-        TotalItems = fieldValue switch
+        _fieldValue = fieldValue;
+    }
+
+    public int GetTotalItems()
+    {
+        return _fieldValue switch
         {
             ICollection<TField> collection => collection.Count,
-            _ => fieldValue.Count()
+            _ => _fieldValue.Count()
         };
     }
-    
-    public int TotalItems { get; private set; }
 }
