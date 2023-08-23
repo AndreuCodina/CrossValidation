@@ -1,10 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <PackageLicenseExpression>MIT</PackageLicenseExpression>
-        <PackageIcon>logo.jpg</PackageIcon>
-        <PackageReadmeFile>crossvalidation-nuget-readme.md</PackageReadmeFile>
-        <Description>State-of-the-art .NET library to handle errors and validate data.</Description>
         <IsPackable>true</IsPackable>
     </PropertyGroup>
 
@@ -34,11 +30,6 @@
 
     <ItemGroup>
       <PackageReference Include="Microsoft.SourceLink.GitHub" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <None Include="..\..\docs\logo.jpg" Pack="true" Visible="false" PackagePath="" />
-        <None Include="..\..\docs\crossvalidation-nuget-readme.md" Visible="false" Pack="true" PackagePath="" />
     </ItemGroup>
     
     <ItemGroup>
