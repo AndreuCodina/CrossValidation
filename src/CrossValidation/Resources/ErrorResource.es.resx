@@ -81,4 +81,7 @@
     <data name="MinimumItems" xml:space="preserve">
         <value>Debe haber mínimo {minimumItems} elementos</value>
     </data>
+    <data name="UniqueItems" xml:space="preserve">
+        <value>Los elementos deben ser únicos</value>
+    </data>
 </root>

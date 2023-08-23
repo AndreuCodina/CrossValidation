@@ -175,4 +175,6 @@ public static partial class CommonException
             AddPlaceholderValue(totalItems);
         }
     }
+    
+    public class UniqueItemsException() : BusinessException(code: nameof(ErrorResource.UniqueItems));
 }

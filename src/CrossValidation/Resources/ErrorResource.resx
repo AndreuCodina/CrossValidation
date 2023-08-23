@@ -87,4 +87,7 @@
     <data name="ExclusiveRange" xml:space="preserve">
         <value>Must be between {fromValue} and {toValue} (exclusive)</value>
     </data>
+    <data name="UniqueItems" xml:space="preserve">
+        <value>The items must be unique</value>
+    </data>
 </root>

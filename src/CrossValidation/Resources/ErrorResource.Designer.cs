@@ -182,5 +182,11 @@ namespace CrossValidation.Resources {
                 return ResourceManager.GetString("ExclusiveRange", resourceCulture);
             }
         }
+        
+        public static string UniqueItems {
+            get {
+                return ResourceManager.GetString("UniqueItems", resourceCulture);
+            }
+        }
     }
 }

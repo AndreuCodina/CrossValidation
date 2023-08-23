@@ -320,6 +320,13 @@ public static class ValidationExtensions
         return validation.SetValidator(() =>
             new MaximumItemsValidator<TField>(validation.GetFieldValue(), maximum));
     }
+    
+    public static IValidation<IEnumerable<TField>> UniqueItems<TField>(
+        this IValidation<IEnumerable<TField>> validation)
+    {
+        return validation.SetValidator(() =>
+            new UniqueItemsValidator<TField>(validation.GetFieldValue()));
+    }
 
     internal static IValidation<TDependentField> CreateScopeValidation<TField, TDependentField>(
         this IValidation<TField> validation,
