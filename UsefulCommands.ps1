@@ -9,3 +9,9 @@ dotnet tool run reportgenerator -reports:"./artifacts/coverage/*/lcov.info" -tar
 Start-Process ./artifacts/coverage/index.html
 
 # Remove-Item -Recurse -Force ./artifacts
+
+# Test NuGet packages locally
+dotnet pack --configuration Release --output ./artifacts -p:Version=0.4.1 -p:SymbolPackageFormat=snupkg --include-symbols
+dotnet new nugetconfig
+mkdir localNuGetPackages
+dotnet nuget add source ./localNuGetPackages --name LocalNuGetPackages

@@ -176,5 +176,17 @@ namespace CrossValidation.Resources {
                 return ResourceManager.GetString("UniqueItems", resourceCulture);
             }
         }
+        
+        internal static string ExclusiveRange {
+            get {
+                return ResourceManager.GetString("ExclusiveRange", resourceCulture);
+            }
+        }
+        
+        internal static string InclusiveRange {
+            get {
+                return ResourceManager.GetString("InclusiveRange", resourceCulture);
+            }
+        }
     }
 }
