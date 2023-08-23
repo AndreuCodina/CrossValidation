@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 
-namespace CrossValidation.DependencyInjection;
+namespace CrossValidation.AspNetCore.DependencyInjection;
 
 internal class GlobalExceptionMiddleware : IMiddleware
 {

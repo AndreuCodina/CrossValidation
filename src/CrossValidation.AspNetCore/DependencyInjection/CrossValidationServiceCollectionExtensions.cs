@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-namespace CrossValidation.DependencyInjection;
+namespace CrossValidation.AspNetCore.DependencyInjection;
 
 public static class CrossValidationServiceCollectionExtensions
 {

@@ -1,4 +1,4 @@
-﻿namespace CrossValidation.DependencyInjection;
+﻿namespace CrossValidation.AspNetCore.DependencyInjection;
 
 public class CrossValidationProblemDetailsError
 {

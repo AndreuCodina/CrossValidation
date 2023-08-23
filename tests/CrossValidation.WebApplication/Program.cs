@@ -1,4 +1,4 @@
-using CrossValidation.DependencyInjection;
+using CrossValidation.AspNetCore.DependencyInjection;
 using CrossValidation.Exceptions;
 using CrossValidation.WebApplication;
 using CrossValidation.WebApplication.Resources;

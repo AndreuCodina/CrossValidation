@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageIcon>logo.jpg</PackageIcon>
+        <PackageReadmeFile>crossvalidation-nuget-readme.md</PackageReadmeFile>
+        <Description>State-of-the-art .NET library to handle errors and validate data.</Description>
+        <IsPackable>true</IsPackable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.SourceLink.GitHub" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <!-- https://learn.microsoft.com/en-us/aspnet/core/fundamentals/target-aspnetcore -->
+        <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\CrossValidation\CrossValidation.csproj" />
+    </ItemGroup>
+
+</Project>

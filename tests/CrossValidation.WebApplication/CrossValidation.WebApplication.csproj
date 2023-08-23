@@ -47,7 +47,7 @@
     </ItemGroup>
     
     <ItemGroup>
-      <ProjectReference Include="..\..\src\CrossValidation\CrossValidation.csproj" />
+      <ProjectReference Include="..\..\src\CrossValidation.AspNetCore\CrossValidation.AspNetCore.csproj" />
       <ProjectReference
               Include="..\..\src\CrossValidation.SourceGenerators\CrossValidation.SourceGenerators.csproj"
               ReferenceOutputAssembly="false"

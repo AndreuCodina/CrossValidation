@@ -2,7 +2,7 @@ using System.Net;
 using CrossValidation.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 
-namespace CrossValidation.DependencyInjection;
+namespace CrossValidation.AspNetCore.DependencyInjection;
 
 internal class ProblemDetailsMapper(ProblemDetails problemDetails)
 {

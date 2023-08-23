@@ -1,6 +1,6 @@
 ﻿using System.Net;
 using System.Text.Json;
-using CrossValidation.DependencyInjection;
+using CrossValidation.AspNetCore.DependencyInjection;
 using CrossValidation.Resources;
 using CrossValidation.Tests.TestUtils;
 using CrossValidation.Tests.TestUtils.Fixtures;
