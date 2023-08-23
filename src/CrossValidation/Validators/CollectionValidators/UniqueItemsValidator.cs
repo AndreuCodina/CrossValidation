@@ -2,18 +2,21 @@ using CrossValidation.Exceptions;
 
 namespace CrossValidation.Validators.CollectionValidators;
 
-public class NotEmptyCollectionValidator<TField>(IEnumerable<TField> fieldValue)
+public class UniqueItemsValidator<TField>(IEnumerable<TField> fieldValue)
     : CollectionValidator<TField>(fieldValue)
 {
     private readonly IEnumerable<TField> _fieldValue = fieldValue;
     
     public override bool IsValid()
     {
-        return _fieldValue.Any();
+        var totalItems = GetTotalItems();
+        var totalDistinctItems = _fieldValue.Distinct()
+            .Count();
+        return totalDistinctItems == totalItems;
     }
 
     public override BusinessException CreateException()
     {
-        return new CommonException.NotEmptyCollectionException();
+        throw new CommonException.UniqueItemsException();
     }
 }
