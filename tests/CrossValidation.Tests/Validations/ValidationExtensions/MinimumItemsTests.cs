@@ -59,4 +59,17 @@ public class MinimumItemsTests : TestBase
             .Should()
             .Be(expectedIntList.Count);
     }
+    
+    [Fact]
+    public void Fail_when_enumerable_has_not_required_minimum_items()
+    {
+        var expectedEnumerable = new List<int> { 1, 2 }.AsEnumerable();
+        var expectedMinimumItems = 3;
+        
+        var action = () => Validate.Field(expectedEnumerable)
+            .MinimumItems(expectedMinimumItems);
+
+        action.Should()
+            .Throw<CommonException.MinimumItemsException>();
+    }
 }
