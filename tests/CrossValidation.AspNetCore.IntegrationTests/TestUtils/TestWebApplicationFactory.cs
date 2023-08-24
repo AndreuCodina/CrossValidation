@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace CrossValidation.Tests.TestUtils;
+namespace CrossValidation.AspNetCore.IntegrationTests.TestUtils;
 
 public class TestWebApplicationFactory : WebApplicationFactory<Program>
 {

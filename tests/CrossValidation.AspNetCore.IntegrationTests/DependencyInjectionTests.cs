@@ -1,30 +1,25 @@
-﻿using System.Net;
+﻿using System.Globalization;
+using System.Net;
 using System.Text.Json;
-using CrossValidation.AspNetCore;
+using CrossValidation.AspNetCore.IntegrationTests.TestUtils;
 using CrossValidation.Resources;
-using CrossValidation.Tests.TestUtils;
-using CrossValidation.Tests.TestUtils.Fixtures;
 using CrossValidation.WebApplication;
 using CrossValidation.WebApplication.Resources;
 using FluentAssertions;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
-using Shouldly;
-using Xunit;
-using Environment = CrossValidation.Tests.TestUtils.Environment;
 
-namespace CrossValidation.Tests;
+namespace CrossValidation.AspNetCore.IntegrationTests;
 
-public class DependencyInjectionTests :
-    TestBase,
-    IClassFixture<CommonFixture>,
-    IDisposable
+public class DependencyInjectionTests : IDisposable
 {
     private WebApplicationFactory<Program> _testWebApplicationFactory;
     private HttpClient _client;
 
     public DependencyInjectionTests()
     {
+        CultureInfo.CurrentCulture = CultureInfo.GetCultureInfo(CrossValidationOptions.DefaultCultureCode);
+        CultureInfo.CurrentUICulture = CultureInfo.GetCultureInfo(CrossValidationOptions.DefaultCultureCode);
         _testWebApplicationFactory = new TestWebApplicationFactory();
         _client = _testWebApplicationFactory.CreateClient();
     }
@@ -36,7 +31,9 @@ public class DependencyInjectionTests :
     {
         var response = await _client.GetAsync(endpoint);
         
-        response.StatusCode.ShouldBe(expectedStatusCode);
+        response.StatusCode
+            .Should()
+            .Be(expectedStatusCode);
     }
     
     [Theory]
@@ -58,12 +55,20 @@ public class DependencyInjectionTests :
         
         var response = await _client.GetAsync(EndpointPath.Test.Prefix + EndpointPath.Test.ResxBusinessExceptionWithCodeFromCustomResx);
         
-        response.StatusCode.ShouldBe(HttpStatusCode.UnprocessableEntity);
+        response.StatusCode
+            .Should()
+            .Be(HttpStatusCode.UnprocessableEntity);
         var problemDetails = await GetProblemDetailsFromResponse(response);
-        problemDetails.Errors!.Count().ShouldBe(1);
+        problemDetails.Errors!
+            .Should()
+            .HaveCount(1);
         var error = problemDetails.Errors!.First();
-        error.Code.ShouldBe(nameof(ErrorResource1.Hello));
-        error.Message.ShouldBe(expectedMessage);
+        error.Code
+            .Should()
+            .Be(nameof(ErrorResource1.Hello));
+        error.Message
+            .Should()
+            .Be(expectedMessage);
     }
     
     [Theory]
@@ -86,12 +91,20 @@ public class DependencyInjectionTests :
         
         var response = await _client.GetAsync(EndpointPath.Test.Prefix + EndpointPath.Test.ExceptionWithCodeWithoutResxKey);
         
-        response.StatusCode.ShouldBe(HttpStatusCode.UnprocessableEntity);
+        response.StatusCode
+            .Should()
+            .Be(HttpStatusCode.UnprocessableEntity);
         var problemDetails = await GetProblemDetailsFromResponse(response);
-        problemDetails.Errors!.Count().ShouldBe(1);
+        problemDetails.Errors!
+            .Should()
+            .HaveCount(1);
         var error = problemDetails.Errors!.First();
-        error.Code.ShouldBe("RandomCode");
-        error.Message.ShouldBeNull();
+        error.Code
+            .Should()
+            .Be("RandomCode");
+        error.Message
+            .Should()
+            .BeNull();
     }
     
     [Fact]
@@ -99,12 +112,20 @@ public class DependencyInjectionTests :
     {
         var response = await _client.GetAsync(EndpointPath.Test.Prefix + EndpointPath.Test.ExceptionWithCodeWithoutResxKey);
         
-        response.StatusCode.ShouldBe(HttpStatusCode.UnprocessableEntity);
+        response.StatusCode
+            .Should()
+            .Be(HttpStatusCode.UnprocessableEntity);
         var problemDetails = await GetProblemDetailsFromResponse(response);
-        problemDetails.Errors!.Count().ShouldBe(1);
+        problemDetails.Errors!
+            .Should()
+            .HaveCount(1);
         var error = problemDetails.Errors!.First();
-        error.Code.ShouldBe("RandomCode");
-        error.Message.ShouldBeNull();
+        error.Code
+            .Should()
+            .Be("RandomCode");
+        error.Message
+            .Should()
+            .BeNull();
     }
     
     [Theory]
@@ -127,12 +148,20 @@ public class DependencyInjectionTests :
         
         var response = await _client.GetAsync(EndpointPath.Test.Prefix + EndpointPath.Test.ReplaceBuiltInCodeWithCustomResx);
         
-        response.StatusCode.ShouldBe(HttpStatusCode.UnprocessableEntity);
+        response.StatusCode
+            .Should()
+            .Be(HttpStatusCode.UnprocessableEntity);
         var problemDetails = await GetProblemDetailsFromResponse(response);
-        problemDetails.Errors!.Count().ShouldBe(1);
+        problemDetails.Errors!
+            .Should()
+            .HaveCount(1);
         var error = problemDetails.Errors!.First();
-        error.Code.ShouldBe(nameof(ErrorResource1.NotNull));
-        error.Message.ShouldBe(expectedMessage);
+        error.Code
+            .Should()
+            .Be(nameof(ErrorResource1.NotNull));
+        error.Message
+            .Should()
+            .Be(expectedMessage);
     }
     
     [Fact]
@@ -148,12 +177,20 @@ public class DependencyInjectionTests :
         
         var response = await _client.GetAsync(EndpointPath.Test.Prefix + EndpointPath.Test.DefaultCultureMessage);
         
-        response.StatusCode.ShouldBe(HttpStatusCode.UnprocessableEntity);
+        response.StatusCode
+            .Should()
+            .Be(HttpStatusCode.UnprocessableEntity);
         var problemDetails = await GetProblemDetailsFromResponse(response);
-        problemDetails.Errors!.Count().ShouldBe(1);
+        problemDetails.Errors!
+            .Should()
+            .HaveCount(1);
         var error = problemDetails.Errors!.First();
-        error.Code.ShouldBe(nameof(ErrorResource.Null));
-        error.Message.ShouldBe(ErrorResource.Null);
+        error.Code
+            .Should()
+            .Be(nameof(ErrorResource.Null));
+        error.Message
+            .Should()
+            .Be(ErrorResource.Null);
     }
     
     [Fact]
@@ -161,9 +198,13 @@ public class DependencyInjectionTests :
     {
         var response = await _client.GetAsync(EndpointPath.Test.Prefix + EndpointPath.Test.BusinessExceptionWithStatusCodeWithMapping);
         
-        response.StatusCode.ShouldBe(HttpStatusCode.Created);
+        response.StatusCode
+            .Should()
+            .Be(HttpStatusCode.Created);
         var problemDetails = await GetProblemDetailsFromResponse(response);
-        problemDetails.Errors.ShouldBeNull();
+        problemDetails.Errors
+            .Should()
+            .BeNull();
     }
     
     [Fact]
@@ -173,12 +214,20 @@ public class DependencyInjectionTests :
         
         var response = await _client.GetAsync(EndpointPath.Test.Prefix + EndpointPath.Test.DefaultCultureMessage);
         
-        response.StatusCode.ShouldBe(HttpStatusCode.UnprocessableEntity);
+        response.StatusCode
+            .Should()
+            .Be(HttpStatusCode.UnprocessableEntity);
         var problemDetails = await GetProblemDetailsFromResponse(response);
-        problemDetails.Errors!.Count().ShouldBe(1);
+        problemDetails.Errors!
+            .Should()
+            .HaveCount(1);
         var error = problemDetails.Errors!.First();
-        error.Code.ShouldBe(nameof(ErrorResource.Null));
-        error.Message.ShouldBe(ErrorResource.Null);
+        error.Code
+            .Should()
+            .Be(nameof(ErrorResource.Null));
+        error.Message
+            .Should()
+            .Be(ErrorResource.Null);
     }
     
     [Fact]
@@ -197,12 +246,20 @@ public class DependencyInjectionTests :
         
         var response = await _client.GetAsync(EndpointPath.Test.Prefix + EndpointPath.Test.DefaultCultureMessage);
         
-        response.StatusCode.ShouldBe(HttpStatusCode.UnprocessableEntity);
+        response.StatusCode
+            .Should()
+            .Be(HttpStatusCode.UnprocessableEntity);
         var problemDetails = await GetProblemDetailsFromResponse(response);
-        problemDetails.Errors!.Count().ShouldBe(1);
+        problemDetails.Errors!
+            .Should()
+            .HaveCount(1);
         var error = problemDetails.Errors!.First();
-        error.Code.ShouldBe(nameof(ErrorResource.Null));
-        error.Message.ShouldBe("No debe tener un valor");
+        error.Code
+            .Should()
+            .Be(nameof(ErrorResource.Null));
+        error.Message
+            .Should()
+            .Be("No debe tener un valor");
     }
     
     [Fact]
@@ -212,12 +269,20 @@ public class DependencyInjectionTests :
         
         var response = await _client.GetAsync(EndpointPath.Test.Prefix + EndpointPath.Test.DefaultCultureMessage);
         
-        response.StatusCode.ShouldBe(HttpStatusCode.UnprocessableEntity);
+        response.StatusCode
+            .Should()
+            .Be(HttpStatusCode.UnprocessableEntity);
         var problemDetails = await GetProblemDetailsFromResponse(response);
-        problemDetails.Errors!.Count().ShouldBe(1);
+        problemDetails.Errors!
+            .Should()
+            .HaveCount(1);
         var error = problemDetails.Errors!.First();
-        error.Code.ShouldBe(nameof(ErrorResource.Null));
-        error.Message.ShouldBe(ErrorResource.Null);
+        error.Code
+            .Should()
+            .Be(nameof(ErrorResource.Null));
+        error.Message
+            .Should()
+            .Be(ErrorResource.Null);
     }
     
     [Theory]
@@ -235,12 +300,20 @@ public class DependencyInjectionTests :
         
         var response = await _client.GetAsync(EndpointPath.Test.Prefix + EndpointPath.Test.ResxBusinessExceptionWithCodeFromCustomResx);
         
-        response.StatusCode.ShouldBe(HttpStatusCode.UnprocessableEntity);
+        response.StatusCode
+            .Should()
+            .Be(HttpStatusCode.UnprocessableEntity);
         var problemDetails = await GetProblemDetailsFromResponse(response);
-        problemDetails.Errors!.Count().ShouldBe(1);
+        problemDetails.Errors!
+            .Should()
+            .HaveCount(1);
         var error = problemDetails.Errors!.First();
-        error.Code.ShouldBe(nameof(ErrorResource1.Hello));
-        error.Message.ShouldBe(expectedMessage);
+        error.Code
+            .Should()
+            .Be(nameof(ErrorResource1.Hello));
+        error.Message
+            .Should()
+            .Be(expectedMessage);
     }
     
     [Theory]
@@ -261,12 +334,20 @@ public class DependencyInjectionTests :
         
         var response = await _client.GetAsync(EndpointPath.Test.Prefix + EndpointPath.Test.ResxBusinessExceptionWithCodeFromCustomResx);
         
-        response.StatusCode.ShouldBe(HttpStatusCode.UnprocessableEntity);
+        response.StatusCode
+            .Should()
+            .Be(HttpStatusCode.UnprocessableEntity);
         var problemDetails = await GetProblemDetailsFromResponse(response);
-        problemDetails.Errors!.Count().ShouldBe(1);
+        problemDetails.Errors!
+            .Should()
+            .HaveCount(1);
         var error = problemDetails.Errors!.First();
-        error.Code.ShouldBe(nameof(ErrorResource1.Hello));
-        error.Message.ShouldBe(expectedMessage);
+        error.Code
+            .Should()
+            .Be(nameof(ErrorResource1.Hello));
+        error.Message
+            .Should()
+            .Be(expectedMessage);
     }
     
     [Theory]
@@ -286,10 +367,14 @@ public class DependencyInjectionTests :
         
         var response = await _client.GetAsync(EndpointPath.Test.Prefix + EndpointPath.Test.UseDecimal);
         
-        response.StatusCode.ShouldBe(HttpStatusCode.UnprocessableEntity);
+        response.StatusCode
+            .Should()
+            .Be(HttpStatusCode.UnprocessableEntity);
         var problemDetails = await GetProblemDetailsFromResponse(response);
         var error = problemDetails.Errors!.First();
-        error.Message.ShouldBe(expectedMessage);
+        error.Message
+            .Should()
+            .Be(expectedMessage);
     }
     
     [Fact]
@@ -306,15 +391,37 @@ public class DependencyInjectionTests :
         
         var response = await _client.GetAsync(EndpointPath.Test.Prefix + EndpointPath.Test.FrontBusinessExceptionWithPlaceholders);
         
-        response.StatusCode.ShouldBe(HttpStatusCode.UnprocessableEntity);
+        response.StatusCode
+            .Should()
+            .Be(HttpStatusCode.UnprocessableEntity);
         var problemDetails = await GetProblemDetailsFromResponse(response);
         var error = problemDetails.Errors!.First();
-        error.Message.ShouldBe(null);
-        error.Placeholders!.Count.ShouldBe(4);
-        error.Placeholders!.ElementAt(0).Key.ShouldBe("placeholder1");
-        error.Placeholders!.ElementAt(1).Key.ShouldBe("placeholder2");
-        error.Placeholders!.ElementAt(2).Key.ShouldBe("placeholder3");
-        error.Placeholders!.ElementAt(3).Key.ShouldBe("placeholder4");
+        error.Message
+            .Should()
+            .BeNull();
+        error.Placeholders!
+            .Should()
+            .HaveCount(4);
+        error.Placeholders!
+            .ElementAt(0)
+            .Key
+            .Should()
+            .Be("placeholder1");
+        error.Placeholders!
+            .ElementAt(1)
+            .Key
+            .Should()
+            .Be("placeholder2");
+        error.Placeholders!
+            .ElementAt(2)
+            .Key
+            .Should()
+            .Be("placeholder3");
+        error.Placeholders!
+            .ElementAt(3)
+            .Key
+            .Should()
+            .Be("placeholder4");
     }
     
     [Fact]
@@ -333,8 +440,12 @@ public class DependencyInjectionTests :
         
         var problemDetails = await GetProblemDetailsFromResponse(response);
         var error = problemDetails.Errors!.First();
-        error.Code.ShouldBe(nameof(ErrorResourceWithNoResx.Key));
-        error.Message.ShouldBe(ErrorResourceWithNoResx.Key);
+        error.Code
+            .Should()
+            .Be(nameof(ErrorResourceWithNoResx.Key));
+        error.Message
+            .Should()
+            .Be(ErrorResourceWithNoResx.Key);
     }
     
     [Fact(Skip = "TODO")]
@@ -353,8 +464,12 @@ public class DependencyInjectionTests :
         
         var problemDetails = await GetProblemDetailsFromResponse(response);
         var error = problemDetails.Errors!.First();
-        error.Code.ShouldBe(nameof(ErrorResourceWithNoResx.Key));
-        error.CodeUrl.ShouldBe($"https://www.backend.com{CrossValidationOptions.ErrorCodePagePath}#Key");
+        error.Code
+            .Should()
+            .Be(nameof(ErrorResourceWithNoResx.Key));
+        error.CodeUrl
+            .Should()
+            .Be($"https://www.backend.com{CrossValidationOptions.ErrorCodePagePath}#Key");
     }
     
     [Fact(Skip = "TODO")]
@@ -371,8 +486,12 @@ public class DependencyInjectionTests :
         
         var problemDetails = await GetProblemDetailsFromResponse(response);
         var error = problemDetails.Errors!.First();
-        error.Code.ShouldBe(nameof(ErrorResourceWithNoResx.Key));
-        error.CodeUrl.ShouldBe($"http://localhost{CrossValidationOptions.ErrorCodePagePath}#Key");
+        error.Code
+            .Should()
+            .Be(nameof(ErrorResourceWithNoResx.Key));
+        error.CodeUrl
+            .Should()
+            .Be($"http://localhost{CrossValidationOptions.ErrorCodePagePath}#Key");
     }
     
     [Theory(Skip = "TODO")]
@@ -464,8 +583,8 @@ public class DependencyInjectionTests :
                 .Be(expectedType);
         }
 
-        await Test(Environment.Development);
-        await Test(Environment.Production);
+        await Test(TestEnvironment.Development);
+        await Test(TestEnvironment.Production);
     }
     
     [Theory]
@@ -488,7 +607,7 @@ public class DependencyInjectionTests :
 
             void AssertExceptionExtensionInDevelopment()
             {
-                if (environment != Environment.Development)
+                if (environment != TestEnvironment.Development)
                 {
                     return;
                 }
@@ -512,7 +631,7 @@ public class DependencyInjectionTests :
 
             void AssertExceptionExtensionInProduction()
             {
-                if (environment != Environment.Production)
+                if (environment != TestEnvironment.Production)
                 {
                     return;
                 }
@@ -526,8 +645,8 @@ public class DependencyInjectionTests :
             AssertExceptionExtensionInProduction();
         }
 
-        await Test(Environment.Development);
-        await Test(Environment.Production);
+        await Test(TestEnvironment.Development);
+        await Test(TestEnvironment.Production);
     }
     
     [Theory]
@@ -569,12 +688,6 @@ public class DependencyInjectionTests :
             .Be(expectedTraceId);
     }
 
-    public void Dispose()
-    {
-        _client.Dispose();
-        CrossValidationOptions.SetDefaultOptions();
-    }
-
     private async Task<CrossValidationProblemDetails> GetProblemDetailsFromResponse(HttpResponseMessage response)
     {
         var jsonSerializerOptions = new JsonSerializerOptions
@@ -590,11 +703,18 @@ public class DependencyInjectionTests :
     {
         if (isEnabled)
         {
-            body.ShouldNotBeEmpty();
+            body.Should()
+                .NotBeEmpty();
         }
         else
         {
-            body.ShouldBeEmpty();
+            body.Should()
+                .BeEmpty();
         }
+    }
+
+    public void Dispose()
+    {
+        CrossValidationOptions.SetDefaultOptions();
     }
 }

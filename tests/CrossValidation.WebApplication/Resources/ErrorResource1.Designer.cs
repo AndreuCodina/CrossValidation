@@ -14,7 +14,7 @@ namespace CrossValidation.WebApplication.Resources {
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
     [System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class ErrorResource1 {
+    public class ErrorResource1 {
         
         private static System.Resources.ResourceManager resourceMan;
         
@@ -25,7 +25,7 @@ namespace CrossValidation.WebApplication.Resources {
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static System.Resources.ResourceManager ResourceManager {
+        public static System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.Equals(null, resourceMan)) {
                     System.Resources.ResourceManager temp = new System.Resources.ResourceManager("CrossValidation.WebApplication.Resources.ErrorResource1", typeof(ErrorResource1).Assembly);
@@ -36,7 +36,7 @@ namespace CrossValidation.WebApplication.Resources {
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static System.Globalization.CultureInfo Culture {
+        public static System.Globalization.CultureInfo Culture {
             get {
                 return resourceCulture;
             }
@@ -45,25 +45,25 @@ namespace CrossValidation.WebApplication.Resources {
             }
         }
         
-        internal static string Hello {
+        public static string Hello {
             get {
                 return ResourceManager.GetString("Hello", resourceCulture);
             }
         }
         
-        internal static string NotNull {
+        public static string NotNull {
             get {
                 return ResourceManager.GetString("NotNull", resourceCulture);
             }
         }
         
-        internal static string UseDecimal {
+        public static string UseDecimal {
             get {
                 return ResourceManager.GetString("UseDecimal", resourceCulture);
             }
         }
         
-        internal static string Code_With_Stops {
+        public static string Code_With_Stops {
             get {
                 return ResourceManager.GetString("Code.With.Stops", resourceCulture);
             }

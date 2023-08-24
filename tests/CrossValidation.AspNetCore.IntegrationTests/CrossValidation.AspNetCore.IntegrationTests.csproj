@@ -5,21 +5,9 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Bogus" />
         <PackageReference Include="FluentAssertions" />
-        <PackageReference Include="FluentAssertions.Analyzers">
-          <PrivateAssets>all</PrivateAssets>
-          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-        </PackageReference>
         <PackageReference Include="Microsoft.NET.Test.Sdk" />
-        <PackageReference Include="NSubstitute" />
-        <PackageReference Include="NSubstitute.Analyzers.CSharp">
-          <PrivateAssets>all</PrivateAssets>
-          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-        </PackageReference>
-        <PackageReference Include="Shouldly" />
         <PackageReference Include="xunit" />
-        <PackageReference Include="xunit.analyzers" />
         <PackageReference Include="xunit.runner.visualstudio">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
@@ -28,12 +16,18 @@
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" />
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\src\CrossValidation\CrossValidation.csproj" />
       <ProjectReference Include="..\CrossValidation.WebApplication\CrossValidation.WebApplication.csproj" />
     </ItemGroup>
 
+
+    <ItemGroup>
+      <Content Update="xunit.runner.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+    </ItemGroup>
 
 </Project>
