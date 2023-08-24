@@ -1,6 +1,8 @@
 using System.Globalization;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using ParentNamespace;
+using ParentNamespace.ChildNamespace.GrandchildNamespace;
 using Shouldly;
 
 namespace CrossValidation.SourceGenerators.UnitTests;
