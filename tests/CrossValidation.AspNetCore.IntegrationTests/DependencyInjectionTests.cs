@@ -1,5 +1,4 @@
-﻿using System.Globalization;
-using System.Net;
+﻿using System.Net;
 using System.Text.Json;
 using CrossValidation.AspNetCore.IntegrationTests.TestUtils;
 using CrossValidation.Resources;
@@ -18,8 +17,6 @@ public class DependencyInjectionTests : IDisposable
 
     public DependencyInjectionTests()
     {
-        CultureInfo.CurrentCulture = CultureInfo.GetCultureInfo(CrossValidationOptions.DefaultCultureCode);
-        CultureInfo.CurrentUICulture = CultureInfo.GetCultureInfo(CrossValidationOptions.DefaultCultureCode);
         _testWebApplicationFactory = new TestWebApplicationFactory();
         _client = _testWebApplicationFactory.CreateClient();
     }
