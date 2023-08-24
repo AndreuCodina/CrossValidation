@@ -10,7 +10,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrossValidation", "src\Cros
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrossValidation.WebApplication", "tests\CrossValidation.WebApplication\CrossValidation.WebApplication.csproj", "{EF3BA893-56D8-45B8-8E20-53AC5B804D0B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrossValidation.Tests", "tests\CrossValidation.Tests\CrossValidation.Tests.csproj", "{C151B7FD-3DFC-4ABB-A38A-5C2A2D2FAD1A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrossValidation.UnitTests", "tests\CrossValidation.UnitTests\CrossValidation.UnitTests.csproj", "{C151B7FD-3DFC-4ABB-A38A-5C2A2D2FAD1A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrossValidation.Benchmarks", "benchmarks\CrossValidation.Benchmarks\CrossValidation.Benchmarks.csproj", "{5955B6A6-936B-4AF7-BA40-3131368A93EB}"
 EndProject
