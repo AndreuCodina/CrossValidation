@@ -1,6 +1,6 @@
+using Common.Tests;
 using CrossValidation.Exceptions;
 using CrossValidation.Resources;
-using CrossValidation.UnitTests.TestUtils;
 using CrossValidation.Validations;
 using FluentAssertions;
 using Xunit;

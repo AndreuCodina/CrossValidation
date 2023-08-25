@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using Common.Tests;
 using CrossValidation.Exceptions;
 using CrossValidation.Resources;
 using CrossValidation.UnitTests.TestUtils;

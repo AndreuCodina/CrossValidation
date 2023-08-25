@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Text.Json;
+using Common.Tests;
 using CrossValidation.AspNetCore.IntegrationTests.TestUtils;
 using CrossValidation.Resources;
 using CrossValidation.WebApplication;
@@ -10,7 +11,7 @@ using Microsoft.AspNetCore.Mvc.Testing;
 
 namespace CrossValidation.AspNetCore.IntegrationTests;
 
-public class DependencyInjectionTests : IDisposable
+public class DependencyInjectionTests : TestBase
 {
     private WebApplicationFactory<Program> _testWebApplicationFactory;
     private HttpClient _client;
@@ -708,10 +709,5 @@ public class DependencyInjectionTests : IDisposable
             body.Should()
                 .BeEmpty();
         }
-    }
-
-    public void Dispose()
-    {
-        CrossValidationOptions.SetDefaultOptions();
     }
 }

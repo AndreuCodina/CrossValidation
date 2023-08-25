@@ -22,6 +22,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrossValidation.AspNetCore"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrossValidation.AspNetCore.IntegrationTests", "tests\CrossValidation.AspNetCore.IntegrationTests\CrossValidation.AspNetCore.IntegrationTests.csproj", "{502AFFCB-1942-4EA8-93FA-52A5A8BDBC12}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common.Tests", "tests\Common.Tests\Common.Tests.csproj", "{926E002A-6D39-433A-B55A-DF4ECA989459}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -60,6 +62,10 @@ Global
 		{502AFFCB-1942-4EA8-93FA-52A5A8BDBC12}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{502AFFCB-1942-4EA8-93FA-52A5A8BDBC12}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{502AFFCB-1942-4EA8-93FA-52A5A8BDBC12}.Release|Any CPU.Build.0 = Release|Any CPU
+		{926E002A-6D39-433A-B55A-DF4ECA989459}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{926E002A-6D39-433A-B55A-DF4ECA989459}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{926E002A-6D39-433A-B55A-DF4ECA989459}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{926E002A-6D39-433A-B55A-DF4ECA989459}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{049100B9-0B86-42B3-8612-CEB09A4FAE0F} = {49061C30-4142-4803-B38C-6E82D2354872}
@@ -70,5 +76,6 @@ Global
 		{116D55CE-6AA7-49E5-9212-ACCAC73A4340} = {2CC84D31-5578-4916-9D07-8346D8DC6171}
 		{C8BF1853-2A2D-41EC-84C8-86C87D96CCB0} = {49061C30-4142-4803-B38C-6E82D2354872}
 		{502AFFCB-1942-4EA8-93FA-52A5A8BDBC12} = {2CC84D31-5578-4916-9D07-8346D8DC6171}
+		{926E002A-6D39-433A-B55A-DF4ECA989459} = {2CC84D31-5578-4916-9D07-8346D8DC6171}
 	EndGlobalSection
 EndGlobal

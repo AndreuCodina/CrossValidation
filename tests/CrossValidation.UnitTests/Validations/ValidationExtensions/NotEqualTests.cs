@@ -1,13 +1,13 @@
+using Common.Tests;
 using CrossValidation.Exceptions;
 using CrossValidation.Resources;
-using CrossValidation.UnitTests.TestUtils;
 using CrossValidation.Validations;
 using FluentAssertions;
 using Xunit;
 
 namespace CrossValidation.UnitTests.Validations.ValidationExtensions;
 
-public class nOTEqualTests : TestBase
+public class NotEqualTests : TestBase
 {
     [Fact]
     public void Validate_value_is_not_equal_to_comparison_value()

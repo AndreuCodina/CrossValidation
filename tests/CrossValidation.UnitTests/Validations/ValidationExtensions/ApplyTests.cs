@@ -1,5 +1,5 @@
+using Common.Tests;
 using CrossValidation.Exceptions;
-using CrossValidation.UnitTests.TestUtils;
 using CrossValidation.UnitTests.TestUtils.Builders;
 using CrossValidation.UnitTests.TestUtils.Models;
 using CrossValidation.Validations;

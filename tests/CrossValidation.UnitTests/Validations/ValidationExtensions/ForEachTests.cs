@@ -1,6 +1,6 @@
 ﻿using System.Net;
+using Common.Tests;
 using CrossValidation.Exceptions;
-using CrossValidation.UnitTests.TestUtils;
 using CrossValidation.UnitTests.TestUtils.Builders;
 using CrossValidation.UnitTests.TestUtils.Fixtures;
 using CrossValidation.UnitTests.TestUtils.Models;
