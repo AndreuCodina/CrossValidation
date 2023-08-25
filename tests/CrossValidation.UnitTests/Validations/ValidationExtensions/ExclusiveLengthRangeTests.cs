@@ -53,5 +53,8 @@ public class ExclusiveLengthRangeTests : TestBase
         exception.TotalLength
             .Should()
             .Be(value.Length);
+        exception.Message
+            .Should()
+            .Be($"Must have between {expectedMinimumLength} and {expectedMaximumLength} character(s) (exclusive)");
     }
 }
