@@ -1,13 +1,22 @@
 <Project>
 
   <PropertyGroup>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Authors>Andreu Codina</Authors>
+    <PackageIcon>logo.jpg</PackageIcon>
+    <PackageReadmeFile>crossvalidation-nuget-readme.md</PackageReadmeFile>
+    <Description>State-of-the-art .NET library to handle errors and validate data.</Description>
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <LangVersion>preview</LangVersion>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <Authors>Andreu Codina</Authors>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\docs\logo.jpg" Pack="true" Visible="false" PackagePath="" />
+    <None Include="..\..\docs\crossvalidation-nuget-readme.md" Visible="false" Pack="true" PackagePath="" />
+  </ItemGroup>
 
 </Project>

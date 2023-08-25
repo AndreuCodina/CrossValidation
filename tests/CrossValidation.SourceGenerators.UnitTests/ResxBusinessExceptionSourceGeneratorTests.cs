@@ -1,9 +1,9 @@
 using System.Globalization;
+using FluentAssertions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using ParentNamespace;
 using ParentNamespace.ChildNamespace.GrandchildNamespace;
-using Shouldly;
 
 namespace CrossValidation.SourceGenerators.UnitTests;
 
@@ -72,9 +72,10 @@ public class ResxBusinessExceptionSourceGeneratorTests
             .GeneratedSources[0]
             .SourceText
             .ToString();
-        var equals = string.Compare(generatedCode, expectedGeneratedCode, CultureInfo.CurrentCulture,
+        var isEqual = string.Compare(generatedCode, expectedGeneratedCode, CultureInfo.CurrentCulture,
             CompareOptions.IgnoreCase | CompareOptions.IgnoreSymbols) == 0;
-        equals.ShouldBeTrue();
+        isEqual.Should()
+            .BeTrue();
     }
     
     [Fact]
@@ -102,7 +103,8 @@ public class ResxBusinessExceptionSourceGeneratorTests
         var runResult = driver.GetRunResult();
         runResult.Results[0]
             .GeneratedSources
-            .ShouldBeEmpty();
+            .Should()
+            .BeEmpty();
     }
     
     [Fact]
@@ -128,7 +130,8 @@ public class ResxBusinessExceptionSourceGeneratorTests
         var runResult = driver.GetRunResult();
         runResult.Results[0]
             .GeneratedSources
-            .ShouldBeEmpty();
+            .Should()
+            .BeEmpty();
     }
 
     [Fact]
@@ -136,26 +139,32 @@ public class ResxBusinessExceptionSourceGeneratorTests
     {
         new WithNoParametersGlobalNamespaceException()
             .Message
-            .ShouldBe("Error message");
+            .Should()
+            .Be("Error message");
         
         new WithParametersGlobalNamespaceException(1, "message")
             .Message
-            .ShouldBe("Error message with 1 and message");
+            .Should()
+            .Be("Error message with 1 and message");
         
         new WithNoParametersWithDeclaredNamespaceException()
             .Message
-            .ShouldBe("Error message");
+            .Should()
+            .Be("Error message");
         
         new WithParametersWithDeclaredNamespaceException(1, "message")
             .Message
-            .ShouldBe("Error message with 1 and message");
+            .Should()
+            .Be("Error message with 1 and message");
 
         new ParentClass<string>.ChildClass.ExceptionWithParameters<int>(1, 2)
             .Message
-            .ShouldBe("Error message with 1 and 2");
+            .Should()
+            .Be("Error message with 1 and 2");
 
         new WithNoParametersNoMessageException()
             .Message
-            .ShouldBe("");
+            .Should()
+            .Be("");
     }
 }
