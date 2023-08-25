@@ -5,7 +5,7 @@ using CrossValidation.UnitTests.TestUtils.Builders;
 using CrossValidation.UnitTests.TestUtils.Fixtures;
 using CrossValidation.UnitTests.TestUtils.Models;
 using CrossValidation.Validations;
-using Shouldly;
+using FluentAssertions;
 using Xunit;
 
 namespace CrossValidation.UnitTests.Validations.ValidationExtensions;
@@ -30,7 +30,8 @@ public class NullTests :
             .Null()
             .Must(_commonFixture.BeValid);
         
-        action.ShouldNotThrow();
+        action.Should()
+            .NotThrow();
     }
     
     [Fact]
@@ -40,7 +41,8 @@ public class NullTests :
             .Null()
             .Must(_commonFixture.BeValid);
         
-        action.ShouldNotThrow();
+        action.Should()
+            .NotThrow();
     }
     
     [Fact]
@@ -53,7 +55,11 @@ public class NullTests :
         var action = () => Validate.Field(_model.NullableString)
             .Null();
 
-        var exception = action.ShouldThrow<CommonException.NullException>();
-        exception.Code.ShouldBe(nameof(ErrorResource.Null));
+        action.Should()
+            .Throw<CommonException.NullException>()
+            .And
+            .Code
+            .Should()
+            .Be(nameof(ErrorResource.Null));
     }
 }
