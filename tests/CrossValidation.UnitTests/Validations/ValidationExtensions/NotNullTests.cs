@@ -5,7 +5,7 @@ using CrossValidation.UnitTests.TestUtils.Builders;
 using CrossValidation.UnitTests.TestUtils.Fixtures;
 using CrossValidation.UnitTests.TestUtils.Models;
 using CrossValidation.Validations;
-using Shouldly;
+using FluentAssertions;
 using Xunit;
 
 namespace CrossValidation.UnitTests.Validations.ValidationExtensions;
@@ -24,7 +24,7 @@ public class NotNullTests :
     }
     
     [Fact]
-    public void NotNull_works_with_nullable_value_types()
+    public void Validate_nullable_value_types()
     {
         _model = new ParentModelBuilder()
             .WithNullableInt(1)
@@ -34,11 +34,12 @@ public class NotNullTests :
             .NotNull()
             .GreaterThan(_model.NullableInt!.Value - 1);
         
-        action.ShouldNotThrow();
+        action.Should()
+            .NotThrow();
     }
     
     [Fact]
-    public void NotNull_works_with_nullable_reference_types()
+    public void Validate_nullable_reference_types()
     {
         _model = new ParentModelBuilder()
             .WithNullableString("The string")
@@ -48,12 +49,13 @@ public class NotNullTests :
             .NotNull()
             .Must(_commonFixture.BeValid);
         
-        action.ShouldNotThrow();
+        action.Should()
+            .NotThrow();
     }
     
         
     [Fact]
-    public void NotNull_works_with_nullable_types_and_error_accumulation()
+    public void Validate_nullable_types_using_error_accumulation()
     {
         _model = new ParentModelBuilder()
             .WithNullableString("Value")
@@ -76,12 +78,18 @@ public class NotNullTests :
         
         var action = () => parentModelValidator.Validate(_model);
 
-        var exceptions = action.ShouldThrow<BusinessListException>()
+        var exceptions = action.Should()
+            .Throw<BusinessListException>()
+            .Which
             .Exceptions;
-        exceptions.Count.ShouldBe(3);
-        exceptions[0].ShouldBeOfType<CommonException.NotNullException>();
-        exceptions[1].ShouldBeOfType<CommonException.InclusiveLengthRangeException>();
-        exceptions[2].ShouldBeOfType<CommonException.NotNullException>();
+        exceptions.Should()
+            .HaveCount(3);
+        exceptions[0].Should()
+            .BeOfType<CommonException.NotNullException>();
+        exceptions[1].Should()
+            .BeOfType<CommonException.InclusiveLengthRangeException>();
+        exceptions[2].Should()
+            .BeOfType<CommonException.NotNullException>();
     }
     
     [Fact]
@@ -90,7 +98,11 @@ public class NotNullTests :
         var action = () => Validate.Field(_model.NullableString)
             .NotNull();
 
-        var exception = action.ShouldThrow<CommonException.NotNullException>();
-        exception.Code.ShouldBe(nameof(ErrorResource.NotNull));
+        action.Should()
+            .Throw<CommonException.NotNullException>()
+            .And
+            .Code
+            .Should()
+            .Be(nameof(ErrorResource.NotNull));
     }
 }

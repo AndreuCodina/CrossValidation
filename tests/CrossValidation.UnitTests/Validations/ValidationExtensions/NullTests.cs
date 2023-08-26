@@ -24,7 +24,7 @@ public class NullTests :
     }
     
     [Fact]
-    public void Null_works_with_nullable_value_types()
+    public void Validate_nullable_value_types()
     {
         var action = () => Validate.That(_model.NullableInt)
             .Null()
@@ -35,7 +35,7 @@ public class NullTests :
     }
     
     [Fact]
-    public void Null_works_with_nullable_reference_types()
+    public void Validate_nullable_reference_types()
     {
         var action = () => Validate.That(_model.NullableString)
             .Null()
