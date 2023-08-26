@@ -177,4 +177,30 @@ public static partial class CommonException
     }
     
     public class UniqueItemsException() : BusinessException(code: nameof(ErrorResource.UniqueItems));
+    
+    public class InclusiveRangeException<TField>(TField fromValue, TField toValue)
+        : BusinessException(code: nameof(ErrorResource.InclusiveRange))
+    {
+        public TField FromValue => fromValue;
+        public TField ToValue => toValue;
+
+        public override void AddParametersAsPlaceholderValues()
+        {
+            AddPlaceholderValue(fromValue);
+            AddPlaceholderValue(toValue);
+        }
+    }
+
+    public class ExclusiveRangeException<TField>(TField fromValue, TField toValue)
+        : BusinessException(code: nameof(ErrorResource.ExclusiveRange))
+    {
+        public TField FromValue => fromValue;
+        public TField ToValue => toValue;
+
+        public override void AddParametersAsPlaceholderValues()
+        {
+            AddPlaceholderValue(fromValue);
+            AddPlaceholderValue(toValue);
+        }
+    }
 }

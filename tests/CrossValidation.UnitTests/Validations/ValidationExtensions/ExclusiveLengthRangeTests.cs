@@ -11,13 +11,6 @@ namespace CrossValidation.UnitTests.Validations.ValidationExtensions;
 
 public class ExclusiveLengthRangeTests : TestBase
 {
-    private readonly ParentModel _model;
-
-    public ExclusiveLengthRangeTests()
-    {
-        _model = new ParentModelBuilder().Build();
-    }
-    
     [Theory]
     [InlineData("word", 3, 5)]
     public void Validate_length_is_not_out_of_range(string value, int minimumLength, int maximumLength)

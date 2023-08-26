@@ -11,13 +11,6 @@ namespace CrossValidation.UnitTests.Validations.ValidationExtensions;
 
 public class InclusiveLengthRangeTests : TestBase
 {
-    private readonly ParentModel _model;
-
-    public InclusiveLengthRangeTests()
-    {
-        _model = new ParentModelBuilder().Build();
-    }
-    
     [Theory]
     [InlineData("word", 4, 4)]
     [InlineData("word", 3, 4)]
