@@ -4,7 +4,7 @@ using CrossValidation.Validations;
 using FluentAssertions;
 using Xunit;
 
-namespace CrossValidation.UnitTests.Validators;
+namespace CrossValidation.UnitTests.Validators.CollectionValidators;
 
 public class CollectionValidatorTests
 {

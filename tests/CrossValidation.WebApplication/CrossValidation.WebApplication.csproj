@@ -1,8 +1,4 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
-    
-    <ItemGroup>
-        <InternalsVisibleTo Include="CrossValidation.Tests" />
-    </ItemGroup>
 
     <ItemGroup>
       <EmbeddedResource Update="Resources\ErrorResource1.es.resx">

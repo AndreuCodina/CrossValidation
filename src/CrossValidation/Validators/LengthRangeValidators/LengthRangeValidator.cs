@@ -1,4 +1,4 @@
-﻿namespace CrossValidation.Validators;
+﻿namespace CrossValidation.Validators.LengthRangeValidators;
 
 public abstract class LengthRangeValidator : Validator
 {

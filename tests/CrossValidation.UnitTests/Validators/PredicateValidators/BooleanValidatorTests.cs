@@ -3,9 +3,9 @@ using CrossValidation.Validators.PredicateValidators;
 using Shouldly;
 using Xunit;
 
-namespace CrossValidation.UnitTests.Validators;
+namespace CrossValidation.UnitTests.Validators.PredicateValidators;
 
-public class PredicateValidatorTests : TestBase
+public class BooleanValidatorTests : TestBase
 {
     [Fact]
     public void Validate_predicate()

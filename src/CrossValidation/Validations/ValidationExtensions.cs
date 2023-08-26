@@ -1,9 +1,12 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using CrossValidation.Validators;
 using CrossValidation.Validators.BooleanValidators;
 using CrossValidation.Validators.CollectionValidators;
 using CrossValidation.Validators.ComparisonValidators;
 using CrossValidation.Validators.EnumValidators;
+using CrossValidation.Validators.LengthRangeValidators;
 using CrossValidation.Validators.NullValidators;
+using CrossValidation.Validators.RangeValidators;
 using CrossValidation.Validators.RegularExpressionValidators;
 using CrossValidation.Validators.StringValidators;
 
@@ -326,6 +329,26 @@ public static class ValidationExtensions
     {
         return validation.SetValidator(() =>
             new UniqueItemsValidator<TField>(validation.GetFieldValue()));
+    }
+    
+    public static IValidation<TField> InclusiveRange<TField>(
+        this IValidation<TField> validation,
+        TField from,
+        TField to)
+        where TField : IComparable<TField>
+    {
+        return validation.SetValidator(() =>
+            new InclusiveRangeValidator<TField>(validation.GetFieldValue(), from, to));
+    }
+
+    public static IValidation<TField> ExclusiveRange<TField>(
+        this IValidation<TField> validation,
+        TField from,
+        TField to)
+        where TField : IComparable<TField>
+    {
+        return validation.SetValidator(() =>
+            new ExclusiveRangeValidator<TField>(validation.GetFieldValue(), from, to));
     }
 
     internal static IValidation<TDependentField> CreateScopeValidation<TField, TDependentField>(

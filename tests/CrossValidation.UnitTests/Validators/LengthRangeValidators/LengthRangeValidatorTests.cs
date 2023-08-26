@@ -5,7 +5,7 @@ using CrossValidation.Validations;
 using FluentAssertions;
 using Xunit;
 
-namespace CrossValidation.UnitTests.Validators;
+namespace CrossValidation.UnitTests.Validators.LengthRangeValidators;
 
 public class LengthRangeValidatorTests : TestBase
 {

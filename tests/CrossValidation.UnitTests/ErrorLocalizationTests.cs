@@ -11,7 +11,7 @@ namespace CrossValidation.UnitTests;
 
 public class ErrorLocalizationTests : TestBase
 {
-    private ParentModel _model;
+    private readonly ParentModel _model;
 
     public ErrorLocalizationTests()
     {

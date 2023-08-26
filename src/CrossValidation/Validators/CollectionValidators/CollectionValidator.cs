@@ -1,4 +1,4 @@
-namespace CrossValidation.Validators;
+namespace CrossValidation.Validators.CollectionValidators;
 
 public abstract class CollectionValidator<TField> : Validator
 {
