@@ -1,6 +1,6 @@
 using CrossValidation.Exceptions;
 
-namespace CrossValidation.Validators;
+namespace CrossValidation.Validators.RangeValidators;
 
 public class InclusiveRangeValidator<TField>(TField fieldValue, TField from, TField to) : Validator
     where TField : IComparable<TField>

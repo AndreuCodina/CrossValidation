@@ -34,7 +34,12 @@
       <ProjectReference Include="..\..\src\CrossValidation\CrossValidation.csproj" />
       <ProjectReference Include="..\Common.Tests\Common.Tests.csproj" />
       <ProjectReference Include="..\CrossValidation.WebApplication\CrossValidation.WebApplication.csproj" />
+
+
+
     </ItemGroup>
+
+
 
 
 </Project>

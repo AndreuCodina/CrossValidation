@@ -3,7 +3,7 @@ using CrossValidation.Validators.NullValidators;
 using Shouldly;
 using Xunit;
 
-namespace CrossValidation.UnitTests.Validators;
+namespace CrossValidation.UnitTests.Validators.NullValidators;
 
 public class NotNullValidatorTests : TestBase
 {

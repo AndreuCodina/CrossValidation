@@ -4,7 +4,9 @@ using CrossValidation.Validators.BooleanValidators;
 using CrossValidation.Validators.CollectionValidators;
 using CrossValidation.Validators.ComparisonValidators;
 using CrossValidation.Validators.EnumValidators;
+using CrossValidation.Validators.LengthRangeValidators;
 using CrossValidation.Validators.NullValidators;
+using CrossValidation.Validators.RangeValidators;
 using CrossValidation.Validators.RegularExpressionValidators;
 using CrossValidation.Validators.StringValidators;
 
