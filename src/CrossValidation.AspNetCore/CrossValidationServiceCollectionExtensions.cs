@@ -16,7 +16,6 @@ public static class CrossValidationServiceCollectionExtensions
     {
         var serviceProvider = services.BuildServiceProvider();
         _environment = serviceProvider.GetRequiredService<IHostEnvironment>();
-        
         options?.Invoke(new CrossValidationOptionsBuilder());
         services.AddProblemDetails(problemDetailsOptions =>
             problemDetailsOptions.CustomizeProblemDetails = context =>
@@ -33,7 +32,6 @@ public static class CrossValidationServiceCollectionExtensions
                     mapper.Map(businessListException);
                     context.HttpContext.Response.StatusCode = (int)context.ProblemDetails.Status!;
                 }
-
 
                 AddExceptionExtension(context);
                 AddTraceIdExtension(context);
@@ -53,7 +51,7 @@ public static class CrossValidationServiceCollectionExtensions
             .Response
             .Headers
             .Append(TraceIdHeaderKey, traceId);
-        context.ProblemDetails.Extensions.Add("traceId", traceId);
+        context.ProblemDetails.Extensions.Add(CrossValidationProblemDetails.TraceIdPropertyName, traceId);
     }
 
     private static void AddExceptionExtension(ProblemDetailsContext context)
@@ -71,8 +69,8 @@ public static class CrossValidationServiceCollectionExtensions
                 .Headers
                 .ToDictionary(x => x.Key, x => x.Value.ToList()),
             Path = context.HttpContext.Request.Path,
-            Endpoint = context.HttpContext.GetEndpoint()?.ToString(),
+            Endpoint = context.HttpContext.GetEndpoint()?.ToString()
         };
-        context.ProblemDetails.Extensions.Add("exception", exceptionExtension);
+        context.ProblemDetails.Extensions.Add(CrossValidationProblemDetails.ExceptionPropertyName, exceptionExtension);
     }
 }

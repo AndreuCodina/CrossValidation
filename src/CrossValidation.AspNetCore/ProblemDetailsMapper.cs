@@ -45,7 +45,7 @@ internal class ProblemDetailsMapper(ProblemDetails problemDetails)
     {
         if (errors.Count > 0)
         {
-            problemDetails.Extensions.Add("errors", errors);
+            problemDetails.Extensions.Add(CrossValidationProblemDetails.ErrorsPropertyName, errors);
         }
     }
     

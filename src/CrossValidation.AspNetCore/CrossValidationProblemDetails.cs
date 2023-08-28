@@ -11,4 +11,8 @@ public class CrossValidationProblemDetails
     public IEnumerable<CrossValidationProblemDetailsError>? Errors { get; set; }
     public CrossValidationProblemDetailsException? Exception { get; set; }
     public required string TraceId { get; set; }
+
+    public static string ErrorsPropertyName = nameof(Errors).ToLowerInvariant();
+    public static string ExceptionPropertyName = nameof(Exception).ToLowerInvariant();
+    public static string TraceIdPropertyName = nameof(TraceId).ToLowerInvariant();
 }
