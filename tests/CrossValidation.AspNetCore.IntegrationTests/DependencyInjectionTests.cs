@@ -646,45 +646,6 @@ public class DependencyInjectionTests : TestBase
         await Test(TestEnvironment.Development);
         await Test(TestEnvironment.Production);
     }
-    
-    [Theory]
-    [InlineData(EndpointPath.Test.BusinessException)]
-    [InlineData(EndpointPath.Test.UnexpectedException)]
-    public async Task Get_new_trace_id_when_is_not_sent_from_the_client(string endpointPath)
-    {
-        var response = await _client.GetAsync(EndpointPath.Test.Prefix + endpointPath);
-        
-        var correlationIdHeader = response.Headers
-            .GetValues("X-Trace-Id")
-            .FirstOrDefault();
-        correlationIdHeader.Should()
-            .NotBeNullOrEmpty();
-        var problemDetails = await GetProblemDetailsFromResponse(response);
-        problemDetails.TraceId
-            .Should()
-            .NotBeNull();
-    }
-    
-    [Theory]
-    [InlineData(EndpointPath.Test.BusinessException)]
-    [InlineData(EndpointPath.Test.UnexpectedException)]
-    public async Task Get_sent_trace_id(string endpointPath)
-    {
-        var expectedTraceId = Guid.NewGuid().ToString();
-        _client.DefaultRequestHeaders.Add("X-Trace-Id", expectedTraceId);
-        
-        var response = await _client.GetAsync(EndpointPath.Test.Prefix + endpointPath);
-        
-        var correlationIdHeader = response.Headers
-            .GetValues("X-Trace-Id")
-            .FirstOrDefault();
-        correlationIdHeader.Should()
-            .Be(expectedTraceId);
-        var problemDetails = await GetProblemDetailsFromResponse(response);
-        problemDetails.TraceId
-            .Should()
-            .Be(expectedTraceId);
-    }
 
     private async Task<CrossValidationProblemDetails> GetProblemDetailsFromResponse(HttpResponseMessage response)
     {

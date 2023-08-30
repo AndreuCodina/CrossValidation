@@ -1,4 +1,5 @@
-﻿using CrossValidation.Exceptions;
+﻿using System.Diagnostics;
+using CrossValidation.Exceptions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -7,7 +8,6 @@ namespace CrossValidation.AspNetCore;
 
 public static class CrossValidationServiceCollectionExtensions
 {
-    private const string TraceIdHeaderKey = "X-Trace-Id";
     private static IHostEnvironment _environment = default!;
     
     public static IServiceCollection AddCrossValidation(
@@ -36,22 +36,16 @@ public static class CrossValidationServiceCollectionExtensions
                 AddExceptionExtension(context);
                 AddTraceIdExtension(context);
             });
-        services.AddTransient<GlobalExceptionMiddleware>();
+        services.AddTransient<BusinessExceptionMiddleware>();
         return services;
     }
 
     private static void AddTraceIdExtension(ProblemDetailsContext context)
     {
-        var hasTraceIdHeaders = context.HttpContext.Request.Headers.TryGetValue(
-            TraceIdHeaderKey, out var correlationIds);
-        var traceId = hasTraceIdHeaders
-            ? correlationIds.FirstOrDefault()
-            : Guid.NewGuid().ToString();
-        context.HttpContext
-            .Response
-            .Headers
-            .Append(TraceIdHeaderKey, traceId);
-        context.ProblemDetails.Extensions.Add(CrossValidationProblemDetails.TraceIdPropertyName, traceId);
+        var traceId = Activity.Current?.Id ?? context.HttpContext.TraceIdentifier;
+        context.ProblemDetails
+            .Extensions
+            .Add(CrossValidationProblemDetails.TraceIdPropertyName, traceId);
     }
 
     private static void AddExceptionExtension(ProblemDetailsContext context)
@@ -71,6 +65,8 @@ public static class CrossValidationServiceCollectionExtensions
             Path = context.HttpContext.Request.Path,
             Endpoint = context.HttpContext.GetEndpoint()?.ToString()
         };
-        context.ProblemDetails.Extensions.Add(CrossValidationProblemDetails.ExceptionPropertyName, exceptionExtension);
+        context.ProblemDetails
+            .Extensions
+            .Add(CrossValidationProblemDetails.ExceptionPropertyName, exceptionExtension);
     }
 }
