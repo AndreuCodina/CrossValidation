@@ -17,6 +17,17 @@ public static class CrossValidationServiceCollectionExtensions
         var serviceProvider = services.BuildServiceProvider();
         _environment = serviceProvider.GetRequiredService<IHostEnvironment>();
         options?.Invoke(new CrossValidationOptionsBuilder());
+        AddProblemDetails(services);
+        return services;
+    }
+
+    private static void AddProblemDetails(IServiceCollection services)
+    {
+        if (!CrossValidationOptions.CustomizeHttpResponse)
+        {
+            return;
+        }
+        
         services.AddProblemDetails(problemDetailsOptions =>
             problemDetailsOptions.CustomizeProblemDetails = context =>
             {
@@ -37,7 +48,6 @@ public static class CrossValidationServiceCollectionExtensions
                 AddTraceIdExtension(context);
             });
         services.AddTransient<BusinessExceptionMiddleware>();
-        return services;
     }
 
     private static void AddTraceIdExtension(ProblemDetailsContext context)

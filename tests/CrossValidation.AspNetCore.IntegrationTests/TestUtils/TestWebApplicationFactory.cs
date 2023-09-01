@@ -15,6 +15,9 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
-        builder.ConfigureServices(services => _services?.Invoke(services));
+        builder.ConfigureServices(services =>
+        {
+            _services?.Invoke(services);
+        });
     }
 }

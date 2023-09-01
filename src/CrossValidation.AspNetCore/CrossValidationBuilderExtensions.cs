@@ -14,16 +14,19 @@ public static class CrossValidationBuilderExtensions
     public static IApplicationBuilder UseCrossValidation(this WebApplication app)
     {
         app.UseCustomRequestLocalization();
-
-        if (CrossValidationOptions.HandleUnknownException)
-        {
-            app.UseExceptionHandler();
-        }
-        
-        app.UseBusinessExceptionMiddleware();
-        app.UseStatusCodePages();
+        AddHttpResponseCustomizers(app);
         AddErrorCodePage(app);
         return app;
+    }
+
+    private static void AddHttpResponseCustomizers(WebApplication app)
+    {
+        if (CrossValidationOptions.CustomizeHttpResponse)
+        {
+            app.UseExceptionHandler();
+            app.UseBusinessExceptionMiddleware();
+            app.UseStatusCodePages();
+        }
     }
 
     private static void AddErrorCodePage(WebApplication app)

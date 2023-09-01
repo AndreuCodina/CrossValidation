@@ -7,27 +7,20 @@ using CrossValidation.WebApplication;
 using CrossValidation.WebApplication.Resources;
 using FluentAssertions;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc.Testing;
 
 namespace CrossValidation.AspNetCore.IntegrationTests;
 
 public class DependencyInjectionTests : TestBase
 {
-    private WebApplicationFactory<Program> _testWebApplicationFactory;
-    private HttpClient _client;
-
-    public DependencyInjectionTests()
-    {
-        _testWebApplicationFactory = new TestWebApplicationFactory();
-        _client = _testWebApplicationFactory.CreateClient();
-    }
-    
     [Theory]
     [InlineData(EndpointPath.Test.Prefix + EndpointPath.Test.BusinessException, HttpStatusCode.UnprocessableEntity)]
     [InlineData(EndpointPath.Test.Prefix + EndpointPath.Test.BusinessListException, HttpStatusCode.UnprocessableEntity)]
     public async Task Get_http_status_code(string endpoint, HttpStatusCode expectedStatusCode)
     {
-        var response = await _client.GetAsync(endpoint);
+        var testWebApplicationFactory = new TestWebApplicationFactory(services => services
+            .AddCrossValidation());
+        var client = testWebApplicationFactory.CreateClient();
+        var response = await client.GetAsync(endpoint);
         
         response.StatusCode
             .Should()
@@ -39,7 +32,7 @@ public class DependencyInjectionTests : TestBase
     [InlineData("es", "Hola")]
     public async Task Get_message_from_custom_resx(string languageCode, string expectedMessage)
     {
-        _testWebApplicationFactory = new TestWebApplicationFactory(services =>
+        var testWebApplicationFactory = new TestWebApplicationFactory(services =>
         {
             services.AddCrossValidation(options =>
             {
@@ -48,10 +41,10 @@ public class DependencyInjectionTests : TestBase
                 options.AddResx<ErrorResource1>();
             });
         });
-        _client = _testWebApplicationFactory.CreateClient();
-        _client.DefaultRequestHeaders.Add("Accept-Language", languageCode);
+        var client = testWebApplicationFactory.CreateClient();
+        client.DefaultRequestHeaders.Add("Accept-Language", languageCode);
         
-        var response = await _client.GetAsync(EndpointPath.Test.Prefix + EndpointPath.Test.ResxBusinessExceptionWithCodeFromCustomResx);
+        var response = await client.GetAsync(EndpointPath.Test.Prefix + EndpointPath.Test.ResxBusinessExceptionWithCodeFromCustomResx);
         
         response.StatusCode
             .Should()
@@ -75,7 +68,7 @@ public class DependencyInjectionTests : TestBase
     public async Task Not_get_message_from_custom_resx_or_built_in_resx_when_the_code_is_not_key_of_any_resx(
         string languageCode)
     {
-        _testWebApplicationFactory = new TestWebApplicationFactory(services =>
+        var testWebApplicationFactory = new TestWebApplicationFactory(services =>
         {
             services.AddCrossValidation(options =>
             {
@@ -84,10 +77,10 @@ public class DependencyInjectionTests : TestBase
                 options.AddResx<ErrorResource1>();
             });
         });
-        _client = _testWebApplicationFactory.CreateClient();
-        _client.DefaultRequestHeaders.Add("Accept-Language", languageCode);
+        var client = testWebApplicationFactory.CreateClient();
+        client.DefaultRequestHeaders.Add("Accept-Language", languageCode);
         
-        var response = await _client.GetAsync(EndpointPath.Test.Prefix + EndpointPath.Test.ExceptionWithCodeWithoutResxKey);
+        var response = await client.GetAsync(EndpointPath.Test.Prefix + EndpointPath.Test.ExceptionWithCodeWithoutResxKey);
         
         response.StatusCode
             .Should()
@@ -108,7 +101,10 @@ public class DependencyInjectionTests : TestBase
     [Fact]
     public async Task Error_with_code_without_a_resx_key_have_null_message()
     {
-        var response = await _client.GetAsync(EndpointPath.Test.Prefix + EndpointPath.Test.ExceptionWithCodeWithoutResxKey);
+        var testWebApplicationFactory = new TestWebApplicationFactory(services => services
+            .AddCrossValidation());
+        var client = testWebApplicationFactory.CreateClient();
+        var response = await client.GetAsync(EndpointPath.Test.Prefix + EndpointPath.Test.ExceptionWithCodeWithoutResxKey);
         
         response.StatusCode
             .Should()
@@ -131,7 +127,7 @@ public class DependencyInjectionTests : TestBase
     [InlineData("es", "NotNull reemplazado")]
     public async Task Get_replaced_message_when_built_in_code_is_replaced_with_custom_resx(string languageCode, string expectedMessage)
     {
-        _testWebApplicationFactory = new TestWebApplicationFactory(services =>
+        var testWebApplicationFactory = new TestWebApplicationFactory(services =>
         {
             services.AddCrossValidation(options =>
             {
@@ -140,11 +136,10 @@ public class DependencyInjectionTests : TestBase
                 options.AddResx<ErrorResource1>();
             });
         });
-        _client = _testWebApplicationFactory.CreateClient();
+        var client = testWebApplicationFactory.CreateClient();
+        client.DefaultRequestHeaders.Add("Accept-Language", languageCode);
         
-        _client.DefaultRequestHeaders.Add("Accept-Language", languageCode);
-        
-        var response = await _client.GetAsync(EndpointPath.Test.Prefix + EndpointPath.Test.ReplaceBuiltInCodeWithCustomResx);
+        var response = await client.GetAsync(EndpointPath.Test.Prefix + EndpointPath.Test.ReplaceBuiltInCodeWithCustomResx);
         
         response.StatusCode
             .Should()
@@ -165,15 +160,15 @@ public class DependencyInjectionTests : TestBase
     [Fact]
     public async Task Get_default_culture_message_when_the_culture_provided_is_not_present()
     {
-        _testWebApplicationFactory = new TestWebApplicationFactory(services =>
+        var testWebApplicationFactory = new TestWebApplicationFactory(services =>
         {
             services.AddCrossValidation(options =>
                 options.AddResx<ErrorResource1>());
         });
-        _client = _testWebApplicationFactory.CreateClient();
-        _client.DefaultRequestHeaders.Add("Accept-Language", "fr");
+        var client = testWebApplicationFactory.CreateClient();
+        client.DefaultRequestHeaders.Add("Accept-Language", "fr");
         
-        var response = await _client.GetAsync(EndpointPath.Test.Prefix + EndpointPath.Test.DefaultCultureMessage);
+        var response = await client.GetAsync(EndpointPath.Test.Prefix + EndpointPath.Test.DefaultCultureMessage);
         
         response.StatusCode
             .Should()
@@ -194,7 +189,10 @@ public class DependencyInjectionTests : TestBase
     [Fact]
     public async Task Get_exception_status_code()
     {
-        var response = await _client.GetAsync(EndpointPath.Test.Prefix + EndpointPath.Test.BusinessExceptionWithStatusCodeWithMapping);
+        var testWebApplicationFactory = new TestWebApplicationFactory(services => services
+            .AddCrossValidation());
+        var client = testWebApplicationFactory.CreateClient();
+        var response = await client.GetAsync(EndpointPath.Test.Prefix + EndpointPath.Test.BusinessExceptionWithStatusCodeWithMapping);
         
         response.StatusCode
             .Should()
@@ -208,9 +206,12 @@ public class DependencyInjectionTests : TestBase
     [Fact]
     public async Task Get_message_in_default_culture_when_a_built_in_language_is_requested_but_not_customized()
     {
-        _client.DefaultRequestHeaders.Add("Accept-Language", "es");
+        var testWebApplicationFactory = new TestWebApplicationFactory(services => services
+            .AddCrossValidation());
+        var client = testWebApplicationFactory.CreateClient();
+        client.DefaultRequestHeaders.Add("Accept-Language", "es");
         
-        var response = await _client.GetAsync(EndpointPath.Test.Prefix + EndpointPath.Test.DefaultCultureMessage);
+        var response = await client.GetAsync(EndpointPath.Test.Prefix + EndpointPath.Test.DefaultCultureMessage);
         
         response.StatusCode
             .Should()
@@ -231,18 +232,17 @@ public class DependencyInjectionTests : TestBase
     [Fact]
     public async Task Get_message_in_requested_culture_when_a_built_in_language_is_requested_and_customized()
     {
-        _testWebApplicationFactory = new TestWebApplicationFactory(services =>
+        var testWebApplicationFactory = new TestWebApplicationFactory(services =>
         {
             services.AddCrossValidation(options => options
                 .SetDefaultCulture("en")
                 .SetSupportedCultures("en", "es")
                 .AddResx<ErrorResource1>());
         });
-        _client = _testWebApplicationFactory.CreateClient();
+        var client = testWebApplicationFactory.CreateClient();
+        client.DefaultRequestHeaders.Add("Accept-Language", "es");
         
-        _client.DefaultRequestHeaders.Add("Accept-Language", "es");
-        
-        var response = await _client.GetAsync(EndpointPath.Test.Prefix + EndpointPath.Test.DefaultCultureMessage);
+        var response = await client.GetAsync(EndpointPath.Test.Prefix + EndpointPath.Test.DefaultCultureMessage);
         
         response.StatusCode
             .Should()
@@ -263,9 +263,12 @@ public class DependencyInjectionTests : TestBase
     [Fact]
     public async Task Get_message_in_parent_culture_when_requested_culture_is_not_supported()
     {
-        _client.DefaultRequestHeaders.Add("Accept-Language", "en-IE");
+        var testWebApplicationFactory = new TestWebApplicationFactory(services => services
+            .AddCrossValidation());
+        var client = testWebApplicationFactory.CreateClient();
+        client.DefaultRequestHeaders.Add("Accept-Language", "en-IE");
         
-        var response = await _client.GetAsync(EndpointPath.Test.Prefix + EndpointPath.Test.DefaultCultureMessage);
+        var response = await client.GetAsync(EndpointPath.Test.Prefix + EndpointPath.Test.DefaultCultureMessage);
         
         response.StatusCode
             .Should()
@@ -288,15 +291,15 @@ public class DependencyInjectionTests : TestBase
     [InlineData("es", "Hola")]
     public async Task Get_message_from_resx_associated_culture(string languageCode, string expectedMessage)
     {
-        _testWebApplicationFactory = new TestWebApplicationFactory(services =>
+        var testWebApplicationFactory = new TestWebApplicationFactory(services =>
         {
             services.AddCrossValidation(options =>
                 options.AddResxAndAssociatedCultures<ErrorResource1>());
         });
-        _client = _testWebApplicationFactory.CreateClient();
-        _client.DefaultRequestHeaders.Add("Accept-Language", languageCode);
+        var client = testWebApplicationFactory.CreateClient();
+        client.DefaultRequestHeaders.Add("Accept-Language", languageCode);
         
-        var response = await _client.GetAsync(EndpointPath.Test.Prefix + EndpointPath.Test.ResxBusinessExceptionWithCodeFromCustomResx);
+        var response = await client.GetAsync(EndpointPath.Test.Prefix + EndpointPath.Test.ResxBusinessExceptionWithCodeFromCustomResx);
         
         response.StatusCode
             .Should()
@@ -319,7 +322,7 @@ public class DependencyInjectionTests : TestBase
     [InlineData("es", "Hola")]
     public async Task Get_message_from_resx_when_several_resx_and_associated_cultures_are_added(string languageCode, string expectedMessage)
     {
-        _testWebApplicationFactory = new TestWebApplicationFactory(services =>
+        var testWebApplicationFactory = new TestWebApplicationFactory(services =>
         {
             services.AddCrossValidation(options =>
             {
@@ -327,10 +330,10 @@ public class DependencyInjectionTests : TestBase
                 options.AddResxAndAssociatedCultures<ErrorResource2>();
             });
         });
-        _client = _testWebApplicationFactory.CreateClient();
-        _client.DefaultRequestHeaders.Add("Accept-Language", languageCode);
+        var client = testWebApplicationFactory.CreateClient();
+        client.DefaultRequestHeaders.Add("Accept-Language", languageCode);
         
-        var response = await _client.GetAsync(EndpointPath.Test.Prefix + EndpointPath.Test.ResxBusinessExceptionWithCodeFromCustomResx);
+        var response = await client.GetAsync(EndpointPath.Test.Prefix + EndpointPath.Test.ResxBusinessExceptionWithCodeFromCustomResx);
         
         response.StatusCode
             .Should()
@@ -353,17 +356,17 @@ public class DependencyInjectionTests : TestBase
     [InlineData("es", "El valor es 3,3")]
     public async Task Get_message_with_decimal(string languageCode, string expectedMessage)
     {
-        _testWebApplicationFactory = new TestWebApplicationFactory(services =>
+        var testWebApplicationFactory = new TestWebApplicationFactory(services =>
         {
             services.AddCrossValidation(options =>
             {
                 options.AddResxAndAssociatedCultures<ErrorResource1>();
             });
         });
-        _client = _testWebApplicationFactory.CreateClient();
-        _client.DefaultRequestHeaders.Add("Accept-Language", languageCode);
+        var client = testWebApplicationFactory.CreateClient();
+        client.DefaultRequestHeaders.Add("Accept-Language", languageCode);
         
-        var response = await _client.GetAsync(EndpointPath.Test.Prefix + EndpointPath.Test.UseDecimal);
+        var response = await client.GetAsync(EndpointPath.Test.Prefix + EndpointPath.Test.UseDecimal);
         
         response.StatusCode
             .Should()
@@ -378,16 +381,16 @@ public class DependencyInjectionTests : TestBase
     [Fact]
     public async Task Get_placeholders_from_FrontBusinessException()
     {
-        _testWebApplicationFactory = new TestWebApplicationFactory(services =>
+        var testWebApplicationFactory = new TestWebApplicationFactory(services =>
         {
             services.AddCrossValidation(options =>
             {
                 options.AddResxAndAssociatedCultures<ErrorResource1>();
             });
         });
-        _client = _testWebApplicationFactory.CreateClient();
+        var client = testWebApplicationFactory.CreateClient();
         
-        var response = await _client.GetAsync(EndpointPath.Test.Prefix + EndpointPath.Test.FrontBusinessExceptionWithPlaceholders);
+        var response = await client.GetAsync(EndpointPath.Test.Prefix + EndpointPath.Test.FrontBusinessExceptionWithPlaceholders);
         
         response.StatusCode
             .Should()
@@ -425,16 +428,16 @@ public class DependencyInjectionTests : TestBase
     [Fact]
     public async Task Get_code_from_ResxBusinessException()
     {
-        _testWebApplicationFactory = new TestWebApplicationFactory(services =>
+        var testWebApplicationFactory = new TestWebApplicationFactory(services =>
         {
             services.AddCrossValidation(options =>
             {
                 options.AddResxAndAssociatedCultures<ErrorResource1>();
             });
         });
-        _client = _testWebApplicationFactory.CreateClient();
+        var client = testWebApplicationFactory.CreateClient();
         
-        var response = await _client.GetAsync(EndpointPath.Test.Prefix + EndpointPath.Test.ResxBusinessException);
+        var response = await client.GetAsync(EndpointPath.Test.Prefix + EndpointPath.Test.ResxBusinessException);
         
         var problemDetails = await GetProblemDetailsFromResponse(response);
         var error = problemDetails.Errors!.First();
@@ -449,16 +452,16 @@ public class DependencyInjectionTests : TestBase
     [Fact(Skip = "TODO")]
     public async Task Get_code_url_when_publication_url_is_specified()
     {
-        _testWebApplicationFactory = new TestWebApplicationFactory(services =>
+        var testWebApplicationFactory = new TestWebApplicationFactory(services =>
         {
             services.AddCrossValidation(options =>
             {
                 options.EnableErrorCodePage(publicationUrl: "https://www.backend.com");
             });
         });
-        _client = _testWebApplicationFactory.CreateClient();
+        var client = testWebApplicationFactory.CreateClient();
         
-        var response = await _client.GetAsync(EndpointPath.Test.Prefix + EndpointPath.Test.ResxBusinessException);
+        var response = await client.GetAsync(EndpointPath.Test.Prefix + EndpointPath.Test.ResxBusinessException);
         
         var problemDetails = await GetProblemDetailsFromResponse(response);
         var error = problemDetails.Errors!.First();
@@ -473,14 +476,14 @@ public class DependencyInjectionTests : TestBase
     [Fact(Skip = "TODO")]
     public async Task Get_code_url_when_publication_url_is_specified_and_environment_is_development()
     {
-        _testWebApplicationFactory = new TestWebApplicationFactory(services =>
+        var testWebApplicationFactory = new TestWebApplicationFactory(services =>
         {
             services.AddCrossValidation(options => options
                 .EnableErrorCodePage());
         });
-        _client = _testWebApplicationFactory.CreateClient();
+        var client = testWebApplicationFactory.CreateClient();
         
-        var response = await _client.GetAsync(EndpointPath.Test.Prefix + EndpointPath.Test.ResxBusinessException);
+        var response = await client.GetAsync(EndpointPath.Test.Prefix + EndpointPath.Test.ResxBusinessException);
         
         var problemDetails = await GetProblemDetailsFromResponse(response);
         var error = problemDetails.Errors!.First();
@@ -497,7 +500,7 @@ public class DependencyInjectionTests : TestBase
     [InlineData(true)]
     public async Task Get_error_code_page_when_it_is_enabled(bool isEnabled)
     {
-        _testWebApplicationFactory = new TestWebApplicationFactory(services =>
+        var testWebApplicationFactory = new TestWebApplicationFactory(services =>
         {
             services.AddCrossValidation(options =>
             {
@@ -507,9 +510,9 @@ public class DependencyInjectionTests : TestBase
                 }
             });
         });
-        _client = _testWebApplicationFactory.CreateClient();
+        var client = testWebApplicationFactory.CreateClient();
         
-        var response = await _client.GetAsync(CrossValidationOptions.ErrorCodePagePath);
+        var response = await client.GetAsync(CrossValidationOptions.ErrorCodePagePath);
 
         var body = await response.Content.ReadAsStringAsync();
 
@@ -560,14 +563,14 @@ public class DependencyInjectionTests : TestBase
     {
         async Task Test(string environment)
         {
-            _testWebApplicationFactory = new TestWebApplicationFactory(services =>
+            var testWebApplicationFactory = new TestWebApplicationFactory(services =>
             {
                 services.AddCrossValidation(options => options
                     .EnableErrorCodePage());
             }).WithWebHostBuilder(builder => builder.UseEnvironment(environment));
-            _client = _testWebApplicationFactory.CreateClient();
+            var client = testWebApplicationFactory.CreateClient();
         
-            var response = await _client.GetAsync(EndpointPath.Test.Prefix + endpointPath);
+            var response = await client.GetAsync(EndpointPath.Test.Prefix + endpointPath);
         
             var problemDetails = await GetProblemDetailsFromResponse(response);
             problemDetails.Status
@@ -592,14 +595,14 @@ public class DependencyInjectionTests : TestBase
     {
         async Task Test(string environment)
         {
-            _testWebApplicationFactory = new TestWebApplicationFactory(services =>
+            var testWebApplicationFactory = new TestWebApplicationFactory(services =>
             {
                 services.AddCrossValidation(options => options
                     .EnableErrorCodePage());
             }).WithWebHostBuilder(builder => builder.UseEnvironment(environment));
-            _client = _testWebApplicationFactory.CreateClient();
+            var client = testWebApplicationFactory.CreateClient();
         
-            var response = await _client.GetAsync(EndpointPath.Test.Prefix + endpointPath);
+            var response = await client.GetAsync(EndpointPath.Test.Prefix + endpointPath);
         
             var problemDetails = await GetProblemDetailsFromResponse(response);
 
@@ -645,6 +648,29 @@ public class DependencyInjectionTests : TestBase
 
         await Test(TestEnvironment.Development);
         await Test(TestEnvironment.Production);
+    }
+
+    [Fact]
+    public async Task Return_default_http_response_when_http_response_customizers_are_disabled()
+    {
+        var testWebApplicationFactory = new TestWebApplicationFactory(services =>
+        {
+            services.AddCrossValidation(options => options
+                .NotCustomizeHttpResponse());
+        });
+        var client = testWebApplicationFactory.CreateClient();
+        
+        var response = await client.GetAsync(EndpointPath.Test.Prefix + EndpointPath.Test.BusinessException);
+        
+        response.StatusCode
+            .Should()
+            .Be(HttpStatusCode.InternalServerError);
+        response.Content
+            .Headers
+            .ToDictionary()["Content-Type"]
+            .First()
+            .Should()
+            .Be("text/plain; charset=utf-8");
     }
 
     private async Task<CrossValidationProblemDetails> GetProblemDetailsFromResponse(HttpResponseMessage response)
