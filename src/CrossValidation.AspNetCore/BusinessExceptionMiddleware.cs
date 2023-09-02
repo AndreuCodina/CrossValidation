@@ -34,7 +34,7 @@ internal class BusinessExceptionMiddleware(IProblemDetailsService problemDetails
 
     private async Task WriteResponse(IProblemDetailsService problemDetailsService, HttpContext context, Exception exception)
     {
-        await problemDetailsService.WriteAsync(new ProblemDetailsContext()
+        await problemDetailsService.WriteAsync(new ProblemDetailsContext
         {
             HttpContext = context,
             Exception = exception,
