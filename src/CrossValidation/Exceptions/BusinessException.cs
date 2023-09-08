@@ -7,7 +7,7 @@ namespace CrossValidation.Exceptions;
 public class BusinessException : Exception
 {
     private const string DefaultPlaceholderValue = "";
-    private static readonly Regex PlaceholderRegex = new("{([^{}:]+)}", RegexOptions.Compiled);
+    private static readonly Regex PlaceholderRegex = new(@"\{([^{}]+)\}", RegexOptions.Compiled);
 
     public override string Message => FormattedMessage;
     public string? Code { get; set;  } 
