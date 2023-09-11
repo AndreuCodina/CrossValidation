@@ -1,4 +1,5 @@
-﻿using System.Resources;
+﻿using System.Collections.Frozen;
+using System.Resources;
 using CrossValidation.Resources;
 
 namespace CrossValidation;
@@ -11,18 +12,29 @@ public static class CrossValidationOptions
     /// <summary>
     /// Generates placeholders when they are not added
     /// </summary>
-    public static bool LocalizeCommonErrorsInFront { get; set; } = SetDefaultLocalizeCommonErrorsInFront();
-    public static List<ResourceManager> ResourceManagers { get; set; } = SetDefaultResourceManager();
-    public static bool CustomizeHttpResponse { get; set; } = SetDefaultCustomizeHttpResponse();
-    public static string DefaultCultureCode { get; set; } = SetDefaultCultureCode();
-    public static List<string> SupportedCultureCodes { get; set; } = SetDefaultSupportedCultureCodes();
-    public static bool IsErrorCodePageEnabled { get; set; } = SetDefaultIsErrorCodePageEnabled();
-    public static string? PublicationUrl { get; set; } = SetDefaultPublicationUrl();
+    public static bool LocalizeCommonErrorsInFront { get; set; }
+    public static FrozenSet<ResourceManager> ResourceManagers { get; set; }
+    public static bool CustomizeHttpResponse { get; set; }
+    public static string DefaultCultureCode { get; set; }
+    public static List<string> SupportedCultureCodes { get; set; }
+    public static bool IsErrorCodePageEnabled { get; set; }
+    public static string? PublicationUrl { get; set; }
 
+    static CrossValidationOptions()
+    {
+        LocalizeCommonErrorsInFront = SetDefaultLocalizeCommonErrorsInFront();
+        ResourceManagers = SetDefaultResourceManagers();
+        CustomizeHttpResponse = SetDefaultCustomizeHttpResponse();
+        DefaultCultureCode = SetDefaultCultureCode();
+        SupportedCultureCodes = SetDefaultSupportedCultureCodes();
+        IsErrorCodePageEnabled = SetDefaultIsErrorCodePageEnabled();
+        PublicationUrl = SetDefaultPublicationUrl();
+    }
+    
     public static void SetDefaultOptions()
     {
         LocalizeCommonErrorsInFront = SetDefaultLocalizeCommonErrorsInFront();
-        ResourceManagers = SetDefaultResourceManager();
+        ResourceManagers = SetDefaultResourceManagers();
         CustomizeHttpResponse = SetDefaultCustomizeHttpResponse();
         DefaultCultureCode = SetDefaultCultureCode();
         SupportedCultureCodes = SetDefaultSupportedCultureCodes();
@@ -35,8 +47,9 @@ public static class CrossValidationOptions
         var resourceType = typeof(TResourceFile);
         var resourceBaseName = resourceType.FullName!;
         var resourceManager = new ResourceManager(resourceBaseName, resourceType.Assembly);
-        ResourceManagers = ResourceManagers.Prepend(resourceManager)
-            .ToList();
+        ResourceManagers = ResourceManagers.ToList()
+            .Prepend(resourceManager)
+            .ToFrozenSet();
     }
     
     public static string GetMessageFromCode(string code)
@@ -61,12 +74,13 @@ public static class CrossValidationOptions
         return false;
     }
     
-    private static List<ResourceManager> SetDefaultResourceManager()
+    private static FrozenSet<ResourceManager> SetDefaultResourceManagers()
     {
         var resourceType = typeof(ErrorResource);
         var resourceBaseName = resourceType.FullName!;
         var resourceManager = new ResourceManager(resourceBaseName, resourceType.Assembly);
-        return new List<ResourceManager> {resourceManager};
+        return new List<ResourceManager> { resourceManager }
+            .ToFrozenSet();
     }
     
     private static bool SetDefaultCustomizeHttpResponse()
