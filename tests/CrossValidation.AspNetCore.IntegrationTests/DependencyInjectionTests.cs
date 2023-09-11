@@ -38,7 +38,7 @@ public class DependencyInjectionTests : TestBase
             {
                 options.SetDefaultCulture("en");
                 options.SetSupportedCultures("en", "es");
-                options.AddResx<ErrorResource1>();
+                options.AddResxWithoutAddingAssociatedCultures<ErrorResource1>();
             });
         });
         var client = testWebApplicationFactory.CreateClient();
@@ -74,7 +74,7 @@ public class DependencyInjectionTests : TestBase
             {
                 options.SetDefaultCulture("en");
                 options.SetSupportedCultures("en", "es");
-                options.AddResx<ErrorResource1>();
+                options.AddResxWithoutAddingAssociatedCultures<ErrorResource1>();
             });
         });
         var client = testWebApplicationFactory.CreateClient();
@@ -133,7 +133,7 @@ public class DependencyInjectionTests : TestBase
             {
                 options.SetDefaultCulture("en");
                 options.SetSupportedCultures("en", "es");
-                options.AddResx<ErrorResource1>();
+                options.AddResxWithoutAddingAssociatedCultures<ErrorResource1>();
             });
         });
         var client = testWebApplicationFactory.CreateClient();
@@ -163,7 +163,7 @@ public class DependencyInjectionTests : TestBase
         var testWebApplicationFactory = new TestWebApplicationFactory(services =>
         {
             services.AddCrossValidation(options =>
-                options.AddResx<ErrorResource1>());
+                options.AddResxWithoutAddingAssociatedCultures<ErrorResource1>());
         });
         var client = testWebApplicationFactory.CreateClient();
         client.DefaultRequestHeaders.Add("Accept-Language", "fr");
@@ -237,7 +237,7 @@ public class DependencyInjectionTests : TestBase
             services.AddCrossValidation(options => options
                 .SetDefaultCulture("en")
                 .SetSupportedCultures("en", "es")
-                .AddResx<ErrorResource1>());
+                .AddResxWithoutAddingAssociatedCultures<ErrorResource1>());
         });
         var client = testWebApplicationFactory.CreateClient();
         client.DefaultRequestHeaders.Add("Accept-Language", "es");
@@ -294,7 +294,7 @@ public class DependencyInjectionTests : TestBase
         var testWebApplicationFactory = new TestWebApplicationFactory(services =>
         {
             services.AddCrossValidation(options =>
-                options.AddResxAndAssociatedCultures<ErrorResource1>());
+                options.AddResx<ErrorResource1>());
         });
         var client = testWebApplicationFactory.CreateClient();
         client.DefaultRequestHeaders.Add("Accept-Language", languageCode);
@@ -326,8 +326,8 @@ public class DependencyInjectionTests : TestBase
         {
             services.AddCrossValidation(options =>
             {
-                options.AddResxAndAssociatedCultures<ErrorResource1>();
-                options.AddResxAndAssociatedCultures<ErrorResource2>();
+                options.AddResx<ErrorResource1>();
+                options.AddResx<ErrorResource2>();
             });
         });
         var client = testWebApplicationFactory.CreateClient();
@@ -360,7 +360,7 @@ public class DependencyInjectionTests : TestBase
         {
             services.AddCrossValidation(options =>
             {
-                options.AddResxAndAssociatedCultures<ErrorResource1>();
+                options.AddResx<ErrorResource1>();
             });
         });
         var client = testWebApplicationFactory.CreateClient();
@@ -385,7 +385,7 @@ public class DependencyInjectionTests : TestBase
         {
             services.AddCrossValidation(options =>
             {
-                options.AddResxAndAssociatedCultures<ErrorResource1>();
+                options.AddResx<ErrorResource1>();
             });
         });
         var client = testWebApplicationFactory.CreateClient();
@@ -432,7 +432,7 @@ public class DependencyInjectionTests : TestBase
         {
             services.AddCrossValidation(options =>
             {
-                options.AddResxAndAssociatedCultures<ErrorResource1>();
+                options.AddResx<ErrorResource1>();
             });
         });
         var client = testWebApplicationFactory.CreateClient();

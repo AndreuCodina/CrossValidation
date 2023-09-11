@@ -12,7 +12,7 @@ public static class CrossValidationOptions
     /// Generates placeholders when they are not added
     /// </summary>
     public static bool LocalizeCommonErrorsInFront { get; set; } = SetDefaultLocalizeCommonErrorsInFront();
-    public static List<ResourceManager> ResourceManagers { get; set; } = SetDefaultResourceManager();
+    public static List<ResourceManager> ResourceManagers { get; set; } = SetDefaultResourceManagers();
     public static bool CustomizeHttpResponse { get; set; } = SetDefaultCustomizeHttpResponse();
     public static string DefaultCultureCode { get; set; } = SetDefaultCultureCode();
     public static List<string> SupportedCultureCodes { get; set; } = SetDefaultSupportedCultureCodes();
@@ -22,7 +22,7 @@ public static class CrossValidationOptions
     public static void SetDefaultOptions()
     {
         LocalizeCommonErrorsInFront = SetDefaultLocalizeCommonErrorsInFront();
-        ResourceManagers = SetDefaultResourceManager();
+        ResourceManagers = SetDefaultResourceManagers();
         CustomizeHttpResponse = SetDefaultCustomizeHttpResponse();
         DefaultCultureCode = SetDefaultCultureCode();
         SupportedCultureCodes = SetDefaultSupportedCultureCodes();
@@ -61,7 +61,7 @@ public static class CrossValidationOptions
         return false;
     }
     
-    private static List<ResourceManager> SetDefaultResourceManager()
+    private static List<ResourceManager> SetDefaultResourceManagers()
     {
         var resourceType = typeof(ErrorResource);
         var resourceBaseName = resourceType.FullName!;
