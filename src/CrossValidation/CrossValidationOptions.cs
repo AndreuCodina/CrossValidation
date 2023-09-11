@@ -76,10 +76,11 @@ public static class CrossValidationOptions
     
     private static FrozenSet<ResourceManager> SetDefaultResourceManagers()
     {
-        ResourceManagers = new List<ResourceManager>()
+        var resourceType = typeof(ErrorResource);
+        var resourceBaseName = resourceType.FullName!;
+        var resourceManager = new ResourceManager(resourceBaseName, resourceType.Assembly);
+        return new List<ResourceManager> { resourceManager }
             .ToFrozenSet();
-        AddResourceManager<ErrorResource>();
-        return ResourceManagers;
     }
     
     private static bool SetDefaultCustomizeHttpResponse()

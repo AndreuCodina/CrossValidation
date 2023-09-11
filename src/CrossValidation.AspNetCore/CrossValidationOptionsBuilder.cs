@@ -10,15 +10,18 @@ public class CrossValidationOptionsBuilder
         return this;
     }
     
-    public CrossValidationOptionsBuilder AddResx<TResourceFile>()
+    public CrossValidationOptionsBuilder AddResxWithoutAddingAssociatedCultures<TResourceFile>()
     {
         CrossValidationOptions.AddResourceManager<TResourceFile>();
         return this;
     }
     
-    public CrossValidationOptionsBuilder AddResxAndAssociatedCultures<TResourceFile>()
+    /// <summary>
+    /// Adds the resource file and its associated cultures
+    /// </summary>
+    public CrossValidationOptionsBuilder AddResx<TResourceFile>()
     {
-        AddResx<TResourceFile>();
+        AddResxWithoutAddingAssociatedCultures<TResourceFile>();
         var supportedCultureCodes = new HashSet<string>(CrossValidationOptions.SupportedCultureCodes);
         var resourceType = typeof(TResourceFile);
         var resourceBaseName = resourceType.FullName;
