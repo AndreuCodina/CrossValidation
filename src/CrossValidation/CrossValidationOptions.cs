@@ -76,11 +76,10 @@ public static class CrossValidationOptions
     
     private static FrozenSet<ResourceManager> SetDefaultResourceManagers()
     {
-        var resourceType = typeof(ErrorResource);
-        var resourceBaseName = resourceType.FullName!;
-        var resourceManager = new ResourceManager(resourceBaseName, resourceType.Assembly);
-        return new List<ResourceManager> { resourceManager }
+        ResourceManagers = new List<ResourceManager>()
             .ToFrozenSet();
+        AddResourceManager<ErrorResource>();
+        return ResourceManagers;
     }
     
     private static bool SetDefaultCustomizeHttpResponse()
@@ -95,7 +94,7 @@ public static class CrossValidationOptions
     
     private static List<string> SetDefaultSupportedCultureCodes()
     {
-        return new() {_defaultCultureCode};
+        return new() { _defaultCultureCode };
     }
     
     private static bool SetDefaultIsErrorCodePageEnabled()
