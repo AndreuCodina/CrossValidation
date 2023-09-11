@@ -473,14 +473,16 @@ public class DependencyInjectionTests : TestBase
             .Be($"https://www.backend.com/{CrossValidationOptions.ErrorCodePagePath}#Key");
     }
     
-    [Fact]
-    public async Task Get_code_url_when_publication_url_is_specified_and_environment_is_development()
+    [Theory]
+    [InlineData(TestEnvironment.Development, $"http://localhost/{CrossValidationOptions.ErrorCodePagePath}#Key")]
+    [InlineData(TestEnvironment.Production, null)]
+    public async Task Get_code_url_when_publication_url_is_not_specified(string environment, string? expectedCodeUrl)
     {
         var testWebApplicationFactory = new TestWebApplicationFactory(services =>
         {
             services.AddCrossValidation(options => options
                 .EnableErrorCodePage());
-        });
+        }).WithWebHostBuilder(builder => builder.UseEnvironment(environment));
         var client = testWebApplicationFactory.CreateClient();
         
         var response = await client.GetAsync(EndpointPath.Test.Prefix + EndpointPath.Test.ResxBusinessException);
@@ -492,7 +494,7 @@ public class DependencyInjectionTests : TestBase
             .Be(nameof(ErrorResourceWithNoResx.Key));
         error.CodeUrl
             .Should()
-            .Be($"http://localhost/{CrossValidationOptions.ErrorCodePagePath}#Key");
+            .Be(expectedCodeUrl);
     }
     
     [Theory]
