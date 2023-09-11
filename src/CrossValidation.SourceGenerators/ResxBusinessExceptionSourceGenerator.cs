@@ -42,7 +42,10 @@ public class ResxBusinessExceptionSourceGenerator : IIncrementalGenerator
 
         var attributeContainingTypeSymbol = symbol.ContainingNamespace;
 
-        if (attributeContainingTypeSymbol is null) return null;
+        if (attributeContainingTypeSymbol is null)
+        {
+            return null;
+        }
         
         cancellationToken.ThrowIfCancellationRequested();
         return new ResxBusinessExceptionInformation(classSyntax, symbol);
@@ -70,8 +73,10 @@ public class ResxBusinessExceptionSourceGenerator : IIncrementalGenerator
             return false;
         }
         
-        var baseIdentifierNameSyntax = (IdentifierNameSyntax)baseList.Types[0].Type;
-        var baseClassName = baseIdentifierNameSyntax.Identifier.Text;
+        var baseIdentifierNameSyntax = (IdentifierNameSyntax)baseList.Types[0]
+            .Type;
+        var baseClassName = baseIdentifierNameSyntax.Identifier
+            .Text;
         return baseClassName is "ResxBusinessException" or "FrontBusinessException";
     }
     

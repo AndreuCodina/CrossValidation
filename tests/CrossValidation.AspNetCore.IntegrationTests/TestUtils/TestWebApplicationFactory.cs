@@ -4,17 +4,12 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace CrossValidation.AspNetCore.IntegrationTests.TestUtils;
 
-public class TestWebApplicationFactory : WebApplicationFactory<Program>
+public class TestWebApplicationFactory(Action<IServiceCollection>? services = null)
+    : WebApplicationFactory<Program>
 {
-    private readonly Action<IServiceCollection>? _services;
-
-    public TestWebApplicationFactory(Action<IServiceCollection>? services = null)
-    {
-        _services = services;
-    }
-
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
-        builder.ConfigureServices(services => _services?.Invoke(services));
+        builder.ConfigureServices(serviceCollection =>
+            services?.Invoke(serviceCollection));
     }
 }

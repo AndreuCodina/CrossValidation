@@ -8,8 +8,8 @@ public static partial class CommonException
 
     public class NullException() : BusinessException(code: nameof(ErrorResource.Null));
 
-    public class GreaterThanException<TField>(TField comparisonValue) :
-        BusinessException(code: nameof(ErrorResource.GreaterThan))
+    public class GreaterThanException<TField>(TField comparisonValue)
+        : BusinessException(code: nameof(ErrorResource.GreaterThan))
     {
         public TField ComparisonValue => comparisonValue;
         

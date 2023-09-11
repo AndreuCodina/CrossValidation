@@ -13,15 +13,23 @@ public static class CrossValidationBuilderExtensions
 {
     public static IApplicationBuilder UseCrossValidation(this WebApplication app)
     {
-        app.UseCustomRequestLocalization();
-        // app.UseGlobalExceptionMiddleware();
-        app.UseExceptionHandler();
-        app.UseStatusCodePages();
-        AddErrorCodePage(app);
+        UseCustomRequestLocalization(app);
+        UseHttpResponseCustomizers(app);
+        UseErrorCodePage(app);
         return app;
     }
 
-    private static void AddErrorCodePage(WebApplication app)
+    private static void UseHttpResponseCustomizers(WebApplication app)
+    {
+        if (CrossValidationOptions.CustomizeHttpResponse)
+        {
+            app.UseExceptionHandler();
+            UseBusinessExceptionMiddleware(app);
+            app.UseStatusCodePages();
+        }
+    }
+
+    private static void UseErrorCodePage(WebApplication app)
     {
         if (!CrossValidationOptions.IsErrorCodePageEnabled)
         {
@@ -78,13 +86,12 @@ public static class CrossValidationBuilderExtensions
         return TypedResults.Content(html.ToString(), MediaTypeNames.Text.Html);
     }
 
-    private static IApplicationBuilder UseGlobalExceptionMiddleware(this IApplicationBuilder app)
+    private static void UseBusinessExceptionMiddleware(IApplicationBuilder app)
     {
-        app.UseMiddleware<GlobalExceptionMiddleware>();
-        return app;
+        app.UseMiddleware<BusinessExceptionMiddleware>();
     }
     
-    private static IApplicationBuilder UseCustomRequestLocalization(this IApplicationBuilder app)
+    private static void UseCustomRequestLocalization(IApplicationBuilder app)
     {
         var supportedCultures = CrossValidationOptions.SupportedCultureCodes
             .Select(x => new CultureInfo(x))
@@ -102,6 +109,5 @@ public static class CrossValidationBuilderExtensions
             }
         };
         app.UseRequestLocalization(localizationOptions);
-        return app;
     }
 }

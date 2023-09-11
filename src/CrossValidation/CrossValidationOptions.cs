@@ -13,7 +13,7 @@ public static class CrossValidationOptions
     /// </summary>
     public static bool LocalizeCommonErrorsInFront { get; set; } = SetDefaultLocalizeCommonErrorsInFront();
     public static List<ResourceManager> ResourceManagers { get; set; } = SetDefaultResourceManager();
-    public static bool HandleUnknownException { get; set; } = SetDefaultHandleUnknownException();
+    public static bool CustomizeHttpResponse { get; set; } = SetDefaultCustomizeHttpResponse();
     public static string DefaultCultureCode { get; set; } = SetDefaultCultureCode();
     public static List<string> SupportedCultureCodes { get; set; } = SetDefaultSupportedCultureCodes();
     public static bool IsErrorCodePageEnabled { get; set; } = SetDefaultIsErrorCodePageEnabled();
@@ -23,7 +23,7 @@ public static class CrossValidationOptions
     {
         LocalizeCommonErrorsInFront = SetDefaultLocalizeCommonErrorsInFront();
         ResourceManagers = SetDefaultResourceManager();
-        HandleUnknownException = SetDefaultHandleUnknownException();
+        CustomizeHttpResponse = SetDefaultCustomizeHttpResponse();
         DefaultCultureCode = SetDefaultCultureCode();
         SupportedCultureCodes = SetDefaultSupportedCultureCodes();
         IsErrorCodePageEnabled = SetDefaultIsErrorCodePageEnabled();
@@ -69,7 +69,7 @@ public static class CrossValidationOptions
         return new List<ResourceManager> {resourceManager};
     }
     
-    private static bool SetDefaultHandleUnknownException()
+    private static bool SetDefaultCustomizeHttpResponse()
     {
         return true;
     }

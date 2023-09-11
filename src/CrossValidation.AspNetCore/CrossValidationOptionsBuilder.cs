@@ -47,9 +47,9 @@ public class CrossValidationOptionsBuilder
         return this;
     }
     
-    public CrossValidationOptionsBuilder NotHandleUnknownException()
+    public CrossValidationOptionsBuilder NotCustomizeHttpResponse()
     {
-        CrossValidationOptions.HandleUnknownException = false;
+        CrossValidationOptions.CustomizeHttpResponse = false;
         return this;
     }
     
