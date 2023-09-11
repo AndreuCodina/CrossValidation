@@ -449,7 +449,7 @@ public class DependencyInjectionTests : TestBase
             .Be(ErrorResourceWithNoResx.Key);
     }
     
-    [Fact(Skip = "TODO")]
+    [Fact]
     public async Task Get_code_url_when_publication_url_is_specified()
     {
         var testWebApplicationFactory = new TestWebApplicationFactory(services =>
@@ -470,10 +470,10 @@ public class DependencyInjectionTests : TestBase
             .Be(nameof(ErrorResourceWithNoResx.Key));
         error.CodeUrl
             .Should()
-            .Be($"https://www.backend.com{CrossValidationOptions.ErrorCodePagePath}#Key");
+            .Be($"https://www.backend.com/{CrossValidationOptions.ErrorCodePagePath}#Key");
     }
     
-    [Fact(Skip = "TODO")]
+    [Fact]
     public async Task Get_code_url_when_publication_url_is_specified_and_environment_is_development()
     {
         var testWebApplicationFactory = new TestWebApplicationFactory(services =>
@@ -492,10 +492,10 @@ public class DependencyInjectionTests : TestBase
             .Be(nameof(ErrorResourceWithNoResx.Key));
         error.CodeUrl
             .Should()
-            .Be($"http://localhost{CrossValidationOptions.ErrorCodePagePath}#Key");
+            .Be($"http://localhost/{CrossValidationOptions.ErrorCodePagePath}#Key");
     }
     
-    [Theory(Skip = "TODO")]
+    [Theory]
     [InlineData(false)]
     [InlineData(true)]
     public async Task Get_error_code_page_when_it_is_enabled(bool isEnabled)
@@ -514,9 +514,7 @@ public class DependencyInjectionTests : TestBase
         
         var response = await client.GetAsync(CrossValidationOptions.ErrorCodePagePath);
 
-        var body = await response.Content.ReadAsStringAsync();
-
-        AssertGet_error_code_page_when_it_is_enabled(isEnabled, body);
+        AssertGet_error_code_page_when_it_is_enabled(isEnabled, response);
     }
     
     [Theory]
@@ -684,17 +682,19 @@ public class DependencyInjectionTests : TestBase
         return problemDetails!;
     }
     
-    private void AssertGet_error_code_page_when_it_is_enabled(bool isEnabled, string body)
+    private void AssertGet_error_code_page_when_it_is_enabled(bool isEnabled, HttpResponseMessage response)
     {
         if (isEnabled)
         {
-            body.Should()
-                .NotBeEmpty();
+            response.StatusCode
+                .Should()
+                .Be(HttpStatusCode.OK);
         }
         else
         {
-            body.Should()
-                .BeEmpty();
+            response.StatusCode
+                .Should()
+                .Be(HttpStatusCode.NotFound);
         }
     }
 }

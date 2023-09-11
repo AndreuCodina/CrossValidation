@@ -54,7 +54,7 @@ internal class ProblemDetailsMapper(ProblemDetails problemDetails)
         var error = new CrossValidationProblemDetailsError
         {
             Code = exception.Code,
-            CodeUrl = null,
+            CodeUrl = exception.CodeUrl,
             Message = exception.Message == "" ? null : exception.Message,
             Details = exception.Details,
             FieldName = exception.FieldName,
@@ -89,34 +89,4 @@ internal class ProblemDetailsMapper(ProblemDetails problemDetails)
     {
         CrossValidationProblemDetailsDefaults.Apply(problemDetails, statusCode);
     }
-    
-    // private string? GetPublicationUrl(BusinessException exception, HttpContext context)
-    // {
-    //     string? baseUrl = null;
-    //     
-    //     if (!CrossValidationOptions.IsErrorCodePageEnabled || exception.Code is null)
-    //     {
-    //         return null;
-    //     }
-    //
-    //     if (CrossValidationOptions.PublicationUrl is not null)
-    //     {
-    //         baseUrl = CrossValidationOptions.PublicationUrl;
-    //     }
-    //     else if (_environment.IsDevelopment())
-    //     {
-    //         var protocol = context.Request.IsHttps ? "https" : "http";
-    //         var host = context.Request.Host.Value;
-    //         var port = context.Request.Host.Port is not null
-    //             ? $":{context.Request.Host.Port.Value}"
-    //             : null;
-    //         baseUrl = $"{protocol}://{host}{port}";
-    //     }
-    //     else
-    //     {
-    //         return null;
-    //     }
-    //     
-    //     return $"{baseUrl}{CrossValidationOptions.ErrorCodePagePath}#{exception.Code}";
-    // }
 }

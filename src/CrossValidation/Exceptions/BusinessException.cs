@@ -10,7 +10,8 @@ public class BusinessException : Exception
     private static readonly Regex PlaceholderRegex = new(@"\{([^{}]+)\}", RegexOptions.Compiled);
 
     public override string Message => FormattedMessage;
-    public string? Code { get; set;  } 
+    public string? Code { get; set;  }
+    public string? CodeUrl { get; set; }
     public string FormattedMessage { get; set; } = "";
     public int StatusCode { get; set; }
     public string? Details { get; set; }
