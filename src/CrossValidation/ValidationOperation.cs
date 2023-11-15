@@ -218,19 +218,17 @@ internal class ValidationOperation
         var exceptionToAdd = context.Exception ?? (Exception ?? exception);
         AddException(exceptionToAdd, context);
 
-        if (context is {ValidationMode: ValidationMode.StopOnFirstError})
+        if (context.ValidationMode is ValidationMode.StopOnFirstError
+            && context.ExceptionsCollected.Count == 1)
         {
-            if (context.ExceptionsCollected.Count == 1)
+            if (CustomExceptionToThrow is not null)
             {
-                if (CustomExceptionToThrow is not null)
-                {
-                    throw (Exception)Activator.CreateInstance(
-                        CustomExceptionToThrow,
-                        CreateParametrizedExceptionMessage(context.ExceptionsCollected[0]))!;
-                }
-                
-                throw context.ExceptionsCollected[0];
+                throw (Exception)Activator.CreateInstance(
+                    CustomExceptionToThrow,
+                    CreateParametrizedExceptionMessage(context.ExceptionsCollected[0]))!;
             }
+                
+            throw context.ExceptionsCollected[0];
         }
     }
     

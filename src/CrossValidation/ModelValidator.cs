@@ -38,8 +38,6 @@ public abstract class ModelValidator<TModel>
         string? fieldDisplayName = null,
         [CallerArgumentExpression(nameof(field))] string fieldName = default!)
     {
-        // if ()
-        
         var fieldPath = fieldName.Contains('.')
             ? fieldName.Substring(fieldName.IndexOf('.') + 1)
             : fieldName;
