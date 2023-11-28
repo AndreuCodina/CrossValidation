@@ -1,6 +1,6 @@
 ﻿using Common.Tests;
+using CrossValidation.ErrorResources;
 using CrossValidation.Exceptions;
-using CrossValidation.Resources;
 using Shouldly;
 using Xunit;
 

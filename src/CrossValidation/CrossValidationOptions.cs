@@ -1,6 +1,6 @@
 ﻿using System.Collections.Frozen;
 using System.Resources;
-using CrossValidation.Resources;
+using CrossValidation.ErrorResources;
 
 namespace CrossValidation;
 

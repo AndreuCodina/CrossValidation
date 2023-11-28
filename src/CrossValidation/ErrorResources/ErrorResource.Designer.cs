@@ -7,28 +7,25 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace CrossValidation.Resources {
-    using System;
-    
-    
+namespace CrossValidation.ErrorResources {
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
     [System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class ErrorResource_es {
+    public class ErrorResource {
         
         private static System.Resources.ResourceManager resourceMan;
         
         private static System.Globalization.CultureInfo resourceCulture;
         
         [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal ErrorResource_es() {
+        internal ErrorResource() {
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static System.Resources.ResourceManager ResourceManager {
+        public static System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.Equals(null, resourceMan)) {
-                    System.Resources.ResourceManager temp = new System.Resources.ResourceManager("CrossValidation.Resources.ErrorResource_es", typeof(ErrorResource_es).Assembly);
+                    System.Resources.ResourceManager temp = new System.Resources.ResourceManager("CrossValidation.ErrorResources.ErrorResource", typeof(ErrorResource).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -36,7 +33,7 @@ namespace CrossValidation.Resources {
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static System.Globalization.CultureInfo Culture {
+        public static System.Globalization.CultureInfo Culture {
             get {
                 return resourceCulture;
             }
@@ -45,147 +42,147 @@ namespace CrossValidation.Resources {
             }
         }
         
-        internal static string InclusiveLengthRange {
+        public static string InclusiveLengthRange {
             get {
                 return ResourceManager.GetString("InclusiveLengthRange", resourceCulture);
             }
         }
         
-        internal static string GreaterThan {
+        public static string GreaterThan {
             get {
                 return ResourceManager.GetString("GreaterThan", resourceCulture);
             }
         }
         
-        internal static string NotNull {
+        public static string NotNull {
             get {
                 return ResourceManager.GetString("NotNull", resourceCulture);
             }
         }
         
-        internal static string Enum {
+        public static string Enum {
             get {
                 return ResourceManager.GetString("Enum", resourceCulture);
             }
         }
         
-        internal static string Null {
+        public static string Null {
             get {
                 return ResourceManager.GetString("Null", resourceCulture);
             }
         }
         
-        internal static string MinimumLength {
+        public static string MinimumLength {
             get {
                 return ResourceManager.GetString("MinimumLength", resourceCulture);
             }
         }
         
-        internal static string RegularExpression {
+        public static string RegularExpression {
             get {
                 return ResourceManager.GetString("RegularExpression", resourceCulture);
             }
         }
         
-        internal static string Generic {
+        public static string Generic {
             get {
                 return ResourceManager.GetString("Generic", resourceCulture);
             }
         }
         
-        internal static string NotEmptyString {
+        public static string NotEmptyString {
             get {
                 return ResourceManager.GetString("NotEmptyString", resourceCulture);
             }
         }
         
-        internal static string EmptyString {
+        public static string EmptyString {
             get {
                 return ResourceManager.GetString("EmptyString", resourceCulture);
             }
         }
         
-        internal static string EmptyCollection {
+        public static string EmptyCollection {
             get {
                 return ResourceManager.GetString("EmptyCollection", resourceCulture);
             }
         }
         
-        internal static string NotEmptyCollection {
+        public static string NotEmptyCollection {
             get {
                 return ResourceManager.GetString("NotEmptyCollection", resourceCulture);
             }
         }
         
-        internal static string MaximumLength {
+        public static string MaximumLength {
             get {
                 return ResourceManager.GetString("MaximumLength", resourceCulture);
             }
         }
         
-        internal static string GreaterThanOrEqual {
+        public static string GreaterThanOrEqual {
             get {
                 return ResourceManager.GetString("GreaterThanOrEqual", resourceCulture);
             }
         }
         
-        internal static string LessThan {
+        public static string LessThan {
             get {
                 return ResourceManager.GetString("LessThan", resourceCulture);
             }
         }
         
-        internal static string LessThanOrEqual {
+        public static string LessThanOrEqual {
             get {
                 return ResourceManager.GetString("LessThanOrEqual", resourceCulture);
             }
         }
         
-        internal static string Equal {
+        public static string Equal {
             get {
                 return ResourceManager.GetString("Equal", resourceCulture);
             }
         }
         
-        internal static string NotEqual {
+        public static string NotEqual {
             get {
                 return ResourceManager.GetString("NotEqual", resourceCulture);
             }
         }
         
-        internal static string ExclusiveLengthRange {
+        public static string ExclusiveLengthRange {
             get {
                 return ResourceManager.GetString("ExclusiveLengthRange", resourceCulture);
             }
         }
         
-        internal static string MaximumItems {
-            get {
-                return ResourceManager.GetString("MaximumItems", resourceCulture);
-            }
-        }
-        
-        internal static string MinimumItems {
+        public static string MinimumItems {
             get {
                 return ResourceManager.GetString("MinimumItems", resourceCulture);
             }
         }
         
-        internal static string UniqueItems {
+        public static string MaximumItems {
             get {
-                return ResourceManager.GetString("UniqueItems", resourceCulture);
+                return ResourceManager.GetString("MaximumItems", resourceCulture);
             }
         }
         
-        internal static string ExclusiveRange {
+        public static string InclusiveRange {
+            get {
+                return ResourceManager.GetString("InclusiveRange", resourceCulture);
+            }
+        }
+        
+        public static string ExclusiveRange {
             get {
                 return ResourceManager.GetString("ExclusiveRange", resourceCulture);
             }
         }
         
-        internal static string InclusiveRange {
+        public static string UniqueItems {
             get {
-                return ResourceManager.GetString("InclusiveRange", resourceCulture);
+                return ResourceManager.GetString("UniqueItems", resourceCulture);
             }
         }
     }

@@ -2,7 +2,7 @@
 using System.Text.Json;
 using Common.Tests;
 using CrossValidation.AspNetCore.IntegrationTests.TestUtils;
-using CrossValidation.Resources;
+using CrossValidation.ErrorResources;
 using CrossValidation.WebApplication;
 using CrossValidation.WebApplication.Resources;
 using FluentAssertions;
