@@ -3,8 +3,8 @@
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
   </PropertyGroup>
   <ItemGroup>
-    <PackageVersion Include="BenchmarkDotNet.Annotations" Version="0.13.10" />
-    <PackageVersion Include="BenchmarkDotNet.Diagnostics.dotTrace" Version="0.13.10" />
+    <PackageVersion Include="BenchmarkDotNet.Annotations" Version="0.13.11" />
+    <PackageVersion Include="BenchmarkDotNet.Diagnostics.dotTrace" Version="0.13.11" />
     <PackageVersion Include="Bogus" Version="34.0.2" />
     <PackageVersion Include="FluentAssertions" Version="6.12.0" />
     <PackageVersion Include="FluentAssertions.Analyzers" Version="0.26.0">
@@ -25,7 +25,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageVersion>
     <PackageVersion Include="coverlet.collector" Version="6.0.0" />
-    <PackageVersion Include="BenchmarkDotNet" Version="0.13.10" />
+    <PackageVersion Include="BenchmarkDotNet" Version="0.13.11" />
     <PackageVersion Include="Microsoft.AspNetCore.Hosting.Abstractions" Version="2.2.0" />
     <PackageVersion Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
     <PackageVersion Include="Microsoft.AspNetCore.Localization" Version="2.2.0" />
